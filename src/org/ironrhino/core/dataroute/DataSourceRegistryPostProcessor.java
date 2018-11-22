@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.core.util.AppInfo;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -16,6 +15,8 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.ChildBeanDefinition;
 import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
 
 import lombok.Getter;
@@ -23,7 +24,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class DataSourceRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor {
+public class DataSourceRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor, EnvironmentAware {
 
 	public static final String KEY_SHARDING_HOSTS = "routingDataSource.shardingHosts";
 
@@ -32,6 +33,8 @@ public class DataSourceRegistryPostProcessor implements BeanDefinitionRegistryPo
 	public static final String KEY_SHARDING_VERSION = "routingDataSource.shardingGeneration";
 
 	public static final String KEY_JDBC_URL_FORMAT = "routingDataSource.jdbcUrlFormat";
+
+	private Environment env;
 
 	@Getter
 	@Setter
@@ -66,23 +69,28 @@ public class DataSourceRegistryPostProcessor implements BeanDefinitionRegistryPo
 	protected String jdbcUrlFormat;
 
 	@Override
+	public void setEnvironment(Environment env) {
+		this.env = env;
+	}
+
+	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
 		Assert.hasText(routingDataSourceName, "routingDataSourceName shouldn't be blank");
 		Assert.hasText(shardingParentName, "shardingParentName shouldn't be blank");
 		Assert.hasText(shardingNamePrefix, "shardingNamePrefix shouldn't be blank");
-		String str = AppInfo.getApplicationContextProperties().getProperty(KEY_SHARDING_HOSTS);
+		String str = env.getProperty(KEY_SHARDING_HOSTS);
 		if (str != null)
 			shardingHosts = parseHosts(str);
 		Assert.notEmpty(shardingHosts, "shardingHosts shouldn't be empty");
-		str = AppInfo.getApplicationContextProperties().getProperty(KEY_SHARDINGS_PER_HOST);
+		str = env.getProperty(KEY_SHARDINGS_PER_HOST);
 		if (str != null)
 			shardingsPerHost = Integer.valueOf(str);
 		if (shardingsPerHost <= 0)
 			shardingsPerHost = 1;
-		str = AppInfo.getApplicationContextProperties().getProperty(KEY_SHARDING_VERSION);
+		str = env.getProperty(KEY_SHARDING_VERSION);
 		if (str != null)
 			shardingGeneration = Integer.valueOf(str);
-		str = AppInfo.getApplicationContextProperties().getProperty(KEY_JDBC_URL_FORMAT);
+		str = env.getProperty(KEY_JDBC_URL_FORMAT);
 		if (str != null)
 			jdbcUrlFormat = str;
 		Assert.hasText(jdbcUrlFormat, "jdbcUrlFormat shouldn't be blank");
@@ -93,15 +101,15 @@ public class DataSourceRegistryPostProcessor implements BeanDefinitionRegistryPo
 			String jdbcUrl = entry.getValue();
 			ChildBeanDefinition beanDefinition = new ChildBeanDefinition(shardingParentName);
 			MutablePropertyValues propertyValues = new MutablePropertyValues();
-			String url = AppInfo.getApplicationContextProperties().getProperty(beanName + ".jdbc.url");
+			String url = env.getProperty(beanName + ".jdbc.url");
 			if (url != null)
 				jdbcUrl = url;
 			propertyValues.addPropertyValue("jdbcUrl", jdbcUrl);
 			dataSourceMapping.append(beanName).append("\t= ").append(jdbcUrl).append("\n");
-			String username = AppInfo.getApplicationContextProperties().getProperty(beanName + ".jdbc.username");
+			String username = env.getProperty(beanName + ".jdbc.username");
 			if (username != null)
 				propertyValues.addPropertyValue("username", username);
-			String password = AppInfo.getApplicationContextProperties().getProperty(beanName + ".jdbc.password");
+			String password = env.getProperty(beanName + ".jdbc.password");
 			if (password != null)
 				propertyValues.addPropertyValue("password", password);
 			beanDefinition.setPropertyValues(propertyValues);

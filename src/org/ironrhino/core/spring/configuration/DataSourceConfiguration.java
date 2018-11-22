@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Role;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy;
@@ -28,6 +30,9 @@ import lombok.extern.slf4j.Slf4j;
 @ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
 @Slf4j
 public class DataSourceConfiguration {
+
+	@Autowired
+	private Environment env;
 
 	@Value("${jdbc.driverClass:}")
 	private String driverClass;
@@ -69,8 +74,7 @@ public class DataSourceConfiguration {
 	private boolean lazyConnect;
 
 	protected DataSource createDataSource() {
-		if (AppInfo.getStage() == Stage.DEVELOPMENT
-				&& StringUtils.isBlank(AppInfo.getApplicationContextProperties().getProperty("jdbc.url"))) {
+		if (AppInfo.getStage() == Stage.DEVELOPMENT && StringUtils.isBlank(env.getProperty("jdbc.url"))) {
 			boolean available = AddressAvailabilityCondition.check(jdbcUrl, 5000);
 			if (!available && ClassUtils.isPresent("org.h2.Driver", getClass().getClassLoader())) {
 				String newJdbcUrl = "jdbc:h2:" + AppInfo.getAppHome() + "/db/h2";
