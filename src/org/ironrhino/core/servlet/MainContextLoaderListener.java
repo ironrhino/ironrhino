@@ -14,7 +14,6 @@ import javax.servlet.annotation.WebListener;
 import org.apache.logging.log4j.LogManager;
 import org.ironrhino.core.util.HttpClientUtils;
 import org.springframework.util.ClassUtils;
-import org.springframework.web.context.ConfigurableWebApplicationContext;
 import org.springframework.web.context.ContextLoaderListener;
 
 /**
@@ -30,9 +29,10 @@ public class MainContextLoaderListener extends ContextLoaderListener {
 	public static final String CONFIG_LOCATION = "classpath*:resources/spring/applicationContext-*.xml";
 
 	@Override
-	protected void configureAndRefreshWebApplicationContext(ConfigurableWebApplicationContext wac, ServletContext sc) {
+	public void contextInitialized(ServletContextEvent event) {
+		ServletContext sc = event.getServletContext();
 		sc.setInitParameter(CONFIG_LOCATION_PARAM, CONFIG_LOCATION);
-		super.configureAndRefreshWebApplicationContext(wac, sc);
+		super.contextInitialized(event);
 	}
 
 	@Override
