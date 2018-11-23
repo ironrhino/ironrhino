@@ -101,7 +101,7 @@ public class ConnectAction extends BaseAction {
 			if (user == null) {
 				String id = p.getUid();
 				LoginEvent loginEvent;
-				user = (User) userManager.loadUserByUsername(id);
+				user = userManager.loadUserByUsername(id);
 				if (user != null) {
 					loginEvent = new LoginEvent(user.getUsername(), request.getRemoteAddr(), "oauth",
 							provider.getName());

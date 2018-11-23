@@ -96,9 +96,11 @@ public class PriorityQualifierPostProcessor implements BeanPostProcessor, Priori
 		for (String name : candidates) {
 			if (beanFactory.containsBean(name)) {
 				ResolvableType rt = typeSupplier.get();
+
 				boolean typeMatched = beanFactory.isTypeMatch(name, rt);
 				if (!typeMatched) {
-					typeMatched = beanFactory.isTypeMatch(name, rt.getRawClass());
+					Class<?> rawClass = rt.getRawClass();
+					typeMatched = (rawClass != null) && beanFactory.isTypeMatch(name, rawClass);
 				}
 				if (typeMatched) {
 					injectConsumer.accept(bean, beanFactory.getBean(name));

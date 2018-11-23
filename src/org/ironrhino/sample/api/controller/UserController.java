@@ -95,7 +95,7 @@ public class UserController {
 	public DeferredResult<User> get(@Length(min = 3, max = 20) @PathVariable String username) {
 		DeferredResult<User> dr = new DeferredResult<>(5000L, RestStatus.REQUEST_TIMEOUT);
 		executorService.execute(() -> {
-			User u = (User) userManager.loadUserByUsername(username);
+			User u = userManager.loadUserByUsername(username);
 			if (u == null)
 				dr.setErrorResult(RestStatus.NOT_FOUND);
 			dr.setResult(u);
@@ -107,11 +107,11 @@ public class UserController {
 	@ResponseStatus(HttpStatus.CREATED)
 	public RestStatus post(@Valid @RequestBody User user) {
 		Asserts.notBlank(user, "username", "password", "name");
-		User u = (User) userManager.loadUserByUsername(user.getUsername());
+		User u = userManager.loadUserByUsername(user.getUsername());
 		if (u != null)
 			throw RestStatus.valueOf(RestStatus.CODE_ALREADY_EXISTS, "username already exists");
 		if (StringUtils.isNotBlank(user.getEmail())) {
-			u = (User) userManager.loadUserByUsername(user.getEmail());
+			u = userManager.loadUserByUsername(user.getEmail());
 			if (u != null)
 				throw RestStatus.valueOf(RestStatus.CODE_ALREADY_EXISTS, "email already exists");
 		}
@@ -125,7 +125,7 @@ public class UserController {
 
 	@RequestMapping(value = "/{username}", method = RequestMethod.PATCH)
 	public RestStatus patch(@Length(min = 3, max = 20) @PathVariable String username, @RequestBody User user) {
-		User u = (User) userManager.loadUserByUsername(username);
+		User u = userManager.loadUserByUsername(username);
 		if (u == null) {
 			throw RestStatus.NOT_FOUND;
 		}
@@ -140,7 +140,7 @@ public class UserController {
 	@Api(value = "删除用户", description = "只能删除已经禁用的用户")
 	@RequestMapping(value = "/{username}", method = RequestMethod.DELETE)
 	public RestStatus delete(@Length(min = 3, max = 20) @PathVariable String username) {
-		User u = (User) userManager.loadUserByUsername(username);
+		User u = userManager.loadUserByUsername(username);
 		if (u == null)
 			throw RestStatus.NOT_FOUND;
 		if (u.isEnabled())
@@ -152,7 +152,7 @@ public class UserController {
 	@RequestMapping(value = "/{username}/password", method = RequestMethod.PATCH)
 	public RestStatus validatePassword(@Length(min = 3, max = 20) @PathVariable String username,
 			@RequestBody User user) {
-		User u = (User) userManager.loadUserByUsername(username);
+		User u = userManager.loadUserByUsername(username);
 		if (u == null)
 			throw RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, "username invalid");
 		boolean valid = AuthzUtils.isPasswordValid(u, user.getPassword());

@@ -65,6 +65,7 @@ public class PasswordAction extends BaseAction {
 	@Autowired
 	protected EventPublisher eventPublisher;
 
+	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@InputConfig(resultName = SUCCESS)
 	@Validations(requiredStrings = {

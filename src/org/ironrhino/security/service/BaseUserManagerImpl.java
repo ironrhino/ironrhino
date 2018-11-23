@@ -59,6 +59,7 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 		u.setPassword(passwordEncoder.encode(password));
 		u.setPasswordModifyDate(new Date(0)); // magic date for user.isCredentialsNonExpired()
 		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+			@Override
 			public void afterCommit() {
 				user.setPassword(u.getPassword());
 				user.setPasswordModifyDate(u.getPasswordModifyDate());
@@ -77,6 +78,7 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 		u.setPasswordModifyDate(new Date());
 		// copy state to origin object to avoid re-login
 		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+			@Override
 			public void afterCommit() {
 				user.setPassword(u.getPassword());
 				user.setPasswordModifyDate(u.getPasswordModifyDate());

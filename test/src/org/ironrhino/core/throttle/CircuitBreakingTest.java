@@ -26,6 +26,7 @@ public class CircuitBreakingTest {
 	public void test() throws Exception {
 		AtomicInteger count = new AtomicInteger();
 		when(echoService.echo(anyString())).thenAnswer(new Answer<String>() {
+			@Override
 			public String answer(InvocationOnMock invocation) throws IOException {
 				if (count.incrementAndGet() % 2 == 0)
 					throw new IOException("test");

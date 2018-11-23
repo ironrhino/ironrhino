@@ -170,6 +170,8 @@ public class JobAction extends BaseAction {
 			log.info("Try launch job {} with parameters incrementer {}", jobName, jobParametersIncrementer);
 			try {
 				JobExecution je = jobExplorer.getJobExecution(jobOperator.startNextInstance(jobName));
+				if (je == null)
+					throw new RuntimeException("Unexpected null");
 				String jobParametersString = JobParameterHelper.toString(je.getJobParameters());
 				String message = getText("launch.job", new String[] { getText(jobName),
 						DateUtils.formatDatetime(je.getCreateTime()), jobParametersString });
@@ -226,13 +228,17 @@ public class JobAction extends BaseAction {
 	public String executions() {
 		Long instanceId = Long.valueOf(getUid());
 		jobInstance = jobExplorer.getJobInstance(instanceId);
-		list = jobExplorer.getJobExecutions(jobExplorer.getJobInstance(instanceId));
+		if (jobInstance == null)
+			return NOTFOUND;
+		list = jobExplorer.getJobExecutions(jobInstance);
 		return "executions";
 	}
 
 	public String steps() {
 		Long executionId = Long.valueOf(getUid());
 		jobExecution = jobExplorer.getJobExecution(executionId);
+		if (jobExecution == null)
+			return NOTFOUND;
 		jobInstance = jobExecution.getJobInstance();
 		return "steps";
 	}

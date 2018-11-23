@@ -29,9 +29,10 @@ public abstract class FallbackSupportMethodInterceptorFactoryBean extends Method
 						for (String beanName : ctx.getBeanNamesForAnnotation(Fallback.class)) {
 							try {
 								Class<?> objectType = getObjectType();
+								if (objectType == null)
+									throw new RuntimeException("Unexpected null");
 								this.fallback = ctx.getBean(beanName, objectType);
-								log.info("Pick bean {} as fallback of {}", beanName,
-										objectType != null ? objectType.getName() : "Unknown");
+								log.info("Pick bean {} as fallback of {}", beanName, objectType);
 								break;
 							} catch (BeansException e) {
 								continue;

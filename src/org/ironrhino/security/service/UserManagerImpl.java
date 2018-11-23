@@ -129,6 +129,7 @@ public class UserManagerImpl extends BaseUserManagerImpl<User> implements UserMa
 		return candidate + i;
 	}
 
+	@Override
 	protected Set<String> getBuiltInRoles() {
 		return Collections.singleton(UserRole.ROLE_BUILTIN_USER);
 	}

@@ -100,6 +100,7 @@ public abstract class RedisSerializerTestBase {
 		private List<GrantedAuthority> authorities;
 		private LocalDateTime created;
 
+		@Override
 		@JsonIgnore
 		public String getPassword() {
 			return password;

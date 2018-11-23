@@ -10,6 +10,7 @@ import org.ironrhino.security.model.BaseUser;
 public interface BaseUserManager<T extends BaseUser>
 		extends BaseManager<T>, PasswordMutator<T>, ConcreteUserDetailsService<T> {
 
+	@Override
 	default boolean accepts(String username) {
 		return ConcreteUserDetailsService.super.accepts(username);
 	}
