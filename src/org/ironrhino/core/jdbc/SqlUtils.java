@@ -299,11 +299,13 @@ public class SqlUtils {
 	static String expandCollectionParameter(String sql, String paramName, int size) {
 		if (size < 1 || size > 100)
 			throw new IllegalArgumentException("invalid size: " + size);
+		boolean padding = true; // https://hibernate.atlassian.net/browse/HHH-12469
+		int count = padding ? (1 << -Integer.numberOfLeadingZeros(size - 1)) : size;
 		StringBuilder sb = new StringBuilder();
 		sb.append('(');
-		for (int i = 0; i < size; i++) {
-			sb.append(":").append(paramName).append('[').append(i).append(']');
-			if (i != size - 1)
+		for (int i = 0; i < count; i++) {
+			sb.append(":").append(paramName).append('[').append(i < size ? i : size - 1).append(']');
+			if (i != count - 1)
 				sb.append(',');
 		}
 		sb.append(')');
