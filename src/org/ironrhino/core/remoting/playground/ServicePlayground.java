@@ -94,7 +94,7 @@ public class ServicePlayground {
 						pi.setName(parameterNames[i]);
 						Type type = parameterTypes[i];
 						pi.setType(type);
-						JavaType jt = objectMapper.getTypeFactory().constructType(type);
+						JavaType jt = objectMapper.constructType(type);
 						pi.setConcrete(jt.isConcrete() || jt.isCollectionLikeType() && jt.getContentType().isConcrete()
 								|| jt.isMapLikeType() && jt.getKeyType().isConcrete()
 										&& jt.getContentType().isConcrete());
@@ -150,7 +150,7 @@ public class ServicePlayground {
 	}
 
 	protected Object convert(Type type, String value) throws Exception {
-		JavaType jt = objectMapper.getTypeFactory().constructType(type);
+		JavaType jt = objectMapper.constructType(type);
 		try {
 			return objectMapper.readValue(value, jt);
 		} catch (JsonProcessingException e) {

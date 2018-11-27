@@ -260,7 +260,7 @@ public class JsonUtils {
 	}
 
 	public static <T> T fromJson(String json, Type type) throws JsonParseException, JsonMappingException, IOException {
-		return sharedObjectMapper.readValue(json, sharedObjectMapper.getTypeFactory().constructType(type));
+		return sharedObjectMapper.readValue(json, sharedObjectMapper.constructType(type));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -269,7 +269,7 @@ public class JsonUtils {
 		if (type instanceof Class && ((Class<?>) type).isAssignableFrom(JsonNode.class))
 			return (T) json;
 		return sharedObjectMapper.readValue(sharedObjectMapper.treeAsTokens(json),
-				sharedObjectMapper.getTypeFactory().constructType(type));
+				sharedObjectMapper.constructType(type));
 	}
 
 	public static <T extends Enum<T>> String enumToJson(Class<T> clazz) {

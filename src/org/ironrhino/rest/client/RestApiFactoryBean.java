@@ -384,7 +384,7 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 				ObjectMapper mapper = jackson.getObjectMapper();
 				if (type instanceof Class && ((Class<?>) type).isAssignableFrom(JsonNode.class))
 					return tree;
-				return mapper.readValue(mapper.treeAsTokens(tree), mapper.getTypeFactory().constructType(type));
+				return mapper.readValue(mapper.treeAsTokens(tree), mapper.constructType(type));
 			}
 		}
 	}

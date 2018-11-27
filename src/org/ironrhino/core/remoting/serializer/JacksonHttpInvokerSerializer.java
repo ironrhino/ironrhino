@@ -171,20 +171,20 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 				return ((Class<?>) rawType).getName() + "<java.lang.Object>";
 			}
 		}
-		return objectMapper.getTypeFactory().constructType(type).toCanonical();
+		return objectMapper.constructType(type).toCanonical();
 	}
 
 	protected String toConcrete(String type, Object argument) {
 		JavaType jt = objectMapper.getTypeFactory().constructFromCanonical(type);
 		if (argument != null) {
 			if (!jt.isContainerType() && !jt.isConcrete()) {
-				return objectMapper.getTypeFactory().constructType(argument.getClass()).toCanonical();
+				return objectMapper.constructType(argument.getClass()).toCanonical();
 			} else if (jt.isCollectionLikeType() && !jt.getContentType().isConcrete()
 					&& argument instanceof Collection) {
 				Collection<?> coll = (Collection<?>) argument;
 				if (!coll.isEmpty()) {
 					JavaType newJt = objectMapper.getTypeFactory().constructParametricType(jt.getRawClass(),
-							objectMapper.getTypeFactory().constructType(coll.iterator().next().getClass()));
+							objectMapper.constructType(coll.iterator().next().getClass()));
 					return newJt.toCanonical();
 				}
 			} else if (jt.isMapLikeType() && (!jt.getKeyType().isConcrete() || !jt.getContentType().isConcrete())
@@ -196,8 +196,8 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 					Object value = entry.getValue();
 					if (key != null && value != null) {
 						JavaType newJt = objectMapper.getTypeFactory().constructParametricType(jt.getRawClass(),
-								objectMapper.getTypeFactory().constructType(key.getClass()),
-								objectMapper.getTypeFactory().constructType(value.getClass()));
+								objectMapper.constructType(key.getClass()),
+								objectMapper.constructType(value.getClass()));
 						return newJt.toCanonical();
 					}
 				}
