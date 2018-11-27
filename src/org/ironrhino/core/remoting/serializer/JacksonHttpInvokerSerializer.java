@@ -3,127 +3,168 @@ package org.ironrhino.core.remoting.serializer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.aopalliance.intercept.MethodInvocation;
+import org.ironrhino.core.model.NullObject;
+import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.JsonSerializationUtils;
+import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
+import org.springframework.util.ClassUtils;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSerializer {
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-	private static final String SEPARATOR = "|";
+public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSerializer {
 
 	private final ObjectMapper objectMapper;
 
 	public JacksonHttpInvokerSerializer(JsonFactory jsonFactory) {
 		objectMapper = JsonSerializationUtils.createNewObjectMapper(jsonFactory)
-				.enableDefaultTyping(ObjectMapper.DefaultTyping.JAVA_LANG_OBJECT, JsonTypeInfo.As.PROPERTY);
+				.registerModule(new SimpleModule().addSerializer(NullObject.class, new JsonSerializer<NullObject>() {
+					@Override
+					public void serialize(NullObject nullObject, JsonGenerator jsonGenerator,
+							SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
+						jsonGenerator.writeNull();
+					}
+				})).disableDefaultTyping();
 	}
 
 	@Override
 	public RemoteInvocation createRemoteInvocation(MethodInvocation methodInvocation) {
-		return new MethodRemoteInvocation(methodInvocation);
+		return new JsonRpcRemoteInvocation(methodInvocation, CodecUtils.nextId());
 	}
 
 	@Override
 	public void writeRemoteInvocation(RemoteInvocation remoteInvocation, OutputStream os) throws IOException {
-		MethodRemoteInvocation invocation = (MethodRemoteInvocation) remoteInvocation;
-		String methodName = invocation.getMethodName();
-		byte[] bytes = methodName.getBytes(StandardCharsets.UTF_8);
-		os.write(bytes.length);
-		os.write(bytes);
-		Method method = invocation.getMethod();
-		String returnType = toCanonical(method.getGenericReturnType());
-		bytes = returnType.getBytes(StandardCharsets.UTF_8);
-		os.write(bytes.length);
-		os.write(bytes);
-		Type[] types = method.getGenericParameterTypes();
-		String[] genericParameterTypes = new String[types.length];
-		for (int i = 0; i < types.length; i++) {
-			Type type = types[i];
-			genericParameterTypes[i] = toCanonical(type);
-		}
-		Object[] arguments = invocation.getArguments();
-		ObjectNode on = new ObjectNode(objectMapper.getNodeFactory());
-		for (int i = 0; i < types.length; i++) {
-			String type = genericParameterTypes[i];
-			Object argument = arguments[i];
-			String concreteType = toConcrete(type, argument);
-			on.putPOJO(concreteType.equals(type) ? type : type + SEPARATOR + concreteType, argument);
-		}
-		objectMapper.writeValue(os, on);
+		JsonRpcRemoteInvocation invocation = (JsonRpcRemoteInvocation) remoteInvocation;
+		Request request = new Request();
+		request.setId(invocation.getId());
+		request.setMethod(invocation.getMethodName());
+		request.setParams(invocation.getArguments());
+		objectMapper.writeValue(os, request);
 	}
 
 	@Override
 	public RemoteInvocation readRemoteInvocation(Class<?> serviceInterface, InputStream is) throws IOException {
-		MethodRemoteInvocation invocation = new MethodRemoteInvocation();
-		int length = is.read();
-		byte[] bytes = new byte[length];
-		is.read(bytes);
-		invocation.setMethodName(new String(bytes, StandardCharsets.UTF_8));
-		length = is.read();
-		bytes = new byte[length];
-		is.read(bytes);
+		JsonRpcRemoteInvocation invocation = new JsonRpcRemoteInvocation();
+		JsonNode tree;
 		try {
-			ObjectNode on = objectMapper.readValue(is, ObjectNode.class);
-			List<Class<?>> parameterTypes = new ArrayList<>();
-			List<Object> arguments = new ArrayList<>();
-			Iterator<String> names = on.fieldNames();
-			while (names.hasNext()) {
-				String name = names.next();
-				int index = name.indexOf(SEPARATOR);
-				String type = index > 0 ? name.substring(0, index) : name;
-				JavaType jt = objectMapper.getTypeFactory().constructFromCanonical(type);
-				parameterTypes.add(jt.getRawClass());
-				if (index > 0)
-					jt = objectMapper.getTypeFactory()
-							.constructFromCanonical(name.substring(index + SEPARATOR.length()));
-				arguments.add(objectMapper.readValue(objectMapper.treeAsTokens(on.get(type)), jt));
-			}
-			invocation.setParameterTypes(parameterTypes.toArray(new Class[parameterTypes.size()]));
-			invocation.setArguments(arguments.toArray(new Object[arguments.size()]));
-			return invocation;
-		} catch (JsonProcessingException e) {
-			throw new SerializationFailedException(e.getMessage(), e);
+			tree = objectMapper.readTree(is);
+		} catch (JsonParseException e) {
+			throw new JsonrpcException(-32700, e.getMessage(), NullObject.get());
 		}
+		Serializable id = null;
+		JsonNode idNode = tree.get("id");
+		if (idNode != null)
+			id = idNode.isNumber() ? idNode.asLong() : idNode.isTextual() ? idNode.asText() : NullObject.get();
+		if (!isValid(tree))
+			throw new JsonrpcException(-32600, id != null ? id : NullObject.get());
+		invocation.setId(id);
+		invocation.setMethodName(tree.get("method").asText());
+		Class<?>[] parameterTypes = null;
+		Object[] arguments = null;
+		if (tree.has("params")) {
+			JsonNode paramsNode = tree.get("params");
+			int parameterCount = paramsNode.size();
+			arguments = new Object[parameterCount];
+			JsonProcessingException ex = null;
+			boolean methodNameExists = false;
+			loop: for (Method m : serviceInterface.getMethods()) {
+				boolean b = m.getName().equals(invocation.getMethodName());
+				if (!methodNameExists)
+					methodNameExists = b;
+				if (b && m.getParameterCount() == parameterCount) {
+					parameterTypes = m.getParameterTypes();
+					Type[] types = m.getGenericParameterTypes();
+					try {
+						if (paramsNode.isArray()) {
+							for (int i = 0; i < parameterCount; i++)
+								arguments[i] = objectMapper.readValue(objectMapper.treeAsTokens(paramsNode.get(i)),
+										objectMapper.constructType(types[i]));
+						} else {
+							String[] parameterNames = ReflectionUtils.getParameterNames(m);
+							for (int i = 0; i < parameterCount; i++) {
+								if (!paramsNode.has(parameterNames[i]))
+									continue loop;
+								JsonNode node = paramsNode.get(parameterNames[i]);
+								if (node != null)
+									arguments[i] = objectMapper.readValue(objectMapper.treeAsTokens(node),
+											objectMapper.constructType(types[i]));
+							}
+						}
+						invocation.setMethod(m);
+						ex = null;
+						break;
+					} catch (JsonMappingException e) {
+						ex = e;
+						continue;
+					}
+				}
+			}
+			if (ex != null || methodNameExists && invocation.getMethod() == null)
+				throw new JsonrpcException(-32602, id);
+		} else {
+			try {
+				invocation.setMethod(serviceInterface.getMethod(invocation.getMethodName()));
+			} catch (NoSuchMethodException e) {
+			}
+			parameterTypes = new Class<?>[0];
+			arguments = new Object[0];
+		}
+		if (invocation.getMethod() == null)
+			throw new JsonrpcException(-32601, id);
+		invocation.setParameterTypes(parameterTypes);
+		invocation.setArguments(arguments);
+		return invocation;
 	}
 
 	@Override
 	public void writeRemoteInvocationResult(RemoteInvocation remoteInvocation, RemoteInvocationResult result,
 			OutputStream os) throws IOException {
-		MethodRemoteInvocation invocation = (MethodRemoteInvocation) remoteInvocation;
-		Throwable exception = result.getException();
-		if (exception == null) {
-			os.write(0);
-			String returnType = toCanonical(invocation.getMethod().getGenericReturnType());
-			returnType = toConcrete(returnType, result.getValue());
-			byte[] bytes = returnType.getBytes(StandardCharsets.UTF_8);
-			os.write(bytes.length);
-			os.write(bytes);
-			objectMapper.writeValue(os, result.getValue());
+		JsonRpcRemoteInvocation invocation = (JsonRpcRemoteInvocation) remoteInvocation;
+		Response response = new Response();
+		response.setId(invocation.getId());
+		if (!result.hasException()) {
+			response.setResult(result.getValue());
+			objectMapper.writeValue(os, response);
 		} else {
-			exception = ((InvocationTargetException) exception).getTargetException();
-			os.write(1);
-			objectMapper.writeValue(os, exception);
+			Error error = new Error();
+			Throwable exception = ((InvocationTargetException) result.getException()).getTargetException();
+			error.setCode(-32603);
+			error.setMessage(exception.getMessage());
+			error.setData(exception.getClass().getName());
+			response.setError(error);
+			objectMapper.writeValue(os, response);
 		}
 	}
 
@@ -131,80 +172,219 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 	public RemoteInvocationResult readRemoteInvocationResult(MethodInvocation methodInvocation, InputStream is)
 			throws IOException {
 		RemoteInvocationResult result = new RemoteInvocationResult();
-		int i = is.read();
 		try {
-			if (i == 0) {
-				int length = is.read();
-				byte[] bytes = new byte[length];
-				is.read(bytes);
-				String type = new String(bytes, StandardCharsets.UTF_8);
-				if (!type.equals("void")) {
-					JavaType jt = objectMapper.getTypeFactory().constructFromCanonical(type);
-					result.setValue(objectMapper.readValue(is, jt));
+			JsonNode tree = objectMapper.readTree(is);
+			Serializable id = null;
+			JsonNode idNode = tree.get("id");
+			if (idNode != null)
+				id = idNode.isNumber() ? idNode.asLong() : idNode.asText();
+			if (!tree.has("error")) {
+				tree = tree.get("result");
+				if (tree != null) {
+					Type type = methodInvocation.getMethod().getGenericReturnType();
+					if (type instanceof ParameterizedType) {
+						ParameterizedType pt = (ParameterizedType) type;
+						Type rawType = pt.getRawType();
+						if (rawType instanceof Class) {
+							Class<?> clz = (Class<?>) rawType;
+							if (clz.equals(Optional.class) || Callable.class.isAssignableFrom(clz)
+									|| Future.class.isAssignableFrom(clz)) {
+								type = pt.getActualTypeArguments()[0];
+							}
+						}
+					}
+					result.setValue(
+							objectMapper.readValue(objectMapper.treeAsTokens(tree), objectMapper.constructType(type)));
 				}
-				return result;
 			} else {
-				Throwable throwable = objectMapper.readValue(is, Throwable.class);
-				InvocationTargetException exception = new InvocationTargetException(throwable);
-				result.setException(exception);
-				return result;
+				tree = tree.get("error");
+				int code = tree.get("code").asInt();
+				String message = tree.get("message").asText();
+				if (code == -32700)
+					throw new SerializationFailedException(message);
+				Exception exception = null;
+				if (tree.has("data")) {
+					try {
+						Class<?> clazz = ClassUtils.forName(tree.get("data").asText(), null);
+						exception = (Exception) clazz.getConstructor(String.class).newInstance(message);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+				if (exception == null)
+					exception = new JsonrpcException(code, message, id);
+				result.setException(new InvocationTargetException(exception));
 			}
+			return result;
 		} catch (JsonProcessingException e) {
 			throw new SerializationFailedException(e.getMessage(), e);
 		}
 	}
 
-	protected String toCanonical(Type type) {
-		if (type instanceof ParameterizedType) {
-			ParameterizedType pt = (ParameterizedType) type;
-			Type rawType = pt.getRawType();
-			if (rawType.equals(Optional.class)) {
-				type = pt.getActualTypeArguments()[0];
-			}
+	@Override
+	public boolean handleException(Exception ex, HttpServletResponse response) throws IOException {
+		if (ex instanceof JsonrpcException) {
+			JsonrpcException e = (JsonrpcException) ex;
+			Response rsp = new Response();
+			rsp.setId(e.getId());
+			Error error = new Error();
+			error.setCode(e.getCode());
+			if (error.getMessage() == null)
+				error.setMessage(e.getMessage());
+			rsp.setError(error);
+			response.setContentType(getContentType());
+			objectMapper.writeValue(response.getOutputStream(), rsp);
+			return true;
 		}
-		if (type instanceof ParameterizedType) {
-			ParameterizedType pt = (ParameterizedType) type;
-			Type rawType = pt.getRawType();
-			Type[] argTypes = pt.getActualTypeArguments();
-			if (rawType instanceof Class && argTypes.length == 1 && argTypes[0] instanceof Class
-					&& ((Class<?>) argTypes[0]).isArray()) {
-				// https://github.com/FasterXML/jackson-databind/issues/2095
-				return ((Class<?>) rawType).getName() + "<java.lang.Object>";
-			}
-		}
-		return objectMapper.constructType(type).toCanonical();
+		return false;
 	}
 
-	protected String toConcrete(String type, Object argument) {
-		JavaType jt = objectMapper.getTypeFactory().constructFromCanonical(type);
-		if (argument != null) {
-			if (!jt.isContainerType() && !jt.isConcrete()) {
-				return objectMapper.constructType(argument.getClass()).toCanonical();
-			} else if (jt.isCollectionLikeType() && !jt.getContentType().isConcrete()
-					&& argument instanceof Collection) {
-				Collection<?> coll = (Collection<?>) argument;
-				if (!coll.isEmpty()) {
-					JavaType newJt = objectMapper.getTypeFactory().constructParametricType(jt.getRawClass(),
-							objectMapper.constructType(coll.iterator().next().getClass()));
-					return newJt.toCanonical();
-				}
-			} else if (jt.isMapLikeType() && (!jt.getKeyType().isConcrete() || !jt.getContentType().isConcrete())
-					&& argument instanceof Map) {
-				Map<?, ?> map = (Map<?, ?>) argument;
-				if (!map.isEmpty()) {
-					Map.Entry<?, ?> entry = map.entrySet().iterator().next();
-					Object key = entry.getKey();
-					Object value = entry.getValue();
-					if (key != null && value != null) {
-						JavaType newJt = objectMapper.getTypeFactory().constructParametricType(jt.getRawClass(),
-								objectMapper.constructType(key.getClass()),
-								objectMapper.constructType(value.getClass()));
-						return newJt.toCanonical();
-					}
-				}
-			}
+	protected boolean isValid(JsonNode tree) {
+		if (!tree.isObject())
+			return false;
+		ObjectNode on = (ObjectNode) tree;
+		Iterator<String> names = on.fieldNames();
+		while (names.hasNext()) {
+			String name = names.next();
+			if (!(name.equals("jsonrpc") || name.equals("method") || name.equals("params") || name.equals("id")))
+				return false;
 		}
-		return type;
+		JsonNode jsonrpc = on.get("jsonrpc");
+		if (jsonrpc == null || !jsonrpc.isTextual() || !jsonrpc.asText().equals(Message.VERSION))
+			return false;
+		JsonNode method = on.get("method");
+		if (method == null || !method.isTextual() || method.asText().startsWith("rpc."))
+			return false;
+		JsonNode params = on.get("params");
+		if (params != null && !params.isContainerNode())
+			return false;
+		JsonNode id = on.get("id");
+		if (id != null && !(id.isNumber() || id.isTextual()))
+			return false;
+		return true;
+	}
+
+	@Getter
+	@Setter
+	private static class Message {
+
+		public static final String VERSION = "2.0";
+
+		private String jsonrpc = VERSION;
+
+	}
+
+	@Getter
+	@Setter
+	private static class Request extends Message {
+
+		private String method;
+
+		private Object[] params;
+
+		private Serializable id;
+
+	}
+
+	@Getter
+	@Setter
+	private static class Response extends Message {
+
+		private Object result;
+
+		private Error error;
+
+		private Serializable id;
+
+	}
+
+	@Getter
+	@Setter
+	private static class Error {
+
+		private static final Map<Integer, String> PREDEFINED_ERRORS;
+
+		static {
+			Map<Integer, String> map = new HashMap<>(8);
+			map.put(-32700, "Parse error");
+			map.put(-32600, "Invalid Request");
+			map.put(-32601, "Method not found");
+			map.put(-32602, "Invalid params");
+			map.put(-32603, "Internal error");
+			PREDEFINED_ERRORS = Collections.unmodifiableMap(map);
+		}
+
+		private int code;
+
+		private String message;
+
+		private Object data;
+
+		public void setCode(int code) {
+			this.code = code;
+			this.message = PREDEFINED_ERRORS.get(code);
+		}
+
+	}
+
+	@NoArgsConstructor
+	@Getter
+	@Setter
+	private class JsonRpcRemoteInvocation extends RemoteInvocation {
+
+		private static final long serialVersionUID = -2740913342844528055L;
+
+		private transient Method method;
+
+		private Serializable id;
+
+		JsonRpcRemoteInvocation(MethodInvocation methodInvocation, Serializable id) {
+			super(methodInvocation);
+			this.method = methodInvocation.getMethod();
+			this.id = id;
+		}
+
+		@Override
+		public Object invoke(Object targetObject)
+				throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+			if (method == null)
+				method = ClassUtils.getInterfaceMethodIfPossible(
+						targetObject.getClass().getMethod(getMethodName(), getParameterTypes()));
+			return method.invoke(targetObject, getArguments());
+		}
+
+	}
+
+	@Getter
+	static class JsonrpcException extends RuntimeException {
+
+		private static final long serialVersionUID = -7532491242290991258L;
+
+		private int code;
+
+		private String message;
+
+		private Serializable id;
+
+		public JsonrpcException(int code) {
+			this.code = code;
+		}
+
+		public JsonrpcException(int code, Serializable id) {
+			this.code = code;
+			this.id = id;
+		}
+
+		public JsonrpcException(int code, String message) {
+			this.code = code;
+			this.message = message;
+		}
+
+		public JsonrpcException(int code, String message, Serializable id) {
+			this.code = code;
+			this.message = message;
+			this.id = id;
+		}
 	}
 
 }

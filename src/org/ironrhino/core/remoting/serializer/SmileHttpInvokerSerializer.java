@@ -14,7 +14,7 @@ public class SmileHttpInvokerSerializer extends JacksonHttpInvokerSerializer {
 
 	@Override
 	public String getContentType() {
-		return RemotingContext.CONTENT_TYPE_SMILE_SERIALIZED_OBJECT;
+		return RemotingContext.CONTENT_TYPE_SMILE_RPC;
 	}
 
 }

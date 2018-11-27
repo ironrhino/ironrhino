@@ -12,7 +12,7 @@ public class JsonHttpInvokerSerializer extends JacksonHttpInvokerSerializer {
 
 	@Override
 	public String getContentType() {
-		return RemotingContext.CONTENT_TYPE_JSON_SERIALIZED_OBJECT;
+		return RemotingContext.CONTENT_TYPE_JSON_RPC;
 	}
 
 }
