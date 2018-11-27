@@ -69,11 +69,6 @@ public abstract class RemotingServiceTestsBase {
 		assertTrue(Arrays.equals(new String[] { "echoWithArrayList" },
 				testService.echoArray(new String[] { "echoWithArrayList" })));
 		assertEquals(3, testService.countAndAdd(Collections.singletonList("test"), 2));
-		assertNull(testService.loadUserByUsername(null));
-		assertEquals("username", testService.loadUserByUsername("username").getUsername());
-		assertNull(testService.search(null));
-		assertEquals(Collections.EMPTY_LIST, testService.search(""));
-		assertEquals("username", testService.search("username").get(0).getUsername());
 	}
 
 	@Test
@@ -83,27 +78,36 @@ public abstract class RemotingServiceTestsBase {
 	}
 
 	@Test
-	public void testUserDetails() {
+	public void testConcreteType() {
 		assertNull(testService.loadUserByUsername(null));
 		assertEquals("username", testService.loadUserByUsername("username").getUsername());
-		assertNull(testService.search(null));
-		assertEquals(Collections.EMPTY_LIST, testService.search(""));
-		assertEquals("username", testService.search("username").get(0).getUsername());
+		assertNull(testService.searchUser(null));
+		assertEquals(Collections.EMPTY_LIST, testService.searchUser(""));
+		assertEquals("username", testService.searchUser("username").get(0).getUsername());
+	}
+
+	@Test
+	public void testNonConcreteType() {
+		assertNull(testService.loadUserDetailsByUsername(null));
+		assertEquals("username", testService.loadUserDetailsByUsername("username").getUsername());
+		assertNull(testService.searchUserDetails(null));
+		assertEquals(Collections.EMPTY_LIST, testService.searchUserDetails(""));
+		assertEquals("username", testService.searchUserDetails("username").get(0).getUsername());
 	}
 
 	@Test(expected = ConstraintViolationException.class)
 	public void testBeanValidation() throws Exception {
-		assertEquals(Scope.LOCAL, testService.echo(Scope.LOCAL));
-		testService.echo((Scope) null);
+		assertEquals(Scope.LOCAL, testService.echoScope(Scope.LOCAL));
+		testService.echoScope((Scope) null);
 	}
 
 	@Test(expected = ConstraintViolationException.class)
 	public void testBeanValidationWithValid() throws Exception {
 		User user = new User();
 		user.setEmail("test@test.com");
-		assertEquals(user, testService.echo(user));
+		assertEquals(user, testService.echoUser(user));
 		user.setEmail("iamnotemail");
-		testService.echo(user);
+		testService.echoUser(user);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -112,20 +116,39 @@ public abstract class RemotingServiceTestsBase {
 	}
 
 	@Test
-	public void testOptional() {
+	public void testConcreteOptional() {
 		assertFalse(testService.loadOptionalUserByUsername("").isPresent());
 		assertEquals("username", testService.loadOptionalUserByUsername("username").get().getUsername());
 	}
 
+	@Test
+	public void testNonConcreteOptional() {
+		assertFalse(testService.loadOptionalUserDetailsByUsername("").isPresent());
+		assertEquals("username", testService.loadOptionalUserDetailsByUsername("username").get().getUsername());
+	}
+
 	@Test(expected = IllegalArgumentException.class)
-	public void testOptionalWithException() {
+	public void testConcreteOptionalWithException() {
 		testService.loadOptionalUserByUsername(null);
 	}
 
+	@Test(expected = IllegalArgumentException.class)
+	public void testNonConcreteOptionalWithException() {
+		testService.loadOptionalUserDetailsByUsername(null);
+	}
+
 	@Test
-	public void testFuture() throws Exception {
+	public void testConcreteFuture() throws Exception {
 		for (FutureType futureType : FutureType.values()) {
 			assertEquals("username", testService.loadFutureUserByUsername("username", futureType).get().getUsername());
+		}
+	}
+
+	@Test
+	public void testNonConcreteFuture() throws Exception {
+		for (FutureType futureType : FutureType.values()) {
+			assertEquals("username",
+					testService.loadFutureUserDetailsByUsername("username", futureType).get().getUsername());
 		}
 	}
 
@@ -158,8 +181,8 @@ public abstract class RemotingServiceTestsBase {
 	}
 
 	@Test
-	public void testListenableFuture() throws Exception {
-		ListenableFuture<UserDetails> future = testService.loadListenableFutureUserByUsername("username");
+	public void testConcreteListenableFuture() throws Exception {
+		ListenableFuture<User> future = testService.loadListenableFutureUserByUsername("username");
 		AtomicBoolean b1 = new AtomicBoolean();
 		AtomicBoolean b2 = new AtomicBoolean();
 		future.addCallback(u -> {
@@ -174,8 +197,30 @@ public abstract class RemotingServiceTestsBase {
 	}
 
 	@Test
-	public void testCallable() throws Exception {
+	public void testNonConcreteListenableFuture() throws Exception {
+		ListenableFuture<? extends UserDetails> future = testService
+				.loadListenableFutureUserDetailsByUsername("username");
+		AtomicBoolean b1 = new AtomicBoolean();
+		AtomicBoolean b2 = new AtomicBoolean();
+		future.addCallback(u -> {
+			b1.set("username".equals(u.getUsername()));
+		}, e -> {
+			b2.set(true);
+		});
+		Thread.sleep(1000);
+		assertTrue(b1.get());
+		assertFalse(b2.get());
+		assertEquals("username", future.get().getUsername());
+	}
+
+	@Test
+	public void testConcreteCallable() throws Exception {
 		assertEquals("username", testService.loadCallableUserByUsername("username").call().getUsername());
+	}
+
+	@Test
+	public void testNonConcreteCallable() throws Exception {
+		assertEquals("username", testService.loadCallableUserDetailsByUsername("username").call().getUsername());
 	}
 
 	@Test(expected = IllegalArgumentException.class)

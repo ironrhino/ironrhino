@@ -34,17 +34,17 @@ public interface TestService {
 
 	public String echo(String value);
 
-	public boolean echo(boolean value);
+	public boolean echoBoolean(boolean value);
 
-	public int echo(int value);
+	public int echoInt(int value);
 
-	public Long echo(Long value);
+	public Long echoLong(Long value);
 
-	public Date echo(Date value);
+	public Date echoDate(Date value);
 
-	public Scope echo(@NotNull Scope value);
+	public Scope echoScope(@NotNull Scope value);
 
-	public User echo(@Valid User value);
+	public User echoUser(@Valid User value);
 
 	public List<String> echoList(List<String> list);
 
@@ -54,16 +54,28 @@ public interface TestService {
 
 	public String[] echoArray(String[] arr);
 
-	public UserDetails loadUserByUsername(String username);
+	public User loadUserByUsername(String username);
 
-	public List<UserDetails> search(String keyword);
+	public UserDetails loadUserDetailsByUsername(String username);
 
-	public Optional<UserDetails> loadOptionalUserByUsername(String username);
+	public List<User> searchUser(String keyword);
 
-	public Future<UserDetails> loadFutureUserByUsername(String username, FutureType futureType);
+	public List<? extends UserDetails> searchUserDetails(String keyword);
 
-	public ListenableFuture<UserDetails> loadListenableFutureUserByUsername(String username);
+	public Optional<User> loadOptionalUserByUsername(String username);
 
-	public Callable<UserDetails> loadCallableUserByUsername(String username);
+	public Optional<? extends UserDetails> loadOptionalUserDetailsByUsername(String username);
+
+	public Future<User> loadFutureUserByUsername(String username, FutureType futureType);
+
+	public Future<? extends UserDetails> loadFutureUserDetailsByUsername(String username, FutureType futureType);
+
+	public ListenableFuture<User> loadListenableFutureUserByUsername(String username);
+
+	public ListenableFuture<? extends UserDetails> loadListenableFutureUserDetailsByUsername(String username);
+
+	public Callable<User> loadCallableUserByUsername(String username);
+
+	public Callable<? extends UserDetails> loadCallableUserDetailsByUsername(String username);
 
 }

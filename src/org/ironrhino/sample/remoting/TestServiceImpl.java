@@ -49,32 +49,32 @@ public class TestServiceImpl implements TestService {
 	}
 
 	@Override
-	public boolean echo(boolean bool) {
+	public boolean echoBoolean(boolean bool) {
 		return bool;
 	}
 
 	@Override
-	public int echo(int integer) {
+	public int echoInt(int integer) {
 		return integer;
 	}
 
 	@Override
-	public Long echo(Long value) {
+	public Long echoLong(Long value) {
 		return value;
 	}
 
 	@Override
-	public Date echo(Date value) {
+	public Date echoDate(Date value) {
 		return value;
 	}
 
 	@Override
-	public Scope echo(Scope value) {
+	public Scope echoScope(Scope value) {
 		return value;
 	}
 
 	@Override
-	public User echo(User value) {
+	public User echoUser(User value) {
 		return value;
 	}
 
@@ -99,7 +99,7 @@ public class TestServiceImpl implements TestService {
 	}
 
 	@Override
-	public UserDetails loadUserByUsername(String username) {
+	public User loadUserByUsername(String username) {
 		if (username == null)
 			return null;
 		User user = new User();
@@ -109,18 +109,28 @@ public class TestServiceImpl implements TestService {
 	}
 
 	@Override
-	public List<UserDetails> search(String keyword) {
+	public UserDetails loadUserDetailsByUsername(String username) {
+		return loadUserByUsername(username);
+	}
+
+	@Override
+	public List<User> searchUser(String keyword) {
 		if (keyword == null)
 			return null;
 		if (StringUtils.isBlank(keyword))
 			return Collections.emptyList();
-		List<UserDetails> list = new ArrayList<>();
+		List<User> list = new ArrayList<>();
 		list.add(loadUserByUsername(keyword));
 		return list;
 	}
 
 	@Override
-	public Optional<UserDetails> loadOptionalUserByUsername(String username) {
+	public List<? extends UserDetails> searchUserDetails(String keyword) {
+		return searchUser(keyword);
+	}
+
+	@Override
+	public Optional<User> loadOptionalUserByUsername(String username) {
 		if (username == null)
 			throw new IllegalArgumentException("username shouldn't be null");
 		if (username.isEmpty())
@@ -132,10 +142,15 @@ public class TestServiceImpl implements TestService {
 	}
 
 	@Override
-	public Future<UserDetails> loadFutureUserByUsername(String username, FutureType futureType) {
+	public Optional<User> loadOptionalUserDetailsByUsername(String username) {
+		return loadOptionalUserByUsername(username);
+	}
+
+	@Override
+	public Future<User> loadFutureUserByUsername(String username, FutureType futureType) {
 		if (username == null)
 			throw new IllegalArgumentException("username shouldn't be null");
-		Supplier<UserDetails> sup = () -> {
+		Supplier<User> sup = () -> {
 			if (StringUtils.isBlank(username))
 				throw new IllegalArgumentException("username shouldn't be blank");
 			try {
@@ -152,7 +167,7 @@ public class TestServiceImpl implements TestService {
 		case COMPLETABLE:
 			return CompletableFuture.supplyAsync(sup);
 		case LISTENABLE:
-			SettableListenableFuture<UserDetails> future = new SettableListenableFuture<>();
+			SettableListenableFuture<User> future = new SettableListenableFuture<>();
 			if (StringUtils.isBlank(username))
 				future.setException(new IllegalArgumentException("username shouldn't be blank"));
 			else
@@ -164,8 +179,13 @@ public class TestServiceImpl implements TestService {
 	}
 
 	@Override
-	public ListenableFuture<UserDetails> loadListenableFutureUserByUsername(String username) {
-		Supplier<UserDetails> sup = () -> {
+	public Future<? extends UserDetails> loadFutureUserDetailsByUsername(String username, FutureType futureType) {
+		return loadFutureUserByUsername(username, futureType);
+	}
+
+	@Override
+	public ListenableFuture<User> loadListenableFutureUserByUsername(String username) {
+		Supplier<User> sup = () -> {
 			if (StringUtils.isBlank(username))
 				throw new IllegalArgumentException("username shouldn't be blank");
 			try {
@@ -178,7 +198,7 @@ public class TestServiceImpl implements TestService {
 			user.setAuthorities(AuthorityUtils.createAuthorityList("test"));
 			return user;
 		};
-		SettableListenableFuture<UserDetails> future = new SettableListenableFuture<>();
+		SettableListenableFuture<User> future = new SettableListenableFuture<>();
 		if (StringUtils.isBlank(username))
 			future.setException(new IllegalArgumentException("username shouldn't be blank"));
 		else
@@ -187,7 +207,12 @@ public class TestServiceImpl implements TestService {
 	}
 
 	@Override
-	public Callable<UserDetails> loadCallableUserByUsername(String username) {
+	public ListenableFuture<? extends UserDetails> loadListenableFutureUserDetailsByUsername(String username) {
+		return loadListenableFutureUserByUsername(username);
+	}
+
+	@Override
+	public Callable<User> loadCallableUserByUsername(String username) {
 		if (username == null)
 			throw new IllegalArgumentException("username shouldn't be null");
 		return () -> {
@@ -203,6 +228,11 @@ public class TestServiceImpl implements TestService {
 			user.setAuthorities(AuthorityUtils.createAuthorityList("test"));
 			return user;
 		};
+	}
+
+	@Override
+	public Callable<? extends UserDetails> loadCallableUserDetailsByUsername(String username) {
+		return loadCallableUserByUsername(username);
 	}
 
 	@PreDestroy
