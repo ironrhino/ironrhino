@@ -2,6 +2,7 @@ package org.ironrhino.core.remoting.client;
 
 import java.io.ByteArrayOutputStream;
 
+import org.aopalliance.intercept.MethodInvocation;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializer;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializers;
 import org.springframework.remoting.support.RemoteInvocation;
@@ -36,13 +37,14 @@ public abstract class HttpInvokerRequestExecutor {
 
 	private int readTimeout = -1;
 
-	public RemoteInvocationResult executeRequest(String serviceUrl, RemoteInvocation invocation) throws Exception {
+	public RemoteInvocationResult executeRequest(String serviceUrl, RemoteInvocation invocation,
+			MethodInvocation methodInvocation) throws Exception {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(SERIALIZED_INVOCATION_BYTE_ARRAY_INITIAL_SIZE);
 		serializer.writeRemoteInvocation(invocation, baos);
-		return doExecuteRequest(serviceUrl, baos);
+		return doExecuteRequest(serviceUrl, methodInvocation, baos);
 	}
 
-	protected abstract RemoteInvocationResult doExecuteRequest(String serviceUrl, ByteArrayOutputStream baos)
-			throws Exception;
+	protected abstract RemoteInvocationResult doExecuteRequest(String serviceUrl, MethodInvocation methodInvocation,
+			ByteArrayOutputStream baos) throws Exception;
 
 }

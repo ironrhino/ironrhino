@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.zip.GZIPInputStream;
 
+import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.remoting.RemotingContext;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializer;
@@ -21,8 +22,8 @@ import org.springframework.remoting.support.RemoteInvocationResult;
 public class SimpleHttpInvokerRequestExecutor extends HttpInvokerRequestExecutor {
 
 	@Override
-	protected RemoteInvocationResult doExecuteRequest(String serviceUrl, ByteArrayOutputStream baos)
-			throws IOException {
+	protected RemoteInvocationResult doExecuteRequest(String serviceUrl, MethodInvocation methodInvocation,
+			ByteArrayOutputStream baos) throws IOException {
 		HttpURLConnection con = (HttpURLConnection) new URL(serviceUrl).openConnection();
 		prepareConnection(con, baos.size());
 		baos.writeTo(con.getOutputStream());
@@ -32,7 +33,7 @@ public class SimpleHttpInvokerRequestExecutor extends HttpInvokerRequestExecutor
 		HttpInvokerSerializer serializer = StringUtils.isNotBlank(contentType)
 				? HttpInvokerSerializers.ofContentType(contentType)
 				: getSerializer();
-		return serializer.readRemoteInvocationResult(responseBody);
+		return serializer.readRemoteInvocationResult(methodInvocation, responseBody);
 	}
 
 	protected void prepareConnection(HttpURLConnection connection, int contentLength) throws IOException {

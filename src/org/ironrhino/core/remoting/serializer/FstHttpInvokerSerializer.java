@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.rmi.RemoteException;
 
+import org.aopalliance.intercept.MethodInvocation;
 import org.ironrhino.core.remoting.RemotingContext;
 import org.nustaq.serialization.FSTObjectInput;
 import org.nustaq.serialization.FSTObjectOutput;
@@ -36,7 +37,7 @@ public class FstHttpInvokerSerializer implements HttpInvokerSerializer {
 	}
 
 	@Override
-	public RemoteInvocation readRemoteInvocation(InputStream is) throws IOException {
+	public RemoteInvocation readRemoteInvocation(Class<?> serviceInterface, InputStream is) throws IOException {
 		FSTObjectInput in = new FSTObjectInput(is);
 		try {
 			Object obj = in.readObject();
@@ -64,7 +65,8 @@ public class FstHttpInvokerSerializer implements HttpInvokerSerializer {
 	}
 
 	@Override
-	public RemoteInvocationResult readRemoteInvocationResult(InputStream is) throws IOException {
+	public RemoteInvocationResult readRemoteInvocationResult(MethodInvocation methodInvocation, InputStream is)
+			throws IOException {
 		FSTObjectInput in = new FSTObjectInput(is);
 		try {
 			Object obj = in.readObject();

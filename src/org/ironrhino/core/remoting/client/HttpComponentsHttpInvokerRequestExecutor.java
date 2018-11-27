@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -57,8 +58,8 @@ public class HttpComponentsHttpInvokerRequestExecutor extends HttpInvokerRequest
 	}
 
 	@Override
-	protected RemoteInvocationResult doExecuteRequest(String serviceUrl, ByteArrayOutputStream baos)
-			throws IOException {
+	protected RemoteInvocationResult doExecuteRequest(String serviceUrl, MethodInvocation methodInvocation,
+			ByteArrayOutputStream baos) throws IOException {
 		HttpPost postMethod = new HttpPost(serviceUrl);
 		String requestId = MDC.get(AccessFilter.MDC_KEY_REQUEST_ID);
 		if (requestId != null)
@@ -94,7 +95,7 @@ public class HttpComponentsHttpInvokerRequestExecutor extends HttpInvokerRequest
 			HttpInvokerSerializer serializer = StringUtils.isNotBlank(contentType)
 					? HttpInvokerSerializers.ofContentType(contentType)
 					: getSerializer();
-			return serializer.readRemoteInvocationResult(responseBody);
+			return serializer.readRemoteInvocationResult(methodInvocation, responseBody);
 		} finally {
 			rsp.close();
 		}

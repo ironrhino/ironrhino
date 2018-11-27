@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
 import java.io.OutputStream;
 
+import org.aopalliance.intercept.MethodInvocation;
 import org.ironrhino.core.remoting.RemotingContext;
 import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.remoting.support.RemoteInvocation;
@@ -37,7 +38,7 @@ public class JavaHttpInvokerSerializer implements HttpInvokerSerializer {
 	}
 
 	@Override
-	public RemoteInvocation readRemoteInvocation(InputStream is) throws IOException {
+	public RemoteInvocation readRemoteInvocation(Class<?> serviceInterface, InputStream is) throws IOException {
 		try (ObjectInputStream ois = new ObjectInputStream(is)) {
 			return (RemoteInvocation) ois.readObject();
 		} catch (ObjectStreamException | ClassNotFoundException e) {
@@ -56,7 +57,8 @@ public class JavaHttpInvokerSerializer implements HttpInvokerSerializer {
 	}
 
 	@Override
-	public RemoteInvocationResult readRemoteInvocationResult(InputStream is) throws IOException {
+	public RemoteInvocationResult readRemoteInvocationResult(MethodInvocation methodInvocation, InputStream is)
+			throws IOException {
 		try (ObjectInputStream ois = new ObjectInputStream(is)) {
 			return (RemoteInvocationResult) ois.readObject();
 		} catch (ObjectStreamException | ClassNotFoundException e) {

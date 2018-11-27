@@ -261,7 +261,7 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 			long time = System.currentTimeMillis();
 			try {
 				RemoteInvocationResult result = httpInvokerRequestExecutor.executeRequest(this.getServiceUrl(),
-						invocation);
+						invocation, methodInvocation);
 				if (serviceStats != null) {
 					serviceStats.clientSideEmit(discoveredHost, getServiceInterface().getName(), method,
 							System.currentTimeMillis() - time, false);

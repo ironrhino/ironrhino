@@ -74,7 +74,7 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 	}
 
 	@Override
-	public RemoteInvocation readRemoteInvocation(InputStream is) throws IOException {
+	public RemoteInvocation readRemoteInvocation(Class<?> serviceInterface, InputStream is) throws IOException {
 		MethodRemoteInvocation invocation = new MethodRemoteInvocation();
 		int length = is.read();
 		byte[] bytes = new byte[length];
@@ -128,7 +128,8 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 	}
 
 	@Override
-	public RemoteInvocationResult readRemoteInvocationResult(InputStream is) throws IOException {
+	public RemoteInvocationResult readRemoteInvocationResult(MethodInvocation methodInvocation, InputStream is)
+			throws IOException {
 		RemoteInvocationResult result = new RemoteInvocationResult();
 		int i = is.read();
 		try {

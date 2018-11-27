@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.HttpRequestHandler;
 
@@ -80,7 +81,7 @@ public class HttpInvokerServer implements HttpRequestHandler {
 		}
 		invoke(request, response, req -> {
 			RemoteInvocation invocation = HttpInvokerSerializers.forRequest(req)
-					.readRemoteInvocation(req.getInputStream());
+					.readRemoteInvocation(ClassUtils.forName(interfaceName, null), req.getInputStream());
 			List<String> parameterTypeList = new ArrayList<>(invocation.getParameterTypes().length);
 			for (Class<?> cl : invocation.getParameterTypes())
 				parameterTypeList.add(cl.getSimpleName());

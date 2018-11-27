@@ -26,10 +26,11 @@ public interface HttpInvokerSerializer {
 
 	public void writeRemoteInvocation(RemoteInvocation invocation, OutputStream os) throws IOException;
 
-	public RemoteInvocation readRemoteInvocation(InputStream is) throws IOException;
+	public RemoteInvocation readRemoteInvocation(Class<?> serviceInterface, InputStream is) throws IOException;
 
 	public void writeRemoteInvocationResult(RemoteInvocation invocation, RemoteInvocationResult result, OutputStream os)
 			throws IOException;
 
-	public RemoteInvocationResult readRemoteInvocationResult(InputStream is) throws IOException;
+	public RemoteInvocationResult readRemoteInvocationResult(MethodInvocation methodInvocation, InputStream is)
+			throws IOException;
 }
