@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
@@ -27,10 +28,6 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSerializer {
 
 	private static final String SEPARATOR = "|";
@@ -44,25 +41,31 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 
 	@Override
 	public RemoteInvocation createRemoteInvocation(MethodInvocation methodInvocation) {
-		return new JacksonRemoteInvocation(methodInvocation);
+		return new MethodRemoteInvocation(methodInvocation);
 	}
 
 	@Override
 	public void writeRemoteInvocation(RemoteInvocation remoteInvocation, OutputStream os) throws IOException {
-		JacksonRemoteInvocation invocation = (JacksonRemoteInvocation) remoteInvocation;
+		MethodRemoteInvocation invocation = (MethodRemoteInvocation) remoteInvocation;
 		String methodName = invocation.getMethodName();
 		byte[] bytes = methodName.getBytes(StandardCharsets.UTF_8);
 		os.write(bytes.length);
 		os.write(bytes);
-		String returnType = invocation.getGenericReturnType();
+		Method method = invocation.getMethod();
+		String returnType = toCanonical(method.getGenericReturnType());
 		bytes = returnType.getBytes(StandardCharsets.UTF_8);
 		os.write(bytes.length);
 		os.write(bytes);
-		String[] types = invocation.getGenericParameterTypes();
+		Type[] types = method.getGenericParameterTypes();
+		String[] genericParameterTypes = new String[types.length];
+		for (int i = 0; i < types.length; i++) {
+			Type type = types[i];
+			genericParameterTypes[i] = toCanonical(type);
+		}
 		Object[] arguments = invocation.getArguments();
 		ObjectNode on = new ObjectNode(objectMapper.getNodeFactory());
 		for (int i = 0; i < types.length; i++) {
-			String type = types[i];
+			String type = genericParameterTypes[i];
 			Object argument = arguments[i];
 			String concreteType = toConcrete(type, argument);
 			on.putPOJO(concreteType.equals(type) ? type : type + SEPARATOR + concreteType, argument);
@@ -72,7 +75,7 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 
 	@Override
 	public RemoteInvocation readRemoteInvocation(InputStream is) throws IOException {
-		JacksonRemoteInvocation invocation = new JacksonRemoteInvocation();
+		MethodRemoteInvocation invocation = new MethodRemoteInvocation();
 		int length = is.read();
 		byte[] bytes = new byte[length];
 		is.read(bytes);
@@ -80,10 +83,8 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 		length = is.read();
 		bytes = new byte[length];
 		is.read(bytes);
-		invocation.setGenericReturnType(new String(bytes, StandardCharsets.UTF_8));
 		try {
 			ObjectNode on = objectMapper.readValue(is, ObjectNode.class);
-			List<String> genericParameterTypes = new ArrayList<>();
 			List<Class<?>> parameterTypes = new ArrayList<>();
 			List<Object> arguments = new ArrayList<>();
 			Iterator<String> names = on.fieldNames();
@@ -91,7 +92,6 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 				String name = names.next();
 				int index = name.indexOf(SEPARATOR);
 				String type = index > 0 ? name.substring(0, index) : name;
-				genericParameterTypes.add(type);
 				JavaType jt = objectMapper.getTypeFactory().constructFromCanonical(type);
 				parameterTypes.add(jt.getRawClass());
 				if (index > 0)
@@ -99,8 +99,6 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 							.constructFromCanonical(name.substring(index + SEPARATOR.length()));
 				arguments.add(objectMapper.readValue(objectMapper.treeAsTokens(on.get(type)), jt));
 			}
-			invocation
-					.setGenericParameterTypes(genericParameterTypes.toArray(new String[genericParameterTypes.size()]));
 			invocation.setParameterTypes(parameterTypes.toArray(new Class[parameterTypes.size()]));
 			invocation.setArguments(arguments.toArray(new Object[arguments.size()]));
 			return invocation;
@@ -112,11 +110,11 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 	@Override
 	public void writeRemoteInvocationResult(RemoteInvocation remoteInvocation, RemoteInvocationResult result,
 			OutputStream os) throws IOException {
-		JacksonRemoteInvocation invocation = (JacksonRemoteInvocation) remoteInvocation;
+		MethodRemoteInvocation invocation = (MethodRemoteInvocation) remoteInvocation;
 		Throwable exception = result.getException();
 		if (exception == null) {
 			os.write(0);
-			String returnType = invocation.getGenericReturnType();
+			String returnType = toCanonical(invocation.getMethod().getGenericReturnType());
 			returnType = toConcrete(returnType, result.getValue());
 			byte[] bytes = returnType.getBytes(StandardCharsets.UTF_8);
 			os.write(bytes.length);
@@ -206,33 +204,6 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 			}
 		}
 		return type;
-	}
-
-	@NoArgsConstructor
-	private class JacksonRemoteInvocation extends RemoteInvocation {
-
-		private static final long serialVersionUID = -2740913342844528055L;
-
-		@Getter
-		@Setter
-		private String[] genericParameterTypes;
-
-		@Getter
-		@Setter
-		private String genericReturnType;
-
-		JacksonRemoteInvocation(MethodInvocation methodInvocation) {
-			super(methodInvocation);
-			Type[] types = methodInvocation.getMethod().getGenericParameterTypes();
-			genericParameterTypes = new String[types.length];
-			for (int i = 0; i < types.length; i++) {
-				Type type = types[i];
-				genericParameterTypes[i] = toCanonical(type);
-			}
-			Type type = methodInvocation.getMethod().getGenericReturnType();
-			genericReturnType = toCanonical(type);
-		}
-
 	}
 
 }
