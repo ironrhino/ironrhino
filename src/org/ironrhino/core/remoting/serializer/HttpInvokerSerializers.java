@@ -9,18 +9,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.ClassUtils;
 
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@UtilityClass
 public final class HttpInvokerSerializers {
-
-	private HttpInvokerSerializers() {
-
-	}
 
 	public static final HttpInvokerSerializer DEFAULT_SERIALIZER = JavaHttpInvokerSerializer.INSTANCE;
 
-	private static final List<HttpInvokerSerializer> SERIALIZERS = new ArrayList<>();
+	public static final List<HttpInvokerSerializer> SERIALIZERS = new ArrayList<>();
 
 	static {
 		SERIALIZERS.add(DEFAULT_SERIALIZER);
