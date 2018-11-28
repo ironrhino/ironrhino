@@ -6,9 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
-import org.springframework.http.MediaType;
 import org.springframework.http.MediaTypeFactory;
 
 public interface FileStorage {
@@ -78,11 +76,9 @@ public interface FileStorage {
 	}
 
 	public default void write(InputStream is, String path, long contentLength) throws IOException {
-		String contentType = null;
 		int index = path.lastIndexOf('/');
-		Optional<MediaType> type = MediaTypeFactory.getMediaType(index >= 0 ? path.substring(index + 1) : path);
-		if (type.isPresent())
-			contentType = type.get().toString();
+		String contentType = MediaTypeFactory.getMediaType(index >= 0 ? path.substring(index + 1) : path)
+				.map(Object::toString).orElse(null);
 		write(is, path, contentLength, contentType);
 	}
 

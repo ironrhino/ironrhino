@@ -118,7 +118,7 @@ public class HttpInvokerServer implements HttpRequestHandler {
 			RemoteInvocation invocation, Object value) {
 		if (value instanceof Optional) {
 			Optional<?> optional = ((Optional<?>) value);
-			return new RemoteInvocationResult(optional.isPresent() ? optional.get() : null);
+			return new RemoteInvocationResult(optional.orElse(null));
 		} else if (value instanceof Callable || value instanceof Future) {
 			AsyncContext context = request.startAsync();
 			Map<String, String> contextMap = MDC.getCopyOfContextMap();

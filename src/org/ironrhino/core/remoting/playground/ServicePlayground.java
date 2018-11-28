@@ -127,7 +127,7 @@ public class ServicePlayground {
 				.orElseThrow(() -> new IllegalArgumentException("Unknown method: " + method));
 		Object result = mi.getMethod().invoke(services.get(service), convert(mi.getParameters(), params));
 		if (result instanceof Optional)
-			result = ((Optional<?>) result).get();
+			result = ((Optional<?>) result).orElse(null);
 		else if (result instanceof Callable)
 			result = ((Callable<?>) result).call();
 		if (result instanceof Future)
