@@ -9,7 +9,10 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.codec.binary.Hex;
+import org.ironrhino.core.tracing.Tracing;
 
+import io.opentracing.Span;
+import io.opentracing.util.GlobalTracer;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -297,6 +300,11 @@ public class CodecUtils {
 	}
 
 	public static String generateRequestId() {
+		if (Tracing.isEnabled()) {
+			Span span = GlobalTracer.get().activeSpan();
+			if (span != null)
+				return span.context().toTraceId();
+		}
 		return nextId();
 	}
 

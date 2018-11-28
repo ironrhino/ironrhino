@@ -17,6 +17,7 @@ import javax.validation.executable.ExecutableValidator;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.ironrhino.core.tracing.Tracing;
 import org.ironrhino.core.util.NameableThreadFactory;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.aop.support.AopUtils;
@@ -28,6 +29,9 @@ import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureTask;
 import org.springframework.validation.annotation.Validated;
 
+import io.opentracing.Scope;
+import io.opentracing.Span;
+import io.opentracing.util.GlobalTracer;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -93,13 +97,28 @@ public abstract class MethodInterceptorFactoryBean implements MethodInterceptor,
 			if (returnType == Callable.class) {
 				return callable;
 			}
-			if (returnType == ListenableFuture.class) {
-				ListenableFutureTask<Object> future = new ListenableFutureTask<>(callable);
-				getExecutorService().execute(future);
-				return future;
-			}
-			if (returnType == Future.class) {
-				return getExecutorService().submit(callable);
+			Span asyncSpan = Tracing.isEnabled() ? GlobalTracer.get().buildSpan("async").withTag("async", true).start()
+					: null;
+			try (Scope scope = asyncSpan != null ? GlobalTracer.get().activateSpan(asyncSpan) : null) {
+				Callable<Object> decoratedCallable = new Callable<Object>() {
+					@Override
+					public Object call() throws Exception {
+						try (Scope s = (asyncSpan != null ? GlobalTracer.get().activateSpan(asyncSpan) : null)) {
+							return callable.call();
+						}
+					}
+				};
+				if (returnType == ListenableFuture.class) {
+					ListenableFutureTask<Object> future = new ListenableFutureTask<>(decoratedCallable);
+					getExecutorService().execute(future);
+					return future;
+				}
+				if (returnType == Future.class) {
+					return getExecutorService().submit(decoratedCallable);
+				}
+			} finally {
+				if (asyncSpan != null)
+					asyncSpan.finish();
 			}
 		}
 		Object returnValue;

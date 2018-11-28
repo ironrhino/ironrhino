@@ -29,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.spring.FallbackSupportMethodInterceptorFactoryBean;
 import org.ironrhino.core.throttle.CircuitBreakerRegistry;
+import org.ironrhino.core.tracing.Tracing;
 import org.ironrhino.core.util.MaxAttemptsExceededException;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.rest.RestStatus;
@@ -198,6 +199,9 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 			} while (--remainingAttempts > 0);
 			throw new MaxAttemptsExceededException(maxAttempts);
 		};
+		Callable<Object> old = callable;
+		callable = () -> Tracing.execute(ReflectionUtils.stringify(methodInvocation.getMethod()), old, "span.kind",
+				"client", "component", "rest");
 		return circuitBreakerRegistry != null
 				? circuitBreakerRegistry.execute(restApiClass.getName(), IO_ERROR_PREDICATE, callable)
 				: callable.call();

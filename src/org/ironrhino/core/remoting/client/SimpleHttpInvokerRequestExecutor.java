@@ -14,6 +14,7 @@ import org.ironrhino.core.remoting.RemotingContext;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializer;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializers;
 import org.ironrhino.core.servlet.AccessFilter;
+import org.ironrhino.core.tracing.Tracing;
 import org.ironrhino.core.util.AppInfo;
 import org.slf4j.MDC;
 import org.springframework.core.serializer.support.SerializationFailedException;
@@ -45,6 +46,8 @@ public class SimpleHttpInvokerRequestExecutor extends HttpInvokerRequestExecutor
 		if (requestChain != null)
 			connection.addRequestProperty(AccessFilter.HTTP_HEADER_REQUEST_CHAIN, requestChain);
 		connection.addRequestProperty(AccessFilter.HTTP_HEADER_REQUEST_FROM, AppInfo.getInstanceId(true));
+
+		Tracing.inject(connection);
 
 		if (getConnectTimeout() >= 0)
 			connection.setConnectTimeout(getConnectTimeout());

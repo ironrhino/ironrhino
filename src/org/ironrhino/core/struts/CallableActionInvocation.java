@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts2.ServletActionContext;
+import org.ironrhino.core.tracing.Tracing;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,8 +22,11 @@ import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.DefaultActionInvocation;
 import com.opensymphony.xwork2.Result;
 import com.opensymphony.xwork2.XWorkException;
+import com.opensymphony.xwork2.config.ConfigurationException;
 import com.opensymphony.xwork2.config.entities.ActionConfig;
+import com.opensymphony.xwork2.config.entities.InterceptorMapping;
 import com.opensymphony.xwork2.config.entities.ResultConfig;
+import com.opensymphony.xwork2.interceptor.PreResultListener;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -83,7 +87,7 @@ public class CallableActionInvocation extends DefaultActionInvocation {
 						}
 						((CallableActionInvocation) actionInvocation).reset();
 						actionInvocation.setResultCode(rst);
-						re.execute(actionInvocation);
+						executeResult(re);
 					} catch (Exception e) {
 						log.error(e.getMessage(), e);
 						try {
@@ -112,6 +116,54 @@ public class CallableActionInvocation extends DefaultActionInvocation {
 			return null;
 		}
 		return super.saveResult(actionConfig, methodResult);
+	}
+
+	@Override
+	public String invoke() throws Exception {
+		if (executed) {
+			throw new IllegalStateException("Action has already executed");
+		}
+		if (interceptors.hasNext()) {
+			InterceptorMapping interceptor = interceptors.next();
+			resultCode = interceptor.getInterceptor().intercept(this);
+		} else {
+			resultCode = invokeActionOnly();
+		}
+		if (!executed) {
+			if (preResultListeners != null) {
+				for (Object preResultListener : preResultListeners) {
+					PreResultListener listener = (PreResultListener) preResultListener;
+					listener.beforeResult(this, resultCode);
+				}
+			}
+			if (proxy.getExecuteResult()) {
+				result = createResult();
+				executeResult(result);
+			}
+			executed = true;
+		}
+		return resultCode;
+	}
+
+	protected void executeResult(Result result) throws Exception {
+		if (result == null) {
+			if ((resultCode != null) && (!"none".equals(resultCode)))
+				throw new ConfigurationException("No result defined for action " + getAction().getClass().getName()
+						+ " and result " + getResultCode(), proxy.getConfig());
+			else
+				return;
+		}
+		Tracing.execute(result.getClass().getName() + ".execute(ActionInvocation)", () -> {
+			result.execute(this);
+			return null;
+		}, "component", "result");
+	}
+
+	@Override
+	protected String invokeAction(Object action, ActionConfig actionConfig) throws Exception {
+		return Tracing.execute(action.getClass().getName() + "." + proxy.getMethod() + "()", () -> {
+			return super.invokeAction(action, actionConfig);
+		}, "component", "action");
 	}
 
 	protected void reset() {

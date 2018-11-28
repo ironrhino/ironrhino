@@ -24,6 +24,7 @@ import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.rest.component.AuthorizeAspect;
 import org.ironrhino.rest.component.MetricsAspect;
 import org.ironrhino.rest.component.RestExceptionHandler;
+import org.ironrhino.rest.component.TracingAspect;
 import org.ironrhino.rest.doc.ApiDocInspector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -264,6 +265,12 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 	@ClassPresentConditional("io.micrometer.core.instrument.Metrics")
 	protected MetricsAspect metricsAspect() {
 		return new MetricsAspect(getServletMapping());
+	}
+
+	@Bean
+	@ClassPresentConditional("io.opentracing.Tracer")
+	protected TracingAspect tracingAspect() {
+		return new TracingAspect(getServletMapping());
 	}
 
 	@Bean

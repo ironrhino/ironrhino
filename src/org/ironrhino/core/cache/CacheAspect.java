@@ -15,6 +15,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.ironrhino.core.aop.BaseAspect;
 import org.ironrhino.core.metrics.Metrics;
 import org.ironrhino.core.model.NullObject;
+import org.ironrhino.core.tracing.Tracing;
 import org.ironrhino.core.util.ExpressionUtils;
 import org.mvel2.PropertyAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -164,6 +165,7 @@ public class CacheAspect extends BaseAspect {
 
 	private static void instrument(String namespace, boolean hit) {
 		Metrics.increment("cache." + namespace, "hit", String.valueOf(hit));
+		Tracing.setTags("cache.namespace", namespace, "cache.hit", hit);
 	}
 
 }

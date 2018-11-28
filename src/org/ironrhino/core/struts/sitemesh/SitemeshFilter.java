@@ -19,6 +19,7 @@ import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.StrutsStatics;
 import org.apache.struts2.views.freemarker.FreemarkerManager;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
+import org.ironrhino.core.tracing.Tracing;
 import org.springframework.stereotype.Component;
 
 import com.opensymphony.module.sitemesh.Config;
@@ -130,7 +131,9 @@ public class SitemeshFilter implements Filter {
 			}
 
 			Decorator decorator = decoratorSelector.selectDecorator(content, webAppContext);
-			decorator.render(content, webAppContext);
+			Tracing.execute(decorator.getClass().getName() + ".render(Content,SiteMeshContext)", () -> {
+				decorator.render(content, webAppContext);
+			}, "component", "decorator");
 
 		} catch (IllegalStateException e) {
 			if (!containerTweaks.shouldIgnoreIllegalStateExceptionOnErrorPage()) {

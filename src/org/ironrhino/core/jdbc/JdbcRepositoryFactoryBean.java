@@ -25,6 +25,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.spring.MethodInterceptorFactoryBean;
+import org.ironrhino.core.tracing.Tracing;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.ExpressionUtils;
@@ -175,9 +176,14 @@ public class JdbcRepositoryFactoryBean extends MethodInterceptorFactoryBean
 		return jdbcRepositoryClass;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	protected Object doInvoke(MethodInvocation methodInvocation) {
+	protected Object doInvoke(MethodInvocation methodInvocation) throws Exception {
+		return Tracing.execute(ReflectionUtils.stringify(methodInvocation.getMethod()),
+				() -> actualInvoke(methodInvocation), "component", "jdbc");
+	}
+
+	@SuppressWarnings("unchecked")
+	private Object actualInvoke(MethodInvocation methodInvocation) {
 		if (AppInfo.getStage() == Stage.DEVELOPMENT)
 			this.sqls = loadSqls();
 		Method method = methodInvocation.getMethod();

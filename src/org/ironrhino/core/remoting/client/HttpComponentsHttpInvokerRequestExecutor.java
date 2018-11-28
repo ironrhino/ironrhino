@@ -23,6 +23,7 @@ import org.ironrhino.core.remoting.RemotingContext;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializer;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializers;
 import org.ironrhino.core.servlet.AccessFilter;
+import org.ironrhino.core.tracing.Tracing;
 import org.ironrhino.core.util.AppInfo;
 import org.slf4j.MDC;
 import org.springframework.core.serializer.support.SerializationFailedException;
@@ -61,6 +62,7 @@ public class HttpComponentsHttpInvokerRequestExecutor extends HttpInvokerRequest
 	protected RemoteInvocationResult doExecuteRequest(String serviceUrl, MethodInvocation methodInvocation,
 			ByteArrayOutputStream baos) throws IOException {
 		HttpPost postMethod = new HttpPost(serviceUrl);
+
 		String requestId = MDC.get(AccessFilter.MDC_KEY_REQUEST_ID);
 		if (requestId != null)
 			postMethod.addHeader(AccessFilter.HTTP_HEADER_REQUEST_ID, requestId);
@@ -68,6 +70,9 @@ public class HttpComponentsHttpInvokerRequestExecutor extends HttpInvokerRequest
 		if (requestChain != null)
 			postMethod.addHeader(AccessFilter.HTTP_HEADER_REQUEST_CHAIN, requestChain);
 		postMethod.addHeader(AccessFilter.HTTP_HEADER_REQUEST_FROM, AppInfo.getInstanceId(true));
+
+		Tracing.inject(postMethod);
+
 		postMethod.setHeader(HTTP_HEADER_CONTENT_TYPE, getSerializer().getContentType());
 		postMethod.setHeader(HTTP_HEADER_CONTENT_LENGTH, Integer.toString(baos.size()));
 		if (isAcceptGzipEncoding())
