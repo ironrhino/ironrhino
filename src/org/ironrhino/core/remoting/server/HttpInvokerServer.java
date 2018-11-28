@@ -175,6 +175,7 @@ public class HttpInvokerServer implements HttpRequestHandler {
 	private void invoke(HttpServletRequest request, HttpServletResponse response,
 			ThrowableFunction<HttpServletRequest, RemoteInvocation, Exception> invocationFunction,
 			Function<RemoteInvocation, RemoteInvocationResult> invocationResultFunction, Runnable completion) {
+		HttpInvokerSerializer serializer = HttpInvokerSerializers.forRequest(request);
 		try {
 			RemoteInvocation invocation = invocationFunction.apply(request);
 			long time = System.currentTimeMillis();
@@ -200,7 +201,6 @@ public class HttpInvokerServer implements HttpRequestHandler {
 				}
 			}
 			remotingLogger.info("Invoked from {} in {}ms", MDC.get(AccessFilter.MDC_KEY_REQUEST_FROM), time);
-			HttpInvokerSerializer serializer = HttpInvokerSerializers.forRequest(request);
 			response.setContentType(serializer.getContentType());
 			serializer.writeRemoteInvocationResult(invocation, result, response.getOutputStream());
 		} catch (SerializationFailedException sfe) {
@@ -208,8 +208,14 @@ public class HttpInvokerServer implements HttpRequestHandler {
 			response.setHeader(RemotingContext.HTTP_HEADER_EXCEPTION_MESSAGE, sfe.getMessage());
 			response.setStatus(RemotingContext.SC_SERIALIZATION_FAILED);
 		} catch (Exception ex) {
-			log.error(ex.getMessage(), ex);
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			try {
+				if (!serializer.handleException(ex, response)) {
+					log.error(ex.getMessage(), ex);
+					response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				}
+			} catch (IOException e) {
+				log.error(e.getMessage(), e);
+			}
 		} finally {
 			completion.run();
 		}
