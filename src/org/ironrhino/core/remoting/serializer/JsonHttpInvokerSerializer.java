@@ -2,7 +2,7 @@ package org.ironrhino.core.remoting.serializer;
 
 import org.ironrhino.core.remoting.RemotingContext;
 
-public class JsonHttpInvokerSerializer extends JacksonHttpInvokerSerializer {
+public class JsonHttpInvokerSerializer extends AbstractJsonRpcHttpInvokerSerializer {
 
 	public static JsonHttpInvokerSerializer INSTANCE = new JsonHttpInvokerSerializer();
 

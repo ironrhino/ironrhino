@@ -44,11 +44,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSerializer {
+public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvokerSerializer {
 
 	private final ObjectMapper objectMapper;
 
-	public JacksonHttpInvokerSerializer(JsonFactory jsonFactory) {
+	public AbstractJsonRpcHttpInvokerSerializer(JsonFactory jsonFactory) {
 		objectMapper = JsonSerializationUtils.createNewObjectMapper(jsonFactory)
 				.registerModule(new SimpleModule().addSerializer(NullObject.class, new JsonSerializer<NullObject>() {
 					@Override
@@ -61,12 +61,12 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 
 	@Override
 	public RemoteInvocation createRemoteInvocation(MethodInvocation methodInvocation) {
-		return new JsonRpcRemoteInvocation(methodInvocation, CodecUtils.nextId());
+		return new JsonrpcRemoteInvocation(methodInvocation, CodecUtils.nextId());
 	}
 
 	@Override
 	public void writeRemoteInvocation(RemoteInvocation remoteInvocation, OutputStream os) throws IOException {
-		JsonRpcRemoteInvocation invocation = (JsonRpcRemoteInvocation) remoteInvocation;
+		JsonrpcRemoteInvocation invocation = (JsonrpcRemoteInvocation) remoteInvocation;
 		Request request = new Request();
 		request.setId(invocation.getId());
 		request.setMethod(invocation.getMethodName());
@@ -76,19 +76,19 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 
 	@Override
 	public RemoteInvocation readRemoteInvocation(Class<?> serviceInterface, InputStream is) throws IOException {
-		JsonRpcRemoteInvocation invocation = new JsonRpcRemoteInvocation();
+		JsonrpcRemoteInvocation invocation = new JsonrpcRemoteInvocation();
 		JsonNode tree;
 		try {
 			tree = objectMapper.readTree(is);
 		} catch (JsonParseException e) {
-			throw new JsonrpcException(-32700, e.getMessage(), NullObject.get());
+			throw new JsonRpcException(-32700, e.getMessage(), NullObject.get());
 		}
 		Serializable id = null;
 		JsonNode idNode = tree.get("id");
 		if (idNode != null)
 			id = idNode.isNumber() ? idNode.asLong() : idNode.isTextual() ? idNode.asText() : NullObject.get();
 		if (!isValid(tree))
-			throw new JsonrpcException(-32600, id != null ? id : NullObject.get());
+			throw new JsonRpcException(-32600, id != null ? id : NullObject.get());
 		invocation.setId(id);
 		invocation.setMethodName(tree.get("method").asText());
 		Class<?>[] parameterTypes = null;
@@ -132,7 +132,7 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 				}
 			}
 			if (ex != null || methodNameExists && invocation.getMethod() == null)
-				throw new JsonrpcException(-32602, id);
+				throw new JsonRpcException(-32602, id);
 		} else {
 			try {
 				invocation.setMethod(serviceInterface.getMethod(invocation.getMethodName()));
@@ -142,7 +142,7 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 			arguments = new Object[0];
 		}
 		if (invocation.getMethod() == null)
-			throw new JsonrpcException(-32601, id);
+			throw new JsonRpcException(-32601, id);
 		invocation.setParameterTypes(parameterTypes);
 		invocation.setArguments(arguments);
 		return invocation;
@@ -151,7 +151,7 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 	@Override
 	public void writeRemoteInvocationResult(RemoteInvocation remoteInvocation, RemoteInvocationResult result,
 			OutputStream os) throws IOException {
-		JsonRpcRemoteInvocation invocation = (JsonRpcRemoteInvocation) remoteInvocation;
+		JsonrpcRemoteInvocation invocation = (JsonrpcRemoteInvocation) remoteInvocation;
 		Response response = new Response();
 		response.setId(invocation.getId());
 		if (!result.hasException()) {
@@ -212,7 +212,7 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 					}
 				}
 				if (exception == null)
-					exception = new JsonrpcException(code, message, id);
+					exception = new JsonRpcException(code, message, id);
 				result.setException(new InvocationTargetException(exception));
 			}
 			return result;
@@ -223,8 +223,8 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 
 	@Override
 	public boolean handleException(Exception ex, HttpServletResponse response) throws IOException {
-		if (ex instanceof JsonrpcException) {
-			JsonrpcException e = (JsonrpcException) ex;
+		if (ex instanceof JsonRpcException) {
+			JsonRpcException e = (JsonRpcException) ex;
 			Response rsp = new Response();
 			rsp.setId(e.getId());
 			Error error = new Error();
@@ -330,7 +330,7 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 	@NoArgsConstructor
 	@Getter
 	@Setter
-	private class JsonRpcRemoteInvocation extends RemoteInvocation {
+	private class JsonrpcRemoteInvocation extends RemoteInvocation {
 
 		private static final long serialVersionUID = -2740913342844528055L;
 
@@ -338,7 +338,7 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 
 		private Serializable id;
 
-		JsonRpcRemoteInvocation(MethodInvocation methodInvocation, Serializable id) {
+		JsonrpcRemoteInvocation(MethodInvocation methodInvocation, Serializable id) {
 			super(methodInvocation);
 			this.method = methodInvocation.getMethod();
 			this.id = id;
@@ -356,7 +356,7 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 	}
 
 	@Getter
-	static class JsonrpcException extends RuntimeException {
+	static class JsonRpcException extends RuntimeException {
 
 		private static final long serialVersionUID = -7532491242290991258L;
 
@@ -366,21 +366,21 @@ public abstract class JacksonHttpInvokerSerializer implements HttpInvokerSeriali
 
 		private Serializable id;
 
-		public JsonrpcException(int code) {
+		public JsonRpcException(int code) {
 			this.code = code;
 		}
 
-		public JsonrpcException(int code, Serializable id) {
+		public JsonRpcException(int code, Serializable id) {
 			this.code = code;
 			this.id = id;
 		}
 
-		public JsonrpcException(int code, String message) {
+		public JsonRpcException(int code, String message) {
 			this.code = code;
 			this.message = message;
 		}
 
-		public JsonrpcException(int code, String message, Serializable id) {
+		public JsonRpcException(int code, String message, Serializable id) {
 			this.code = code;
 			this.message = message;
 			this.id = id;

@@ -4,7 +4,7 @@ import org.ironrhino.core.remoting.RemotingContext;
 
 import com.fasterxml.jackson.dataformat.smile.SmileFactory;
 
-public class SmileHttpInvokerSerializer extends JacksonHttpInvokerSerializer {
+public class SmileHttpInvokerSerializer extends AbstractJsonRpcHttpInvokerSerializer {
 
 	public static SmileHttpInvokerSerializer INSTANCE = new SmileHttpInvokerSerializer();
 
