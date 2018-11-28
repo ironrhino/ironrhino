@@ -16,6 +16,7 @@ import org.ironrhino.core.model.NullObject;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.jackson2.SimpleGrantedAuthorityMixin;
+import org.springframework.util.ClassUtils;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -37,6 +38,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.module.mrbean.MrBeanModule;
 
 import lombok.experimental.UtilityClass;
 
@@ -87,7 +89,7 @@ public class JsonSerializationUtils {
 	}
 
 	public static ObjectMapper createNewObjectMapper(JsonFactory jsonFactory) {
-		return new ObjectMapper(jsonFactory)
+		ObjectMapper objectMapper = new ObjectMapper(jsonFactory)
 				.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY)
 				.setSerializationInclusion(JsonInclude.Include.NON_NULL)
 				.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
@@ -161,6 +163,10 @@ public class JsonSerializationUtils {
 						return NullObject.get();
 					}
 				})).setAnnotationIntrospector(SmartJacksonAnnotationIntrospector.INSTANCE);
+		if (ClassUtils.isPresent("com.fasterxml.jackson.module.mrbean.MrBeanModule",
+				ObjectMapper.class.getClassLoader()))
+			objectMapper.registerModule(new MrBeanModule());
+		return objectMapper;
 	}
 
 	@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY)
