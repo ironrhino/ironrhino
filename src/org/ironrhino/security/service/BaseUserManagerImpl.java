@@ -51,7 +51,7 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 	@Transactional
 	@Override
 	public void resetPassword(T user) {
-		T u = get(user.getId());
+		T u = user.isNew() ? user : get(user.getId());
 		String newPassword = passwordGenerator != null ? passwordGenerator.generate(user) : user.getUsername();
 		if (newPassword == null)
 			newPassword = user.getUsername();
