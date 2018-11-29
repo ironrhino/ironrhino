@@ -159,12 +159,15 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 			objectMapper.writeValue(os, response);
 		} else {
 			Error error = new Error();
-			Throwable exception = ((InvocationTargetException) result.getException()).getTargetException();
-			error.setCode(-32603);
-			error.setMessage(exception.getMessage());
-			error.setData(exception.getClass().getName());
-			response.setError(error);
-			objectMapper.writeValue(os, response);
+			InvocationTargetException ex = ((InvocationTargetException) result.getException());
+			if (ex != null) {
+				Throwable exception = ex.getTargetException();
+				error.setCode(-32603);
+				error.setMessage(exception.getMessage());
+				error.setData(exception.getClass().getName());
+				response.setError(error);
+				objectMapper.writeValue(os, response);
+			}
 		}
 	}
 
