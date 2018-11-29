@@ -21,6 +21,7 @@ import javax.persistence.PostUpdate;
 import javax.persistence.PrePersist;
 import javax.persistence.PreRemove;
 import javax.persistence.PreUpdate;
+import javax.validation.ConstraintViolationException;
 
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
@@ -385,6 +386,14 @@ public class EntityManagerTest {
 		}, dc, true);
 		assertEquals(9, count);
 
+	}
+
+	@Test(expected = ConstraintViolationException.class)
+	public void testValidation() {
+		entityManager.setEntityClass(Person.class);
+		Person person = new Person();
+		person.setName("");
+		entityManager.save(person);
 	}
 
 	private void prepareData() {

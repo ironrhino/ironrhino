@@ -16,6 +16,7 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
+import javax.validation.constraints.NotEmpty;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.NaturalId;
@@ -33,6 +34,7 @@ public class Person extends BaseEntity {
 	private static final long serialVersionUID = 1L;
 
 	@NaturalId
+	@NotEmpty
 	private String name;
 
 	@Column(unique = true)
