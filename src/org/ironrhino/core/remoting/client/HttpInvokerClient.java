@@ -38,6 +38,7 @@ import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 import org.springframework.remoting.RemoteInvocationFailureException;
+import org.springframework.remoting.RemoteLookupFailureException;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 import org.springframework.util.Assert;
@@ -58,9 +59,7 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 	@Setter
 	private Class<?> serviceInterface;
 
-	@Getter
-	@Setter
-	private String serviceUrl;
+	private volatile String serviceUrl;
 
 	@Getter
 	@Setter
@@ -112,8 +111,6 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 
 	private boolean urlFromDiscovery;
 
-	private volatile boolean discovered; // for lazy discover from serviceRegistry
-
 	private String discoveredHost;
 
 	private Object serviceProxy;
@@ -152,8 +149,6 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 		}
 		if (serviceUrl == null) {
 			Assert.notNull(serviceRegistry, "serviceRegistry shouldn't be null");
-			setServiceUrl("http://fakehost/");
-			discovered = false;
 			urlFromDiscovery = true;
 		}
 		ProxyFactory pf = new ProxyFactory(serviceInterface, this);
@@ -188,7 +183,7 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 				throw ex;
 			} else {
 				throw new RemoteInvocationFailureException("Invocation of method [" + methodInvocation.getMethod()
-						+ "] failed in HTTP invoker remote service at [" + getServiceUrl() + "]", ex);
+						+ "] failed in HTTP invoker remote service at [" + serviceUrl + "]", ex);
 			}
 		}
 	}
@@ -259,16 +254,15 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 			method = ReflectionUtils.stringify(methodInvocation.getMethod(), false, true);
 		int remainingAttempts = maxAttempts;
 		do {
-			if (!discovered) {
-				setServiceUrl(discoverServiceUrl());
-				discovered = true;
+			if (serviceUrl == null) {
+				serviceUrl = discoverServiceUrl();
 			} else if (polling) {
-				setServiceUrl(discoverServiceUrl(true));
+				serviceUrl = discoverServiceUrl(true);
 			}
 			long time = System.currentTimeMillis();
 			try {
-				RemoteInvocationResult result = httpInvokerRequestExecutor.executeRequest(this.getServiceUrl(),
-						invocation, methodInvocation);
+				RemoteInvocationResult result = httpInvokerRequestExecutor.executeRequest(serviceUrl, invocation,
+						methodInvocation);
 				if (serviceStats != null) {
 					serviceStats.clientSideEmit(discoveredHost, getServiceInterface().getName(), method,
 							System.currentTimeMillis() - time, false);
@@ -299,9 +293,9 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 							serviceRegistry.evict(discoveredHost);
 							discoveredHost = null;
 						}
-						String serviceUrl = discoverServiceUrl();
-						if (!serviceUrl.equals(getServiceUrl())) {
-							setServiceUrl(serviceUrl);
+						String newServiceUrl = discoverServiceUrl();
+						if (!newServiceUrl.equals(serviceUrl)) {
+							serviceUrl = newServiceUrl;
 							log.info("Relocate service url " + serviceUrl);
 						}
 					}
@@ -315,14 +309,16 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 		RemoteAccessException rae = null;
 		if (ex instanceof ConnectException) {
 			rae = new RemoteConnectFailureException(
-					"Could not connect to HTTP invoker remote service at [" + getServiceUrl() + "]", ex);
+					"Could not connect to HTTP invoker remote service at [" + serviceUrl + "]", ex);
+		} else if (ex instanceof ServiceNotFoundException) {
+			rae = new RemoteLookupFailureException(
+					"Could not found remote service [" + getServiceInterface().getName() + "]", ex);
 		} else if (ex instanceof ClassNotFoundException || ex instanceof NoClassDefFoundError
 				|| ex instanceof InvalidClassException) {
 			rae = new RemoteAccessException(
-					"Could not deserialize result from HTTP invoker remote service [" + getServiceUrl() + "]", ex);
+					"Could not deserialize result from HTTP invoker remote service [" + serviceUrl + "]", ex);
 		} else if (ex instanceof Exception) {
-			rae = new RemoteAccessException("Could not access HTTP invoker remote service at [" + getServiceUrl() + "]",
-					ex);
+			rae = new RemoteAccessException("Could not access HTTP invoker remote service at [" + serviceUrl + "]", ex);
 		}
 		if (rae != null) {
 			if (rae.getCause() != null)
