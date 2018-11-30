@@ -8,6 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.annotation.PostConstruct;
+
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.remoting.Remoting;
@@ -29,9 +31,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.aop.framework.ProxyFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
@@ -46,7 +48,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBean implements InitializingBean {
+public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBean {
 
 	private static final String SERVLET_PATH_PREFIX = "/remoting/httpinvoker/";
 
@@ -64,7 +66,7 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 	@Setter
 	private HttpInvokerRequestExecutor httpInvokerRequestExecutor = new SimpleHttpInvokerRequestExecutor();
 
-	@Value("${httpInvoker.serialization.type:}")
+	@Value("${httpInvoker.serializationType:}")
 	private String serializationType;
 
 	@Getter
@@ -88,6 +90,9 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 	@Setter
 	@Autowired(required = false)
 	private ServiceStats serviceStats;
+
+	@Autowired
+	private Environment env;
 
 	@Setter
 	private String host;
@@ -123,7 +128,7 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 		return this.serviceInterface;
 	}
 
-	@Override
+	@PostConstruct
 	public void afterPropertiesSet() {
 		Assert.notNull(serviceInterface, "'serviceInterface' must not be null");
 		Assert.isTrue(serviceInterface.isInterface(), "'serviceInterface' must be an interface");
@@ -131,6 +136,8 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 		Remoting anno = serviceInterface.getAnnotation(Remoting.class);
 		if (anno != null && StringUtils.isNotBlank(anno.serializationType()))
 			this.serializationType = anno.serializationType();
+		this.serializationType = env.getProperty(serviceInterface.getName() + ".serializationType",
+				this.serializationType);
 		httpInvokerRequestExecutor.setSerializer(HttpInvokerSerializers.ofSerializationType(serializationType));
 		httpInvokerRequestExecutor.setConnectTimeout(connectTimeout);
 		httpInvokerRequestExecutor.setReadTimeout(readTimeout);

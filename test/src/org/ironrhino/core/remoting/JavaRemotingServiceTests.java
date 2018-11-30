@@ -7,7 +7,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = RemotingConfiguration.class)
-@TestPropertySource(properties = "httpInvoker.serialization.type=JAVA")
+@TestPropertySource(properties = "httpInvoker.serializationType=JAVA")
 public class JavaRemotingServiceTests extends RemotingServiceTestsBase {
 
 }

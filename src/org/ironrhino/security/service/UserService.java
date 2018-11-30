@@ -5,7 +5,7 @@ import org.ironrhino.core.spring.security.RemotingUserDetailsService;
 import org.ironrhino.security.domain.User;
 import org.springframework.core.annotation.Order;
 
-@Remoting
+@Remoting(serializationType = "JAVA")
 @Order(0)
 public interface UserService extends RemotingUserDetailsService<User> {
 

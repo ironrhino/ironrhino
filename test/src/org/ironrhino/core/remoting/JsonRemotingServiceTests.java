@@ -7,7 +7,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = RemotingConfiguration.class)
-@TestPropertySource(properties = "httpInvoker.serialization.type=JSON")
+@TestPropertySource(properties = "httpInvoker.serializationType=JSON")
 public class JsonRemotingServiceTests extends RemotingServiceTestsBase {
 
 }
