@@ -16,8 +16,6 @@ public class ParameterInfo implements Serializable {
 
 	private String name;
 
-	private boolean concrete;
-
 	private String sample;
 
 	public boolean isRequired() {

@@ -16,14 +16,6 @@ public class MethodInfo {
 
 	private ParameterInfo[] parameters;
 
-	public boolean isConcrete() {
-		for (ParameterInfo p : parameters) {
-			if (!p.isConcrete())
-				return false;
-		}
-		return true;
-	}
-
 	public String getSignature() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(name).append('(');

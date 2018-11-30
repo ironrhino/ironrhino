@@ -17,7 +17,6 @@
 	</div>
 	<div id="method-${m?index}" class="accordion-body collapse">
 	<div class="accordion-inner">
-		<#if m.concrete>
 		<@s.form id="method-form-${m?index}" action="${actionBaseUrl}/${service}" method="post" class="ajax form-horizontal">
 		<@s.hidden name="method" value=m.signature/>
 		<#list m.parameters as p>
@@ -45,9 +44,6 @@
 		</#list>
 		<@s.submit label=getText('invoke') class="btn-primary"/>
 		</@s.form>
-		<#else>
-		Not concrete!
-		</#if>
 	</div>
 	</div>
 	</div>

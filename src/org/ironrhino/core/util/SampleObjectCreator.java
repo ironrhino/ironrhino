@@ -3,6 +3,7 @@ package org.ironrhino.core.util;
 import java.lang.reflect.Array;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -106,8 +107,23 @@ public class SampleObjectCreator {
 		Object object = createValue(clazz, null, null);
 		if (object != null)
 			return object;
-		if (clazz.isInterface())
-			return null;
+		if (clazz.isInterface()) {
+			object = Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[] { clazz }, (proxy, method, args) -> {
+				Type returnType = method.getGenericReturnType();
+				if (returnType == void.class)
+					return null;
+				if (returnType == clazz)
+					return null;
+				if (returnType instanceof ParameterizedType) {
+					ParameterizedType pt = (ParameterizedType) returnType;
+					for (Type t : pt.getActualTypeArguments())
+						if (t == clazz)
+							return null;
+				}
+				return createSample(returnType);
+			});
+			return object;
+		}
 		try {
 			final Object obj = BeanUtils.instantiateClass(clazz);
 			references.add(clazz);

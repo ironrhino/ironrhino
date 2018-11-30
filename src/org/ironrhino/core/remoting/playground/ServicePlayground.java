@@ -91,10 +91,6 @@ public class ServicePlayground {
 						pi.setName(parameterNames[i]);
 						Type type = parameterTypes[i];
 						pi.setType(type);
-						JavaType jt = objectMapper.constructType(type);
-						pi.setConcrete(jt.isConcrete() || jt.isCollectionLikeType() && jt.getContentType().isConcrete()
-								|| jt.isMapLikeType() && jt.getKeyType().isConcrete()
-										&& jt.getContentType().isConcrete());
 						try {
 							Object sampleObject = SampleObjectCreator.getDefaultInstance().createSample(type);
 							String sample = objectMapper.writeValueAsString(sampleObject);
