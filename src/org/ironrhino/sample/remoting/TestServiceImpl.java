@@ -79,6 +79,11 @@ public class TestServiceImpl implements TestService {
 	}
 
 	@Override
+	public UserDetails echoUserDetails(UserDetails value) {
+		return value;
+	}
+
+	@Override
 	public List<String> echoList(List<String> list) {
 		return list;
 	}

@@ -88,6 +88,9 @@ public abstract class RemotingServiceTestsBase {
 
 	@Test
 	public void testNonConcreteType() {
+		User user = new User();
+		user.setUsername("test");
+		assertEquals(user.getUsername(), testService.echoUserDetails(user).getUsername());
 		assertNull(testService.loadUserDetailsByUsername(null));
 		assertEquals("username", testService.loadUserDetailsByUsername("username").getUsername());
 		assertNull(testService.searchUserDetails(null));

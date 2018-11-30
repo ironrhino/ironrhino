@@ -46,6 +46,8 @@ public interface TestService {
 
 	public User echoUser(@Valid User value);
 
+	public UserDetails echoUserDetails(@Valid UserDetails value);
+
 	public List<String> echoList(List<String> list);
 
 	public List<String[]> echoListWithArray(List<String[]> list);

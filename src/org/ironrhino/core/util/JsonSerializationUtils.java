@@ -45,11 +45,8 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class JsonSerializationUtils {
 
-	private static final ObjectMapper sharedObjectMapper = createNewObjectMapper();
-
-	public static ObjectMapper createNewObjectMapper() {
-		return createNewObjectMapper(null);
-	}
+	private static final ObjectMapper defaultTypingObjectMapper = createNewObjectMapper()
+			.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
 
 	public static String serialize(Object object) throws IOException {
 		if (object == null)
@@ -60,7 +57,7 @@ public class JsonSerializationUtils {
 			return object + "F";
 		else if (object instanceof Enum)
 			return object.getClass().getName() + '.' + ((Enum<?>) object).name();
-		return sharedObjectMapper.writeValueAsString(object);
+		return defaultTypingObjectMapper.writeValueAsString(object);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -85,12 +82,15 @@ public class JsonSerializationUtils {
 				}
 			}
 		}
-		return sharedObjectMapper.readValue(string, Object.class);
+		return defaultTypingObjectMapper.readValue(string, Object.class);
+	}
+
+	public static ObjectMapper createNewObjectMapper() {
+		return createNewObjectMapper(null);
 	}
 
 	public static ObjectMapper createNewObjectMapper(JsonFactory jsonFactory) {
 		ObjectMapper objectMapper = new ObjectMapper(jsonFactory)
-				.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY)
 				.setSerializationInclusion(JsonInclude.Include.NON_NULL)
 				.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
 				.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS).addMixIn(Throwable.class, ThrowableMixin.class)
@@ -200,8 +200,8 @@ public class JsonSerializationUtils {
 				if (mem instanceof Method) {
 					Method method = (Method) mem;
 					String name = method.getName();
-					if (name.startsWith("get")) {
-						name = 's' + name.substring(1);
+					if (name.startsWith("get") || name.startsWith("is")) {
+						name = name.startsWith("get") ? 's' + name.substring(1) : "set" + name.substring(2);
 						try {
 							declaringClass.getMethod(name, method.getReturnType());
 							return false;

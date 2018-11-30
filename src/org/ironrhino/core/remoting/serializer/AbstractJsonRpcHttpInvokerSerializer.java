@@ -56,7 +56,7 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 							SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
 						jsonGenerator.writeNull();
 					}
-				})).disableDefaultTyping();
+				}));
 	}
 
 	@Override
