@@ -31,7 +31,7 @@
 				<@s.select label=p.name name="params['"+p.name+"']" value=p.sample! list={'true':getText('true'),'false':getText('false')} headerKey="" headerValue=""/>
 				</#if>
 			<#elseif p.enum>
-				<@s.select label=p.name name="params['"+p.name+"']" value=p.sample! list="@${p.type.name}@values()" listKey="name" listValue="name" headerKey="" headerValue="" class="${p.required?then('required','')}"/>
+				<@s.select label=p.name name="params['"+p.name+"']" value=p.sample! list="@${p.type.name}@values()" listKey="${p.displayable?then('name','top')}" listValue="${p.displayable?then('name','top')}" headerKey="" headerValue="" class="${p.required?then('required','')}"/>
 			<#elseif p.temporal>
 				<@s.textfield label=p.name name="params['"+p.name+"']" value=(p.sample?substring(1,p.sample?length-1))! class="datetime${p.required?then(' required','')}"/>
 			<#else>

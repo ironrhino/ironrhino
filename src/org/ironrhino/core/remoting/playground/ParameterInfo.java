@@ -3,6 +3,7 @@ package org.ironrhino.core.remoting.playground;
 import java.io.Serializable;
 import java.lang.reflect.Type;
 
+import org.ironrhino.core.model.Displayable;
 import org.ironrhino.core.util.TypeUtils;
 
 import lombok.Data;
@@ -48,6 +49,14 @@ public class ParameterInfo implements Serializable {
 		if (type instanceof Class) {
 			Class<?> c = (Class<?>) type;
 			return Enum.class.isAssignableFrom(c);
+		}
+		return false;
+	}
+	
+	public boolean isDisplayable() {
+		if (type instanceof Class) {
+			Class<?> c = (Class<?>) type;
+			return Displayable.class.isAssignableFrom(c);
 		}
 		return false;
 	}
