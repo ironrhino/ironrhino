@@ -18,6 +18,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.ironrhino.core.model.NullObject;
 import org.ironrhino.core.remoting.RemotingContext;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializer;
@@ -182,6 +183,11 @@ public class HttpInvokerServer implements HttpRequestHandler {
 			RemoteInvocationResult result = invocationResultFunction.apply(invocation);
 			if (result == null) {
 				return; // async
+			}
+			if (result.getValue() == NullObject.get()) {
+				// JSON-RPC notification
+				response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+				return;
 			}
 			time = System.currentTimeMillis() - time;
 			if (serviceStats != null) {

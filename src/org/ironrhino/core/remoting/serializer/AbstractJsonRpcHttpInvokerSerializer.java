@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 
 import javax.servlet.http.HttpServletResponse;
@@ -23,6 +24,7 @@ import org.ironrhino.core.model.NullObject;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.JsonSerializationUtils;
 import org.ironrhino.core.util.ReflectionUtils;
+import org.slf4j.MDC;
 import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
@@ -43,7 +45,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvokerSerializer {
 
 	private final ObjectMapper objectMapper;
@@ -86,7 +90,8 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 		Serializable id = null;
 		JsonNode idNode = tree.get("id");
 		if (idNode != null)
-			id = idNode.isNumber() ? idNode.asLong() : idNode.isTextual() ? idNode.asText() : NullObject.get();
+			id = idNode.isNull() ? NullObject.get()
+					: idNode.isNumber() ? idNode.asLong() : idNode.isTextual() ? idNode.asText() : NullObject.get();
 		if (!isValid(tree))
 			throw new JsonRpcException(-32600, id != null ? id : NullObject.get());
 		invocation.setId(id);
@@ -177,6 +182,10 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 		RemoteInvocationResult result = new RemoteInvocationResult();
 		try {
 			JsonNode tree = objectMapper.readTree(is);
+			if (tree == null) {
+				// notification
+				throw new JsonRpcException(-1, "JSON-RPC Notification do not have Response");
+			}
 			Serializable id = null;
 			JsonNode idNode = tree.get("id");
 			if (idNode != null)
@@ -262,7 +271,7 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 		if (params != null && !params.isContainerNode())
 			return false;
 		JsonNode id = on.get("id");
-		if (id != null && !(id.isNumber() || id.isTextual()))
+		if (id != null && !(id.isNull() || id.isNumber() || id.isTextual()))
 			return false;
 		return true;
 	}
@@ -353,7 +362,22 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 			if (method == null)
 				method = ClassUtils.getInterfaceMethodIfPossible(
 						targetObject.getClass().getMethod(getMethodName(), getParameterTypes()));
-			return method.invoke(targetObject, getArguments());
+			if (id == null) {
+				// notification
+				Map<String, String> contextMap = MDC.getCopyOfContextMap();
+				ForkJoinPool.commonPool().execute(() -> {
+					try {
+						MDC.setContextMap(contextMap);
+						method.invoke(targetObject, getArguments());
+					} catch (Exception e) {
+						log.error(e.getMessage(), e);
+					}
+				});
+				return NullObject.get();
+			} else {
+				return method.invoke(targetObject, getArguments());
+			}
+
 		}
 
 	}
