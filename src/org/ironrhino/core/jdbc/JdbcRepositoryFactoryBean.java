@@ -233,7 +233,7 @@ public class JdbcRepositoryFactoryBean extends MethodInterceptorFactoryBean
 					}
 					if (arg instanceof Collection) {
 						Collection<?> collection = (Collection<?>) arg;
-						sql = SqlUtils.expandCollectionParameter(sql, names[i], collection.size());
+						// sql = SqlUtils.expandCollectionParameter(sql, names[i], collection.size());
 						if (collection.size() > 0 && collection.iterator().next() instanceof Enum) {
 							List<Object> objects = new ArrayList<>();
 							for (Object obj : collection)
