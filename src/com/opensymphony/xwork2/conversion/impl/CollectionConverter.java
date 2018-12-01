@@ -41,7 +41,7 @@ public class CollectionConverter extends DefaultTypeConverter {
 		if (toType.isAssignableFrom(value.getClass())) {
 			// no need to do anything
 			result = (Collection) value;
-		} else if (value.getClass().isArray()) {
+		} else if (value instanceof Object[]) {
 			Object[] objArray = (Object[]) value;
 			TypeConverter converter = getTypeConverter(context);
 			result = createCollection(toType, memberType, objArray.length);

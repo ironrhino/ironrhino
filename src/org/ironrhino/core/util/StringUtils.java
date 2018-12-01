@@ -463,7 +463,7 @@ public class StringUtils {
 			return DateUtils.formatDatetime((Date) value);
 		if (value instanceof Enum)
 			return ((Enum<?>) value).name();
-		if (value != null && value.getClass().isArray())
+		if (value instanceof Object[])
 			return Arrays.toString((Object[]) value);
 		return String.valueOf(value);
 	}

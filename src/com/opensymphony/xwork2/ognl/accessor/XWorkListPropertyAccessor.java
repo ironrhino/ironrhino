@@ -142,7 +142,7 @@ public class XWorkListPropertyAccessor extends ListPropertyAccessor {
         String lastProperty = (String) context.get(XWorkConverter.LAST_BEAN_PROPERTY_ACCESSED);
         Class convertToClass = objectTypeDeterminer.getElementClass(lastClass, lastProperty, name);
 
-        if (name instanceof String && value.getClass().isArray()) {
+        if (name instanceof String && value instanceof Object[]) {
             // looks like the input game in the form of "someList.foo" and
             // we are expected to define the index values ourselves.
             // So let's do it:

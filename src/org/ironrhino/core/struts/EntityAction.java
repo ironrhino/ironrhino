@@ -1477,7 +1477,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 							text = "";
 						} else if (value instanceof Collection) {
 							text = StringUtils.join((Collection) value, ",");
-						} else if (value.getClass().isArray()) {
+						} else if (value instanceof Object[]) {
 							text = StringUtils.join((Object[]) value, ",");
 						} else if (value instanceof Boolean) {
 							text = getText(value.toString());

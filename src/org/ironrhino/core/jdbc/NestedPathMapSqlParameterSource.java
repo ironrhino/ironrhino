@@ -31,7 +31,7 @@ public class NestedPathMapSqlParameterSource extends MapSqlParameterSource {
 			String top = paramName.substring(0, index1);
 			String sub = paramName.substring(index1 + 1, index2);
 			Object topValue = super.hasValue(top) ? topValue = super.getValue(top) : null;
-			if (topValue != null && topValue.getClass().isArray()) {
+			if (topValue instanceof Object[]) {
 				if (!StringUtils.isNumeric(sub))
 					return false;
 				int index = Integer.valueOf(sub);
@@ -102,7 +102,7 @@ public class NestedPathMapSqlParameterSource extends MapSqlParameterSource {
 			Object topValue = super.hasValue(top) ? topValue = super.getValue(top) : null;
 			if (topValue == null)
 				return null;
-			if (topValue.getClass().isArray()) {
+			if (topValue instanceof Object[]) {
 				if (!StringUtils.isNumeric(sub))
 					return false;
 				int index = Integer.valueOf(sub);

@@ -62,7 +62,7 @@ public class MyXWorkConverter extends XWorkConverter {
 				result = ctor.newInstance(value);
 				removeConversionError(context, property);
 			} catch (Exception e) {
-				if (value.getClass().isArray()) {
+				if (value instanceof Object[]) {
 					Object[] arr = (Object[]) value;
 					if (arr.length == 1) {
 						try {

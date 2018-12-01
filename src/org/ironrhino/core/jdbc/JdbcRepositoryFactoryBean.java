@@ -220,7 +220,7 @@ public class JdbcRepositoryFactoryBean extends MethodInterceptorFactoryBean
 					if (arg instanceof RowCallbackHandler) {
 						rch = (RowCallbackHandler) arg;
 					}
-					if (arg.getClass().isArray()) {
+					if (arg instanceof Object[]) {
 						Object[] objects = (Object[]) arg;
 						sql = SqlUtils.expandCollectionParameter(sql, names[i], objects.length);
 						if (objects.length > 0 && Enum.class.isAssignableFrom(arg.getClass().getComponentType())) {

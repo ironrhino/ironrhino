@@ -171,7 +171,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	public List<T> delete(Serializable... id) {
 		if (id == null || id.length == 0 || id.length == 1 && id[0] == null)
 			return null;
-		if (id.length == 1 && id[0].getClass().isArray()) {
+		if (id.length == 1 && id[0] instanceof Object[]) {
 			Object[] objs = (Object[]) id[0];
 			Serializable[] arr = new Serializable[objs.length];
 			for (int i = 0; i < objs.length; i++)
@@ -486,7 +486,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	private static Serializable[] transform(Serializable... objects) {
 		if (objects == null || objects.length == 0 || objects.length == 1 && objects[0] == null)
 			return null;
-		if (objects.length == 1 && objects[0].getClass().isArray()) {
+		if (objects.length == 1 && objects[0] instanceof Object[]) {
 			Object[] objs = (Object[]) objects[0];
 			Serializable[] arr = new Serializable[objs.length];
 			for (int i = 0; i < objs.length; i++)
