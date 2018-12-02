@@ -23,7 +23,6 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.web.WebApplicationInitializer;
-import org.springframework.web.util.IntrospectorCleanupListener;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class MainAppInitializer implements WebApplicationInitializer {
@@ -135,8 +134,6 @@ public class MainAppInitializer implements WebApplicationInitializer {
 
 		ServletRegistration.Dynamic servletDynamic = servletContext.addServlet("test", TestServlet.class);
 		servletDynamic.setLoadOnStartup(100);
-
-		servletContext.addListener(IntrospectorCleanupListener.class);
 
 		// No standard servletContext::addErrorPage
 		String[] errorCodes = "500,404,403,401".split(",");
