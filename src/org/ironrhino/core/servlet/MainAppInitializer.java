@@ -76,11 +76,13 @@ public class MainAppInitializer implements WebApplicationInitializer {
 
 	private void configure(ServletContext servletContext) {
 
+		String encoding = StandardCharsets.UTF_8.name();
+
 		FilterRegistration.Dynamic filterDynamic;
 
 		filterDynamic = servletContext.addFilter("characterEncodingFilter", CharacterEncodingFilter.class);
 		filterDynamic.setAsyncSupported(true);
-		filterDynamic.setInitParameter("encoding", StandardCharsets.UTF_8.name());
+		filterDynamic.setInitParameter("encoding", encoding);
 		filterDynamic.setInitParameter("forceEncoding", Boolean.toString(true));
 		filterDynamic.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), false, "/*");
 
@@ -142,6 +144,12 @@ public class MainAppInitializer implements WebApplicationInitializer {
 		for (String errorCode : errorCodes)
 			errorPages.put(Integer.valueOf(errorCode), "/error/" + errorCode);
 		ServletContainerHelper.addErrorPages(servletContext, errorPages);
+
+		ServletRegistration servletRegistration = servletContext.getServletRegistration("default");
+		if (servletRegistration != null && servletRegistration.getClassName().endsWith("DefaultServlet")) {
+			// http://tomcat.10.x6.nabble.com/Tomcat-8-5-19-corrupts-static-text-files-encoded-with-UTF-8-td5065877.html
+			servletRegistration.setInitParameter("fileEncoding", encoding);
+		}
 	}
 
 	private void printVersion(ServletContext servletContext) {
