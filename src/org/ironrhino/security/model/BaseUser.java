@@ -11,7 +11,6 @@ import java.util.Set;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 import javax.validation.constraints.Email;
@@ -19,8 +18,6 @@ import javax.validation.constraints.Email;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.hibernate.annotations.NaturalId;
-import org.ironrhino.core.hibernate.convert.StringMapConverter;
-import org.ironrhino.core.hibernate.convert.StringSetConverter;
 import org.ironrhino.core.metadata.CaseInsensitive;
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.metadata.UiConfig;
@@ -113,14 +110,12 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 
 	@SearchableProperty
 	@Column(length = 4000)
-	@Convert(converter = StringSetConverter.class)
 	@UiConfig(displayOrder = 99, type = "multiselect", cssClass = "input-xxlarge chosen", listOptions = "beans['userRoleManager'].getAllRoles(true)", listKey = "key", listValue = "value", template = "<#list beans['userRoleManager'].displayRoles(value) as role>${action.getText(role)}&nbsp;&nbsp;</#list>", csvTemplate = "<#list value as r>${beans['userRoleManager'].displayRole(r)}<#sep>,</#list>")
 	private Set<String> roles = new LinkedHashSet<>(0);
 
 	@NotInCopy
 	@JsonIgnore
 	@Column(length = 4000)
-	@Convert(converter = StringMapConverter.class)
 	@UiConfig(hidden = true)
 	private Map<String, String> attributes;
 

@@ -238,8 +238,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 		CriteriaBuilder cb = sessionFactory.getCriteriaBuilder();
 		CriteriaQuery<Long> cq = cb.createQuery(Long.class);
 		Root<?> root = cq.from(getEntityClass());
-		cq.select(cb.count(root));
-		cq.where(cb.equal(root.get("id"), id));
+		cq.select(cb.count(root)).where(cb.equal(root.get("id"), id));
 		Query<Long> query = sessionFactory.getCurrentSession().createQuery(cq);
 		return query.uniqueResult() > 0;
 	}

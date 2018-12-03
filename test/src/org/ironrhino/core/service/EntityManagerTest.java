@@ -45,7 +45,7 @@ import lombok.Data;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = HibernateConfiguration.class)
-@TestPropertySource(properties = "annotatedClasses=org.ironrhino.core.service.Person")
+@TestPropertySource(properties = { "annotatedClasses=org.ironrhino.core.service.Person", "hibernate.show_sql=true" })
 public class EntityManagerTest {
 
 	@Autowired
