@@ -54,13 +54,16 @@ public class UploadFilesHandler extends AccessHandler {
 
 	private String pattern;
 
+	private boolean prependDefaultUploadDirForBucketBased;
+
 	@PostConstruct
 	private void init() {
 		pathPrefix = normalize(pathPrefix);
 		uploadDir = normalize(uploadDir);
 		if (uploadFileStorage.isBucketBased()) {
 			uploadDir = "";
-			if (DEFAULT_PATH_PREFIX.equals(pathPrefix))
+			prependDefaultUploadDirForBucketBased = DEFAULT_PATH_PREFIX.equals(pathPrefix);
+			if (prependDefaultUploadDirForBucketBased)
 				pattern = pathPrefix + DEFAULT_UPLOAD_DIR + "/*";
 			else
 				pattern = pathPrefix + "/*";
@@ -74,12 +77,20 @@ public class UploadFilesHandler extends AccessHandler {
 		return pattern;
 	}
 
+	public String getFileUrl(String path) {
+		StringBuilder sb = new StringBuilder(pathPrefix);
+		if (prependDefaultUploadDirForBucketBased)
+			sb.append(UploadFilesHandler.DEFAULT_UPLOAD_DIR);
+		sb.append(path);
+		return sb.toString();
+	}
+
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response) {
 		long since = request.getDateHeader("If-Modified-Since");
 		String uri = RequestUtils.getRequestUri(request);
 		String path = uri.substring(pathPrefix.length());
-		if (uploadFileStorage.isBucketBased() && DEFAULT_PATH_PREFIX.equals(pathPrefix))
+		if (prependDefaultUploadDirForBucketBased)
 			path = path.substring(DEFAULT_UPLOAD_DIR.length());
 		try {
 			path = URLDecoder.decode(path, "UTF-8");
