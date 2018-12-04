@@ -26,7 +26,7 @@ public interface FileStorage {
 	}
 
 	public default boolean isRelativeProtocolAllowed() {
-		return isBucketBased();
+		return false;
 	}
 
 	public default void migrateTo(FileStorage target, String directory, boolean removeSourceFiles) throws IOException {

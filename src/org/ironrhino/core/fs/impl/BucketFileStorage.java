@@ -23,6 +23,11 @@ public abstract class BucketFileStorage extends AbstractFileStorage {
 		return true;
 	}
 
+	@Override
+	public boolean isRelativeProtocolAllowed() {
+		return !StringUtils.isEmpty(getDomain());
+	}
+
 	public boolean isUseHttps() {
 		return false;
 	}
@@ -82,7 +87,7 @@ public abstract class BucketFileStorage extends AbstractFileStorage {
 	@Override
 	public String getFileUrl(String path) {
 		String domain = getDomain();
-		if (domain == null || domain.isEmpty())
+		if (StringUtils.isEmpty(domain))
 			return super.getFileUrl(path);
 		StringBuilder sb = new StringBuilder(isUseHttps() ? "https" : "http");
 		sb.append("://");
