@@ -40,7 +40,8 @@ import org.hibernate.event.spi.PostUpdateEventListener;
 import org.hibernate.event.spi.PreDeleteEventListener;
 import org.hibernate.event.spi.PreInsertEventListener;
 import org.hibernate.event.spi.PreUpdateEventListener;
-import org.ironrhino.core.hibernate.dialect.MyDialectResolver;
+import org.hibernate.tool.schema.Action;
+import org.hibernate.tool.schema.JdbcMetadaAccessStrategy;
 import org.ironrhino.core.hibernate.event.SimpleDeleteEventListener;
 import org.ironrhino.core.hibernate.event.SimpleFlushEntityEventListener;
 import org.ironrhino.core.hibernate.event.SimpleMergeEventListener;
@@ -124,7 +125,6 @@ public class SessionFactoryBean extends LocalSessionFactoryBean implements Defau
 	public SessionFactoryBean() {
 		// default properties override hibernate defaults
 		Map<String, String> map = new HashMap<>();
-		map.put(AvailableSettings.DIALECT_RESOLVERS, MyDialectResolver.class.getName());
 		map.put(AvailableSettings.MAX_FETCH_DEPTH, String.valueOf(3));
 		map.put(AvailableSettings.DEFAULT_BATCH_FETCH_SIZE, String.valueOf(10));
 		map.put(AvailableSettings.STATEMENT_FETCH_SIZE, String.valueOf(20));
@@ -134,7 +134,7 @@ public class SessionFactoryBean extends LocalSessionFactoryBean implements Defau
 		map.put(AvailableSettings.XML_MAPPING_ENABLED, String.valueOf(false));
 		map.put(AvailableSettings.KEYWORD_AUTO_QUOTING_ENABLED, String.valueOf(true));
 		map.put(AvailableSettings.USE_SECOND_LEVEL_CACHE, String.valueOf(false));
-		map.put(AvailableSettings.HBM2DDL_AUTO, "update");
+		map.put(AvailableSettings.HBM2DDL_AUTO, Action.UPDATE.name().toLowerCase());
 		defaultProperties = Collections.unmodifiableMap(map);
 	}
 
@@ -198,6 +198,11 @@ public class SessionFactoryBean extends LocalSessionFactoryBean implements Defau
 			log.warn("Override {} to false because this driver returns incorrect row counts from executeBatch()",
 					AvailableSettings.BATCH_VERSIONED_DATA);
 		}
+
+		if (StringUtils.isBlank(properties.getProperty(AvailableSettings.HBM2DDL_JDBC_METADATA_EXTRACTOR_STRATEGY))
+				&& databaseProduct == DatabaseProduct.ORACLE)
+			properties.put(AvailableSettings.HBM2DDL_JDBC_METADATA_EXTRACTOR_STRATEGY,
+					JdbcMetadaAccessStrategy.INDIVIDUALLY);
 
 		value = properties.getProperty(AvailableSettings.USE_NEW_ID_GENERATOR_MAPPINGS);
 		if (StringUtils.isBlank(value))
