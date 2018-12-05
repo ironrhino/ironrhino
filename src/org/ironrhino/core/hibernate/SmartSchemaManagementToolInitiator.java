@@ -17,6 +17,7 @@ import javax.sql.DataSource;
 
 import org.hibernate.boot.model.relational.Database;
 import org.hibernate.boot.model.relational.Namespace;
+import org.hibernate.boot.registry.StandardServiceInitiator;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.ForeignKey;
@@ -27,6 +28,7 @@ import org.hibernate.mapping.Table;
 import org.hibernate.mapping.Table.ForeignKeyKey;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 import org.hibernate.tool.schema.internal.HibernateSchemaManagementTool;
+import org.hibernate.tool.schema.internal.SchemaManagementToolInitiator;
 import org.hibernate.tool.schema.spi.SchemaCreator;
 import org.hibernate.tool.schema.spi.SchemaManagementTool;
 import org.hibernate.tool.schema.spi.SchemaMigrator;
@@ -40,7 +42,7 @@ import org.springframework.stereotype.Component;
 @SuppressWarnings("rawtypes")
 @Component
 @ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
-public class SchemaManagementToolInitiator extends org.hibernate.tool.schema.internal.SchemaManagementToolInitiator {
+public class SmartSchemaManagementToolInitiator implements StandardServiceInitiator<SchemaManagementTool> {
 
 	@Autowired
 	private DataSource dataSource;
@@ -51,7 +53,7 @@ public class SchemaManagementToolInitiator extends org.hibernate.tool.schema.int
 	@Override
 	public SchemaManagementTool initiateService(Map configurationValues, ServiceRegistryImplementor registry) {
 		if (!convertForeignKeyToIndex) {
-			return super.initiateService(configurationValues, registry);
+			return SchemaManagementToolInitiator.INSTANCE.initiateService(configurationValues, registry);
 		} else {
 			dropExistsForeignKey();
 			return new HibernateSchemaManagementTool() {
@@ -138,7 +140,7 @@ public class SchemaManagementToolInitiator extends org.hibernate.tool.schema.int
 		}
 	}
 
-	public void dropExistsForeignKey() {
+	private void dropExistsForeignKey() {
 		try (Connection conn = dataSource.getConnection()) {
 			DatabaseMetaData dbmd = conn.getMetaData();
 			DatabaseProduct dp = DatabaseProduct.parse(dbmd.getDatabaseProductName());
@@ -177,6 +179,11 @@ public class SchemaManagementToolInitiator extends org.hibernate.tool.schema.int
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public Class<SchemaManagementTool> getServiceInitiated() {
+		return SchemaManagementTool.class;
 	}
 
 }

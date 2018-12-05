@@ -54,6 +54,7 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.env.Environment;
+import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBuilder;
 import org.springframework.stereotype.Component;
 
@@ -61,8 +62,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class SessionFactoryBean extends org.springframework.orm.hibernate5.LocalSessionFactoryBean
-		implements DefaultPropertiesProvider {
+public class SessionFactoryBean extends LocalSessionFactoryBean implements DefaultPropertiesProvider {
 
 	@Autowired
 	private Environment environment;
