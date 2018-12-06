@@ -37,7 +37,7 @@ EOF
 
 
 #install packages
-yum -y install java-1.8.0-openjdk-devel mysql-server subversion git nginx chkconfig zip unzip wget make gcc telnet
+yum -y install java-1.8.0-openjdk-headless mysql-server subversion git nginx zip unzip wget make gcc telnet
 grep "password" /var/log/mysqld.log
 
 #install ant
@@ -99,64 +99,42 @@ sed -i '99i JAVA_OPTS="-Dport.http=8081 -Dport.shutdown=8006"' tomcat8081/bin/ca
 chown -R $USER:$USER tomcat*
 fi
 
-if [ ! -f /etc/init.d/tomcat8080 ]; then
-cat>/etc/init.d/tomcat8080<<EOF
-#!/bin/sh
-#
-# Startup script for the tomcat
-#
-# chkconfig: 345 80 15
-# description: Tomcat
-user=$USER
+if [ ! -f /etc/systemd/system/tomcat8080.service ]; then
+cat>/etc/systemd/system/tomcat8080.service<<EOF
+[Unit]
+Description=Tomcat 8080 service
+After=network.target
 
-case "\$1" in
-start)
-       su \$user -c "/home/$USER/tomcat8080/bin/catalina.sh start"
-       ;;
-stop)
-       su \$user -c "/home/$USER/tomcat8080/bin/catalina.sh stop -force"
-       ;;
-restart)
-       su \$user -c "/home/$USER/tomcat8080/bin/catalina.sh stop -force"
-       su \$user -c "/home/$USER/tomcat8080/bin/catalina.sh start"
-       ;;
-*)
-       echo "Usage: \$0 {start|stop|restart}"
-esac
-exit 0
+[Service]
+Type=forking
+User=$USER
+ExecStart=/home/$USER/tomcat8080/bin/catalina.sh start
+ExecStop=/home/$USER/tomcat8080/bin/catalina.sh stop -force
+
+[Install]
+WantedBy=multi-user.target
 EOF
-chmod +x /etc/init.d/tomcat8080
-chkconfig tomcat8080 on
+systemctl daemon-reload
+systemctl enable tomcat8080
 fi
 
-if [ ! -f /etc/init.d/tomcat8081 ]; then
-cat>/etc/init.d/tomcat8081<<EOF
-#!/bin/sh
-#
-# Startup script for the tomcat
-#
-# chkconfig: 345 80 15
-# description: Tomcat
-user=$USER
+if [ ! -f /etc/systemd/system/tomcat8081.service ]; then
+cat>/etc/systemd/system/tomcat8081.service<<EOF
+[Unit]
+Description=Tomcat 8081 service
+After=network.target
 
-case "\$1" in
-start)
-       su \$user -c "/home/$USER/tomcat8081/bin/catalina.sh start"
-       ;;
-stop)
-       su \$user -c "/home/$USER/tomcat8081/bin/catalina.sh stop -force"
-       ;;
-restart)
-       su \$user -c "/home/$USER/tomcat8081/bin/catalina.sh stop -force"
-       su \$user -c "/home/$USER/tomcat8081/bin/catalina.sh start"
-       ;;
-*)
-       echo "Usage: \$0 {start|stop|restart}"
-esac
-exit 0
+[Service]
+Type=forking
+User=$USER
+ExecStart=/home/$USER/tomcat8081/bin/catalina.sh start
+ExecStop=/home/$USER/tomcat8081/bin/catalina.sh stop -force
+
+[Install]
+WantedBy=multi-user.target
 EOF
-chmod +x /etc/init.d/tomcat8081
-chkconfig tomcat8081 on
+systemctl daemon-reload
+systemctl enable tomcat8081
 fi
 
 if [ ! -f upgrade_tomcat.sh ]; then
@@ -245,7 +223,7 @@ sed -i '/\[mysqld\]/a\key_buffer_size = 384M' /etc/my.cnf
 sed -i '/\[mysqld\]/a\sort_buffer_size = 4M' /etc/my.cnf
 sed -i '/\[mysqld\]/a\read_buffer_size = 1M' /etc/my.cnf
 sed -i '/\[mysqld\]/a\table_open_cache = 2000' /etc/my.cnf
-service mysqld restart
+systemctl restart mysqld
 fi
 
 #reset mysql password
@@ -318,7 +296,7 @@ server {
 }
 EOF
 setsebool -P httpd_can_network_connect=1 httpd_read_user_content=1 httpd_setrlimit=1
-service nginx restart
+systemctl restart nginx
 fi
 
 
@@ -555,8 +533,7 @@ cd utils && ./install_server.sh
 cd ../../
 rm -rf redis-\$version
 sed -i '31i bind 127.0.0.1' /etc/redis/6379.conf
-service redis_6379 stop
-service redis_6379 start
+systemctl restart redis_6379
 rm -rf redis-\$version
 EOF
 chown $USER:$USER upgrade_redis.sh
