@@ -50,6 +50,17 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvokerSerializer {
 
+	private final static String VERSION = "2.0";
+	private final static String JSONRPC = "jsonrpc";
+	private final static String METHOD = "method";
+	private final static String PARAMS = "params";
+	private final static String ID = "id";
+	private final static String RESULT = "result";
+	private final static String ERROR = "error";
+	private final static String CODE = "code";
+	private final static String MESSAGE = "message";
+	private final static String DATA = "data";
+
 	private final ObjectMapper objectMapper;
 
 	public AbstractJsonRpcHttpInvokerSerializer(JsonFactory jsonFactory) {
@@ -88,18 +99,18 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 			throw new JsonRpcException(-32700, e.getMessage(), NullObject.get());
 		}
 		Serializable id = null;
-		JsonNode idNode = tree.get("id");
+		JsonNode idNode = tree.get(ID);
 		if (idNode != null)
 			id = idNode.isNull() ? NullObject.get()
 					: idNode.isNumber() ? idNode.asLong() : idNode.isTextual() ? idNode.asText() : NullObject.get();
 		if (!isValid(tree))
 			throw new JsonRpcException(-32600, id != null ? id : NullObject.get());
 		invocation.setId(id);
-		invocation.setMethodName(tree.get("method").asText());
+		invocation.setMethodName(tree.get(METHOD).asText());
 		Class<?>[] parameterTypes = null;
 		Object[] arguments = null;
-		if (tree.has("params")) {
-			JsonNode paramsNode = tree.get("params");
+		if (tree.has(PARAMS)) {
+			JsonNode paramsNode = tree.get(PARAMS);
 			int parameterCount = paramsNode.size();
 			arguments = new Object[parameterCount];
 			JsonProcessingException ex = null;
@@ -160,7 +171,8 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 		Response response = new Response();
 		response.setId(invocation.getId());
 		if (!result.hasException()) {
-			response.setResult(result.getValue());
+			Object value = result.getValue();
+			response.setResult(value == null ? NullObject.get() : value);
 			objectMapper.writeValue(os, response);
 		} else {
 			Error error = new Error();
@@ -187,11 +199,11 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 				throw new JsonRpcException(-1, "JSON-RPC Notification do not have Response");
 			}
 			Serializable id = null;
-			JsonNode idNode = tree.get("id");
+			JsonNode idNode = tree.get(ID);
 			if (idNode != null)
 				id = idNode.isNumber() ? idNode.asLong() : idNode.asText();
-			if (!tree.has("error")) {
-				tree = tree.get("result");
+			if (!tree.has(ERROR)) {
+				tree = tree.get(RESULT);
 				if (tree != null) {
 					Type type = methodInvocation.getMethod().getGenericReturnType();
 					if (type instanceof ParameterizedType) {
@@ -209,15 +221,15 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 							objectMapper.readValue(objectMapper.treeAsTokens(tree), objectMapper.constructType(type)));
 				}
 			} else {
-				tree = tree.get("error");
-				int code = tree.get("code").asInt();
-				String message = tree.get("message").asText();
+				tree = tree.get(ERROR);
+				int code = tree.get(CODE).asInt();
+				String message = tree.get(MESSAGE).asText();
 				if (code == -32700)
 					throw new SerializationFailedException(message);
 				Exception exception = null;
-				if (tree.has("data")) {
+				if (tree.has(DATA)) {
 					try {
-						Class<?> clazz = ClassUtils.forName(tree.get("data").asText(), null);
+						Class<?> clazz = ClassUtils.forName(tree.get(DATA).asText(), null);
 						exception = (Exception) clazz.getConstructor(String.class).newInstance(message);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -258,19 +270,19 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 		Iterator<String> names = on.fieldNames();
 		while (names.hasNext()) {
 			String name = names.next();
-			if (!(name.equals("jsonrpc") || name.equals("method") || name.equals("params") || name.equals("id")))
+			if (!(name.equals(JSONRPC) || name.equals(METHOD) || name.equals(PARAMS) || name.equals(ID)))
 				return false;
 		}
-		JsonNode jsonrpc = on.get("jsonrpc");
-		if (jsonrpc == null || !jsonrpc.isTextual() || !jsonrpc.asText().equals(Message.VERSION))
+		JsonNode jsonrpc = on.get(JSONRPC);
+		if (jsonrpc == null || !jsonrpc.isTextual() || !jsonrpc.asText().equals(VERSION))
 			return false;
-		JsonNode method = on.get("method");
+		JsonNode method = on.get(METHOD);
 		if (method == null || !method.isTextual() || method.asText().startsWith("rpc."))
 			return false;
-		JsonNode params = on.get("params");
+		JsonNode params = on.get(PARAMS);
 		if (params != null && !params.isContainerNode())
 			return false;
-		JsonNode id = on.get("id");
+		JsonNode id = on.get(ID);
 		if (id != null && !(id.isNull() || id.isNumber() || id.isTextual()))
 			return false;
 		return true;
@@ -279,8 +291,6 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 	@Getter
 	@Setter
 	private static class Message {
-
-		public static final String VERSION = "2.0";
 
 		private String jsonrpc = VERSION;
 
