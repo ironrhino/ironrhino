@@ -80,33 +80,7 @@
 			}
 			importPackage(java.io);
 			project.setProperty('timestamp',new java.text.SimpleDateFormat('yyyy-MM-dd HH:mm:ss').format(new java.util.Date()));
-			if(new File(basedir+'/.svn').isDirectory()){
-				var exec = project.createTask('exec');
-				exec.setExecutable('svn');
-				exec.setOutputproperty('svninfo');
-				exec.setFailIfExecutionFails(false);
-				exec.setResultProperty('resultCode');
-				var arg = exec.createArg();
-				arg.setValue('info');
-				exec.execute();
-				var svninfo = project.getProperty('svninfo');
-				if(svninfo){
-					var arr = svninfo.split('\n');
-					for(var i=0;i<arr.length;i++){
-						var arr2 = arr[i].split(':',2);
-						if(arr2.length>1){
-							var revision = arr2[1].trim();
-							try{
-								if(revision.match(/^\d+$/)){
-									project.setProperty('revision',revision);
-									break;
-								}
-							}catch(e){
-							}
-						}
-					}
-				}
-			}else if(new File(basedir+'/.git').isDirectory()){
+			if(new File(basedir+'/.git').isDirectory()){
 				var exec = project.createTask('exec');
 				exec.setExecutable('git');
 				exec.setOutputproperty('gitlog');
@@ -121,7 +95,7 @@
 				if(gitlog&&gitlog.trim().length()>0){
 					var revision = gitlog.split('\n')[0].split(' ')[1];
 					if(revision.length() > 8)
-						revision = revision.substring(0,8);
+						revision = revision.substring(0,7);
 					project.setProperty('revision',revision);
 				}
 			}
@@ -137,9 +111,7 @@
 			}
 			importPackage(java.io);
 			var vcs;
-			if(new File(basedir+'/.svn').isDirectory())
-				vcs = 'svn';
-			else if(new File(basedir+'/.git').isDirectory())
+			if(new File(basedir+'/.git').isDirectory())
 				vcs = 'git';
 			var assetsDir = new File(project.getProperty('webapp.dir')+'/assets');
 			var dirs = assetsDir.listFiles();
@@ -156,34 +128,7 @@
 					if(name.indexOf('-min.') > 0)
 						continue;
 					var revision = null;
-					if(vcs == 'svn'){
-						var exec = project.createTask('exec');
-						exec.setExecutable('svn');
-						exec.setOutputproperty(name+'.svninfo');
-						exec.setFailIfExecutionFails(false);
-						exec.setResultProperty('resultCode');
-						var arg = exec.createArg();
-						arg.setValue('info');
-						arg = exec.createArg();
-						arg.setValue(file.getPath());
-						exec.execute();
-						var svninfo = project.getProperty(name+'.svninfo');
-							if(svninfo){
-								var arr = svninfo.split('\n');
-								for(var j=0;j<arr.length;j++){
-									var arr2 = arr[j].split(':',2);
-									if(arr2.length>1){
-										var s = arr2[1].trim();
-										try{
-											if(s.match(/^\d+$/)){
-												revision = s;
-											}
-										}catch(e){
-										}
-									}
-								}
-							}
-					}else if(vcs == 'git'){
+					if(vcs == 'git'){
 						var exec = project.createTask('exec');
 						exec.setExecutable('git');
 						exec.setOutputproperty(name+'.gitlog');
@@ -202,7 +147,7 @@
 						if(gitlog&&gitlog.trim().length()>0){
 							revision = gitlog.split('\n')[0].split(' ')[1];
 							if(revision.length() > 8)
-								revision = revision.substring(0,8);
+								revision = revision.substring(0,7);
 						}
 					}
 					revision = revision || (''+file.lastModified());

@@ -205,7 +205,7 @@
 				if (gitlog && gitlog.trim().length() > 0) {
 					var revision = gitlog.split('\n')[0].split(' ')[1];
 					if (revision.length() > 8)
-						revision = revision.substring(0, 8);
+						revision = revision.substring(0, 7);
 					project.setProperty('revision', revision);
 				}
 			}
@@ -290,7 +290,7 @@
 						if (gitlog && gitlog.trim().length() > 0) {
 							revision = gitlog.split('\n')[0].split(' ')[1];
 							if (revision.length() > 8)
-								revision = revision.substring(0, 8);
+								revision = revision.substring(0, 7);
 						}
 					}
 					revision = revision || ('' + file.lastModified());
