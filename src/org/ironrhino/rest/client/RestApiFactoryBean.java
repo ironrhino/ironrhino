@@ -4,6 +4,7 @@ import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -78,6 +79,8 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 
 	private final Object restApiBean;
 
+	private ObjectMapper objectMapper;
+
 	@Getter
 	@Setter
 	private int maxAttempts = 3;
@@ -117,6 +120,12 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 		}
 		this.restTemplate = restTemplate;
 		this.restApiBean = new ProxyFactory(restApiClass, this).getProxy(restApiClass.getClassLoader());
+		for (HttpMessageConverter<?> mc : restTemplate.getMessageConverters()) {
+			if (mc instanceof AbstractJackson2HttpMessageConverter) {
+				objectMapper = ((AbstractJackson2HttpMessageConverter) mc).getObjectMapper();
+				break;
+			}
+		}
 	}
 
 	@Override
@@ -160,26 +169,11 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 		RequestMapping methodRequestMapping = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class);
 		if (classRequestMapping == null && methodRequestMapping == null)
 			throw new UnsupportedOperationException("@RequestMapping should be present");
-		ApplicationContext ctx = getApplicationContext();
-		String baseUrl = apiBaseUrl;
-		if (ctx != null)
-			baseUrl = ctx.getEnvironment().getProperty(restApiClass.getName() + ".apiBaseUrl", baseUrl);
-		StringBuilder sb = new StringBuilder(baseUrl);
-		if (classRequestMapping != null && classRequestMapping.value().length > 0)
-			sb.append(classRequestMapping.value()[0]);
-		if (methodRequestMapping != null && methodRequestMapping.value().length > 0)
-			sb.append(methodRequestMapping.value()[0]);
-		String url = sb.toString().trim();
-		if (ctx != null)
-			url = ctx.getEnvironment().resolvePlaceholders(url);
-		RequestMethod[] requestMethods = methodRequestMapping != null ? methodRequestMapping.method()
-				: classRequestMapping.method();
-		RequestMethod requestMethod = requestMethods.length > 0 ? requestMethods[0] : RequestMethod.GET;
+		String url = getRequestUrl(classRequestMapping, methodRequestMapping);
+		String requestMethod = getRequestMethod(classRequestMapping, methodRequestMapping);
 
 		Map<String, Object> pathVariables = new HashMap<>(8);
-		MultiValueMap<String, String> headers = new HttpHeaders();
-		for (Map.Entry<String, String> entry : requestHeaders.entrySet())
-			headers.set(entry.getKey(), entry.getValue());
+		MultiValueMap<String, String> headers = createHeaders(classRequestMapping, methodRequestMapping);
 		MultiValueMap<String, Object> requestParams = null;
 		Map<String, String> cookieValues = null;
 		List<Object> requestParamsObjectCandidates = new ArrayList<>(1);
@@ -187,14 +181,13 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 		String[] parameterNames = ReflectionUtils.getParameterNames(method);
 		Object[] arguments = methodInvocation.getArguments();
 		Annotation[][] array = method.getParameterAnnotations();
-		InputStream is = null;
-		boolean multipart = false;
 		for (int i = 0; i < array.length; i++) {
 			Object argument = arguments[i];
 			if (argument == null)
 				continue;
-			if (argument instanceof InputStream)
-				is = (InputStream) argument;
+			if (argument instanceof InputStream) {
+				body = new InputStreamResource((InputStream) argument);
+			}
 			boolean annotationPresent = false;
 			for (Annotation anno : array[i]) {
 				if (anno instanceof PathVariable) {
@@ -210,9 +203,9 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 					if (StringUtils.isBlank(name))
 						name = parameterNames[i];
 					if (argument instanceof Collection) {
-						for (Object o : (Collection<Object>) argument)
-							if (o != null)
-								headers.add(name, o.toString());
+						for (Object obj : (Collection<Object>) argument)
+							if (obj != null)
+								headers.add(name, obj.toString());
 					} else {
 						headers.add(name, argument.toString());
 					}
@@ -225,29 +218,25 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 					if (requestParams == null)
 						requestParams = new LinkedMultiValueMap<>(8);
 					if (argument instanceof Collection) {
-						for (Object o : (Collection<Object>) argument)
-							if (o != null) {
-								if (o instanceof File)
-									o = new FileSystemResource((File) o);
-								else if (o instanceof InputStream)
-									o = new InputStreamResource((InputStream) o);
-								if (o instanceof Resource)
-									multipart = true;
+						for (Object obj : (Collection<Object>) argument)
+							if (obj != null) {
+								if (obj instanceof File)
+									obj = new FileSystemResource((File) obj);
+								else if (obj instanceof InputStream)
+									obj = new InputStreamResource((InputStream) obj);
 								else
-									o = o.toString();
-								requestParams.add(name, o);
+									obj = obj.toString();
+								requestParams.add(name, obj);
 							}
 					} else {
-						Object o = argument;
-						if (o instanceof File)
-							o = new FileSystemResource((File) o);
-						else if (o instanceof InputStream)
-							o = new InputStreamResource((InputStream) o);
-						if (o instanceof Resource)
-							multipart = true;
+						Object obj = argument;
+						if (obj instanceof File)
+							obj = new FileSystemResource((File) obj);
+						else if (obj instanceof InputStream)
+							obj = new InputStreamResource((InputStream) obj);
 						else
-							o = o.toString();
-						requestParams.add(name, o);
+							obj = obj.toString();
+						requestParams.add(name, obj);
 					}
 				}
 				if (anno instanceof CookieValue) {
@@ -286,15 +275,70 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 				if (requestParams == null)
 					requestParams = new LinkedMultiValueMap<>(8);
 				if (argument instanceof Collection) {
-					for (Object o : (Collection<Object>) argument)
-						if (o != null)
-							requestParams.add(name, o.toString());
+					for (Object obj : (Collection<Object>) argument)
+						if (obj != null)
+							requestParams.add(name, obj.toString());
 				} else {
 					requestParams.add(name, argument.toString());
 				}
 			}
 		}
+		headers = addCookies(headers, cookieValues);
+		url = resolvePathVariables(url, pathVariables);
+		return exchange(method, createRequestEntity(url, requestMethod, headers, requestParams, body));
+	}
 
+	private String getRequestMethod(RequestMapping classRequestMapping, RequestMapping methodRequestMapping) {
+		RequestMethod[] requestMethods = methodRequestMapping != null ? methodRequestMapping.method()
+				: classRequestMapping.method();
+		RequestMethod requestMethod = requestMethods.length > 0 ? requestMethods[0] : RequestMethod.GET;
+		return requestMethod.name();
+	}
+
+	private String getRequestUrl(RequestMapping classRequestMapping, RequestMapping methodRequestMapping)
+			throws Exception {
+		ApplicationContext ctx = getApplicationContext();
+		String baseUrl = apiBaseUrl;
+		if (ctx != null) {
+			baseUrl = ctx.getEnvironment().getProperty(restApiClass.getName() + ".apiBaseUrl", baseUrl);
+		}
+		StringBuilder sb = new StringBuilder(baseUrl);
+		sb.append(getPathFromRequestMapping(classRequestMapping));
+		sb.append(getPathFromRequestMapping(methodRequestMapping));
+		String url = sb.toString().trim();
+		if (ctx != null)
+			url = ctx.getEnvironment().resolvePlaceholders(url);
+		return url;
+	}
+
+	private MultiValueMap<String, String> createHeaders(RequestMapping classRequestMapping,
+			RequestMapping methodRequestMapping) throws UnsupportedEncodingException {
+		HttpHeaders headers = new HttpHeaders();
+		for (Map.Entry<String, String> entry : requestHeaders.entrySet())
+			headers.set(entry.getKey(), entry.getValue());
+		if (classRequestMapping != null) {
+			for (String s : classRequestMapping.headers()) {
+				String[] arr = s.split("=", 2);
+				if (arr.length == 2)
+					headers.add(arr[0], arr[1]);
+			}
+		}
+		if (methodRequestMapping != null) {
+			for (String s : methodRequestMapping.headers()) {
+				String[] arr = s.split("=", 2);
+				if (arr.length == 2)
+					headers.add(arr[0], arr[1]);
+			}
+		}
+		return headers;
+	}
+
+	private String getPathFromRequestMapping(RequestMapping requestMapping) {
+		return (requestMapping != null && requestMapping.value().length > 0) ? requestMapping.value()[0] : "";
+	}
+
+	private String resolvePathVariables(String url, Map<String, Object> pathVariables)
+			throws UnsupportedEncodingException {
 		while (url.contains("{")) {
 			int index = url.indexOf('{');
 			String prefix = url.substring(0, index);
@@ -309,39 +353,48 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 			else if (prefix != null && prefix.length() > 0 && url.substring(index).startsWith(prefix))
 				url = url.substring(index);
 		}
-		if (cookieValues != null) {
+		return url;
+	}
+
+	private MultiValueMap<String, String> addCookies(MultiValueMap<String, String> headers,
+			Map<String, String> cookieValues) throws UnsupportedEncodingException {
+		if (cookieValues != null && !cookieValues.isEmpty()) {
 			StringBuilder cookie = new StringBuilder();
 			for (Map.Entry<String, String> entry : cookieValues.entrySet())
 				cookie.append(entry.getKey()).append("=").append(URLEncoder.encode(entry.getValue(), "UTF-8"))
 						.append("; ");
-			cookie.delete(cookie.length() - 2, cookie.length());
 			headers.set(HttpHeaders.COOKIE, cookie.toString());
 		}
-		if (requestMethod.name().startsWith("P")) {
-			if (body == null && is != null)
-				body = is;
-			if (body instanceof InputStream)
-				body = new InputStreamResource((InputStream) body);
-		}
+		return headers;
+	}
+
+	private RequestEntity<Object> createRequestEntity(String url, String requestMethod,
+			MultiValueMap<String, String> headers, MultiValueMap<String, Object> requestParams, Object body)
+			throws UnsupportedEncodingException {
 		if (requestParams != null) {
-			if (body == null && requestMethod.name().startsWith("P")) {
-				if (!headers.containsKey(HttpHeaders.CONTENT_TYPE))
-					headers.set(HttpHeaders.CONTENT_TYPE, multipart ? MediaType.MULTIPART_FORM_DATA_VALUE
-							: MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+			if (body == null && requestMethod.startsWith("P")) {
+				boolean multipart = requestParams.entrySet().stream().flatMap(entry -> entry.getValue().stream())
+						.anyMatch(e -> e instanceof Resource);
+				if (multipart && !headers.containsKey(HttpHeaders.CONTENT_TYPE))
+					headers.set(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA_VALUE);
 				body = requestParams;
 			} else {
 				StringBuilder temp = new StringBuilder(url);
 				for (Map.Entry<String, List<Object>> entry : requestParams.entrySet())
-					for (Object value : entry.getValue())
-						if (value instanceof String)
-							temp.append(temp.indexOf("?") < 0 ? '?' : '&').append(entry.getKey()).append("=")
-									.append(URLEncoder.encode(value.toString(), "UTF-8"));
+					for (Object value : entry.getValue()) {
+						String v = value != null ? value.toString() : null;
+						if (v == null)
+							continue;
+						temp.append(temp.indexOf("?") < 0 ? '?' : '&').append(entry.getKey()).append("=")
+								.append(URLEncoder.encode(v.toString(), "UTF-8"));
+					}
 				url = temp.toString();
 			}
 		}
+		return new RequestEntity<>(body, headers, HttpMethod.valueOf(requestMethod), URI.create(url));
+	}
 
-		RequestEntity<Object> requestEntity = new RequestEntity<>(body, headers,
-				HttpMethod.valueOf(requestMethod.name()), URI.create(url));
+	private Object exchange(Method method, RequestEntity<Object> requestEntity) throws Exception {
 		Type type = method.getGenericReturnType();
 		if (type == InputStream.class) {
 			Resource resource = restTemplate.exchange(requestEntity, Resource.class).getBody();
@@ -356,37 +409,31 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 			if (pointer == null) {
 				return restTemplate.exchange(requestEntity, ParameterizedTypeReference.forType(type)).getBody();
 			} else {
-				AbstractJackson2HttpMessageConverter jackson = null;
-				for (HttpMessageConverter<?> mc : restTemplate.getMessageConverters()) {
-					if (mc instanceof AbstractJackson2HttpMessageConverter) {
-						jackson = (AbstractJackson2HttpMessageConverter) mc;
-						break;
-					}
-				}
-				if (jackson == null)
-					throw new RuntimeException("AbstractJackson2HttpMessageConverter not present");
-				JsonNode tree = restTemplate.exchange(requestEntity, JsonNode.class).getBody();
-				Class<? extends JsonValidator> validatorClass = pointer.validator();
-				if (validatorClass != JsonValidator.class) {
-					JsonValidator validator = null;
-					if (ctx != null)
-						try {
-							validator = ctx.getBean(validatorClass);
-						} catch (NoSuchBeanDefinitionException e) {
-							// fallback
-						}
-					if (validator == null)
-						validator = validatorClass.getConstructor().newInstance();
-					validator.validate(tree);
-				}
-				if (!pointer.value().isEmpty())
-					tree = tree.at(pointer.value());
-				ObjectMapper mapper = jackson.getObjectMapper();
-				if (type instanceof Class && ((Class<?>) type).isAssignableFrom(JsonNode.class))
-					return tree;
-				return mapper.readValue(mapper.treeAsTokens(tree), mapper.constructType(type));
+				return exchangeWithJsonPointer(type, requestEntity, pointer);
 			}
 		}
+	}
+
+	private Object exchangeWithJsonPointer(Type type, RequestEntity<Object> requestEntity, JsonPointer pointer)
+			throws Exception {
+		JsonNode tree = restTemplate.exchange(requestEntity, JsonNode.class).getBody();
+		Class<? extends JsonValidator> validatorClass = pointer.validator();
+		if (validatorClass != JsonValidator.class) {
+			JsonValidator validator = null;
+			ApplicationContext ctx = getApplicationContext();
+			if (ctx != null)
+				try {
+					validator = ctx.getBean(validatorClass);
+				} catch (NoSuchBeanDefinitionException e) {
+					validator = validatorClass.getConstructor().newInstance();
+				}
+			validator.validate(tree);
+		}
+		if (!pointer.value().isEmpty())
+			tree = tree.at(pointer.value());
+		if (type instanceof Class && ((Class<?>) type).isAssignableFrom(JsonNode.class))
+			return tree;
+		return objectMapper.readValue(objectMapper.treeAsTokens(tree), objectMapper.constructType(type));
 	}
 
 	@SuppressWarnings("unchecked")
