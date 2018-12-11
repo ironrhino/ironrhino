@@ -45,10 +45,19 @@ public class RestStatus extends RuntimeException {
 	public static final String CODE_INTERNAL_SERVER_ERROR = "-1";
 
 	public static final RestStatus OK = valueOf(CODE_OK);
-	public static final RestStatus REQUEST_TIMEOUT = valueOf(CODE_REQUEST_TIMEOUT, null, 408);
-	public static final RestStatus FORBIDDEN = valueOf(CODE_FORBIDDEN, null, 403);
-	public static final RestStatus UNAUTHORIZED = valueOf(CODE_UNAUTHORIZED, null, 401);
-	public static final RestStatus NOT_FOUND = valueOf(CODE_NOT_FOUND, null, 404);
+	public static final RestStatus REQUEST_TIMEOUT = valueOf(CODE_REQUEST_TIMEOUT, "Request Timeout", 408);
+	public static final RestStatus FORBIDDEN = valueOf(CODE_FORBIDDEN, "Forbidden", 403);
+	public static final RestStatus UNAUTHORIZED = valueOf(CODE_UNAUTHORIZED, "Unauthorized", 401);
+	public static final RestStatus NOT_FOUND = valueOf(CODE_NOT_FOUND, "Not Found", 404);
+
+	static {
+		StackTraceElement[] stackTrace = new StackTraceElement[0];
+		OK.setStackTrace(stackTrace);
+		REQUEST_TIMEOUT.setStackTrace(stackTrace);
+		FORBIDDEN.setStackTrace(stackTrace);
+		UNAUTHORIZED.setStackTrace(stackTrace);
+		NOT_FOUND.setStackTrace(stackTrace);
+	}
 
 	@NotNull
 	private final String code;
@@ -64,20 +73,15 @@ public class RestStatus extends RuntimeException {
 	private Integer httpStatusCode;
 
 	protected RestStatus(String code, String status) {
-		super(status);
-		this.code = code;
-		this.status = status;
+		this(code, status, null);
 	}
 
 	protected RestStatus(String code, String status, String message) {
-		super(message);
-		this.code = code;
-		this.status = status;
-		this.message = message;
+		this(code, status, message, null);
 	}
 
 	protected RestStatus(String code, String status, String message, Integer httpStatusCode) {
-		super(message);
+		super(message != null ? message : status);
 		this.code = code;
 		this.status = status;
 		this.message = message;
