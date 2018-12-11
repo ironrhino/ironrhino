@@ -10,11 +10,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 
 import javax.annotation.PreDestroy;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.event.InstanceLifecycleEvent;
 import org.ironrhino.core.event.InstanceShutdownEvent;
@@ -52,14 +54,30 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	@Autowired(required = false)
 	private ExecutorService executorService;
 
+	private Map<String, String> servicePaths = new ConcurrentHashMap<>();
+
 	@Override
 	protected void onReady() {
 		Set<String> services = getExportedServices().keySet();
 		if (!services.isEmpty()) {
-			ExportServicesEvent event = new ExportServicesEvent(new ArrayList<>(services));
+			ExportServicesEvent event = new ExportServicesEvent(new ArrayList<>(services), servicePaths);
 			eventPublisher.publish(event, Scope.GLOBAL);
 		}
 		super.onReady();
+	}
+
+	@Override
+	public void register(String serviceName, String path, Object serviceObject) {
+		super.register(serviceName, path, serviceObject);
+		if (StringUtils.isNotBlank(path))
+			servicePaths.put(serviceName, path);
+	}
+
+	@Override
+	public void unregister(String serviceName, String path) {
+		super.unregister(serviceName, path);
+		if (StringUtils.isNotBlank(path))
+			servicePaths.remove(serviceName);
 	}
 
 	@Override
@@ -188,9 +206,11 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 		} else if (event instanceof ExportServicesEvent) {
 			ExportServicesEvent ev = (ExportServicesEvent) event;
 			for (String serviceName : ev.getExportServices()) {
+				String path = ev.getServicePaths().get(serviceName);
+				String ho = path != null ? host + path : host;
 				List<String> hosts = getImportedServiceCandidates().get(serviceName);
-				if (hosts != null && !hosts.contains(host))
-					hosts.add(host);
+				if (hosts != null && !hosts.contains(ho))
+					hosts.add(ho);
 			}
 		}
 	}

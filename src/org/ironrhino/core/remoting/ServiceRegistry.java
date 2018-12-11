@@ -7,31 +7,39 @@ public interface ServiceRegistry {
 
 	int DEFAULT_HTTP_PORT = 8080;
 
-	public String getLocalHost();
+	String getLocalHost();
 
 	// key: service name, value: service object
-	public Map<String, Object> getExportedServices();
+	Map<String, Object> getExportedServices();
 
-	public void register(String serviceName, Object serviceObject);
+	default void register(String serviceName, Object serviceObject) {
+		register(serviceName, null, serviceObject);
+	}
 
-	public void unregister(String serviceName);
+	void register(String serviceName, String path, Object serviceObject);
 
-	public String discover(String serviceName, boolean polling);
+	default void unregister(String serviceName) {
+		unregister(serviceName, null);
+	}
 
-	public void evict(String host);
+	void unregister(String serviceName, String path);
 
-	public Collection<String> getAllAppNames();
+	String discover(String serviceName, boolean polling);
+
+	void evict(String host);
+
+	Collection<String> getAllAppNames();
 
 	// key: service name, value: service description
-	public Map<String, String> getExportedServicesByAppName(String appName);
+	Map<String, String> getExportedServicesByAppName(String appName);
 
 	// key: service name, value: service provider host
-	public Map<String, String> getImportedServicesByHost(String host);
+	Map<String, String> getImportedServicesByHost(String host);
 
 	// key: service provider host, value: service consumer hosts
-	public Map<String, Collection<String>> getExportedHostsByService(String service);
+	Map<String, Collection<String>> getExportedHostsByService(String service);
 
 	// key: service consumer host, value: service provider host
-	public Map<String, String> getImportedHostsByService(String service);
+	Map<String, String> getImportedHostsByService(String service);
 
 }

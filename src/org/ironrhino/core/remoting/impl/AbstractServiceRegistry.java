@@ -184,22 +184,22 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	}
 
 	@Override
-	public void register(String serviceName, Object serviceObject) {
+	public void register(String serviceName, String path, Object serviceObject) {
 		exportedServices.put(serviceName, serviceObject);
 		String description = exportedServiceDescriptions.get(serviceName);
 		if (StringUtils.isBlank(description))
 			exportedServiceDescriptions.put(serviceName,
 					ctx.getEnvironment().getProperty(serviceName + ".description", ""));
-		doRegister(serviceName, getLocalHost());
+		doRegister(serviceName, StringUtils.isNotBlank(path) ? getLocalHost() + path : getLocalHost());
 	}
 
 	protected abstract void doRegister(String serviceName, String host);
 
 	@Override
-	public void unregister(String serviceName) {
+	public void unregister(String serviceName, String path) {
 		exportedServices.remove(serviceName);
 		exportedServiceDescriptions.remove(serviceName);
-		doUnregister(serviceName, getLocalHost());
+		doUnregister(serviceName, StringUtils.isNotBlank(path) ? getLocalHost() + path : getLocalHost());
 	}
 
 	protected abstract void doUnregister(String serviceName, String host);
