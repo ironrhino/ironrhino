@@ -20,7 +20,7 @@ public class RemotingServerInitializer implements WebApplicationInitializer {
 				new InheritedDispatcherServlet(ctx));
 		dynamic.addMapping("/remoting/*");
 		dynamic.setAsyncSupported(true);
-		dynamic.setLoadOnStartup(1);
+		dynamic.setLoadOnStartup(Integer.MAX_VALUE - 1);
 	}
 
 }

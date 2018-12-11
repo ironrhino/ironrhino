@@ -133,7 +133,7 @@ public class MainAppInitializer implements WebApplicationInitializer {
 				EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.ERROR), true, "/*");
 
 		ServletRegistration.Dynamic servletDynamic = servletContext.addServlet("test", TestServlet.class);
-		servletDynamic.setLoadOnStartup(100);
+		servletDynamic.setLoadOnStartup(Integer.MAX_VALUE);
 
 		// No standard servletContext::addErrorPage
 		String[] errorCodes = "500,404,403,401".split(",");
