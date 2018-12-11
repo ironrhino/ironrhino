@@ -44,7 +44,7 @@ public class ServicePlayground {
 	@Autowired
 	private ServiceRegistry serviceRegistry;
 
-	private Map<String, Object> services = new TreeMap<>();
+	private volatile Map<String, Object> services;
 
 	private Map<String, Collection<MethodInfo>> methods = new ConcurrentHashMap<>();
 
@@ -53,22 +53,28 @@ public class ServicePlayground {
 			.setDateFormat(new SimpleDateFormat(DateUtils.DATETIME));
 
 	public Collection<String> getServices() {
-		if (services.isEmpty()) {
-			synchronized (services) {
-				List<String> names = new ArrayList<>();
-				names.addAll(serviceRegistry.getExportedServices().keySet());
-				if (serviceRegistry instanceof AbstractServiceRegistry)
-					names.addAll(((AbstractServiceRegistry) serviceRegistry).getImportedServiceCandidates().keySet());
-				for (String name : names) {
-					try {
-						services.put(name, ctx.getBean(Class.forName(name)));
-					} catch (Exception e) {
-						e.printStackTrace();
+		Map<String, Object> temp = services;
+		if (temp == null) {
+			synchronized (this) {
+				temp = services;
+				if (temp == null) {
+					temp = new TreeMap<>();
+					temp.putAll(serviceRegistry.getExportedServices());
+					if (serviceRegistry instanceof AbstractServiceRegistry) {
+						for (String name : ((AbstractServiceRegistry) serviceRegistry).getImportedServiceCandidates()
+								.keySet()) {
+							try {
+								temp.put(name, ctx.getBean(Class.forName(name)));
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
 					}
+					services = temp;
 				}
 			}
 		}
-		return services.keySet();
+		return temp.keySet();
 	}
 
 	public Collection<MethodInfo> getMethods(String service) {
