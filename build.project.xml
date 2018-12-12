@@ -364,6 +364,7 @@
 				<patternset>
 					<include name="com/**" />
 					<include name="org/**" />
+					<exclude name="com/google/common/base/*" />
 					<exclude name="org/ironrhino/**" />
 				</patternset>
 			</unzip>
