@@ -2,6 +2,9 @@ package org.ironrhino.core.spring.configuration;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.spring.NameGenerator;
@@ -57,13 +60,14 @@ public abstract class AnnotationBeanDefinitionRegistryPostProcessor<A extends An
 
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
-		if (annotatedClasses == null) {
-			annotatedClasses = ClassScanner
-					.scanAnnotated(packagesToScan != null ? packagesToScan : ClassScanner.getAppPackages(),
-							annotationClass)
-					.toArray(new Class<?>[0]);
-		}
-		for (Class<?> annotatedClass : annotatedClasses) {
+		Set<Class<?>> classes = new HashSet<>();
+		if (annotatedClasses != null)
+			classes.addAll(Arrays.asList(annotatedClasses));
+		if (packagesToScan != null)
+			classes.addAll(ClassScanner.scanAnnotated(packagesToScan, annotationClass));
+		if (annotatedClasses == null && packagesToScan == null)
+			classes.addAll(ClassScanner.scanAnnotated(ClassScanner.getAppPackages(), annotationClass));
+		for (Class<?> annotatedClass : classes) {
 			if (!annotatedClass.isInterface() || shouldSkip(annotatedClass))
 				continue;
 			String key = annotatedClass.getName() + ".imported";

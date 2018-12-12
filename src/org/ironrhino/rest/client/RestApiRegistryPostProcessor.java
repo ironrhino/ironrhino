@@ -30,6 +30,13 @@ public class RestApiRegistryPostProcessor
 
 	@Override
 	protected boolean shouldSkip(Class<?> annotatedClass) {
+		Class<?>[] annotatedClasses = getAnnotatedClasses();
+		if (annotatedClasses != null) {
+			for (Class<?> c : annotatedClasses) {
+				if (c.equals(annotatedClass))
+					return false;
+			}
+		}
 		Collection<Class<?>> assignables = ClassScanner.scanAssignable(annotatedClass.getPackage().getName(),
 				annotatedClass);
 		for (Class<?> c : assignables) {
