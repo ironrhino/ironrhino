@@ -3,16 +3,46 @@
 <html>
 <head>
 <title>${getText('service')}${getText('console')}</title>
+<style>
+<#assign borderColor='rgba(82, 168, 236, 0.8)'>
+.services >.thumbnails > li {
+	position: relative;
+}
+.services >.thumbnails > li > button.open {
+	border-left-color: ${borderColor};
+	border-top-color: ${borderColor};
+	border-right-color: ${borderColor};
+	border-radius: 4px 4px 0 0;
+}
+.services >.thumbnails > li > table {
+	position: absolute;
+	z-index: 1000;
+	background-color: #fff;
+	border-color: ${borderColor};
+	border-top-width: 0;
+	border-radius: 0 0 4px 4px;
+}
+button.open + table > thead:first-child > tr:first-child > th:first-child {
+	border-top-left-radius: 0px;
+}
+button.open + table > thead:first-child > tr:first-child > th:last-child {
+	border-top-right-radius: 0px;
+}
+button.open + table > thead > tr > th:first-child, button.open + table > tbody > tr > td:first-child {
+	border-left-color: ${borderColor};
+}
+</style>
 <script>
 $(function(){
-$('.service').click(function(){
-	var t = $(this);
-	if(t.siblings().length){
-		t.siblings().remove();
+$('.service').click(function(e){
+	$('button.open').filter(function(){return this != e.target;}).click();
+	var t = $(this).toggleClass('open');
+	if(!t.hasClass('open')){
+		t.next('table.hosts').remove();
 	}else{
 		var url = '${actionBaseUrl}/hosts/'+t.text();
 		$.getJSON(url,function(data){
-			var table = $('<table class="table table-bordered" style="margin-top:5px;"><thead><tr><th style="width:50%;">Exported By:</th><th>Imported By:</th></tr></head><tbody></tbody></table>').insertAfter(t);
+			var table = $('<table class="table table-bordered hosts"><thead><tr><th style="width:50%;">Exported By:</th><th>Imported By:</th></tr></head><tbody></tbody></table>').insertAfter(t);
 			$.each(data,function(k,v){
 				var row = $('<tr><td class="provider middle"></td><td class="consumers"></td></tr>').appendTo(table.find('tbody'));
 				row.find('.provider').html('<a class="host" href="#">'+k+'</a>');
@@ -25,6 +55,12 @@ $('.service').click(function(){
 			});
 		});
 	}
+});
+$(document).click(function(e){
+	var target = $(e.target);
+	if(target.closest('button.service,table.hosts').length)
+		return;
+	$('button.open').click();
 });
 $(document).on('click','a.host',function(e){
 	$('#imported-services').remove();
