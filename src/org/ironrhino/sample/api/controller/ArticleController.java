@@ -27,14 +27,21 @@ public class ArticleController implements ArticleService {
 		}
 	}
 
+	@Override
 	public Collection<Article> list() {
 		return articles.values();
 	}
 
+	@Override
 	public Article view(Integer id) {
 		Article article = articles.get(id);
 		if (article == null)
 			throw RestStatus.NOT_FOUND;
+		return article;
+	}
+
+	@Override
+	public Article postForm(Article article) {
 		return article;
 	}
 

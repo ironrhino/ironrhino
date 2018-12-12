@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 
 import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.rest.RestStatus;
+import org.ironrhino.sample.api.model.Article;
 import org.ironrhino.security.domain.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,6 +38,9 @@ public class RestApiTests {
 	@Autowired
 	private UploadClient uploadClient;
 
+	@Autowired
+	private ArticleClient articleClient;
+
 	@Test
 	public void testGetAndPatch() {
 		assertEquals("admin", userClient.self().getUsername());
@@ -50,6 +55,15 @@ public class RestApiTests {
 		u.setName(newName);
 		userClient.patch(u);
 		assertEquals(newName, userClient.self().getName());
+	}
+
+	@Test
+	public void testPostForm() {
+		Article article = new Article();
+		article.setId(100);
+		article.setAuthor("测试");
+		article.setPublishDate(LocalDate.of(2000, 10, 12));
+		assertEquals(article, articleClient.postForm(article));
 	}
 
 	@Test

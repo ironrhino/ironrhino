@@ -37,4 +37,7 @@ public interface ArticleService {
 	@JsonView(View.Detail.class)
 	Article view(@PathVariable Integer id);
 
+	@RequestMapping(method = RequestMethod.POST)
+	Article postForm(Article article);
+
 }
