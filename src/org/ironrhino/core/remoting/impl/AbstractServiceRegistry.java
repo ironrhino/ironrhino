@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -71,6 +72,8 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
 	@Getter
 	private String localHost;
+
+	private Map<String, AtomicInteger> counters = new ConcurrentHashMap<>();
 
 	@PostConstruct
 	private void afterPropertiesSet() {
@@ -240,8 +243,18 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 				logger.error(e.getMessage(), e);
 			}
 		}
-		if (host == null)
-			host = candidates.get(ThreadLocalRandom.current().nextInt(candidates.size()));
+		if (host == null) {
+			// polling
+			List<String> list = candidates;
+			AtomicInteger counter = counters.computeIfAbsent(serviceName,
+					s -> new AtomicInteger(ThreadLocalRandom.current().nextInt(list.size())));
+			int current, next, size = list.size();
+			do {
+				current = counter.get();
+				next = (current + 1) % list.size();
+			} while (!counter.compareAndSet(current, next));
+			host = list.get((next - 1 + size) % size); // list.get(next);
+		}
 		onDiscover(serviceName, host, polling);
 		return normalizeHost(host);
 	}
