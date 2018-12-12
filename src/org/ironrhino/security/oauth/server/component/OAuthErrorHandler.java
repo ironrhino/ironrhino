@@ -2,6 +2,7 @@ package org.ironrhino.security.oauth.server.component;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,7 +36,7 @@ public class OAuthErrorHandler {
 			if (StringUtils.isNotBlank(oauthError.getErrorMessage()))
 				message = oauthError.getErrorMessage();
 			if (message.startsWith("client_"))
-				message = message.toUpperCase();
+				message = message.toUpperCase(Locale.ROOT);
 			map.put("message", message);
 			response.getWriter().write(JsonUtils.toJson(map));
 		}

@@ -3,6 +3,7 @@ package org.ironrhino.core.remoting.serializer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,7 +18,7 @@ public interface HttpInvokerSerializer {
 		String suffix = HttpInvokerSerializer.class.getSimpleName();
 		if (name.endsWith(suffix))
 			name = name.substring(0, name.length() - suffix.length());
-		return name.toUpperCase();
+		return name.toUpperCase(Locale.ROOT);
 	}
 
 	public String getContentType();

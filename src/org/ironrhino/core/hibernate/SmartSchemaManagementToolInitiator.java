@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -86,7 +87,7 @@ public class SmartSchemaManagementToolInitiator implements StandardServiceInitia
 								Set<String> existedIndexes = new HashSet<>();
 								String tableName = table.getName();
 								for (String name : new LinkedHashSet<>(
-										Arrays.asList(tableName.toUpperCase(), tableName, tableName.toLowerCase()))) {
+										Arrays.asList(tableName.toUpperCase(Locale.ROOT), tableName, tableName.toLowerCase(Locale.ROOT)))) {
 									try (ResultSet rs = dbmd.getIndexInfo(conn.getCatalog(), conn.getSchema(),
 											dialect.openQuote() + name + dialect.closeQuote(), false, false)) {
 										boolean tableFound = false;
@@ -157,7 +158,7 @@ public class SmartSchemaManagementToolInitiator implements StandardServiceInitia
 				try (ResultSet importedKeys = dbmd.getImportedKeys(conn.getCatalog(), conn.getSchema(), table)) {
 					while (importedKeys.next()) {
 						String fkName = importedKeys.getString("FK_NAME");
-						if (fkName != null && fkName.length() == 27 && fkName.toLowerCase().startsWith("fk"))
+						if (fkName != null && fkName.length() == 27 && fkName.toLowerCase(Locale.ROOT).startsWith("fk"))
 							foreignKeys.put(fkName, importedKeys.getString("FKTABLE_NAME"));
 					}
 				}

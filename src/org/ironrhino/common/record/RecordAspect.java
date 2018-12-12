@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import org.aspectj.lang.JoinPoint;
@@ -93,7 +94,7 @@ public class RecordAspect implements TransactionSynchronization, Ordered {
 					StringBuilder sb = new StringBuilder();
 					boolean sep = false;
 					for (int i = 0; i < propertyNames.length; i++) {
-						if (propertyTypes[i].getName().toLowerCase().endsWith("lob"))
+						if (propertyTypes[i].getName().toLowerCase(Locale.ROOT).endsWith("lob"))
 							continue;
 						Object value = pie.getState()[i];
 						if (value == null || value instanceof Collection && ((Collection<?>) value).isEmpty()
@@ -122,7 +123,7 @@ public class RecordAspect implements TransactionSynchronization, Ordered {
 					StringBuilder sb = new StringBuilder();
 					boolean sep = false;
 					for (int i = 0; i < dirtyProperties.length; i++) {
-						if (propertyTypes[dirtyProperties[i]].getName().toLowerCase().endsWith("lob"))
+						if (propertyTypes[dirtyProperties[i]].getName().toLowerCase(Locale.ROOT).endsWith("lob"))
 							continue;
 						String propertyName = propertyNames[dirtyProperties[i]];
 						IdentifierGenerator ig = em.getIdentifierProperty().getIdentifierGenerator();

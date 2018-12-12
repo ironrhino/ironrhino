@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Locale;
 import java.util.Map;
 
 import org.ironrhino.core.util.MaxAttemptsExceededException;
@@ -99,7 +100,7 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 			} catch (Throwable t) {
 			}
 			for (String table : new LinkedHashSet<>(
-					Arrays.asList(tableName.toUpperCase(), tableName, tableName.toLowerCase()))) {
+					Arrays.asList(tableName.toUpperCase(Locale.ROOT), tableName, tableName.toLowerCase(Locale.ROOT)))) {
 				try (ResultSet rs = dbmd.getTables(catalog, schema, table, new String[] { "TABLE" })) {
 					if (rs.next()) {
 						tableExists = true;
@@ -130,7 +131,7 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 					stmt.execute(getCreateTableStatement());
 					try (PreparedStatement ps = conn.prepareStatement("INSERT INTO " + tableName + " VALUES(?,?)")) {
 						for (Map.Entry<String, Object> entry : map.entrySet()) {
-							if (entry.getKey().toUpperCase().endsWith("_TIMESTAMP")) {
+							if (entry.getKey().toUpperCase(Locale.ROOT).endsWith("_TIMESTAMP")) {
 								String sequenceName = entry.getKey();
 								sequenceName = sequenceName.substring(0, sequenceName.lastIndexOf('_'));
 								ps.setString(1, sequenceName);

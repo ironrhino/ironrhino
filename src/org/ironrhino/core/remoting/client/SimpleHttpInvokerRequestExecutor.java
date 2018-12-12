@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Locale;
 import java.util.zip.GZIPInputStream;
 
 import org.aopalliance.intercept.MethodInvocation;
@@ -72,7 +73,7 @@ public class SimpleHttpInvokerRequestExecutor extends HttpInvokerRequestExecutor
 
 	protected InputStream readResponseBody(HttpURLConnection con) throws IOException {
 		String encodingHeader = con.getHeaderField(HTTP_HEADER_CONTENT_ENCODING);
-		if ((encodingHeader != null && encodingHeader.toLowerCase().contains(ENCODING_GZIP))) {
+		if ((encodingHeader != null && encodingHeader.toLowerCase(Locale.ROOT).contains(ENCODING_GZIP))) {
 			return new GZIPInputStream(con.getInputStream());
 		} else {
 			return con.getInputStream();

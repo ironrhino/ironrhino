@@ -3,6 +3,7 @@ package org.ironrhino.core.servlet;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -73,7 +74,7 @@ public class ServletContainerHelper {
 				Set<ObjectName> objs = mbs.queryNames(new ObjectName("*:type=Connector,port=*"),
 						Query.match(Query.attr("scheme"), Query.value(ssl ? "https" : "http")));
 				for (ObjectName on : objs) {
-					if (((String) mbs.getAttribute(on, "protocol")).toLowerCase().startsWith("http/"))
+					if (((String) mbs.getAttribute(on, "protocol")).toLowerCase(Locale.ROOT).startsWith("http/"))
 						return (Integer) mbs.getAttribute(on, "port");
 				}
 			} catch (Exception e) {
@@ -128,7 +129,7 @@ public class ServletContainerHelper {
 							.invoke(connector);
 					boolean http = false;
 					for (String p : protocols)
-						if (p.toLowerCase().startsWith("http/")) {
+						if (p.toLowerCase(Locale.ROOT).startsWith("http/")) {
 							http = true;
 							break;
 						}

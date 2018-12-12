@@ -46,7 +46,7 @@ public class BatchSchemaSetup {
 			} catch (Throwable t) {
 			}
 			for (String table : new LinkedHashSet<>(
-					Arrays.asList(tableName.toUpperCase(), tableName, tableName.toLowerCase()))) {
+					Arrays.asList(tableName.toUpperCase(Locale.ROOT), tableName, tableName.toLowerCase(Locale.ROOT)))) {
 				try (ResultSet rs = dbmd.getTables(catalog, schema, table, new String[] { "TABLE" })) {
 					if (rs.next())
 						return;

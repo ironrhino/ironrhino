@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -158,7 +159,7 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> implem
 		dc.setLockMode(LockMode.UPGRADE_SKIPLOCKED);
 		String s = "enqueue {}";
 		if (mode != Mode.NORMAL)
-			s = s + ' ' + mode.name().toLowerCase();
+			s = s + ' ' + mode.name().toLowerCase(Locale.ROOT);
 		String message = s;
 		while (true) {
 			List<T> updatedEntities = entityManager.execute(session -> {

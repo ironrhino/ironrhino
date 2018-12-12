@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -174,7 +175,7 @@ public class SqlUtils {
 			int i = s.indexOf("/*--");
 			int j = s.indexOf("--*/");
 			if (i == 0 && j > i)
-				type = s.substring(i + 4, j).trim().toLowerCase();
+				type = s.substring(i + 4, j).trim().toLowerCase(Locale.ROOT);
 
 			map.put(name, type);
 		}

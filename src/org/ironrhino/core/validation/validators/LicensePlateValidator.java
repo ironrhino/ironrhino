@@ -1,6 +1,7 @@
 package org.ironrhino.core.validation.validators;
 
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.validation.ConstraintValidator;
@@ -30,7 +31,7 @@ public class LicensePlateValidator implements ConstraintValidator<LicensePlate, 
 			if (prefix.indexOf(input.charAt(1)) < 0)
 				return false;
 			String s = input.substring(2);
-			if (!s.toUpperCase().equals(s) || !StringUtils.isAlphanumeric(s) || StringUtils.isAlpha(s))
+			if (!s.toUpperCase(Locale.ROOT).equals(s) || !StringUtils.isAlphanumeric(s) || StringUtils.isAlpha(s))
 				return false;
 			return true;
 		} else {

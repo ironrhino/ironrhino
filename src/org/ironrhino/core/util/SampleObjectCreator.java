@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -235,19 +236,19 @@ public class SampleObjectCreator {
 	private String suggestStringValue(String fieldName, Class<?> sampleClass) {
 		if (fieldName == null)
 			return "test";
-		if (fieldName.toLowerCase().equals("id"))
+		if (fieldName.toLowerCase(Locale.ROOT).equals("id"))
 			return CodecUtils.encodeBase62(CodecUtils.md5Hex(sampleClass.getName()));
-		if (fieldName.toLowerCase().endsWith("email"))
+		if (fieldName.toLowerCase(Locale.ROOT).endsWith("email"))
 			return "test@test.com";
-		if (fieldName.toLowerCase().endsWith("username"))
+		if (fieldName.toLowerCase(Locale.ROOT).endsWith("username"))
 			return "admin";
-		if (fieldName.toLowerCase().endsWith("password"))
+		if (fieldName.toLowerCase(Locale.ROOT).endsWith("password"))
 			return "********";
-		if (fieldName.toLowerCase().endsWith("phone") || fieldName.toLowerCase().endsWith("mobile"))
+		if (fieldName.toLowerCase(Locale.ROOT).endsWith("phone") || fieldName.toLowerCase(Locale.ROOT).endsWith("mobile"))
 			return "13888888888";
-		if (fieldName.toLowerCase().endsWith("code"))
+		if (fieldName.toLowerCase(Locale.ROOT).endsWith("code"))
 			return "123456";
-		return fieldName.toUpperCase();
+		return fieldName.toUpperCase(Locale.ROOT);
 	}
 
 }
