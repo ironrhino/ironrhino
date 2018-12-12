@@ -33161,8 +33161,21 @@ Observation.common = function(container) {
 				success : function(data, textStatus, xhr) {
 					if (!data || !(data.fieldErrors || data.actionErrors)) {
 						$('.remove-on-success', target).remove();
-						$(':input.readonly-on-success', target).prop(
-								'readonly', true);
+						$(':input.readonly-on-success', target).each(
+								function() {
+									var t = $(this);
+									if (t.is('select')) {
+										t
+												.prop('disabled', true)
+												.after('<input type="hidden" name="'
+														+ t.attr('name')
+														+ '" value="'
+														+ t.val()
+														+ '">');
+									} else {
+										t.prop('readonly', true);
+									}
+								});
 						$(':input.disabled-on-success', target).prop(
 								'disabled', true);
 						var postback = xhr.getResponseHeader('X-Postback');
