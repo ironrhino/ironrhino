@@ -16,6 +16,7 @@ import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -124,6 +125,18 @@ public class ReflectionUtils {
 			return getActualClass(clazz);
 		} else {
 			return clazz;
+		}
+	}
+
+	public static Set<Class<?>> getAllInterfaces(Class<?> clazz) {
+		if (clazz.isInterface()) {
+			Set<Class<?>> set = new HashSet<>();
+			set.add(clazz);
+			for (Class<?> intf : clazz.getInterfaces())
+			set.addAll(getAllInterfaces(intf));
+			return set;
+		} else {
+			return ClassUtils.getAllInterfacesForClassAsSet(clazz);
 		}
 	}
 

@@ -3,17 +3,16 @@ package org.ironrhino.rest;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.ironrhino.core.remoting.ServiceRegistry;
+import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.rest.client.RestApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.annotation.RestController;
 
 public class ApiRegistrant {
@@ -49,7 +48,7 @@ public class ApiRegistrant {
 			} catch (Exception e) {
 				continue;
 			}
-			serviceInterfaces.addAll(Stream.of(ClassUtils.getAllInterfacesForClass(clazz))
+			serviceInterfaces.addAll(ReflectionUtils.getAllInterfaces(clazz).stream()
 					.filter(c -> c.isAnnotationPresent(RestApi.class)).collect(Collectors.toList()));
 		}
 		for (Class<?> clz : serviceInterfaces)

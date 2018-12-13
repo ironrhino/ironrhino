@@ -22,6 +22,4 @@ public @interface Remoting {
 
 	String serializationType() default "";
 
-	String description() default "";
-
 }

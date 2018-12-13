@@ -1,8 +1,11 @@
 package org.ironrhino.core.remoting.impl;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadLocalRandom;
@@ -19,6 +22,7 @@ import org.ironrhino.core.remoting.Remoting;
 import org.ironrhino.core.remoting.ServiceNotFoundException;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.util.AppInfo;
+import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.PropertyValue;
@@ -132,57 +136,39 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	}
 
 	private void tryExport(Class<?> clazz, String beanName, String beanClassName) {
-		if (!clazz.isInterface()) {
-			Remoting remoting = AnnotatedElementUtils.getMergedAnnotation(clazz, Remoting.class);
-			if (remoting != null) {
-				Class<?>[] classes = remoting.serviceInterfaces();
-				if (classes.length == 0) {
-					Class<?>[] interfaces = clazz.getInterfaces();
-					if (interfaces.length > 0)
-						classes = interfaces;
-				}
-				if (classes.length == 0) {
-					logger.warn("@Remoting on concrete class [{}] must assign interfaces to export services",
-							clazz.getName());
-				} else {
-					for (Class<?> inte : classes) {
-						if (!inte.isInterface()) {
-							logger.warn("Class [{}] in @Remoting on class [{}] must be interface", inte.getName(),
-									clazz.getName());
-						} else if (!inte.isAssignableFrom(clazz)) {
-							logger.warn("Class [{}] must implements interface [{}] in @Remoting", clazz.getName(),
-									inte.getName());
-						} else {
-							doExport(remoting, inte, beanName, beanClassName);
-						}
-					}
-				}
-			}
-			for (Class<?> inte : clazz.getInterfaces()) {
-				tryExport(inte, beanName, beanClassName);
+		Set<Class<?>> serviceInterfaces;
+		Remoting remoting = AnnotatedElementUtils.getMergedAnnotation(clazz, Remoting.class);
+		if (remoting != null) {
+			serviceInterfaces = new HashSet<>();
+			serviceInterfaces.addAll(Arrays.asList(remoting.serviceInterfaces()));
+			if (serviceInterfaces.isEmpty())
+				serviceInterfaces = ReflectionUtils.getAllInterfaces(clazz);
+			if (serviceInterfaces.isEmpty()) {
+				logger.warn("@Remoting on concrete class [{}] must assign interfaces to export services",
+						clazz.getName());
 			}
 		} else {
-			Remoting remoting = clazz.getAnnotation(Remoting.class);
-			if (remoting != null) {
-				doExport(remoting, clazz, beanName, beanClassName);
-			}
-			for (Class<?> inte : clazz.getInterfaces())
-				tryExport(inte, beanName, beanClassName);
+			serviceInterfaces = ReflectionUtils.getAllInterfaces(clazz).stream()
+					.filter(c -> c.isAnnotationPresent(Remoting.class)).collect(Collectors.toSet());
 		}
-	}
-
-	private void doExport(Remoting remoting, Class<?> serviceInterface, String beanName, String beanClassName) {
-		String key = serviceInterface.getName() + ".exported";
-		if ("false".equals(ctx.getEnvironment().getProperty(key))) {
-			logger.info("Skipped export service [{}] for bean [{}#{}]@{} because {}=false", serviceInterface.getName(),
-					beanClassName, beanName, normalizeHost(localHost), key);
-		} else {
-			register(serviceInterface.getName(), ctx.getBean(beanName));
-			String description = remoting.description();
-			if (StringUtils.isNotBlank(description))
-				exportedServiceDescriptions.put(serviceInterface.getName(), description);
-			logger.info("Exported service [{}] for bean [{}#{}]@{}", serviceInterface.getName(), beanClassName,
-					beanName, normalizeHost(localHost));
+		for (Class<?> serviceInterface : serviceInterfaces) {
+			if (!serviceInterface.isInterface()) {
+				logger.warn("Class [{}] in @Remoting on class [{}] must be interface", serviceInterface.getName(),
+						clazz.getName());
+			} else if (!serviceInterface.isAssignableFrom(clazz)) {
+				logger.warn("Class [{}] must implements interface [{}] in @Remoting", clazz.getName(),
+						serviceInterface.getName());
+			} else {
+				String key = serviceInterface.getName() + ".exported";
+				if ("false".equals(ctx.getEnvironment().getProperty(key))) {
+					logger.info("Skipped export service [{}] for bean [{}#{}]@{} because {}=false",
+							serviceInterface.getName(), beanClassName, beanName, normalizeHost(localHost), key);
+				} else {
+					register(serviceInterface.getName(), ctx.getBean(beanName));
+					logger.info("Exported service [{}] for bean [{}#{}]@{}", serviceInterface.getName(), beanClassName,
+							beanName, normalizeHost(localHost));
+				}
+			}
 		}
 	}
 
