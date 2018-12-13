@@ -39,7 +39,7 @@
 		</#if>
 		<#if verificationCodeRequired>
 		<@s.textfield name="verificationCode" class="required input-small" maxlength="${properties['verification.code.length']!'6'}">
-			<@s.param name="after"> <button type="button" class="btn sendVerificationCode" data-interval="${properties['verification.code.resend.interval']!'60'}">${getText('send')}</button></@s.param>
+			<@s.param name="after"> <button type="button" class="btn input-mini sendVerificationCode" data-interval="${properties['verification.code.resend.interval']!'60'}">${getText('send')}</button></@s.param>
 		</@s.textfield>
 		<#else>
 		<@s.checkbox name="rememberme" class="switch span2"/>

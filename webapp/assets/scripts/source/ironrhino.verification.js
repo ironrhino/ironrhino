@@ -42,7 +42,13 @@
 							}
 						});
 			}
-		}).on('click', '.sendVerificationCode', function() {
+		}).on('focus', '[name="verificationCode"]', function() {
+					var t = $(this);
+					if (!t.data('autosend')) {
+						t.next('.sendVerificationCode').trigger('click');
+						t.data('autosend', true);
+					}
+				}).on('click', '.sendVerificationCode', function() {
 			var btn = $(this).addClass('clicked');
 			var f = btn.closest('form');
 			var cooldown = parseInt(btn.data('cooldown') || 60);

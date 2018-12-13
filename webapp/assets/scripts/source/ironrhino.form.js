@@ -301,6 +301,18 @@ Observation.form = function(container) {
 					},
 					complete : function() {
 						f.removeClass('loading');
+						var arr = $('input:visible', f).get();
+						var after = false;
+						for (var i = 0; i < arr.length; i++) {
+							if (arr[i] == t[0] && i < arr.length - 1) {
+								after = true;
+								continue;
+							}
+							if (after && !$(arr[i]).val()) {
+								$(arr[i]).focus();
+								break;
+							}
+						}
 					}
 				});
 	}).change(function() {
