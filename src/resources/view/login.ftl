@@ -23,8 +23,8 @@
 	<#assign verificationCodeRequired = false>
 	<#assign passwordCodeRequired = true>
 	<#if verificationCodeEnabled && username?has_content>
-		<#assign verificationCodeRequired = beans['verificationManager'].isVerificationRequired(username)>
-		<#assign passwordCodeRequired = beans['verificationManager'].isPasswordRequired(username)>
+		<#assign verificationCodeRequired = verificationManager.isVerificationRequired(username)>
+		<#assign passwordCodeRequired = verificationManager.isPasswordRequired(username)>
 	</#if>
 	<@s.form id="login" action=actionBaseUrl method="post" class="ajax focus form-horizontal well">
 		<#if targetUrl?has_content><@s.hidden name="targetUrl" /></#if>

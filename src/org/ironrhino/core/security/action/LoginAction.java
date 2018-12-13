@@ -59,7 +59,6 @@ public class LoginAction extends BaseAction {
 
 	@Getter
 	@Setter
-	@NotBlank
 	protected String password;
 
 	@Getter
@@ -86,6 +85,7 @@ public class LoginAction extends BaseAction {
 	protected EventPublisher eventPublisher;
 
 	@Autowired(required = false)
+	@Getter
 	protected VerificationManager verificationManager;
 
 	@Override
