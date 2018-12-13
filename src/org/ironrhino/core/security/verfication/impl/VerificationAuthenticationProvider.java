@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.ironrhino.core.security.verfication.VerificationAware;
 import org.ironrhino.core.security.verfication.VerificationManager;
 import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,13 +54,10 @@ public class VerificationAuthenticationProvider extends DaoAuthenticationProvide
 	@Override
 	protected void additionalAuthenticationChecks(UserDetails userDetails,
 			UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
-		if (userDetails instanceof VerificationAware) {
-			VerificationAware user = (VerificationAware) userDetails;
-			if (user.isVerificationRequired()) {
-				verificationManager.verify(user);
-				if (verificationCodeQualified && !user.isPasswordRequired())
-					return; // skip check password
-			}
+		if (verificationManager.isVerificationRequired(userDetails)) {
+			verificationManager.verify(userDetails);
+			if (verificationCodeQualified && !verificationManager.isPasswordRequired(userDetails))
+				return; // skip check password
 		}
 		super.additionalAuthenticationChecks(userDetails, authentication);
 	}

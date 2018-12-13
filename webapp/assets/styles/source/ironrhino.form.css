@@ -67,7 +67,7 @@ select.input-xxlarge {
 	line-height: 30px;
 }
 
-.form-inline button {
+.form-inline button , .form-horizontal .controls button {
 	vertical-align: top;
 	border-radius: 4px;
 }
