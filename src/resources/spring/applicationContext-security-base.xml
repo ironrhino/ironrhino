@@ -4,14 +4,9 @@
 	xmlns:security="http://www.springframework.org/schema/security"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
 
-	<security:authentication-manager alias="authenticationManager"
-		erase-credentials="true">
-		<security:authentication-provider
-			user-service-ref="userDetailsService">
-			<security:password-encoder ref="passwordEncoder" />
-		</security:authentication-provider>
-		<security:authentication-provider
-			ref="rememberMeAuthenticationProvider" />
+	<security:authentication-manager alias="authenticationManager" erase-credentials="true">
+		<security:authentication-provider ref="daoAuthenticationProvider" />
+		<security:authentication-provider ref="rememberMeAuthenticationProvider" />
 	</security:authentication-manager>
 
 	<bean id="accessDecisionManager"
@@ -37,6 +32,9 @@
 		p:filterProcessesUrl="/check" p:authenticationManager-ref="authenticationManager"
 		p:rememberMeServices-ref="rememberMeServices">
 	</bean>
+	
+	<bean id="daoAuthenticationProvider"
+		class="org.ironrhino.core.spring.security.DefaultDaoAuthenticationProvider" />	
 
 	<bean id="rememberMeAuthenticationProvider"
 		class="org.springframework.security.authentication.RememberMeAuthenticationProvider">
@@ -53,19 +51,19 @@
 	<bean id="passwordEncoder" class="org.ironrhino.core.spring.security.password.MixedPasswordEncoder" />
 
 	<!--
-		<bean id="passwordEncoder" class="org.ironrhino.core.spring.security.password.MultiVersionPasswordEncoder"> 
-			<property name="versions"> 
-				<list> 
-					<bean class="org.ironrhino.core.spring.security.password.V1PasswordEncoder"/> 
-				</list> 
-			</property> 
-		</bean>
-	-->
+			<bean id="passwordEncoder" class="org.ironrhino.core.spring.security.password.MultiVersionPasswordEncoder"> 
+				<property name="versions"> 
+					<list> 
+						<bean class="org.ironrhino.core.spring.security.password.V1PasswordEncoder"/> 
+					</list> 
+				</property> 
+			</bean>
+		-->
 
 	<!--
-		<bean id="switchUserFilter" class="org.springframework.security.web.authentication.switchuser.SwitchUserFilter" 
-			p:userDetailsService-ref="userDetailsService" p:switchUserUrl="/switch" p:exitUserUrl="/switch/back" 
-			p:targetUrl="/" />
-	-->
+			<bean id="switchUserFilter" class="org.springframework.security.web.authentication.switchuser.SwitchUserFilter" 
+				p:userDetailsService-ref="userDetailsService" p:switchUserUrl="/switch" p:exitUserUrl="/switch/back" 
+				p:targetUrl="/" />
+		-->
 
 </beans>

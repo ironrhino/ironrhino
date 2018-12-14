@@ -5,21 +5,21 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public interface VerificationManager {
 
-	public boolean isVerificationRequired(String username);
+	boolean isVerificationRequired(String username);
 
-	public default boolean isVerificationRequired(UserDetails user) {
+	default boolean isVerificationRequired(UserDetails user) {
 		return (user instanceof VerificationAware) && ((VerificationAware) user).isVerificationRequired();
 	}
 
-	public boolean isPasswordRequired(String username);
+	boolean isPasswordRequired(String username);
 
-	public default boolean isPasswordRequired(UserDetails user) {
+	default boolean isPasswordRequired(UserDetails user) {
 		boolean isVerificationAware = user instanceof VerificationAware;
 		return !isVerificationAware && StringUtils.isNotBlank(user.getPassword())
 				|| isVerificationAware && ((VerificationAware) user).isPasswordRequired();
 	}
 
-	public default String getReceiver(UserDetails user) {
+	default String getReceiver(UserDetails user) {
 		String receiver = null;
 		if (user instanceof VerificationAware)
 			receiver = ((VerificationAware) user).getReceiver();
@@ -28,8 +28,8 @@ public interface VerificationManager {
 		return receiver;
 	}
 
-	public void send(String username);
+	void send(String username);
 
-	public boolean verify(UserDetails user, String verificationCode);
+	boolean verify(UserDetails user, String verificationCode);
 
 }
