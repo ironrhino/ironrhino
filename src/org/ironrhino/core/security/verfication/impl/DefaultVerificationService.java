@@ -1,7 +1,5 @@
 package org.ironrhino.core.security.verfication.impl;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.ironrhino.core.cache.CacheManager;
@@ -35,8 +33,8 @@ public class DefaultVerificationService implements VerificationService {
 	@Autowired
 	private VerificationCodeGenerator verficationCodeGenerator;
 
-	@Autowired(required = false)
-	private List<VerificationCodeNotifier> verificationCodeNotifiers = Collections.emptyList();
+	@Autowired
+	private VerificationCodeNotifier verificationCodeNotifier;
 
 	@Value("${verification.code.length:6}")
 	private int length = 6;
@@ -73,8 +71,7 @@ public class DefaultVerificationService implements VerificationService {
 			codeToSend = verficationCodeGenerator.generator(receiver, length);
 			cacheManager.put(receiver, codeToSend, expiry, TimeUnit.SECONDS, CACHE_NAMESPACE);
 		}
-		for (VerificationCodeNotifier notifier : verificationCodeNotifiers)
-			notifier.send(receiver, codeToSend);
+		verificationCodeNotifier.send(receiver, codeToSend);
 		cacheManager.put(receiver + SUFFIX_RESEND, "", resendInterval, TimeUnit.SECONDS, CACHE_NAMESPACE);
 	}
 
