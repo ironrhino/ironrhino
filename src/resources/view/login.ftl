@@ -26,6 +26,7 @@
 		<#assign verificationCodeRequired = verificationManager.isVerificationRequired(username)>
 		<#assign passwordCodeRequired = verificationManager.isPasswordRequired(username)>
 	</#if>
+	<#assign totpEnabled = (properties['totp.enabled']!)=='true'>
 	<@s.form id="login" action=actionBaseUrl method="post" class="ajax focus form-horizontal well">
 		<#if targetUrl?has_content><@s.hidden name="targetUrl" /></#if>
 		<#assign dynamicAttributes={}>
@@ -37,9 +38,11 @@
 		<#if passwordCodeRequired>
 		<@s.password name="password" class="required span2 input-pattern submit sha"/>
 		</#if>
-		<#if verificationCodeRequired>
+		<#if verificationCodeRequired || totpEnabled>
 		<@s.textfield name="verificationCode" class="required input-small" maxlength="${properties['verification.code.length']!'6'}">
+			<#if verificationCodeRequired>
 			<@s.param name="after"> <button type="button" class="btn input-mini sendVerificationCode" data-interval="${properties['verification.code.resend.interval']!'60'}">${getText('send')}</button></@s.param>
+			</#if>
 		</@s.textfield>
 		<#else>
 		<@s.checkbox name="rememberme" class="switch span2"/>
