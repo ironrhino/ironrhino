@@ -15,6 +15,7 @@ import java.util.TimeZone;
 import java.util.TreeSet;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.ironrhino.core.log4j.SimpleMergeStrategy;
 import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.core.env.MutablePropertySources;
@@ -412,9 +413,13 @@ public class AppInfo {
 		System.setProperty("log4j.configurationFile", configurationFile);
 		if (configurationFile.indexOf(',') > 0)
 			System.setProperty("log4j.mergeStrategy", SimpleMergeStrategy.class.getName());
-		System.setProperty("Log4jContextSelector", "org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
-		if (System.getProperty("AsyncLogger.RingBufferSize") == null)
-			System.setProperty("AsyncLogger.RingBufferSize", "16384");
+		if (!SystemUtils.IS_OS_WINDOWS) {
+			if (System.getProperty("Log4jContextSelector") == null)
+				System.setProperty("Log4jContextSelector",
+						"org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
+			if (System.getProperty("AsyncLogger.RingBufferSize") == null)
+				System.setProperty("AsyncLogger.RingBufferSize", "16384");
+		}
 		if (System.getProperty("hibernate.logger.level") == null)
 			System.setProperty("hibernate.logger.level", AppInfo.getStage() == Stage.DEVELOPMENT ? "TRACE" : "INFO");
 		if (System.getProperty("console.logger.level") == null)
