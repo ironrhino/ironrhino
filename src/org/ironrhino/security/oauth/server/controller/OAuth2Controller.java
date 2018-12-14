@@ -30,6 +30,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -64,6 +65,9 @@ public class OAuth2Controller {
 	@Autowired
 	private AuthenticationManager authenticationManager;
 
+	@Autowired
+	private WebAuthenticationDetailsSource authenticationDetailsSource;
+
 	@Autowired(required = false)
 	private VerificationManager verificationManager;
 
@@ -88,9 +92,11 @@ public class OAuth2Controller {
 					throw new MissingServletRequestParameterException("username", String.class.getSimpleName());
 				if (password == null)
 					throw new MissingServletRequestParameterException("password", String.class.getSimpleName());
+				UsernamePasswordAuthenticationToken attempt = new UsernamePasswordAuthenticationToken(username,
+						password);
+				attempt.setDetails(authenticationDetailsSource.buildDetails(request));
 				try {
-					Authentication authResult = authenticationManager
-							.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+					Authentication authResult = authenticationManager.authenticate(attempt);
 					if (authResult != null)
 						authenticationSuccessHandler.onAuthenticationSuccess(request, response, authResult);
 				} catch (InternalAuthenticationServiceException failed) {
@@ -105,15 +111,18 @@ public class OAuth2Controller {
 				// }
 				catch (AuthenticationException failed) {
 					authenticationFailureHandler.onAuthenticationFailure(request, response, failed);
-					throw new IllegalArgumentException(I18N.getText(failed.getClass().getName()));
+					throw new IllegalArgumentException(I18N.getText(failed.getClass().getName()), failed);
 				}
 				UserDetails u = userDetailsService.loadUserByUsername(username);
 				authorization = oauthManager.grant(client, u.getUsername(), device_id, device_name);
 			} catch (Exception e) {
 				if (e instanceof MissingServletRequestParameterException)
 					throw e;
-				log.error("Exchange token by password for \"{}\" failed with {}: {}", username, e.getClass().getName(),
-						e.getLocalizedMessage());
+				if (e.getCause() instanceof AuthenticationException)
+					log.error("Exchange token by password for \"{}\" failed with {}: {}", username,
+							e.getClass().getName(), e.getLocalizedMessage());
+				else
+					log.error(e.getMessage(), e);
 				throw new OAuthError(OAuthError.INVALID_REQUEST, e.getLocalizedMessage());
 			}
 			result.put("access_token", authorization.getAccessToken());

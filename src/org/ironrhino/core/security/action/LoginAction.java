@@ -22,7 +22,6 @@ import org.ironrhino.core.spring.security.DefaultAuthenticationSuccessHandler;
 import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationFilter;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.ExceptionUtils;
-import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -79,6 +78,9 @@ public class LoginAction extends BaseAction {
 	private AuthenticationManager authenticationManager;
 
 	@Autowired
+	private WebAuthenticationDetailsSource authenticationDetailsSource;
+
+	@Autowired
 	protected SessionAuthenticationStrategy sessionAuthenticationStrategy;
 
 	@Autowired
@@ -99,9 +101,7 @@ public class LoginAction extends BaseAction {
 		Authentication authResult = null;
 		try {
 			UsernamePasswordAuthenticationToken attempt = new UsernamePasswordAuthenticationToken(username, password);
-			WebAuthenticationDetailsSource wads = ReflectionUtils.getFieldValue(usernamePasswordAuthenticationFilter,
-					"authenticationDetailsSource");
-			attempt.setDetails(wads.buildDetails(request));
+			attempt.setDetails(authenticationDetailsSource.buildDetails(request));
 			authResult = authenticationManager.authenticate(attempt);
 			sessionAuthenticationStrategy.onAuthentication(authResult, request, response);
 		} catch (InternalAuthenticationServiceException failed) {

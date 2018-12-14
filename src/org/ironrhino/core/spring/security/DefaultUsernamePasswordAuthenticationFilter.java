@@ -13,8 +13,11 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 
 public class DefaultUsernamePasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+
+	public static final String TARGET_URL = "targetUrl";
 
 	@Autowired
 	protected AuthenticationFailureHandler authenticationFailureHandler;
@@ -22,12 +25,14 @@ public class DefaultUsernamePasswordAuthenticationFilter extends UsernamePasswor
 	@Autowired
 	protected AuthenticationSuccessHandler authenticationSuccessHandler;
 
-	public static final String TARGET_URL = "targetUrl";
+	@Autowired
+	private WebAuthenticationDetailsSource authenticationDetailsSource;
 
 	@PostConstruct
 	public void init() {
 		setAuthenticationFailureHandler(authenticationFailureHandler);
 		setAuthenticationSuccessHandler(authenticationSuccessHandler);
+		setAuthenticationDetailsSource(authenticationDetailsSource);
 	}
 
 	public void success(HttpServletRequest request, HttpServletResponse response, Authentication authResult)

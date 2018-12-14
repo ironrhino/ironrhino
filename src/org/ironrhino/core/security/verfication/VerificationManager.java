@@ -28,8 +28,8 @@ public interface VerificationManager {
 		return receiver;
 	}
 
-	public void send(String username) throws ReceiverNotFoundException;
+	public void send(String username);
 
-	public void verify(UserDetails user) throws WrongVerificationCodeException;
+	public boolean verify(UserDetails user, String verificationCode);
 
 }

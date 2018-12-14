@@ -4,8 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.security.verfication.ReceiverNotFoundException;
 import org.ironrhino.core.security.verfication.VerificationManager;
 import org.ironrhino.core.security.verfication.VerificationService;
-import org.ironrhino.core.security.verfication.WrongVerificationCodeException;
-import org.ironrhino.core.servlet.RequestContext;
 import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -42,22 +40,17 @@ public class DefaultVerificationManager implements VerificationManager {
 	}
 
 	@Override
-	public void send(String username) throws ReceiverNotFoundException {
+	public void send(String username) {
 		verificationService.send(getReceiver(userDetailsService.loadUserByUsername(username)));
 	}
 
 	@Override
-	public void verify(UserDetails user) throws WrongVerificationCodeException {
+	public boolean verify(UserDetails user, String verificationCode) {
 		String username = user.getUsername();
 		String receiver = getReceiver(user);
 		if (StringUtils.isBlank(receiver))
 			throw new ReceiverNotFoundException("No receiver found for: " + username);
-		String verificationCode = RequestContext.getRequest().getParameter("verificationCode");
-		if (verificationCode == null)
-			verificationCode = RequestContext.getRequest().getParameter("password");
-		boolean verified = verificationService.verify(receiver, verificationCode);
-		if (!verified)
-			throw new WrongVerificationCodeException("Wrong verification code: " + verificationCode);
+		return verificationService.verify(receiver, verificationCode);
 	}
 
 }
