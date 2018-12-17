@@ -7,7 +7,7 @@ import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Captcha;
 import org.ironrhino.core.metadata.Redirect;
-import org.ironrhino.core.security.otp.TotpPasswordCheckInterceptor;
+import org.ironrhino.core.security.otp.TotpVerificationCodeChecker;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
 import org.ironrhino.core.struts.BaseAction;
@@ -32,7 +32,7 @@ public class TotpAction extends BaseAction {
 	private UserDetailsService userDetailsService;
 
 	@Autowired
-	private TotpPasswordCheckInterceptor totpPasswordCheckInterceptor;
+	private TotpVerificationCodeChecker totpVerificationCodeChecker;
 
 	@Getter
 	@Setter
@@ -49,7 +49,7 @@ public class TotpAction extends BaseAction {
 	@Captcha(threshold = 3)
 	public String execute() throws Exception {
 		try {
-			totpUri = totpPasswordCheckInterceptor.of(userDetailsService.loadUserByUsername(username)).uri(username,
+			totpUri = totpVerificationCodeChecker.of(userDetailsService.loadUserByUsername(username)).uri(username,
 					getText(AppInfo.getAppName()));
 		} catch (UsernameNotFoundException e) {
 			addFieldError("username", getText("not.found"));

@@ -3,10 +3,9 @@ package org.ironrhino.core.security.otp;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.core.security.verfication.WrongVerificationCodeException;
 import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
-import org.ironrhino.core.spring.security.DefaultWebAuthenticationDetails;
-import org.ironrhino.core.spring.security.password.PasswordCheckInterceptor;
+import org.ironrhino.core.spring.security.VerificationCodeChecker;
+import org.ironrhino.core.spring.security.WrongVerificationCodeException;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.CodecUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 @ApplicationContextPropertiesConditional(key = "totp.enabled", value = "true")
 @Component
-public class TotpPasswordCheckInterceptor implements PasswordCheckInterceptor {
+public class TotpVerificationCodeChecker implements VerificationCodeChecker {
 
 	@Value("${totp.key:}")
 	private String key;
@@ -40,21 +39,10 @@ public class TotpPasswordCheckInterceptor implements PasswordCheckInterceptor {
 	}
 
 	@Override
-	public void prePasswordCheck(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) {
-		DefaultWebAuthenticationDetails wad = (DefaultWebAuthenticationDetails) authentication.getDetails();
-		if (!shouldSkip(authentication)) {
-			String verificationCode = wad.getVerificationCode();
-			boolean verified = of(userDetails).verify(verificationCode);
-			if (!verified)
-				throw new WrongVerificationCodeException("Wrong verification code: " + verificationCode);
-		}
-	}
-
-	protected boolean shouldSkip(UsernamePasswordAuthenticationToken authentication) {
-		DefaultWebAuthenticationDetails wad = (DefaultWebAuthenticationDetails) authentication.getDetails();
-		String remoteAddress = wad.getRemoteAddress();
-		return "admin".equals(authentication.getName())
-				&& ("127.0.0.1".equals(remoteAddress) || "0:0:0:0:0:0:0:1".equals(remoteAddress));
+	public void verify(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication,
+			String verificationCode) {
+		if (!of(userDetails).verify(verificationCode))
+			throw new WrongVerificationCodeException("Wrong verification code: " + verificationCode);
 	}
 
 }

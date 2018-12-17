@@ -10,7 +10,7 @@
 	<property name="target.dir" location="${basedir}/target" />
 	<property name="assets-jar.name" value="ironrhino-assets-${version}.jar" />
 	<property name="core-jar.name" value="ironrhino-core-${version}.jar" />
-	<property name="core-jar.includes" value="META-INF/**,log4j2.xml,ehcache.xml,es-plugin.properties,struts-plugin.xml,xwork-conversion.properties,META-INF/**,com/google/**,org/springframework/**,org/hibernate/**,org/ironrhino/core/**,org/ironrhino/common/**,resources/i18n/common/**,resources/view/common/**,resources/view/meta/**,resources/view/setup.ftl,resources/view/login.ftl,resources/view/password.ftl,resources/view/index.ftl,resources/view/locale.ftl,resources/view/decorator/**,resources/spring/applicationContext-common.xml" />
+	<property name="core-jar.includes" value="META-INF/**,log4j2.xml,ehcache.xml,es-plugin.properties,struts-plugin.xml,xwork-conversion.properties,META-INF/**,com/google/**,org/springframework/**,org/hibernate/**,org/ironrhino/core/**,org/ironrhino/common/**,resources/i18n/common/**,resources/view/common/**,resources/view/meta/**,resources/view/setup.ftl,resources/view/login.ftl,resources/view/password.ftl,resources/view/totp.ftl,resources/view/index.ftl,resources/view/locale.ftl,resources/view/decorator/**,resources/spring/applicationContext-common.xml" />
 	<property name="fs-jar.name" value="ironrhino-fs-${version}.jar" />
 	<property name="fs-jar.includes" value="org/ironrhino/core/fs/**" />
 	<property name="zookeeper-jar.name" value="ironrhino-zookeeper-${version}.jar" />

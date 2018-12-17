@@ -1,4 +1,4 @@
-package org.ironrhino.core.security.verfication;
+package org.ironrhino.core.spring.security;
 
 import org.springframework.security.core.AuthenticationException;
 
