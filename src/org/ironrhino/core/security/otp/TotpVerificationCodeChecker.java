@@ -1,13 +1,17 @@
 package org.ironrhino.core.security.otp;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
 import org.ironrhino.core.spring.security.VerificationCodeChecker;
 import org.ironrhino.core.spring.security.WrongVerificationCodeException;
+import org.ironrhino.core.throttle.ThrottleService;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.CodecUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,6 +30,12 @@ public class TotpVerificationCodeChecker implements VerificationCodeChecker {
 	@Value("${verification.code.resend.interval:60}")
 	private int period = 60;
 
+	@Value("${authenticationFailureHandler.delayInterval:5}")
+	private int delayInterval;
+
+	@Autowired
+	private ThrottleService throttleService;
+
 	@PostConstruct
 	private void init() {
 		if (StringUtils.isBlank(key))
@@ -41,8 +51,11 @@ public class TotpVerificationCodeChecker implements VerificationCodeChecker {
 	@Override
 	public void verify(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication,
 			String verificationCode) {
-		if (!of(userDetails).verify(verificationCode))
+		if (!of(userDetails).verify(verificationCode)) {
+			throttleService.delay("username:" + userDetails.getUsername(), delayInterval, TimeUnit.SECONDS,
+					delayInterval / 2);
 			throw new WrongVerificationCodeException("Wrong verification code: " + verificationCode);
+		}
 	}
 
 }
