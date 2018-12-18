@@ -92,11 +92,11 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 
 	@Override
 	protected void writeDiscoveredServices() {
-		if (importedServices.size() == 0)
+		if (getImportedServices().isEmpty())
 			return;
 		String path = new StringBuilder().append(hostsParentPath).append("/").append(escapeSlash(getLocalHost()))
 				.toString();
-		byte[] data = JsonUtils.toJson(importedServices).getBytes();
+		byte[] data = JsonUtils.toJson(getImportedServices()).getBytes();
 		try {
 			curatorFramework.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).inBackground()
 					.forPath(path, data);
@@ -107,11 +107,11 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 
 	@Override
 	protected void writeExportServiceDescriptions() {
-		if (exportedServiceDescriptions.size() == 0)
+		if (getExportedServiceDescriptions().isEmpty())
 			return;
 		String path = new StringBuilder().append(appsParentPath).append("/").append(escapeSlash(AppInfo.getAppName()))
 				.toString();
-		byte[] data = JsonUtils.toJson(exportedServiceDescriptions).getBytes();
+		byte[] data = JsonUtils.toJson(getExportedServiceDescriptions()).getBytes();
 		try {
 			curatorFramework.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT).inBackground()
 					.forPath(path, data);
@@ -166,7 +166,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	@Override
 	public Map<String, String> getImportedServicesByHost(String host) {
 		if (host.equals(getLocalHost()))
-			return importedServices;
+			return getImportedServices();
 		try {
 			String path = new StringBuilder().append(hostsParentPath).append("/").append(escapeSlash(host)).toString();
 			byte[] data = curatorFramework.getData().forPath(path);
@@ -202,7 +202,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	@Override
 	public Map<String, String> getExportedServicesByAppName(String appName) {
 		if (AppInfo.getAppName().equals(appName))
-			return new TreeMap<>(exportedServiceDescriptions);
+			return new TreeMap<>(getExportedServiceDescriptions());
 		try {
 			String path = new StringBuilder().append(appsParentPath).append("/").append(escapeSlash(appName))
 					.toString();

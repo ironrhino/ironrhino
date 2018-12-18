@@ -40,6 +40,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.context.ConfigurableWebApplicationContext;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 
 public abstract class AbstractServiceRegistry implements ServiceRegistry {
@@ -69,12 +70,14 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	@Getter
 	private Map<String, List<String>> importedServiceCandidates = new ConcurrentHashMap<>();
 
+	@Getter(AccessLevel.PROTECTED)
+	private Map<String, String> importedServices = new ConcurrentHashMap<>();
+
 	@Getter
 	private Map<String, Object> exportedServices = new ConcurrentHashMap<>();
 
-	protected Map<String, String> exportedServiceDescriptions = new ConcurrentHashMap<>();
-
-	protected Map<String, String> importedServices = new ConcurrentHashMap<>();
+	@Getter(AccessLevel.PROTECTED)
+	private Map<String, String> exportedServiceDescriptions = new ConcurrentHashMap<>();
 
 	protected boolean ready;
 

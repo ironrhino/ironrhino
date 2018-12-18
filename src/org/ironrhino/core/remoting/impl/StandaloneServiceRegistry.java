@@ -75,7 +75,7 @@ public class StandaloneServiceRegistry extends AbstractServiceRegistry {
 	@Override
 	public Map<String, String> getExportedServicesByAppName(String appName) {
 		if (AppInfo.getAppName().equals(appName))
-			return new TreeMap<>(exportedServiceDescriptions);
+			return new TreeMap<>(getExportedServiceDescriptions());
 		else
 			return Collections.emptyMap();
 	}
