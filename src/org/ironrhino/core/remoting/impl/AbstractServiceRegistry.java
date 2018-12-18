@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadLocalRandom;
@@ -45,6 +46,9 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
 	private static final String CLASS_NAME_SERVER = "org.ironrhino.core.remoting.server.HttpInvokerServer";
 	private static final String CLASS_NAME_CLIENT = "org.ironrhino.core.remoting.client.HttpInvokerClient";
+
+	private static final String PATH_DELIMITER = "///";
+
 	private static final boolean IS_SERVER_PRESENT = ClassUtils.isPresent(CLASS_NAME_SERVER,
 			AbstractServiceRegistry.class.getClassLoader());
 
@@ -130,11 +134,6 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 		onReady();
 	}
 
-	private static String normalizeHost(String host) {
-		int i = host.indexOf('@');
-		return i < 0 ? host : host.substring(i + 1);
-	}
-
 	private void tryExport(Class<?> clazz, String beanName, String beanClassName) {
 		Set<Class<?>> serviceInterfaces;
 		Remoting remoting = AnnotatedElementUtils.getMergedAnnotation(clazz, Remoting.class);
@@ -179,7 +178,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 		if (StringUtils.isBlank(description))
 			exportedServiceDescriptions.put(serviceName,
 					ctx.getEnvironment().getProperty(serviceName + ".description", ""));
-		doRegister(serviceName, StringUtils.isNotBlank(path) ? getLocalHost() + path : getLocalHost());
+		doRegister(serviceName, concatPath(getLocalHost(), path));
 	}
 
 	protected abstract void doRegister(String serviceName, String host);
@@ -188,7 +187,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	public void unregister(String serviceName, String path) {
 		exportedServices.remove(serviceName);
 		exportedServiceDescriptions.remove(serviceName);
-		doUnregister(serviceName, StringUtils.isNotBlank(path) ? getLocalHost() + path : getLocalHost());
+		doUnregister(serviceName, concatPath(getLocalHost(), path));
 	}
 
 	protected abstract void doUnregister(String serviceName, String host);
@@ -197,9 +196,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	public void evict(String host) {
 		for (Map.Entry<String, List<String>> entry : importedServiceCandidates.entrySet()) {
 			List<String> hosts = entry.getValue();
-			List<String> tobeRemoved = hosts.stream()
-					.filter(s -> s.equals(host) || normalizeHost(s).equals(host) || s.startsWith(host + "/"))
-					.collect(Collectors.toList());
+			List<String> tobeRemoved = hosts.stream().filter(s -> isSame(s, host)).collect(Collectors.toList());
 			hosts.removeAll(tobeRemoved);
 		}
 	}
@@ -241,7 +238,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 			} while (!counter.compareAndSet(current, next));
 			host = list.get((next - 1 + size) % size); // list.get(next);
 		}
-		onDiscover(serviceName, host, polling);
+		onDiscover(serviceName, stripPath(host), polling);
 		return normalizeHost(host);
 	}
 
@@ -266,6 +263,16 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
 	protected abstract void lookup(String serviceName);
 
+	@Override
+	public Map<String, Collection<String>> getExportedHostsByService(String serviceName) {
+		Map<String, Collection<String>> result = new TreeMap<>();
+		doGetExportedHostsByService(serviceName).entrySet().stream()
+				.forEach(entry -> result.put(stripPath(entry.getKey()), entry.getValue()));
+		return result;
+	}
+
+	protected abstract Map<String, Collection<String>> doGetExportedHostsByService(String serviceName);
+
 	@PreDestroy
 	public void destroy() {
 		for (String serviceName : exportedServices.keySet())
@@ -281,6 +288,41 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 			if (event.getApplicationContext() == ctx)
 				init();
 		}
+	}
+
+	private static String normalizeHost(String host) {
+		host = StringUtils.replace(host, PATH_DELIMITER, "");
+		int i = host.indexOf('@');
+		return i < 0 ? host : host.substring(i + 1);
+	}
+
+	private static String concatPath(String host, String path) {
+		return StringUtils.isNotBlank(path) ? host + PATH_DELIMITER + path : host;
+	}
+
+	private static String stripPath(String host) {
+		int index = host.indexOf(PATH_DELIMITER);
+		return index > 0 ? host.substring(0, index) : host;
+	}
+
+	private static boolean isSame(String candidate, String evict) {
+		if (candidate.equals(evict)) {
+			// candidate: without path, host: unnormalized (from InstanceShutdownEvent)
+			return true;
+		}
+		if (normalizeHost(candidate).equals(evict)) {
+			// candidate: without path, host: normalized (from client)
+			return true;
+		}
+		if (stripPath(candidate).equals(evict)) {
+			// candidate: with path, host: unnormalized (from InstanceShutdownEvent)
+			return true;
+		}
+		if (candidate.contains('@' + evict + PATH_DELIMITER)) {
+			// candidate: with path, host: normalized (from client)
+			return true;
+		}
+		return false;
 	}
 
 }

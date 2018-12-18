@@ -123,7 +123,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	}
 
 	@Override
-	public Map<String, Collection<String>> getExportedHostsByService(String service) {
+	protected Map<String, Collection<String>> doGetExportedHostsByService(String service) {
 		Map<String, Collection<String>> result = new TreeMap<>();
 		Map<String, String> map = getImportedHostsByService(service);
 		List<String> hosts = remotingStringRedisTemplate.opsForList().range(NAMESPACE_SERVICES + service, 0, -1);

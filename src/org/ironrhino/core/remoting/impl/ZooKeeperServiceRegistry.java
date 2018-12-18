@@ -121,7 +121,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	}
 
 	@Override
-	public Map<String, Collection<String>> getExportedHostsByService(String service) {
+	protected Map<String, Collection<String>> doGetExportedHostsByService(String service) {
 		try {
 			Map<String, Collection<String>> result = new TreeMap<>();
 			Map<String, String> map = getImportedHostsByService(service);

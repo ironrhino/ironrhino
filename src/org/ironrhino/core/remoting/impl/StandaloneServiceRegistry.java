@@ -51,7 +51,7 @@ public class StandaloneServiceRegistry extends AbstractServiceRegistry {
 	}
 
 	@Override
-	public Map<String, Collection<String>> getExportedHostsByService(String service) {
+	protected Map<String, Collection<String>> doGetExportedHostsByService(String service) {
 		return (getExportedServices().containsKey(service))
 				? Collections.singletonMap(getLocalHost(), Collections.emptyList())
 				: Collections.emptyMap();
