@@ -72,7 +72,6 @@ public class HttpInvokerServer implements HttpRequestHandler {
 		}
 		String uri = request.getRequestURI();
 		String interfaceName = uri.substring(uri.lastIndexOf('/') + 1);
-		MDC.put(AccessFilter.MDC_KEY_REQUEST_FROM, request.getHeader(AccessFilter.HTTP_HEADER_REQUEST_FROM));
 		MDC.put(MDC_KEY_INTERFACE_NAME, interfaceName);
 		Object target = serviceRegistry.getExportedServices().get(interfaceName);
 		if (target == null) {
