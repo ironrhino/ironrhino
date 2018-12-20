@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.coordination.LockService;
 import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
 import org.ironrhino.core.spring.security.VerificationCodeChecker;
 import org.ironrhino.core.spring.security.WrongVerificationCodeException;
@@ -34,6 +35,9 @@ public class TotpVerificationCodeChecker implements VerificationCodeChecker {
 	private int delayInterval;
 
 	@Autowired
+	private LockService lockService;
+
+	@Autowired
 	private ThrottleService throttleService;
 
 	@PostConstruct
@@ -51,10 +55,20 @@ public class TotpVerificationCodeChecker implements VerificationCodeChecker {
 	@Override
 	public void verify(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication,
 			String verificationCode) {
-		if (!of(userDetails).verify(verificationCode)) {
-			throttleService.delay("username:" + userDetails.getUsername(), delayInterval, TimeUnit.SECONDS,
-					delayInterval / 2);
-			throw new WrongVerificationCodeException("Wrong verification code: " + verificationCode);
+		String username = userDetails.getUsername();
+		String lockName = "totp:" + username;
+		String throttleKey = "username:" + username;
+		if (lockService.tryLock(lockName)) {
+			try {
+				if (!of(userDetails).verify(verificationCode)) {
+					throttleService.delay(throttleKey, delayInterval, TimeUnit.SECONDS, delayInterval / 2);
+					throw new WrongVerificationCodeException("Wrong verification code: " + verificationCode);
+				}
+			} finally {
+				lockService.unlock(lockName);
+			}
+		} else {
+			throttleService.delay(throttleKey, delayInterval, TimeUnit.SECONDS, delayInterval / 2);
 		}
 	}
 
