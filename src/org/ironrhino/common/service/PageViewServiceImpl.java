@@ -1,11 +1,13 @@
 package org.ironrhino.common.service;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +24,10 @@ import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.HyperLogLogOperations;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -318,7 +323,17 @@ public class PageViewServiceImpl implements PageViewService {
 			if (value != null) {
 				return Long.valueOf(value);
 			} else {
-				Set<String> keys = pageViewStringRedisTemplate.keys(prefix + "*");
+				Set<String> keys = pageViewStringRedisTemplate.<Set<String>>execute((RedisConnection conn) -> {
+					Set<String> set = new HashSet<>();
+					try (Cursor<byte[]> cursor = conn
+							.scan(new ScanOptions.ScanOptionsBuilder().match(prefix + "*").count(100).build())) {
+						while (cursor.hasNext())
+							set.add((String) pageViewStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+					return set;
+				});
 				if (keys == null)
 					throw new RuntimeException("Unexpected null");
 				List<String> results = pageViewStringRedisTemplate.opsForValue().multiGet(keys);

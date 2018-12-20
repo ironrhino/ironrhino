@@ -3,9 +3,11 @@ package org.ironrhino.core.remoting.impl;
 import static org.ironrhino.core.metadata.Profiles.CLOUD;
 import static org.ironrhino.core.metadata.Profiles.DUAL;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +30,9 @@ import org.ironrhino.core.util.AppInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.EventListener;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -143,7 +148,17 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	@Override
 	public Map<String, String> getImportedHostsByService(String service) {
 		Map<String, String> result = new TreeMap<>();
-		Set<String> hosts = remotingStringRedisTemplate.keys(NAMESPACE_HOSTS + "*");
+		Set<String> hosts = remotingStringRedisTemplate.<Set<String>>execute((RedisConnection conn) -> {
+			Set<String> set = new HashSet<>();
+			try (Cursor<byte[]> cursor = conn
+					.scan(new ScanOptions.ScanOptionsBuilder().match(NAMESPACE_HOSTS + "*").count(100).build())) {
+				while (cursor.hasNext())
+					set.add((String) remotingStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			return set;
+		});
 		if (hosts == null)
 			return Collections.emptyMap();
 		for (String key : hosts) {
@@ -167,7 +182,17 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 
 	@Override
 	public Collection<String> getAllAppNames() {
-		Set<String> keys = remotingStringRedisTemplate.keys(NAMESPACE_APPS + "*");
+		Set<String> keys = remotingStringRedisTemplate.<Set<String>>execute((RedisConnection conn) -> {
+			Set<String> set = new HashSet<>();
+			try (Cursor<byte[]> cursor = conn
+					.scan(new ScanOptions.ScanOptionsBuilder().match(NAMESPACE_APPS + "*").count(100).build())) {
+				while (cursor.hasNext())
+					set.add((String) remotingStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			return set;
+		});
 		if (keys == null)
 			return Collections.emptyList();
 		List<String> appNames = new ArrayList<>(keys.size());

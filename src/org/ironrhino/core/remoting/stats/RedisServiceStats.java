@@ -4,10 +4,12 @@ import static org.ironrhino.core.metadata.Profiles.CLOUD;
 import static org.ironrhino.core.metadata.Profiles.CLUSTER;
 import static org.ironrhino.core.metadata.Profiles.DUAL;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,8 +38,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.BoundZSetOperations;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -117,7 +122,17 @@ public class RedisServiceStats implements ServiceStats {
 	@Override
 	public Map<String, Set<String>> getServices() {
 		Map<String, Set<String>> map = new TreeMap<>();
-		Set<String> serviceKeys = remotingStringRedisTemplate.keys(NAMESPACE_SERVICES + "*");
+		Set<String> serviceKeys = remotingStringRedisTemplate.<Set<String>>execute((RedisConnection conn) -> {
+			Set<String> set = new HashSet<>();
+			try (Cursor<byte[]> cursor = conn
+					.scan(new ScanOptions.ScanOptionsBuilder().match(NAMESPACE_SERVICES + "*").count(100).build())) {
+				while (cursor.hasNext())
+					set.add((String) remotingStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			return set;
+		});
 		if (serviceKeys == null)
 			return Collections.emptyMap();
 		for (String serviceKey : serviceKeys) {
@@ -140,7 +155,17 @@ public class RedisServiceStats implements ServiceStats {
 			if (value != null) {
 				return Long.valueOf(value);
 			} else {
-				Set<String> keys = remotingStringRedisTemplate.keys(prefix + "*");
+				Set<String> keys = remotingStringRedisTemplate.<Set<String>>execute((RedisConnection conn) -> {
+					Set<String> set = new HashSet<>();
+					try (Cursor<byte[]> cursor = conn
+							.scan(new ScanOptions.ScanOptionsBuilder().match(prefix + "*").count(100).build())) {
+						while (cursor.hasNext())
+							set.add((String) remotingStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+					return set;
+				});
 				if (keys == null)
 					return 0;
 				List<String> results = remotingStringRedisTemplate.opsForValue().multiGet(keys);
@@ -305,7 +330,17 @@ public class RedisServiceStats implements ServiceStats {
 		sb.append(serviceName).append(".").append(method);
 		sb.append(":").append(day);
 		String prefix = sb.toString();
-		Set<String> keys = remotingStringRedisTemplate.keys(prefix + "*");
+		Set<String> keys = remotingStringRedisTemplate.<Set<String>>execute((RedisConnection conn) -> {
+			Set<String> set = new HashSet<>();
+			try (Cursor<byte[]> cursor = conn
+					.scan(new ScanOptions.ScanOptionsBuilder().match(prefix + "*").count(100).build())) {
+				while (cursor.hasNext())
+					set.add((String) remotingStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			return set;
+		});
 		if (keys == null)
 			return;
 		if (!keys.isEmpty()) {
@@ -330,7 +365,17 @@ public class RedisServiceStats implements ServiceStats {
 		sb.append(serviceName).append(".").append(method);
 		sb.append(":").append(yesterday);
 		String prefix = sb.toString();
-		Set<String> keys = remotingStringRedisTemplate.keys(prefix + "*");
+		Set<String> keys = remotingStringRedisTemplate.<Set<String>>execute((RedisConnection conn) -> {
+			Set<String> set = new HashSet<>();
+			try (Cursor<byte[]> cursor = conn
+					.scan(new ScanOptions.ScanOptionsBuilder().match(prefix + "*").count(100).build())) {
+				while (cursor.hasNext())
+					set.add((String) remotingStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			return set;
+		});
 		if (keys == null)
 			return;
 		List<String> results = remotingStringRedisTemplate.opsForValue().multiGet(keys);
