@@ -457,12 +457,14 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 		if (validatorClass != JsonValidator.class) {
 			JsonValidator validator = null;
 			ApplicationContext ctx = getApplicationContext();
-			if (ctx != null)
+			if (ctx != null) {
 				try {
 					validator = ctx.getBean(validatorClass);
 				} catch (NoSuchBeanDefinitionException e) {
-					validator = validatorClass.getConstructor().newInstance();
 				}
+			}
+			if (validator == null)
+				validator = validatorClass.getConstructor().newInstance();
 			validator.validate(tree);
 		}
 		if (!pointer.value().isEmpty())
