@@ -24,7 +24,7 @@ EOF
 
 #install packages
 apt-get update
-apt-get --force-yes --yes install openjdk-8-jdk mysql-server-5.7 subversion git nginx sysv-rc-conf fontconfig xfonts-utils zip unzip wget iptables make gcc
+apt-get --force-yes --yes install openjdk-8-jdk-headless mysql-server subversion git nginx sysv-rc-conf fontconfig xfonts-utils zip unzip wget iptables make gcc
 if [ ! -f "/sbin/insserv" ] ; then
 ln -s /usr/lib/insserv/insserv /sbin/insserv
 fi

@@ -37,7 +37,7 @@ EOF
 
 
 #install packages
-yum -y install java-1.8.0-openjdk-headless mysql-server subversion git nginx zip unzip wget make gcc telnet
+yum -y install java-1.8.0-openjdk-devel mysql-server subversion git nginx zip unzip wget make gcc telnet
 grep "password" /var/log/mysqld.log
 
 #install ant
