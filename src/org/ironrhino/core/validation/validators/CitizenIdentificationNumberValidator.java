@@ -8,6 +8,7 @@ import java.util.List;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.validation.constraints.CitizenIdentificationNumber;
 
 /**
@@ -17,7 +18,7 @@ public class CitizenIdentificationNumberValidator implements ConstraintValidator
 
 	@Override
 	public boolean isValid(String input, ConstraintValidatorContext constraintValidatorContext) {
-		if (input == null)
+		if (StringUtils.isEmpty(input))
 			return true;
 		return isValid(input);
 	}

@@ -17,7 +17,7 @@ public class LicensePlateValidator implements ConstraintValidator<LicensePlate, 
 
 	@Override
 	public boolean isValid(String input, ConstraintValidatorContext constraintValidatorContext) {
-		if (input == null)
+		if (StringUtils.isEmpty(input))
 			return true;
 		return isValid(input);
 	}

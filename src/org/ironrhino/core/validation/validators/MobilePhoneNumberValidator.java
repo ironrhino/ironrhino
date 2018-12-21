@@ -14,14 +14,12 @@ public class MobilePhoneNumberValidator implements ConstraintValidator<MobilePho
 
 	@Override
 	public boolean isValid(String input, ConstraintValidatorContext constraintValidatorContext) {
-		if (input == null)
+		if (StringUtils.isEmpty(input))
 			return true;
 		return isValid(input);
 	}
 
 	public static boolean isValid(String input) {
-		if (input == null)
-			return false;
 		if (input.startsWith("+86"))
 			input = input.substring(3);
 		if (!StringUtils.isNumeric(input) || input.length() != 11)

@@ -9,7 +9,6 @@ public class MobilePhoneNumberValidatorTest {
 
 	@Test
 	public void testIsValid() {
-		assertFalse(MobilePhoneNumberValidator.isValid(""));
 		assertFalse(MobilePhoneNumberValidator.isValid("10000000"));
 		assertFalse(MobilePhoneNumberValidator.isValid("11811111111"));
 		assertTrue(MobilePhoneNumberValidator.isValid("13811111111"));
