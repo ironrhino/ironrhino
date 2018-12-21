@@ -61,6 +61,9 @@ public class SsoHandler extends AccessHandler {
 	@Value("${ssoHandler.excludePattern:}")
 	protected String excludePattern;
 
+	@Value("${ssoHandler.strictAccess:false}")
+	protected boolean strictAccess;
+
 	@Value("${httpSessionManager.sessionTrackerName:" + HttpSessionManager.DEFAULT_SESSION_TRACKER_NAME + "}")
 	protected String sessionTrackerName = HttpSessionManager.DEFAULT_SESSION_TRACKER_NAME;
 
@@ -111,7 +114,7 @@ public class SsoHandler extends AccessHandler {
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		if (!RequestUtils.isSameOrigin(request.getRequestURL().toString(), portalBaseUrl))
-			return false;
+			return strictAccess;
 		String token = RequestUtils.getCookieValue(request, sessionTrackerName);
 		if (StringUtils.isBlank(token)) {
 			redirect(request, response);
