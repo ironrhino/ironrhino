@@ -3,6 +3,7 @@ package org.ironrhino.core.hibernate;
 import java.util.Arrays;
 
 import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
 import org.hibernate.criterion.CriteriaQuery;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.dialect.Dialect;
@@ -12,21 +13,24 @@ import org.hibernate.engine.jdbc.spi.JdbcServices;
 import org.hibernate.engine.spi.TypedValue;
 import org.hibernate.type.StringType;
 
-public class FindInSetCriterion implements Criterion {
+public class FindInSetExpression implements Criterion {
 
 	private static final long serialVersionUID = 1447679780985973530L;
 
 	private final String propertyName;
 	private final String value;
 
-	public FindInSetCriterion(String propertyName, String value) {
+	public FindInSetExpression(String propertyName, String value) {
 		this.propertyName = propertyName;
 		this.value = value;
 	}
 
 	@Override
 	public String toSqlString(Criteria criteria, CriteriaQuery criteriaQuery) {
-		String column = criteriaQuery.findColumns(propertyName, criteria)[0];
+		String[] columns = criteriaQuery.getColumnsUsingProjection(criteria, propertyName);
+		if (columns.length != 1)
+			throw new HibernateException("find_in_set may only be used with single-column properties");
+		String column = columns[0];
 		Dialect dialect = criteriaQuery.getFactory().getServiceRegistry().getService(JdbcServices.class).getDialect();
 		if (dialect instanceof MySQLDialect)
 			return "find_in_set(?," + column + ")";
@@ -46,6 +50,11 @@ public class FindInSetCriterion implements Criterion {
 		else
 			typedValue = new TypedValue(StringType.INSTANCE, "%," + value + ",%");
 		return new TypedValue[] { typedValue };
+	}
+
+	@Override
+	public String toString() {
+		return "find_in_set('" + value + "'," + propertyName + ")";
 	}
 
 }

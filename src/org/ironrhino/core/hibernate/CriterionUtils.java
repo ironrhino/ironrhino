@@ -100,7 +100,7 @@ public class CriterionUtils {
 	}
 
 	public static Criterion matchTag(String tagFieldName, String tag) {
-		return new FindInSetCriterion(tagFieldName, tag);
+		return new FindInSetExpression(tagFieldName, tag);
 	}
 
 	public static Criterion matchTagPrefix(String tagFieldName, String tagPrefix) {
