@@ -1,5 +1,8 @@
 package org.ironrhino.core.security.action;
 
+import static org.ironrhino.core.security.action.LoginAction.KEY_LOGIN_DEFAULT_TARGET_URL;
+import static org.ironrhino.core.security.action.LoginAction.DEFAULT_VALUE_LOGIN_DEFAULT_TARGET_URL;
+
 import java.util.List;
 
 import org.apache.struts2.ServletActionContext;
@@ -53,7 +56,7 @@ public class PasswordAction extends BaseAction {
 	@Value("${user.password.currentPasswordNeeded:true}")
 	private boolean userCurrentPasswordNeeded;
 
-	@Value("${login.defaultTargetUrl:/}")
+	@Value("${" + KEY_LOGIN_DEFAULT_TARGET_URL + ":" + DEFAULT_VALUE_LOGIN_DEFAULT_TARGET_URL + "}")
 	protected String defaultTargetUrl;
 
 	@Autowired(required = false)

@@ -52,6 +52,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LoginAction extends BaseAction {
 
+	public final static String KEY_LOGIN_DEFAULT_TARGET_URL = "login.defaultTargetUrl";
+
+	public final static String DEFAULT_VALUE_LOGIN_DEFAULT_TARGET_URL = "/";
+
 	public final static String COOKIE_NAME_LOGIN_USER = "U";
 
 	private static final long serialVersionUID = 2783386542815083811L;
@@ -65,7 +69,7 @@ public class LoginAction extends BaseAction {
 	@NotBlank
 	protected String username;
 
-	@Value("${login.defaultTargetUrl:/}")
+	@Value("${" + KEY_LOGIN_DEFAULT_TARGET_URL + ":" + DEFAULT_VALUE_LOGIN_DEFAULT_TARGET_URL + "}")
 	protected String defaultTargetUrl;
 
 	@Autowired
