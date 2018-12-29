@@ -10,6 +10,7 @@
 	<bean type="com.opensymphony.xwork2.ActionProxyFactory" name="ironrhino" class="org.ironrhino.core.struts.CallableActionProxyFactory"/>
 	<bean type="org.apache.struts2.dispatcher.multipart.MultiPartRequest" name="jakarta-stream" class="org.apache.struts2.dispatcher.multipart.JakartaStreamMultiPartRequest" scope="prototype"/>
 	<bean type="com.opensymphony.xwork2.ObjectFactory" name="ironrhino" class="org.ironrhino.core.struts.StrutsSpringObjectFactory" />
+	<constant name="struts.serve.static" value="false" />
 	<constant name="struts.objectFactory" value="ironrhino" />
 	<constant name="struts.actionProxyFactory" value="ironrhino" />
 	<constant name="struts.xworkConverter" value="ironrhino" />
