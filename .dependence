@@ -47,3 +47,4 @@
 +resilience4j-circuitbreaker
 +micrometer-core
 +micrometer-registry-influx
++micrometer-registry-prometheus

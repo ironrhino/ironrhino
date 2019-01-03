@@ -52,6 +52,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-slf4j-impl-2.11.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/micrometer-core-1.1.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/micrometer-registry-influx-1.1.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/micrometer-registry-prometheus-1.1.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mongodb-driver-3.9.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mvel2-2.4.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mysql-connector-java-8.0.13.jar"/>
