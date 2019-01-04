@@ -10,7 +10,7 @@ import org.springframework.security.crypto.util.EncodingUtils;
 
 public class MixedPasswordEncoder implements PasswordEncoder {
 
-	private final BytesKeyGenerator saltGenerator = KeyGenerators.secureRandom();
+	private final static BytesKeyGenerator saltGenerator = KeyGenerators.secureRandom();
 
 	@Override
 	public String encode(CharSequence rawPassword) {
@@ -48,8 +48,8 @@ public class MixedPasswordEncoder implements PasswordEncoder {
 		String password = rawPassword.toString();
 		boolean isShaInput = password.length() == 40 && password.matches("\\p{XDigit}+");
 		byte[] input = isShaInput ? Hex.decode(password) : Utf8.encode(password);
-		if (input.length > 255)
-			return input; // avoid long password DOS attack
+		if (input.length > 256)
+			return saltGenerator.generateKey(); // avoid long password DOS attack
 		if (!isShaInput)
 			input = CodecUtils.sha(input);
 		byte[] digested = CodecUtils.sha256(EncodingUtils.concatenate(new byte[][] { salt, input }));
