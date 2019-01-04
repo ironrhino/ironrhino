@@ -1,5 +1,7 @@
 package org.ironrhino.core.spring.security.password;
 
+import java.security.MessageDigest;
+
 import org.ironrhino.core.util.CodecUtils;
 import org.springframework.security.crypto.codec.Hex;
 import org.springframework.security.crypto.codec.Utf8;
@@ -27,15 +29,15 @@ public class MixedPasswordEncoder implements PasswordEncoder {
 			return false;
 		switch (encodedPassword.length()) {
 		case 32:
-			return matches(Hex.decode(encodedPassword), legacyDigest(rawPassword.toString()));
+			return MessageDigest.isEqual(Hex.decode(encodedPassword), legacyDigest(rawPassword.toString()));
 		case 48:
 			byte[] digested = Hex.decode(encodedPassword);
 			byte[] salt = EncodingUtils.subArray(digested, 0, saltGenerator.getKeyLength());
-			return matches(digested, digest(rawPassword, salt, true));
+			return MessageDigest.isEqual(digested, digest(rawPassword, salt, true));
 		case 80:
 			digested = Hex.decode(encodedPassword);
 			salt = EncodingUtils.subArray(digested, 0, saltGenerator.getKeyLength());
-			return matches(digested, digest(rawPassword, salt, false));
+			return MessageDigest.isEqual(digested, digest(rawPassword, salt, false));
 		default:
 			return false;
 		}
@@ -63,17 +65,6 @@ public class MixedPasswordEncoder implements PasswordEncoder {
 	private static byte[] legacyDigest(String input) {
 		// sha1 -> sha1 ->sha1 -> md5
 		return Hex.decode(CodecUtils.digest(input));
-	}
-
-	private boolean matches(byte[] expected, byte[] actual) {
-		if (expected.length != actual.length) {
-			return false;
-		}
-		int result = 0;
-		for (int i = 0; i < expected.length; i++) {
-			result |= expected[i] ^ actual[i];
-		}
-		return result == 0;
 	}
 
 }
