@@ -1,6 +1,5 @@
 package org.ironrhino.common.service;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Calendar;
@@ -325,13 +324,10 @@ public class PageViewServiceImpl implements PageViewService {
 			} else {
 				Set<String> keys = pageViewStringRedisTemplate.<Set<String>>execute((RedisConnection conn) -> {
 					Set<String> set = new HashSet<>();
-					try (Cursor<byte[]> cursor = conn
-							.scan(new ScanOptions.ScanOptionsBuilder().match(prefix + "*").count(100).build())) {
-						while (cursor.hasNext())
-							set.add((String) pageViewStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
-					} catch (IOException e) {
-						throw new RuntimeException(e);
-					}
+					Cursor<byte[]> cursor = conn
+							.scan(new ScanOptions.ScanOptionsBuilder().match(prefix + "*").count(100).build());
+					while (cursor.hasNext())
+						set.add((String) pageViewStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
 					return set;
 				});
 				if (keys == null)

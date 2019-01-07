@@ -4,7 +4,6 @@ import static org.ironrhino.core.metadata.Profiles.CLOUD;
 import static org.ironrhino.core.metadata.Profiles.CLUSTER;
 import static org.ironrhino.core.metadata.Profiles.DUAL;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -124,13 +123,10 @@ public class RedisServiceStats implements ServiceStats {
 		Map<String, Set<String>> map = new TreeMap<>();
 		Set<String> serviceKeys = remotingStringRedisTemplate.<Set<String>>execute((RedisConnection conn) -> {
 			Set<String> set = new HashSet<>();
-			try (Cursor<byte[]> cursor = conn
-					.scan(new ScanOptions.ScanOptionsBuilder().match(NAMESPACE_SERVICES + "*").count(100).build())) {
-				while (cursor.hasNext())
-					set.add((String) remotingStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+			Cursor<byte[]> cursor = conn
+					.scan(new ScanOptions.ScanOptionsBuilder().match(NAMESPACE_SERVICES + "*").count(100).build());
+			while (cursor.hasNext())
+				set.add((String) remotingStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
 			return set;
 		});
 		if (serviceKeys == null)
@@ -157,13 +153,10 @@ public class RedisServiceStats implements ServiceStats {
 			} else {
 				Set<String> keys = remotingStringRedisTemplate.<Set<String>>execute((RedisConnection conn) -> {
 					Set<String> set = new HashSet<>();
-					try (Cursor<byte[]> cursor = conn
-							.scan(new ScanOptions.ScanOptionsBuilder().match(prefix + "*").count(100).build())) {
-						while (cursor.hasNext())
-							set.add((String) remotingStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
-					} catch (IOException e) {
-						throw new RuntimeException(e);
-					}
+					Cursor<byte[]> cursor = conn
+							.scan(new ScanOptions.ScanOptionsBuilder().match(prefix + "*").count(100).build());
+					while (cursor.hasNext())
+						set.add((String) remotingStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
 					return set;
 				});
 				if (keys == null)
@@ -332,13 +325,10 @@ public class RedisServiceStats implements ServiceStats {
 		String prefix = sb.toString();
 		Set<String> keys = remotingStringRedisTemplate.<Set<String>>execute((RedisConnection conn) -> {
 			Set<String> set = new HashSet<>();
-			try (Cursor<byte[]> cursor = conn
-					.scan(new ScanOptions.ScanOptionsBuilder().match(prefix + "*").count(100).build())) {
-				while (cursor.hasNext())
-					set.add((String) remotingStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+			Cursor<byte[]> cursor = conn
+					.scan(new ScanOptions.ScanOptionsBuilder().match(prefix + "*").count(100).build());
+			while (cursor.hasNext())
+				set.add((String) remotingStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
 			return set;
 		});
 		if (keys == null)
@@ -367,13 +357,10 @@ public class RedisServiceStats implements ServiceStats {
 		String prefix = sb.toString();
 		Set<String> keys = remotingStringRedisTemplate.<Set<String>>execute((RedisConnection conn) -> {
 			Set<String> set = new HashSet<>();
-			try (Cursor<byte[]> cursor = conn
-					.scan(new ScanOptions.ScanOptionsBuilder().match(prefix + "*").count(100).build())) {
-				while (cursor.hasNext())
-					set.add((String) remotingStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+			Cursor<byte[]> cursor = conn
+					.scan(new ScanOptions.ScanOptionsBuilder().match(prefix + "*").count(100).build());
+			while (cursor.hasNext())
+				set.add((String) remotingStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
 			return set;
 		});
 		if (keys == null)

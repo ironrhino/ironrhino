@@ -3,7 +3,6 @@ package org.ironrhino.core.remoting.impl;
 import static org.ironrhino.core.metadata.Profiles.CLOUD;
 import static org.ironrhino.core.metadata.Profiles.DUAL;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -150,13 +149,10 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 		Map<String, String> result = new TreeMap<>();
 		Set<String> hosts = remotingStringRedisTemplate.<Set<String>>execute((RedisConnection conn) -> {
 			Set<String> set = new HashSet<>();
-			try (Cursor<byte[]> cursor = conn
-					.scan(new ScanOptions.ScanOptionsBuilder().match(NAMESPACE_HOSTS + "*").count(100).build())) {
-				while (cursor.hasNext())
-					set.add((String) remotingStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+			Cursor<byte[]> cursor = conn
+					.scan(new ScanOptions.ScanOptionsBuilder().match(NAMESPACE_HOSTS + "*").count(100).build());
+			while (cursor.hasNext())
+				set.add((String) remotingStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
 			return set;
 		});
 		if (hosts == null)
@@ -184,13 +180,10 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	public Collection<String> getAllAppNames() {
 		Set<String> keys = remotingStringRedisTemplate.<Set<String>>execute((RedisConnection conn) -> {
 			Set<String> set = new HashSet<>();
-			try (Cursor<byte[]> cursor = conn
-					.scan(new ScanOptions.ScanOptionsBuilder().match(NAMESPACE_APPS + "*").count(100).build())) {
-				while (cursor.hasNext())
-					set.add((String) remotingStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+			Cursor<byte[]> cursor = conn
+					.scan(new ScanOptions.ScanOptionsBuilder().match(NAMESPACE_APPS + "*").count(100).build());
+			while (cursor.hasNext())
+				set.add((String) remotingStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
 			return set;
 		});
 		if (keys == null)
