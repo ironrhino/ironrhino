@@ -15,19 +15,18 @@ public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectio
 
 	private static final long serialVersionUID = 1028300647776161253L;
 
-	private static final String CLIENT_INFO_KEY_IDENTIFIER = "IDENTIFIER";
+	private final DataSource dataSource;
 
-	private static final String CLIENT_INFO_NULL_IDENTIFIER = "$$NULL$$";
+	private final boolean useCatalog;
 
-	private DataSource dataSource;
-
-	private boolean useCatalog;
+	private final String defaultSchema;
 
 	public SchemaMultiTenantConnectionProvider(DataSource dataSource) {
 		this.dataSource = dataSource;
 		try (Connection conn = dataSource.getConnection()) {
 			DatabaseProduct dp = DatabaseProduct.parse(conn.getMetaData().getDatabaseProductName());
 			this.useCatalog = (dp == DatabaseProduct.MYSQL);
+			this.defaultSchema = useCatalog ? conn.getCatalog() : conn.getSchema();
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
@@ -65,30 +64,20 @@ public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectio
 	public Connection getConnection(String tenantIdentifier) throws SQLException {
 		Connection connection = dataSource.getConnection();
 		if (StringUtils.isNotBlank(tenantIdentifier)) {
-			if (useCatalog) {
-				String catalog = connection.getCatalog();
-				connection.setClientInfo(CLIENT_INFO_KEY_IDENTIFIER, catalog);
+			if (useCatalog)
 				connection.setCatalog(tenantIdentifier);
-			} else {
-				String schema = connection.getSchema();
-				connection.setClientInfo(CLIENT_INFO_KEY_IDENTIFIER, schema);
+			else
 				connection.setSchema(tenantIdentifier);
-			}
 		}
 		return connection;
 	}
 
 	@Override
 	public void releaseConnection(String tenantIdentifier, Connection connection) throws SQLException {
-		String oldTenantIdentifier = connection.getClientInfo(CLIENT_INFO_KEY_IDENTIFIER);
-		if (oldTenantIdentifier != null && !CLIENT_INFO_NULL_IDENTIFIER.equals(oldTenantIdentifier)) {
-			if (useCatalog) {
-				connection.setCatalog(oldTenantIdentifier);
-			} else {
-				connection.setSchema(oldTenantIdentifier);
-			}
-			connection.setClientInfo(CLIENT_INFO_KEY_IDENTIFIER, CLIENT_INFO_NULL_IDENTIFIER);
-		}
+		if (useCatalog)
+			connection.setCatalog(defaultSchema);
+		else
+			connection.setSchema(defaultSchema);
 		connection.close();
 	}
 
