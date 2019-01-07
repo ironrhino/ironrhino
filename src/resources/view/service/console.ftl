@@ -12,7 +12,7 @@
 	border-left-color: ${borderColor};
 	border-top-color: ${borderColor};
 	border-right-color: ${borderColor};
-	border-radius: 4px 4px 0 0;
+	border-radius: 2px 2px 0 0;
 }
 .services >.thumbnails > li > table {
 	position: absolute;
@@ -20,7 +20,7 @@
 	background-color: #fff;
 	border-color: ${borderColor};
 	border-top-width: 0;
-	border-radius: 0 0 4px 4px;
+	border-radius: 0 0 2px 2px;
 }
 button.open + table > thead:first-child > tr:first-child > th:first-child {
 	border-top-left-radius: 0px;
