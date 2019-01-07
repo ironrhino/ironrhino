@@ -17,6 +17,8 @@ public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectio
 
 	private static final String CLIENT_INFO_KEY_IDENTIFIER = "IDENTIFIER";
 
+	private static final String CLIENT_INFO_NULL_IDENTIFIER = "$$NULL$$";
+
 	private DataSource dataSource;
 
 	private boolean useCatalog;
@@ -79,13 +81,13 @@ public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectio
 	@Override
 	public void releaseConnection(String tenantIdentifier, Connection connection) throws SQLException {
 		String oldTenantIdentifier = connection.getClientInfo(CLIENT_INFO_KEY_IDENTIFIER);
-		if (oldTenantIdentifier != null) {
+		if (oldTenantIdentifier != null && !CLIENT_INFO_NULL_IDENTIFIER.equals(oldTenantIdentifier)) {
 			if (useCatalog) {
 				connection.setCatalog(oldTenantIdentifier);
 			} else {
 				connection.setSchema(oldTenantIdentifier);
 			}
-			connection.setClientInfo(CLIENT_INFO_KEY_IDENTIFIER, null);
+			connection.setClientInfo(CLIENT_INFO_KEY_IDENTIFIER, CLIENT_INFO_NULL_IDENTIFIER);
 		}
 		connection.close();
 	}
