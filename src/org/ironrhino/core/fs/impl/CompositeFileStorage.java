@@ -2,6 +2,7 @@ package org.ironrhino.core.fs.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.ironrhino.core.fs.FileInfo;
@@ -9,6 +10,7 @@ import org.ironrhino.core.fs.FileStorage;
 import org.ironrhino.core.fs.Paged;
 
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 @RequiredArgsConstructor
 public class CompositeFileStorage implements FileStorage {
@@ -16,6 +18,9 @@ public class CompositeFileStorage implements FileStorage {
 	private final FileStorage mainFileStorage;
 
 	private final FileStorage fallbackFileStorage;
+
+	@Setter
+	private boolean merging;
 
 	@Override
 	public void write(InputStream is, String path) throws IOException {
@@ -63,24 +68,48 @@ public class CompositeFileStorage implements FileStorage {
 
 	@Override
 	public List<FileInfo> listFiles(String path) {
-		FileStorage fs = mainFileStorage.isDirectory(path) ? mainFileStorage : fallbackFileStorage;
-		return fs.listFiles(path);
+		if (merging) {
+			List<FileInfo> list1 = mainFileStorage.listFiles(path);
+			List<FileInfo> list2 = fallbackFileStorage.listFiles(path);
+			List<FileInfo> result = new ArrayList<>(list1.size() + list2.size());
+			result.addAll(list1);
+			result.addAll(list2);
+			result.sort(COMPARATOR);
+			return result;
+		} else {
+			FileStorage fs = mainFileStorage.isDirectory(path) ? mainFileStorage : fallbackFileStorage;
+			return fs.listFiles(path);
+		}
 	}
 
 	@Override
 	public Paged<FileInfo> listFiles(String path, int limit, String marker) {
+		if (merging)
+			return FileStorage.super.listFiles(path, limit, marker);
 		FileStorage fs = mainFileStorage.isDirectory(path) ? mainFileStorage : fallbackFileStorage;
 		return fs.listFiles(path, limit, marker);
 	}
 
 	@Override
 	public List<FileInfo> listFilesAndDirectory(String path) {
-		FileStorage fs = mainFileStorage.isDirectory(path) ? mainFileStorage : fallbackFileStorage;
-		return fs.listFilesAndDirectory(path);
+		if (merging) {
+			List<FileInfo> list1 = mainFileStorage.listFilesAndDirectory(path);
+			List<FileInfo> list2 = fallbackFileStorage.listFilesAndDirectory(path);
+			List<FileInfo> result = new ArrayList<>(list1.size() + list2.size());
+			result.addAll(list1);
+			result.addAll(list2);
+			result.sort(COMPARATOR);
+			return result;
+		} else {
+			FileStorage fs = mainFileStorage.isDirectory(path) ? mainFileStorage : fallbackFileStorage;
+			return fs.listFilesAndDirectory(path);
+		}
 	}
 
 	@Override
 	public Paged<FileInfo> listFilesAndDirectory(String path, int limit, String marker) {
+		if (merging)
+			return FileStorage.super.listFilesAndDirectory(path, limit, marker);
 		FileStorage fs = mainFileStorage.isDirectory(path) ? mainFileStorage : fallbackFileStorage;
 		return fs.listFilesAndDirectory(path, limit, marker);
 	}
