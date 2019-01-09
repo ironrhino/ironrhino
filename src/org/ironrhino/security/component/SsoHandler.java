@@ -23,6 +23,7 @@ import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesCondi
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.security.model.User;
+import org.ironrhino.security.oauth.server.component.OAuthHandler;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -94,8 +95,7 @@ public class SsoHandler extends AccessHandler {
 		excludePattern = StringUtils.isBlank(excludePattern) ? EXCLUDED_PATTERN
 				: excludePattern + "," + EXCLUDED_PATTERN;
 		if (oauthHandler != null) {
-			String apiPattern = ((org.ironrhino.security.oauth.server.component.OAuthHandler) oauthHandler)
-					.getPattern();
+			String apiPattern = ((OAuthHandler) oauthHandler).getPattern();
 			if (StringUtils.isNotBlank(apiPattern))
 				excludePattern = StringUtils.isBlank(excludePattern) ? apiPattern : excludePattern + "," + apiPattern;
 		}

@@ -11,6 +11,7 @@ import org.ironrhino.core.util.ThrowableRunnable;
 import org.springframework.util.ClassUtils;
 
 import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Timer;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -47,7 +48,7 @@ public class Metrics {
 			String... tags) throws E {
 		if (!micrometerPresent)
 			return callable.call();
-		io.micrometer.core.instrument.Timer timer = io.micrometer.core.instrument.Metrics.timer(name, tags);
+		Timer timer = io.micrometer.core.instrument.Metrics.timer(name, tags);
 		long start = System.nanoTime();
 		try {
 			return callable.call();
@@ -62,7 +63,7 @@ public class Metrics {
 			runnable.run();
 			return;
 		}
-		io.micrometer.core.instrument.Timer timer = io.micrometer.core.instrument.Metrics.timer(name, tags);
+		Timer timer = io.micrometer.core.instrument.Metrics.timer(name, tags);
 		long start = System.nanoTime();
 		try {
 			runnable.run();
