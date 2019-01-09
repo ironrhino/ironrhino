@@ -24,7 +24,6 @@ import org.ironrhino.core.util.RequestUtils;
 import org.ironrhino.security.model.User;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
@@ -53,6 +52,9 @@ public class SsoHandler extends AccessHandler {
 	@Value("${ssoHandler.excludePattern:}")
 	protected String excludePattern;
 
+	@Value("${ssoHandler.strictAccess:false}")
+	protected boolean strictAccess;
+
 	@Value("${httpSessionManager.sessionTrackerName:" + HttpSessionManager.DEFAULT_SESSION_TRACKER_NAME + "}")
 	protected String sessionTrackerName = HttpSessionManager.DEFAULT_SESSION_TRACKER_NAME;
 
@@ -74,20 +76,10 @@ public class SsoHandler extends AccessHandler {
 	@Autowired
 	protected RestTemplate restTemplate;
 
-	@Autowired(required = false)
-	@Qualifier("oauthHandler")
-	private AccessHandler oauthHandler;
-
 	@PostConstruct
 	private void init() {
 		excludePattern = StringUtils.isBlank(excludePattern) ? EXCLUDED_PATTERN
 				: excludePattern + "," + EXCLUDED_PATTERN;
-		if (oauthHandler != null) {
-			String apiPattern = ((org.ironrhino.security.oauth.server.component.OAuthHandler) oauthHandler)
-					.getPattern();
-			if (StringUtils.isNotBlank(apiPattern))
-				excludePattern = StringUtils.isBlank(excludePattern) ? apiPattern : excludePattern + "," + apiPattern;
-		}
 	}
 
 	@Override
@@ -103,6 +95,10 @@ public class SsoHandler extends AccessHandler {
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		if (!RequestUtils.isSameOrigin(request.getRequestURL().toString(), portalBaseUrl))
+			return strictAccess;
+		SecurityContext sc = SecurityContextHolder.getContext();
+		Authentication auth = sc.getAuthentication();
+		if (auth != null && auth.isAuthenticated())
 			return false;
 		String token = RequestUtils.getCookieValue(request, sessionTrackerName);
 		if (StringUtils.isBlank(token)) {
@@ -128,9 +124,7 @@ public class SsoHandler extends AccessHandler {
 				User userFromApi = restTemplate.exchange(requestEntity, User.class).getBody();
 				if (userFromApi != null) {
 					UserDetails ud = map(userFromApi);
-					SecurityContext sc = SecurityContextHolder.getContext();
-					Authentication auth = new UsernamePasswordAuthenticationToken(ud, ud.getPassword(),
-							ud.getAuthorities());
+					auth = new UsernamePasswordAuthenticationToken(ud, ud.getPassword(), ud.getAuthorities());
 					sc.setAuthentication(auth);
 					MDC.put("username", auth.getName());
 					Map<String, Object> sessionMap = new HashMap<>(2, 1);
