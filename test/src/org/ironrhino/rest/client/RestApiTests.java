@@ -90,15 +90,29 @@ public class RestApiTests {
 		assertEquals(RestStatus.CODE_FIELD_INVALID, userClient.validatePassword(u).getCode());
 	}
 
-	@Test(expected = HttpClientErrorException.class)
+	@Test
 	public void testThrows() {
-		userClient.get("usernamenotexists");
+		RestStatus rs = null;
+		try {
+			userClient.get("usernamenotexists");
+		} catch (RestStatus e) {
+			rs = e;
+		}
+		assertEquals(rs.getCode(), RestStatus.CODE_NOT_FOUND);
+		assertTrue(rs.getCause() instanceof HttpClientErrorException);
 	}
 
-	@Test(expected = HttpServerErrorException.class)
+	@Test
 	public void testPostStream() {
-		InputStream is = new ByteArrayInputStream("test".getBytes());
-		userClient.postStream(is);
+		RestStatus rs = null;
+		try {
+			InputStream is = new ByteArrayInputStream("test".getBytes());
+			userClient.postStream(is);
+		} catch (RestStatus e) {
+			rs = e;
+		}
+		assertEquals(rs.getCode(), RestStatus.CODE_INTERNAL_SERVER_ERROR);
+		assertTrue(rs.getCause() instanceof HttpServerErrorException);
 	}
 
 	@Test

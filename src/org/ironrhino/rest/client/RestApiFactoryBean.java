@@ -421,32 +421,35 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 	}
 
 	private Object exchange(Method method, RequestEntity<Object> requestEntity) throws Exception {
-		Type type = method.getGenericReturnType();
-		if (type == InputStream.class) {
-			Resource resource = restTemplate.exchange(requestEntity, Resource.class).getBody();
-			if (resource == null)
+		try {
+			Type type = method.getGenericReturnType();
+			if (type == InputStream.class) {
+				Resource resource = restTemplate.exchange(requestEntity, Resource.class).getBody();
+				if (resource == null)
+					return null;
+				return resource.getInputStream();
+			} else if (type == Void.TYPE) {
+				restTemplate.exchange(requestEntity, Resource.class);
 				return null;
-			return resource.getInputStream();
-		} else if (type == Void.TYPE) {
-			restTemplate.exchange(requestEntity, Resource.class);
-			return null;
-		} else {
-			JsonPointer pointer = method.getAnnotation(JsonPointer.class);
-			try {
+			} else {
+				JsonPointer pointer = method.getAnnotation(JsonPointer.class);
 				if (pointer == null) {
 					return restTemplate.exchange(requestEntity, ParameterizedTypeReference.forType(type)).getBody();
 				} else {
 					return exchangeWithJsonPointer(type, requestEntity, pointer);
 				}
-			} catch (HttpStatusCodeException e) {
-				try {
-					JsonNode tree = objectMapper.readTree(e.getResponseBodyAsString());
-					if (tree.has("code") && tree.has("status"))
-						throw objectMapper.readValue(objectMapper.treeAsTokens(tree), RestStatus.class);
-				} catch (JsonParseException jpe) {
-				}
-				throw e;
 			}
+		} catch (HttpStatusCodeException e) {
+			try {
+				JsonNode tree = objectMapper.readTree(e.getResponseBodyAsString());
+				if (tree.has("code") && tree.has("status")) {
+					RestStatus rs = objectMapper.readValue(objectMapper.treeAsTokens(tree), RestStatus.class);
+					rs.initCause(e);
+					throw rs;
+				}
+			} catch (JsonParseException jpe) {
+			}
+			throw e;
 		}
 	}
 
