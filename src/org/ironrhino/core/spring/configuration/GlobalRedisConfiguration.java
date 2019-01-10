@@ -64,8 +64,8 @@ public class GlobalRedisConfiguration extends RedisConfiguration {
 	@Value("${global.redis.minIdle:1}")
 	private int minIdle;
 
-	@Value("${global.redis.connectTimeout:2000}")
-	private int connectTimeout = 2000;
+	@Value("${global.redis.connectTimeout:5000}")
+	private int connectTimeout = 5000;
 
 	@Value("${global.redis.readTimeout:5000}")
 	private int readTimeout = 5000;

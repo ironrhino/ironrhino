@@ -36,6 +36,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.SocketOptions;
+import io.lettuce.core.TimeoutOptions;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -85,8 +86,8 @@ public class RedisConfiguration {
 	@Value("${redis.minIdle:1}")
 	private int minIdle;
 
-	@Value("${redis.connectTimeout:2000}")
-	private int connectTimeout = 2000;
+	@Value("${redis.connectTimeout:5000}")
+	private int connectTimeout = 5000;
 
 	@Value("${redis.readTimeout:5000}")
 	private int readTimeout = 5000;
@@ -102,7 +103,7 @@ public class RedisConfiguration {
 	public RedisConnectionFactory redisConnectionFactory() {
 		ClientOptions clientOptions = ClientOptions.builder()
 				.socketOptions(SocketOptions.builder().connectTimeout(Duration.ofMillis(getConnectTimeout())).build())
-				.build();
+				.timeoutOptions(TimeoutOptions.enabled()).build();
 		LettuceClientConfigurationBuilder builder;
 		if (isUsePool()) {
 			GenericObjectPoolConfig<?> poolConfig = new GenericObjectPoolConfig<>();
