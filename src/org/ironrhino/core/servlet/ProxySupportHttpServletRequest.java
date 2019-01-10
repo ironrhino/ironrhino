@@ -32,6 +32,8 @@ public class ProxySupportHttpServletRequest extends HttpServletRequestWrapper {
 	// proxy_set_header X-Forwarded-Port $server_port;
 	public static final String HEADER_NAME_X_FORWARDED_PORT = "X-Forwarded-Port";
 
+	public static final String HEADER_NAME_X_FORWARDED_PREFIX = "X-Forwarded-Prefix";
+
 	// proxy_set_header X-Url-Scheme $scheme;
 	public static final String HEADER_NAME_X_URL_SCHEME = "X-Url-Scheme";
 
@@ -161,6 +163,24 @@ public class ProxySupportHttpServletRequest extends HttpServletRequestWrapper {
 	}
 
 	@Override
+	public String getContextPath() {
+		String prefix = getForwardedPrefix();
+		return prefix != null ? prefix : super.getContextPath();
+	}
+
+	@Override
+	public String getRequestURI() {
+		String prefix = getForwardedPrefix();
+		if (prefix != null) {
+			String contextPath = super.getContextPath();
+			String requestURI = super.getRequestURI();
+			return prefix + requestURI.substring(contextPath.length());
+		} else {
+			return super.getRequestURI();
+		}
+	}
+
+	@Override
 	public StringBuffer getRequestURL() {
 		StringBuffer sb = new StringBuffer(getScheme());
 		sb.append("://");
@@ -182,10 +202,18 @@ public class ProxySupportHttpServletRequest extends HttpServletRequestWrapper {
 		return getScheme().equals("https") || super.isSecure();
 	}
 
+	private String getForwardedPrefix() {
+		String prefix = getHeader(HEADER_NAME_X_FORWARDED_PREFIX);
+		if (prefix != null && prefix.endsWith("/"))
+			prefix = prefix.substring(0, prefix.length() - 1);
+		return prefix;
+	}
+
 	public static HttpServletRequest wrap(HttpServletRequest request) {
 		boolean proxyable = !"true".equals(System.getProperty(SYSTEM_PROPERTY_PROXY_REQUEST_DISABLED))
 				&& (request.getHeader(ProxySupportHttpServletRequest.HEADER_NAME_X_REAL_IP) != null
-						|| request.getHeader(ProxySupportHttpServletRequest.HEADER_NAME_X_FORWARDED_FOR) != null);
+						|| request.getHeader(ProxySupportHttpServletRequest.HEADER_NAME_X_FORWARDED_FOR) != null
+						|| request.getHeader(ProxySupportHttpServletRequest.HEADER_NAME_X_FORWARDED_PREFIX) != null);
 		return proxyable ? new ProxySupportHttpServletRequest(request) : request;
 	}
 
