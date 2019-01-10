@@ -25,7 +25,7 @@ public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectio
 		this.dataSource = dataSource;
 		try (Connection conn = dataSource.getConnection()) {
 			DatabaseProduct dp = DatabaseProduct.parse(conn.getMetaData().getDatabaseProductName());
-			this.useCatalog = (dp == DatabaseProduct.MYSQL);
+			this.useCatalog = (dp == DatabaseProduct.MYSQL || dp == DatabaseProduct.SQLSERVER);
 			this.defaultSchema = useCatalog ? conn.getCatalog() : conn.getSchema();
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
