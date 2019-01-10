@@ -26,6 +26,9 @@ public class ProxySupportHttpServletRequest extends HttpServletRequestWrapper {
 	// proxy_set_header X-Forwarded-Proto $scheme;
 	public static final String HEADER_NAME_X_FORWARDED_PROTO = "X-Forwarded-Proto";
 
+	// proxy_set_header X-Forwarded-Host $server_name;
+	public static final String HEADER_NAME_X_FORWARDED_HOST = "X-Forwarded-Host";
+
 	// proxy_set_header X-Forwarded-Port $server_port;
 	public static final String HEADER_NAME_X_FORWARDED_PORT = "X-Forwarded-Port";
 
@@ -117,7 +120,10 @@ public class ProxySupportHttpServletRequest extends HttpServletRequestWrapper {
 
 	@Override
 	public String getServerName() {
-		String host = getHeader("Host");
+		String host = getHeader(HEADER_NAME_X_FORWARDED_HOST);
+		if (StringUtils.isNotBlank(host))
+			return host;
+		host = getHeader("Host");
 		if (StringUtils.isNotBlank(host)) {
 			int index = host.lastIndexOf(':');
 			if (index > 0) {
