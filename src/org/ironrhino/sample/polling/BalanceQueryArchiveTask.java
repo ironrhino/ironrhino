@@ -33,11 +33,12 @@ public class BalanceQueryArchiveTask {
 		if (insertedRows > 0) {
 			int deletedRows = jdbcTemplate.update("delete from sample_balance_query where createDate < ?", date);
 			if (deletedRows == insertedRows)
-				logger.info("archived {} rows of sample_balance_query", deletedRows);
+				logger.info("Archived {} rows of sample_balance_query", deletedRows);
 			else
-				logger.error("archive sample_balance_query failed, deleted:{}, inserted:{}", deletedRows, insertedRows);
+				throw new RuntimeException(
+						"Archive sample_balance_query failed, deleted:" + deletedRows + ", inserted:" + insertedRows);
 		} else {
-			logger.info("archived 0 rows of sample_balance_query");
+			logger.info("Archived 0 rows of sample_balance_query");
 		}
 	}
 
