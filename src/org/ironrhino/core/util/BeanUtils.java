@@ -51,7 +51,7 @@ public class BeanUtils {
 		}
 	}
 
-	public static void copyProperties(Map<String, ?> source, Object target, String... ignoreProperties) {
+	public static void copyProperties(Map<String, ?> source, Object target) {
 		BeanWrapperImpl bw = new BeanWrapperImpl(target);
 		bw.setConversionService(CustomConversionService.getSharedInstance());
 		for (Map.Entry<String, ?> entry : source.entrySet()) {
