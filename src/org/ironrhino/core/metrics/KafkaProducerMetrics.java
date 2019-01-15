@@ -1,7 +1,9 @@
 package org.ironrhino.core.metrics;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class KafkaProducerMetrics extends AbstractKafkaMetrics {
 
@@ -18,6 +20,11 @@ public class KafkaProducerMetrics extends AbstractKafkaMetrics {
 		config.put("producer-topic-metrics",
 				new String[] { "byte-rate", "record-error-rate", "record-retry-rate", "record-send-rate" });
 		return config;
+	}
+
+	@Override
+	protected Map<String, Map<String, TimeUnit>> timeGaugeConfig() {
+		return Collections.emptyMap();
 	}
 
 	@Override

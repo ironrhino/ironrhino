@@ -3,6 +3,7 @@ package org.ironrhino.core.metrics;
 import static java.util.Collections.emptyList;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.management.ObjectName;
 
@@ -11,6 +12,7 @@ import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
+import io.micrometer.core.instrument.TimeGauge;
 
 public abstract class AbstractKafkaMetrics extends JmxBasedMeterBinder {
 
@@ -21,6 +23,17 @@ public abstract class AbstractKafkaMetrics extends JmxBasedMeterBinder {
 				for (String gaugeName : v)
 					Gauge.builder(toMetricName(gaugeName), mBeanServer,
 							s -> safeDouble(() -> s.getAttribute(name, gaugeName))).tags(allTags).register(registry);
+			});
+		});
+		timeGaugeConfig().forEach((k, v) -> {
+			registerMetricsEventually(getDomain(), k, (name, allTags) -> {
+				for (Map.Entry<String, TimeUnit> entry : v.entrySet()) {
+					String gaugeName = entry.getKey();
+					TimeGauge
+							.builder(toMetricName(gaugeName), mBeanServer, entry.getValue(),
+									s -> safeDouble(() -> s.getAttribute(name, gaugeName)))
+							.tags(allTags).register(registry);
+				}
 			});
 		});
 		counterConfig().forEach((k, v) -> {
@@ -52,6 +65,8 @@ public abstract class AbstractKafkaMetrics extends JmxBasedMeterBinder {
 	protected abstract String getDomain();
 
 	protected abstract Map<String, String[]> gaugeConfig();
+
+	protected abstract Map<String, Map<String, TimeUnit>> timeGaugeConfig();
 
 	protected abstract Map<String, String[]> counterConfig();
 
