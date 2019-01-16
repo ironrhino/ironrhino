@@ -46,11 +46,15 @@ import javax.persistence.Version;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.Future;
+import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
+import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
@@ -80,6 +84,7 @@ import org.ironrhino.core.struts.AnnotationShadows.ReadonlyImpl;
 import org.ironrhino.core.struts.AnnotationShadows.UiConfigImpl;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
+import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.core.util.TypeUtils;
 import org.ironrhino.core.util.ValueThenKeyComparator;
@@ -526,27 +531,48 @@ public class EntityClassHelper {
 							if (cssClasses.contains("zero"))
 								uci.getInternalDynamicAttributes().put("min", "0");
 						}
-					} else if (Date.class.isAssignableFrom(returnType)) {
-						Temporal temporal = findAnnotation(readMethod, declaredField, Temporal.class);
+					} else if (Date.class.isAssignableFrom(returnType)
+							|| java.time.temporal.Temporal.class.isAssignableFrom(returnType)) {
 						String temporalType = "date";
-						if (temporal != null)
-							if (temporal.value() == TemporalType.TIMESTAMP)
-								temporalType = "datetime";
-							else if (temporal.value() == TemporalType.TIME)
-								temporalType = "time";
+						if (Date.class.isAssignableFrom(returnType)) {
+							Temporal temporal = findAnnotation(readMethod, declaredField, Temporal.class);
+							if (temporal != null)
+								if (temporal.value() == TemporalType.TIMESTAMP)
+									temporalType = "datetime";
+								else if (temporal.value() == TemporalType.TIME)
+									temporalType = "time";
+						} else {
+							temporalType = returnType == Duration.class ? "duration"
+									: returnType == LocalTime.class ? "time"
+											: returnType == LocalDateTime.class ? "datetime"
+													: returnType == YearMonth.class ? "yearmonth" : "date";
+						}
 						uci.addCssClass(temporalType);
 						// uci.setInputType(temporalType);
 						if (StringUtils.isBlank(uci.getCellEdit()))
 							uci.setCellEdit("click," + temporalType);
-					} else if (java.time.temporal.Temporal.class.isAssignableFrom(returnType)) {
-						String temporalType = returnType == Duration.class ? "duration"
-								: returnType == LocalTime.class ? "time"
-										: returnType == LocalDateTime.class ? "datetime"
-												: returnType == YearMonth.class ? "yearmonth" : "date";
-						uci.addCssClass(temporalType);
-						// uci.setInputType(temporalType);
-						if (StringUtils.isBlank(uci.getCellEdit()))
-							uci.setCellEdit("click," + temporalType);
+						if (!"time".equals(temporalType) && !"duration".equals(temporalType)) {
+							if (!uci.getInternalDynamicAttributes().containsKey("data-enddate")) {
+								if (findAnnotation(readMethod, declaredField, Past.class) != null) {
+									uci.getInternalDynamicAttributes().put("data-enddate",
+											DateUtils.formatDate10("datetime".equals(temporalType) ? new Date()
+													: DateUtils.addDays(new Date(), -1)));
+								} else if (findAnnotation(readMethod, declaredField, PastOrPresent.class) != null) {
+									uci.getInternalDynamicAttributes().put("data-enddate",
+											DateUtils.formatDate10(new Date()));
+								}
+							}
+							if (!uci.getInternalDynamicAttributes().containsKey("data-startdate")) {
+								if (findAnnotation(readMethod, declaredField, Future.class) != null) {
+									uci.getInternalDynamicAttributes().put("data-startdate",
+											DateUtils.formatDate10("datetime".equals(temporalType) ? new Date()
+													: DateUtils.addDays(new Date(), 1)));
+								} else if (findAnnotation(readMethod, declaredField, FutureOrPresent.class) != null) {
+									uci.getInternalDynamicAttributes().put("data-startdate",
+											DateUtils.formatDate10(new Date()));
+								}
+							}
+						}
 					} else if (String.class == returnType) {
 						Size size = findAnnotation(readMethod, declaredField, Size.class);
 						if (size != null) {

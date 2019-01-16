@@ -10,6 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.PastOrPresent;
 
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Richtable;
@@ -47,6 +48,7 @@ public class Employee implements Persistable<String> {
 
 	@UiConfig(width = "80px", alias = "入职年月")
 	@Column(length = 7)
+	@PastOrPresent
 	private YearMonth since;
 
 	@Lob

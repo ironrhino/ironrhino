@@ -36651,6 +36651,8 @@ Observation.form = function(container) {
 						option.pickDate = false;
 					} else if (t.hasClass('yearmonth')) {
 						option.format = t.data('format') || 'yyyy-MM';
+						option.minViewMode = 'months';
+						option.viewMode = 'months';
 						option.pickTime = false;
 					} else {
 						option.format = t.data('format') || 'yyyy-MM-dd';
