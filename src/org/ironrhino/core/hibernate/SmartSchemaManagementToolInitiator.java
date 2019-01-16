@@ -86,9 +86,15 @@ public class SmartSchemaManagementToolInitiator implements StandardServiceInitia
 							for (Table table : namespace.getTables()) {
 								Set<String> existedIndexes = new HashSet<>();
 								String tableName = table.getName();
-								for (String name : new LinkedHashSet<>(
-										Arrays.asList(tableName.toUpperCase(Locale.ROOT), tableName, tableName.toLowerCase(Locale.ROOT)))) {
-									try (ResultSet rs = dbmd.getIndexInfo(conn.getCatalog(), conn.getSchema(),
+								for (String name : new LinkedHashSet<>(Arrays.asList(tableName.toUpperCase(Locale.ROOT),
+										tableName, tableName.toLowerCase(Locale.ROOT)))) {
+									String schema = null;
+									try {
+										schema = conn.getSchema();
+									} catch (Throwable t) {
+										schema = "%";
+									}
+									try (ResultSet rs = dbmd.getIndexInfo(conn.getCatalog(), schema,
 											dialect.openQuote() + name + dialect.closeQuote(), false, false)) {
 										boolean tableFound = false;
 										while (rs.next()) {
@@ -151,11 +157,12 @@ public class SmartSchemaManagementToolInitiator implements StandardServiceInitia
 			try {
 				schema = conn.getSchema();
 			} catch (Throwable t) {
+				schema = "%";
 			}
 			ResultSet tables = dbmd.getTables(catalog, schema, "%", new String[] { "TABLE" });
 			while (tables.next()) {
 				String table = tables.getString(3);
-				try (ResultSet importedKeys = dbmd.getImportedKeys(conn.getCatalog(), conn.getSchema(), table)) {
+				try (ResultSet importedKeys = dbmd.getImportedKeys(conn.getCatalog(), schema, table)) {
 					while (importedKeys.next()) {
 						String fkName = importedKeys.getString("FK_NAME");
 						if (fkName != null && fkName.length() == 27 && fkName.toLowerCase(Locale.ROOT).startsWith("fk"))

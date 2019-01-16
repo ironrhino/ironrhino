@@ -134,7 +134,7 @@ public enum DatabaseProduct {
 	INFORMIX {
 		@Override
 		public int getDefaultPort() {
-			return 1533;
+			return 1526;
 		}
 
 		@Override
@@ -222,7 +222,7 @@ public enum DatabaseProduct {
 	SYBASE {
 		@Override
 		public int getDefaultPort() {
-			return 4100;
+			return 5000;
 		}
 
 		@Override
@@ -371,7 +371,7 @@ public enum DatabaseProduct {
 			else if (nameOrUrl.toLowerCase(Locale.ROOT).contains("microsoft"))
 				return SQLSERVER;
 			else if (nameOrUrl.toLowerCase(Locale.ROOT).contains("sql server")
-					|| nameOrUrl.equals("Adaptive Server Enterprise") || nameOrUrl.equals("ASE"))
+					|| nameOrUrl.equalsIgnoreCase("Adaptive Server Enterprise") || nameOrUrl.equals("ASE"))
 				return SYBASE;
 			else if (nameOrUrl.toLowerCase(Locale.ROOT).equals("h2"))
 				return H2;

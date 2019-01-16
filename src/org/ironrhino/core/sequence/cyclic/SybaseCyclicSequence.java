@@ -4,7 +4,12 @@ public class SybaseCyclicSequence extends AbstractSequenceCyclicSequence {
 
 	@Override
 	protected String getTimestampColumnType() {
-		return "DATETIME";
+		return "TIMESTAMP";
+	}
+
+	@Override
+	protected String getCurrentTimestamp() {
+		return "GETDATE()";
 	}
 
 	@Override
