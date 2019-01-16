@@ -30315,7 +30315,7 @@ var swfobject = function() {
 							options.pickSeconds, options.collapse)).appendTo(
 					'body');
 			this.minViewMode = options.minViewMode
-					|| this.$element.data('date-minviewmode') || 0;
+					|| this.$element.data('minviewmode') || 0;
 			if (typeof this.minViewMode === 'string') {
 				switch (this.minViewMode) {
 				case 'months':
@@ -30330,7 +30330,7 @@ var swfobject = function() {
 				}
 			}
 			this.viewMode = options.viewMode
-					|| this.$element.data('date-viewmode') || 0;
+					|| this.$element.data('viewmode') || 0;
 			if (typeof this.viewMode === 'string') {
 				switch (this.viewMode) {
 				case 'months':
@@ -30346,12 +30346,12 @@ var swfobject = function() {
 			}
 			this.startViewMode = this.viewMode;
 			this.weekStart = options.weekStart
-					|| this.$element.data('date-weekstart') || 0;
+					|| this.$element.data('weekstart') || 0;
 			this.weekEnd = this.weekStart === 0 ? 6 : this.weekStart - 1;
 			this.setStartDate(options.startDate
-					|| this.$element.data('date-startdate'));
+					|| this.$element.data('startdate'));
 			this.setEndDate(options.endDate
-					|| this.$element.data('date-enddate'));
+					|| this.$element.data('enddate'));
 			this.fillDow();
 			this.fillMonths();
 			this.fillHours();
@@ -31149,8 +31149,6 @@ var swfobject = function() {
 		pickTime : true,
 		pick12HourFormat : false,
 		pickSeconds : true,
-		startDate : -Infinity,
-		endDate : Infinity,
 		collapse : true
 	};
 	$.fn.datetimepicker.Constructor = DateTimePicker;
