@@ -49,7 +49,7 @@
 				<@s.select disabled=readonly multiple=config.multiple id=id label=label name=name class=config.cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
 			<#else>
 				<#if readonly><#if value?has_content><#list value as en><@s.hidden id="" name=name value=en.name()/></#list></#if></#if>
-				<@s.checkboxlist disabled=readonly id=id label=label name=name class=config.cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
+				<@s.checkboxlist disabled=readonly id=id label=label name=name class=config.cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue dynamicAttributes=dynamicAttributes/>
 			</#if>
 		<#elseif config.type=='select'>
 			<#if readonly><@s.hidden name=name/></#if>
@@ -182,7 +182,7 @@
 								<@s.select disabled=readonly multiple=config.multiple id="" theme="simple" name=name class=config.cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
 							<#else>
 								<#if readonly><#if value?has_content><#list value as en><@s.hidden id="" name=name value=en.name()/></#list></#if></#if>
-								<@s.checkboxlist disabled=readonly id="" theme="simple" name=name class=config.cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
+								<@s.checkboxlist disabled=readonly id="" theme="simple" name=name class=config.cssClass list="@${config.propertyType.name}@values()" listKey=config.listKey listValue=config.listValue dynamicAttributes=dynamicAttributes/>
 							</#if>
 						<#elseif config.type=='select'>
 							<#if readonly><@s.hidden name=name/></#if>
