@@ -3,6 +3,7 @@ package org.ironrhino.core.spring.configuration;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flywaydb.core.Flyway;
 import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
@@ -73,6 +74,9 @@ public class DataSourceConfiguration {
 	@Value("${dataSource.lazyConnect:false}")
 	private boolean lazyConnect;
 
+	@Value("${dataSource.enableMgrations:false}")
+	private boolean enableMgrations;
+
 	protected DataSource createDataSource() {
 		if (AppInfo.getStage() == Stage.DEVELOPMENT && StringUtils.isBlank(env.getProperty("jdbc.url"))) {
 			boolean available = AddressAvailabilityCondition.check(jdbcUrl, 5000);
@@ -102,6 +106,11 @@ public class DataSourceConfiguration {
 		ds.setRegisterMbeans(registerMbeans);
 		ds.setPoolName("HikariPool-" + AppInfo.getAppName());
 		log.info("Using {} to connect {}", ds.getClass().getName(), ds.getJdbcUrl());
+
+		if (enableMgrations) {
+			Flyway.configure().baselineOnMigrate(true).dataSource(ds).load().migrate();
+		}
+
 		return ds;
 	}
 
