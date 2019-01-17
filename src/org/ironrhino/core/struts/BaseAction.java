@@ -263,8 +263,9 @@ public class BaseAction extends ActionSupport {
 	protected String returnInputOrExtractRequestBody() throws Exception {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		String method = request.getMethod();
+		boolean postMethodLike = method.startsWith("P"); // POST PUT PATCH
 		InputConfig inputConfig = getAnnotation(InputConfig.class);
-		if (inputConfig != null && "GET".equalsIgnoreCase(method)) {
+		if (inputConfig != null && !postMethodLike) {
 			returnInput = true;
 			if (!inputConfig.methodName().equals("")) {
 				ActionInvocation ai = ActionContext.getContext().getActionInvocation();
@@ -276,7 +277,7 @@ public class BaseAction extends ActionSupport {
 				return inputConfig.resultName();
 			}
 		}
-		if ("POST".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method) || "PATCH".equalsIgnoreCase(method)) {
+		if (postMethodLike) {
 			String contentType = request.getHeader("Content-Type");
 			if (contentType != null) {
 				if (contentType.indexOf(';') > 0)
