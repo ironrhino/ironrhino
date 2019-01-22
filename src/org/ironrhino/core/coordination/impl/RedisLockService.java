@@ -34,6 +34,9 @@ public class RedisLockService implements LockService {
 	@Value("${lockService.maxHoldTime:18000}")
 	private int maxHoldTime = 18000;
 
+	@Value("${lockService.suspiciousHoldTime:600}")
+	private int suspiciousHoldTime = 600;
+
 	@Autowired
 	@Qualifier("stringRedisTemplate")
 	@PriorityQualifier
@@ -56,37 +59,21 @@ public class RedisLockService implements LockService {
 		} else {
 			if (AppInfo.getContextPath() == null) // not in servlet container
 				return false;
-			String currentHolder = coordinationStringRedisTemplate.opsForValue().get(key);
-			if (currentHolder == null || currentHolder.startsWith(AppInfo.getInstanceId())) // self
-				return false;
-			String currentHolderInstanceId = currentHolder.substring(0, currentHolder.lastIndexOf('$'));
-			String url = new StringBuilder("http://")
-					.append(currentHolderInstanceId.substring(currentHolderInstanceId.lastIndexOf('@') + 1))
-					.append("/_ping?_internal_testing_").toString();
-			boolean alive = false;
-			try {
-				HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
-				conn.setConnectTimeout(3000);
-				conn.setReadTimeout(2000);
-				conn.setInstanceFollowRedirects(false);
-				conn.setDoOutput(false);
-				conn.setUseCaches(false);
-				conn.connect();
-				if (conn.getResponseCode() == 200) {
-					try (BufferedReader br = new BufferedReader(
-							new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
-						String value = br.lines().collect(Collectors.joining("\n"));
-						if (value.equals(currentHolderInstanceId)) {
-							alive = true;
-						}
-					}
-				}
-				conn.disconnect();
-			} catch (IOException e) {
+			boolean detectAlive = false;
+			if (this.maxHoldTime > this.suspiciousHoldTime) {
+				Long value = coordinationStringRedisTemplate.getExpire(key, TimeUnit.SECONDS);
+				detectAlive = value != null && this.maxHoldTime - value > this.suspiciousHoldTime;
 			}
-			if (!alive) {
-				coordinationStringRedisTemplate.delete(key);
-				return tryLock(name);
+			if (detectAlive) {
+				String currentHolder = coordinationStringRedisTemplate.opsForValue().get(key);
+				if (currentHolder == null || currentHolder.startsWith(AppInfo.getInstanceId())) // self
+					return false;
+				if (!isAlive(currentHolder)) {
+					Long ret = coordinationStringRedisTemplate.execute(compareAndDeleteScript,
+							Collections.singletonList(key), currentHolder);
+					if (ret != null && ret != 0)
+						return tryLock(name);
+				}
 			}
 			return false;
 		}
@@ -130,8 +117,35 @@ public class RedisLockService implements LockService {
 		}
 	}
 
-	private String holder() {
+	private static String holder() {
 		return AppInfo.getInstanceId() + '$' + Thread.currentThread().getId();
+	}
+
+	private static boolean isAlive(String holder) {
+		String instanceId = holder.substring(0, holder.lastIndexOf('$'));
+		String url = new StringBuilder("http://").append(instanceId.substring(instanceId.lastIndexOf('@') + 1))
+				.append("/_ping?_internal_testing_").toString();
+		try {
+			HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+			conn.setConnectTimeout(3000);
+			conn.setReadTimeout(2000);
+			conn.setInstanceFollowRedirects(false);
+			conn.setDoOutput(false);
+			conn.setUseCaches(false);
+			conn.connect();
+			if (conn.getResponseCode() == 200) {
+				try (BufferedReader br = new BufferedReader(
+						new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
+					String value = br.lines().collect(Collectors.joining("\n"));
+					if (value.equals(instanceId)) {
+						return true;
+					}
+				}
+			}
+			conn.disconnect();
+		} catch (IOException e) {
+		}
+		return false;
 	}
 
 }
