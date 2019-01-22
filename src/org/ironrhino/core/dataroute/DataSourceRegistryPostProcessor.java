@@ -141,15 +141,15 @@ public class DataSourceRegistryPostProcessor implements BeanDefinitionRegistryPo
 				if (shardingsPerHost == 1 && shardingGeneration <= 1)
 					databaseName = shardingNamePrefix;
 				String host = shardingHosts.get(seq.indexOf(instanceIndex) / shardingsPerHost);
-				String jdbcUrl = buildJdbcUrl(host, databaseName, databaseIndex);
+				String jdbcUrl = buildJdbcUrl(host, databaseName, beanName, instanceIndex);
 				map.put(beanName, jdbcUrl);
 			}
 		}
 		return map;
 	}
 
-	protected String buildJdbcUrl(String host, String databaseName, int databaseIndex) {
-		return String.format(jdbcUrlFormat, host, databaseName);
+	protected String buildJdbcUrl(String host, String databaseName, String beanName, int instanceIndex) {
+		return String.format(jdbcUrlFormat, host, databaseName, beanName, instanceIndex, instanceIndex + 1);
 	}
 
 	protected static List<String> parseHosts(String hosts) {
