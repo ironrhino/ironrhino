@@ -357,6 +357,11 @@ public class AppInfo {
 		if (System.getProperty("http.maxConnections") == null)
 			System.setProperty("http.maxConnections", "100");
 		System.setProperty("sun.net.http.errorstream.enableBuffering", "true");
+		if ("false".equals(System.getProperty("java.net.useSystemProxies"))) {
+			System.clearProperty("http.proxyHost");
+			System.clearProperty("https.proxyHost");
+			System.clearProperty("socksProxyHost");
+		}
 
 		String p = System.getProperty("port.http");
 		if (StringUtils.isBlank(p))
