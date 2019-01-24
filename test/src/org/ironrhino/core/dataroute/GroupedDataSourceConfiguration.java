@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -46,17 +45,12 @@ public class GroupedDataSourceConfiguration {
 	}
 
 	@Bean
-	public DataSource groupedDataSource() {
+	@Primary
+	public DataSource dataSource() {
 		GroupedDataSource ds = new GroupedDataSource();
 		ds.setMasterName("masterDataSource");
 		ds.setReadSlaveNames(Collections.singletonMap("slaveDataSource", 1));
 		return ds;
-	}
-
-	@Bean
-	@Primary
-	public DataSource dataSource(DataSource groupedDataSource) {
-		return new LazyConnectionDataSourceProxy(groupedDataSource);
 	}
 
 	@Bean
