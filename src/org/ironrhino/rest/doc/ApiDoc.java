@@ -30,6 +30,7 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJacksonValue;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -275,7 +276,8 @@ public class ApiDoc implements Serializable {
 				boolean bindAnnotationPresent = false;
 				for (int j = 0; j < annotations.length; j++) {
 					Annotation anno = annotations[j];
-					if (anno.annotationType().getPackage().equals(RequestBody.class.getPackage())
+					if (ClassUtils.getPackageName(anno.annotationType())
+							.equals(ClassUtils.getPackageName(RequestBody.class))
 							|| anno.annotationType().equals(Qualifier.class)
 							|| anno.annotationType().isAnnotationPresent(Qualifier.class)) {
 						// @RequestBody @Qualifier @LoggedInUser ...
@@ -387,7 +389,7 @@ public class ApiDoc implements Serializable {
 				if (!bindAnnotationPresent && Arrays.asList(methods).contains("GET")) {
 					// bind object not @RequestParam
 					if (!parameterType.isPrimitive()) { // int.class
-						String paramPackageName = parameterType.getPackage().getName();
+						String paramPackageName = ClassUtils.getPackageName(parameterType);
 						if (!paramPackageName.startsWith("java.") && !paramPackageName.startsWith("javax.")
 								&& !paramPackageName.startsWith("org.springframework.")
 								&& Serializable.class.isAssignableFrom(parameterType)) {

@@ -2,6 +2,7 @@ package org.ironrhino.rest.client;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.ClassUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -17,7 +18,7 @@ public class RestClientConfiguration {
 	@Bean
 	public static RestApiRegistryPostProcessor restApiRegistryPostProcessor() {
 		RestApiRegistryPostProcessor obj = new RestApiRegistryPostProcessor();
-		obj.setPackagesToScan(new String[] { RestClientConfiguration.class.getPackage().getName() });
+		obj.setPackagesToScan(new String[] { ClassUtils.getPackageName(RestClientConfiguration.class) });
 		return obj;
 	}
 

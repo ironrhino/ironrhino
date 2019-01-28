@@ -161,7 +161,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 				if (clazz.getSimpleName().equals("package-info"))
 					continue;
 				boolean inAnotherPackage = false;
-				String thisPackage = clazz.getPackage().getName();
+				String thisPackage = ClassUtils.getPackageName(clazz);
 				String currentPackage = null;
 				for (String s : currentPackages) {
 					if ((thisPackage.startsWith(s + ".") || thisPackage.equals(s))

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.ClassUtils;
 
 @Component
 public class RestApiRegistryPostProcessor
@@ -37,7 +38,7 @@ public class RestApiRegistryPostProcessor
 					return false;
 			}
 		}
-		Collection<Class<?>> assignables = ClassScanner.scanAssignable(annotatedClass.getPackage().getName(),
+		Collection<Class<?>> assignables = ClassScanner.scanAssignable(ClassUtils.getPackageName(annotatedClass),
 				annotatedClass);
 		for (Class<?> c : assignables) {
 			if (!c.isInterface() && AnnotationUtils.findAnnotation(c, Controller.class) != null) {

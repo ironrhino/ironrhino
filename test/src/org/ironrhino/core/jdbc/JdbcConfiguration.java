@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.util.ClassUtils;
 
 @Configuration
 @EnableTransactionManagement(proxyTargetClass = true)
@@ -23,7 +24,7 @@ public class JdbcConfiguration {
 	@Bean
 	public static JdbcRepositoryRegistryPostProcessor jdbcRepositoryRegistryPostProcessor() {
 		JdbcRepositoryRegistryPostProcessor obj = new JdbcRepositoryRegistryPostProcessor();
-		obj.setPackagesToScan(new String[] { JdbcConfiguration.class.getPackage().getName() });
+		obj.setPackagesToScan(new String[] { ClassUtils.getPackageName(JdbcConfiguration.class) });
 		return obj;
 	}
 

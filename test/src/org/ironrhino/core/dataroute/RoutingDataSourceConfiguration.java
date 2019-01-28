@@ -14,6 +14,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.util.ClassUtils;
 
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -79,7 +80,7 @@ public class RoutingDataSourceConfiguration {
 	@Bean
 	public static JdbcRepositoryRegistryPostProcessor jdbcRepositoryRegistryPostProcessor() {
 		JdbcRepositoryRegistryPostProcessor obj = new JdbcRepositoryRegistryPostProcessor();
-		obj.setPackagesToScan(new String[] { RoutingDataSourceConfiguration.class.getPackage().getName() });
+		obj.setPackagesToScan(new String[] { ClassUtils.getPackageName(RoutingDataSourceConfiguration.class) });
 		return obj;
 	}
 

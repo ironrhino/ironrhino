@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.util.ClassUtils;
 
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -61,7 +62,7 @@ public class GroupedDataSourceConfiguration {
 	@Bean
 	public static JdbcRepositoryRegistryPostProcessor jdbcRepositoryRegistryPostProcessor() {
 		JdbcRepositoryRegistryPostProcessor obj = new JdbcRepositoryRegistryPostProcessor();
-		obj.setPackagesToScan(new String[] { GroupedDataSourceConfiguration.class.getPackage().getName() });
+		obj.setPackagesToScan(new String[] { ClassUtils.getPackageName(GroupedDataSourceConfiguration.class) });
 		return obj;
 	}
 

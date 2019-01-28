@@ -20,6 +20,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.annotation.RestController;
 
 import javassist.ClassClassPath;
@@ -45,7 +46,7 @@ public class ApiDocInspector {
 			ComponentScan cs = AnnotatedElementUtils.getMergedAnnotation(apiConfig.getClass(), ComponentScan.class);
 			String[] basePackages = cs != null ? cs.basePackages() : new String[0];
 			if (basePackages.length == 0)
-				basePackages = new String[] { apiConfig.getClass().getPackage().getName() };
+				basePackages = new String[] { ClassUtils.getPackageName(apiConfig.getClass()) };
 			apiModules = getApiModules(basePackages);
 		}
 		return apiModules;
