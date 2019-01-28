@@ -23,8 +23,4 @@ public abstract class AbstractDatabaseCyclicSequence extends AbstractCyclicSeque
 		return new StringBuilder(getSequenceName()).append("_SEQ").toString();
 	}
 
-	protected String getLockName() {
-		return "SEQLOCK:" + getSequenceName();
-	}
-
 }
