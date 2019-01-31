@@ -14,9 +14,7 @@ import org.springframework.dao.DataAccessResourceFailureException;
 
 public abstract class AbstractSequenceSimpleSequence extends AbstractDatabaseSimpleSequence {
 
-	protected String getQuerySequenceStatement() {
-		return new StringBuilder("SELECT NEXTVAL('").append(getActualSequenceName()).append("')").toString();
-	}
+	protected abstract String getQuerySequenceStatement();
 
 	protected String getCreateSequenceStatement() {
 		StringBuilder sb = new StringBuilder("CREATE SEQUENCE ").append(getActualSequenceName());
@@ -43,8 +41,8 @@ public abstract class AbstractSequenceSimpleSequence extends AbstractDatabaseSim
 				schema = conn.getSchema();
 			} catch (Throwable t) {
 			}
-			for (String sequence : new LinkedHashSet<>(
-					Arrays.asList(sequenceName.toUpperCase(Locale.ROOT), sequenceName, sequenceName.toLowerCase(Locale.ROOT)))) {
+			for (String sequence : new LinkedHashSet<>(Arrays.asList(sequenceName.toUpperCase(Locale.ROOT),
+					sequenceName, sequenceName.toLowerCase(Locale.ROOT)))) {
 				try (ResultSet rs = dbmd.getTables(catalog, schema, sequence, new String[] { "SEQUENCE" })) {
 					if (rs.next()) {
 						sequenceExists = true;
