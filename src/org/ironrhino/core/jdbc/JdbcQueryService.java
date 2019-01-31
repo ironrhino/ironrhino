@@ -122,7 +122,7 @@ public class JdbcQueryService {
 			String str = dbmd.getIdentifierQuoteString();
 			if (StringUtils.isNotBlank(str))
 				quoteString = str.trim().substring(0, 1);
-			keywords = databaseProduct.getKeywords();
+			keywords = new ArrayList<>(databaseProduct.getKeywords());
 			if (keywords.isEmpty()) {
 				str = dbmd.getSQLKeywords();
 				if (StringUtils.isNotBlank(str))
@@ -314,8 +314,8 @@ public class JdbcQueryService {
 			return namedParameterJdbcTemplate.queryForList(sb.toString(), paramMap);
 		}
 
-		if (databaseProduct == DatabaseProduct.MYSQL || databaseProduct == DatabaseProduct.POSTGRESQL
-				|| databaseProduct == DatabaseProduct.H2) {
+		if (databaseProduct == DatabaseProduct.MYSQL || databaseProduct == DatabaseProduct.MARIADB
+				|| databaseProduct == DatabaseProduct.POSTGRESQL || databaseProduct == DatabaseProduct.H2) {
 			StringBuilder sb = new StringBuilder(sql.length() + 20);
 			sb.append(sql);
 			sb.append(" limit ");
@@ -444,13 +444,13 @@ public class JdbcQueryService {
 		resultPage.setPaginating(!hasLimit);
 		jdbcTemplate.setQueryTimeout(queryTimeout);
 		resultPage.setTotalResults(count(sql, paramMap));
-		if (resultPage.getTotalResults() > getCsvMaxRows() && (hasLimit
-				|| !(databaseProduct == DatabaseProduct.MYSQL || databaseProduct == DatabaseProduct.POSTGRESQL
-						|| databaseProduct == DatabaseProduct.H2 || databaseProduct == DatabaseProduct.HSQL
-						|| databaseProduct == DatabaseProduct.ORACLE || databaseProduct == DatabaseProduct.DB2
-						|| databaseProduct == DatabaseProduct.INFORMIX && databaseMajorVersion >= 11
-						|| databaseProduct == DatabaseProduct.SQLSERVER && databaseMajorVersion >= 11
-						|| databaseProduct == DatabaseProduct.DERBY)))
+		if (resultPage.getTotalResults() > getCsvMaxRows() && (hasLimit || !(databaseProduct == DatabaseProduct.MYSQL
+				|| databaseProduct == DatabaseProduct.MARIADB || databaseProduct == DatabaseProduct.POSTGRESQL
+				|| databaseProduct == DatabaseProduct.H2 || databaseProduct == DatabaseProduct.HSQL
+				|| databaseProduct == DatabaseProduct.ORACLE || databaseProduct == DatabaseProduct.DB2
+				|| databaseProduct == DatabaseProduct.INFORMIX && databaseMajorVersion >= 11
+				|| databaseProduct == DatabaseProduct.SQLSERVER && databaseMajorVersion >= 11
+				|| databaseProduct == DatabaseProduct.DERBY)))
 			throw new ErrorMessage("query.result.number.exceed", new Object[] { getCsvMaxRows() });
 		long time = System.currentTimeMillis();
 		jdbcTemplate.setQueryTimeout(queryTimeout);
@@ -518,8 +518,8 @@ public class JdbcQueryService {
 
 	private boolean hasLimit(String sql) {
 		sql = SqlUtils.clearComments(sql);
-		if (databaseProduct == DatabaseProduct.MYSQL || databaseProduct == DatabaseProduct.H2
-				|| databaseProduct == DatabaseProduct.HSQL) {
+		if (databaseProduct == DatabaseProduct.MYSQL || databaseProduct == DatabaseProduct.MARIADB
+				|| databaseProduct == DatabaseProduct.H2 || databaseProduct == DatabaseProduct.HSQL) {
 			return LIMIT_PATTERN.matcher(sql).find();
 		} else if (databaseProduct == DatabaseProduct.POSTGRESQL) {
 			return LIMIT_PATTERN.matcher(sql).find()

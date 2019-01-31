@@ -10,6 +10,8 @@ public class DatabaseProductTest {
 	public void testParse() {
 		assertEquals(DatabaseProduct.MYSQL, DatabaseProduct.parse("MySQL"));
 		assertEquals(DatabaseProduct.MYSQL, DatabaseProduct.parse("jdbc:mysql://localhost:3306/test"));
+		assertEquals(DatabaseProduct.MARIADB, DatabaseProduct.parse("MariaDB"));
+		assertEquals(DatabaseProduct.MARIADB, DatabaseProduct.parse("jdbc:mariadb://localhost:3306/test"));
 		assertEquals(DatabaseProduct.POSTGRESQL, DatabaseProduct.parse("PostgreSQL"));
 		assertEquals(DatabaseProduct.POSTGRESQL, DatabaseProduct.parse("jdbc:postgresql://localhost:5432/test"));
 		assertEquals(DatabaseProduct.ORACLE, DatabaseProduct.parse("Oracle"));

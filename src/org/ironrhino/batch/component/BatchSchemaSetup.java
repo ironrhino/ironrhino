@@ -53,6 +53,8 @@ public class BatchSchemaSetup {
 				}
 			}
 			DatabaseProduct dp = DatabaseProduct.parse(dbmd.getDatabaseProductName());
+			if (dp == DatabaseProduct.MARIADB)
+				dp = DatabaseProduct.MYSQL;
 			if (maxVarCharLength > 65535)
 				throw new IllegalArgumentException("Max varchar length is 65535");
 			if (dp == DatabaseProduct.ORACLE && maxVarCharLength > 4000)

@@ -29,6 +29,8 @@ public class DatabaseCyclicSequenceDelegate extends AbstractDatabaseCyclicSequen
 		}
 		if (databaseProduct == DatabaseProduct.MYSQL)
 			seq = new MySQLCyclicSequence();
+		else if (databaseProduct == DatabaseProduct.MARIADB)
+			seq = new MariaDBCyclicSequence();
 		else if (databaseProduct == DatabaseProduct.POSTGRESQL)
 			seq = new PostgreSQLCyclicSequence();
 		else if (databaseProduct == DatabaseProduct.ORACLE)

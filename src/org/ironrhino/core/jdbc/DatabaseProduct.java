@@ -36,6 +36,25 @@ public enum DatabaseProduct {
 		}
 
 	},
+	MARIADB {
+
+		@Override
+		public int getDefaultPort() {
+			return 3306;
+		}
+
+		@Override
+		public String getDefaultDriverClass() {
+			return "org.mariadb.jdbc.Driver";
+		}
+
+		@Override
+		protected String getRecommendedJdbcUrlQueryString() {
+			return "createDatabaseIfNotExist=true&serverTimezone=" + TimeZone.getDefault().getID()
+					+ "&useServerPrepStmts=true&socketTimeout=60000";
+		}
+
+	},
 	POSTGRESQL {
 		@Override
 		public int getDefaultPort() {
@@ -360,6 +379,8 @@ public enum DatabaseProduct {
 		} else {
 			if (nameOrUrl.toLowerCase(Locale.ROOT).contains("mysql"))
 				return MYSQL;
+			else if (nameOrUrl.toLowerCase(Locale.ROOT).contains("mariadb"))
+				return MARIADB;
 			else if (nameOrUrl.toLowerCase(Locale.ROOT).contains("postgres"))
 				return POSTGRESQL;
 			else if (nameOrUrl.toLowerCase(Locale.ROOT).contains("oracle"))

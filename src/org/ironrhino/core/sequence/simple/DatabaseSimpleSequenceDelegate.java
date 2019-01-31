@@ -29,6 +29,8 @@ public class DatabaseSimpleSequenceDelegate extends AbstractDatabaseSimpleSequen
 		}
 		if (databaseProduct == DatabaseProduct.MYSQL)
 			seq = new MySQLSimpleSequence();
+		else if (databaseProduct == DatabaseProduct.MARIADB)
+			seq = new MariaDBSimpleSequence();
 		else if (databaseProduct == DatabaseProduct.POSTGRESQL)
 			seq = new PostgreSQLSimpleSequence();
 		else if (databaseProduct == DatabaseProduct.ORACLE)
