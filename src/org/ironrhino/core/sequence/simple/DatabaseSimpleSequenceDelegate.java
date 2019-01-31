@@ -66,8 +66,8 @@ public class DatabaseSimpleSequenceDelegate extends AbstractDatabaseSimpleSequen
 	}
 
 	@Override
-	public int nextIntValue() {
-		return seq.nextIntValue();
+	public long nextLongValue() {
+		return seq.nextLongValue();
 	}
 
 }

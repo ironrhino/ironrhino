@@ -32,11 +32,11 @@ public class RedisSimpleSequence extends AbstractSimpleSequence {
 	}
 
 	@Override
-	public int nextIntValue() {
+	public long nextLongValue() {
 		Long value = boundValueOperations.increment(1);
 		if (value == null)
 			throw new RuntimeException("Unexpected null");
-		return value.intValue();
+		return value;
 	}
 
 }

@@ -20,7 +20,7 @@ public class MySQLSimpleSequence extends AbstractDatabaseSimpleSequence {
 	}
 
 	@Override
-	public int nextIntValue() {
+	public long nextLongValue() {
 		try (Connection con = getDataSource().getConnection()) {
 			con.setAutoCommit(true);
 			try (Statement stmt = con.createStatement()) {
@@ -32,7 +32,7 @@ public class MySQLSimpleSequence extends AbstractDatabaseSimpleSequence {
 						throw new DataAccessResourceFailureException(
 								"LAST_INSERT_ID() failed after executing an update");
 					}
-					return rs.getInt(1);
+					return rs.getLong(1);
 				}
 			}
 		} catch (SQLException ex) {

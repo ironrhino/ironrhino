@@ -58,12 +58,12 @@ public abstract class AbstractSequenceSimpleSequence extends AbstractDatabaseSim
 	}
 
 	@Override
-	public int nextIntValue() throws DataAccessException {
+	public long nextLongValue() throws DataAccessException {
 		try (Connection con = getDataSource().getConnection();
 				Statement stmt = con.createStatement();
 				ResultSet rs = stmt.executeQuery(getQuerySequenceStatement())) {
 			rs.next();
-			return rs.getInt(1);
+			return rs.getLong(1);
 		} catch (SQLException ex) {
 			throw new DataAccessResourceFailureException("Could not obtain next value of sequence", ex);
 		}

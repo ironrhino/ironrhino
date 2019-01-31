@@ -35,12 +35,6 @@ public abstract class AbstractCyclicSequence implements CyclicSequence, Initiali
 	}
 
 	@Override
-	public int nextIntValue() {
-		String s = nextStringValue();
-		return Integer.valueOf(s.substring(cycleType.getPattern().length()));
-	}
-
-	@Override
 	public long nextLongValue() {
 		return Long.valueOf(nextStringValue());
 	}
