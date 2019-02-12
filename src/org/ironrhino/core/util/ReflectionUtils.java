@@ -129,15 +129,16 @@ public class ReflectionUtils {
 	}
 
 	public static Set<Class<?>> getAllInterfaces(Class<?> clazz) {
+		Set<Class<?>> set = new HashSet<>();
 		if (clazz.isInterface()) {
-			Set<Class<?>> set = new HashSet<>();
 			set.add(clazz);
 			for (Class<?> intf : clazz.getInterfaces())
 				set.addAll(getAllInterfaces(intf));
-			return set;
 		} else {
-			return ClassUtils.getAllInterfacesForClassAsSet(clazz);
+			for (Class<?> intf : ClassUtils.getAllInterfacesForClassAsSet(clazz))
+				set.addAll(getAllInterfaces(intf));
 		}
+		return set;
 	}
 
 	public static String[] getParameterNames(Constructor<?> ctor) {
