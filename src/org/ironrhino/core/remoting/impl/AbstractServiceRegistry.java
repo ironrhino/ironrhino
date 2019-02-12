@@ -27,8 +27,6 @@ import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.PropertyValue;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -105,16 +103,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 			if (!bd.isSingleton() || bd.isAbstract())
 				continue;
 			String beanClassName = bd.getBeanClassName();
-			if (beanClassName == null)
-				continue;
-			Class<?> clazz = null;
-			try {
-				clazz = Class.forName(beanClassName);
-			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-				continue;
-			}
-			if (beanClassName.equals(CLASS_NAME_CLIENT)) {
+			if (CLASS_NAME_CLIENT.equals(beanClassName)) {
 				// remoting_client
 				PropertyValue pv = bd.getPropertyValues().getPropertyValue("serviceInterface");
 				if (pv == null)
@@ -122,11 +111,10 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 				String serviceName = (String) pv.getValue();
 				importedServiceCandidates.put(serviceName, new CopyOnWriteArrayList<String>());
 			} else {
-				if (clazz != null && FactoryBean.class.isAssignableFrom(clazz)) {
-					clazz = ((FactoryBean<?>) ctx.getBean(BeanFactory.FACTORY_BEAN_PREFIX + beanName)).getObjectType();
+				if (IS_SERVER_PRESENT && !skipExport) {
+					Class<?> clazz = ctx.getBean(beanName).getClass();
+					tryExport(clazz, beanName, beanClassName != null ? beanClassName : clazz.getName());
 				}
-				if (IS_SERVER_PRESENT && !skipExport)
-					tryExport(clazz, beanName, beanClassName);
 			}
 		}
 		for (String serviceName : importedServiceCandidates.keySet())

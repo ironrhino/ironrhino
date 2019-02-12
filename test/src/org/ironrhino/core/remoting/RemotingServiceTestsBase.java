@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.validation.ConstraintViolationException;
 
 import org.ironrhino.core.metadata.Scope;
+import org.ironrhino.sample.remoting.BarService;
 import org.ironrhino.sample.remoting.FooService;
 import org.ironrhino.sample.remoting.PersonRepository;
 import org.ironrhino.sample.remoting.TestService;
@@ -45,6 +46,9 @@ public abstract class RemotingServiceTestsBase {
 	protected FooService fooService;
 
 	@Autowired
+	protected BarService barService;
+
+	@Autowired
 	protected PersonRepository personRepository;
 
 	@BeforeClass
@@ -65,6 +69,11 @@ public abstract class RemotingServiceTestsBase {
 	@Test
 	public void testServiceImplementedByFactoryBean() {
 		assertEquals("test", fooService.test("test"));
+	}
+
+	@Test
+	public void testServiceRegistriedInConfigurationClass() {
+		assertEquals("test", barService.test("test"));
 	}
 
 	@Test
