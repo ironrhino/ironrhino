@@ -1,6 +1,7 @@
 package org.ironrhino.core.remoting;
 
 import org.ironrhino.core.remoting.client.HttpInvokerClient;
+import org.ironrhino.sample.remoting.FooService;
 import org.ironrhino.sample.remoting.PersonRepository;
 import org.ironrhino.sample.remoting.TestService;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +15,14 @@ public class RemotingConfiguration {
 	public HttpInvokerClient testService() {
 		HttpInvokerClient hic = new HttpInvokerClient();
 		hic.setServiceInterface(TestService.class);
+		hic.setHost("localhost");
+		return hic;
+	}
+
+	@Bean
+	public HttpInvokerClient fooService() {
+		HttpInvokerClient hic = new HttpInvokerClient();
+		hic.setServiceInterface(FooService.class);
 		hic.setHost("localhost");
 		return hic;
 	}

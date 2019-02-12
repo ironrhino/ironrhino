@@ -27,11 +27,11 @@ import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.PropertyValue;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
@@ -122,11 +122,8 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 				String serviceName = (String) pv.getValue();
 				importedServiceCandidates.put(serviceName, new CopyOnWriteArrayList<String>());
 			} else {
-				if (clazz != null && FactoryBean.class.isAssignableFrom(clazz) && bd instanceof RootBeanDefinition) {
-					clazz = ((RootBeanDefinition) bd).getTargetType();
-					if (clazz == null)
-						continue;
-					beanClassName = clazz.getName();
+				if (clazz != null && FactoryBean.class.isAssignableFrom(clazz)) {
+					clazz = ((FactoryBean<?>) ctx.getBean(BeanFactory.FACTORY_BEAN_PREFIX + beanName)).getObjectType();
 				}
 				if (IS_SERVER_PRESENT && !skipExport)
 					tryExport(clazz, beanName, beanClassName);

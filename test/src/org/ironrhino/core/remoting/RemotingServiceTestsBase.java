@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.validation.ConstraintViolationException;
 
 import org.ironrhino.core.metadata.Scope;
+import org.ironrhino.sample.remoting.FooService;
 import org.ironrhino.sample.remoting.PersonRepository;
 import org.ironrhino.sample.remoting.TestService;
 import org.ironrhino.sample.remoting.TestService.FutureType;
@@ -41,6 +42,9 @@ public abstract class RemotingServiceTestsBase {
 	protected TestService testService;
 
 	@Autowired
+	protected FooService fooService;
+
+	@Autowired
 	protected PersonRepository personRepository;
 
 	@BeforeClass
@@ -56,6 +60,11 @@ public abstract class RemotingServiceTestsBase {
 	@Test
 	public void testJdbcRepository() {
 		assertNotNull(personRepository.findAll());
+	}
+
+	@Test
+	public void testServiceImplementedByFactoryBean() {
+		assertEquals("test", fooService.test("test"));
 	}
 
 	@Test

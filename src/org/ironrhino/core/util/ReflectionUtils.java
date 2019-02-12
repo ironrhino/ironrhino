@@ -133,7 +133,7 @@ public class ReflectionUtils {
 			Set<Class<?>> set = new HashSet<>();
 			set.add(clazz);
 			for (Class<?> intf : clazz.getInterfaces())
-			set.addAll(getAllInterfaces(intf));
+				set.addAll(getAllInterfaces(intf));
 			return set;
 		} else {
 			return ClassUtils.getAllInterfacesForClassAsSet(clazz);
