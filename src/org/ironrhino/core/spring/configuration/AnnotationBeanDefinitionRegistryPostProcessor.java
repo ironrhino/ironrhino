@@ -21,6 +21,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.EnvironmentAware;
+import org.springframework.core.ResolvableType;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.env.Environment;
 
@@ -80,8 +81,13 @@ public abstract class AnnotationBeanDefinitionRegistryPostProcessor<A extends An
 			if (StringUtils.isBlank(beanName))
 				beanName = NameGenerator.buildDefaultBeanName(annotatedClass.getName());
 			if (registry.containsBeanDefinition(beanName)) {
-				if (existsBean(beanName, annotatedClass, registry))
+				BeanDefinition bd = registry.getBeanDefinition(beanName);
+				if (existsBean(beanName, annotatedClass, bd, registry)) {
+					String beanClassName = bd.getBeanClassName();
+					log.info("Skipped import interface [{}] because bean[{}#{}] exists", annotatedClass.getName(),
+							beanClassName, beanName);
 					continue;
+				}
 				beanName = annotatedClass.getName();
 			}
 			RootBeanDefinition beanDefinition = new RootBeanDefinition(factoryBeanClass);
@@ -99,13 +105,18 @@ public abstract class AnnotationBeanDefinitionRegistryPostProcessor<A extends An
 		return false;
 	}
 
-	private boolean existsBean(String beanName, Class<?> annotatedClass, BeanDefinitionRegistry registry) {
-		BeanDefinition bd = registry.getBeanDefinition(beanName);
+	private boolean existsBean(String beanName, Class<?> annotatedClass, BeanDefinition bd,
+			BeanDefinitionRegistry registry) {
 		String beanClassName = bd.getBeanClassName();
 		Class<?> beanClass = null;
 		try {
 			if (beanClassName != null) {
 				beanClass = Class.forName(beanClassName);
+				if (FactoryBean.class.isAssignableFrom(beanClass)) {
+					if (ResolvableType.forClassWithGenerics(FactoryBean.class, annotatedClass)
+							.isAssignableFrom(beanClass))
+						return true;
+				}
 			} else if (bd instanceof RootBeanDefinition) {
 				RootBeanDefinition rbd = (RootBeanDefinition) bd;
 				String fbn = rbd.getFactoryBeanName();
@@ -133,20 +144,19 @@ public abstract class AnnotationBeanDefinitionRegistryPostProcessor<A extends An
 		} catch (ClassNotFoundException e) {
 			log.error(e.getMessage(), e);
 		}
-		if (beanClass == null || beanClass.equals(annotatedClass) || beanClass.equals(factoryBeanClass))
+		if (beanClass == null || annotatedClass.isAssignableFrom(beanClass)
+				|| ResolvableType.forClassWithGenerics(FactoryBean.class, annotatedClass).isAssignableFrom(beanClass)
+				|| beanClass.equals(factoryBeanClass)) {
 			return true;
+		}
 		if (!beanClass.isAnnotationPresent(Fallback.class)) {
 			if (annotatedClass.isAssignableFrom(beanClass)) {
-				log.info("Skipped import interface [{}] because bean[{}#{}] exists", annotatedClass.getName(),
-						beanClassName, beanName);
 				return true;
 			}
 			if (bd instanceof RootBeanDefinition && FactoryBean.class.isAssignableFrom(beanClass)) {
 				Class<?> targetType = ((RootBeanDefinition) bd).getTargetType();
 				if (annotatedClass.isAssignableFrom(targetType)) {
 					beanClassName = targetType.getName();
-					log.info("Skipped import interface [{}] because bean[{}#{}] exists", annotatedClass.getName(),
-							beanClassName, beanName);
 					return true;
 				}
 			}
