@@ -23,6 +23,7 @@ import org.springframework.util.ClassUtils;
 
 import com.zaxxer.hikari.HikariDataSource;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Order(0)
@@ -74,8 +75,9 @@ public class DataSourceConfiguration {
 	@Value("${dataSource.lazyConnect:false}")
 	private boolean lazyConnect;
 
-	@Value("${dataSource.enableMgrations:false}")
-	private boolean enableMgrations;
+	@Value("${dataSource.enableMigrations:false}")
+	@Getter
+	private boolean enableMigrations;
 
 	protected DataSource createDataSource() {
 		if (AppInfo.getStage() == Stage.DEVELOPMENT && StringUtils.isBlank(env.getProperty("jdbc.url"))) {
@@ -107,7 +109,7 @@ public class DataSourceConfiguration {
 		ds.setPoolName("HikariPool-" + AppInfo.getAppName());
 		log.info("Using {} to connect {}", ds.getClass().getName(), ds.getJdbcUrl());
 
-		if (enableMgrations) {
+		if (enableMigrations) {
 			Flyway.configure().baselineOnMigrate(true).dataSource(ds).load().migrate();
 		}
 

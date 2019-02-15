@@ -51,6 +51,7 @@ import org.ironrhino.core.hibernate.event.SimpleSaveOrUpdateEventListener;
 import org.ironrhino.core.hibernate.type.YearMonthType;
 import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.ironrhino.core.spring.DefaultPropertiesProvider;
+import org.ironrhino.core.spring.configuration.DataSourceConfiguration;
 import org.ironrhino.core.util.ClassScanner;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,6 +114,9 @@ public class SessionFactoryBean extends LocalSessionFactoryBean implements Defau
 
 	@Autowired
 	private ValidatorFactory validatorFactory;
+
+	@Autowired(required = false)
+	private DataSourceConfiguration dataSourceConfiguration;
 
 	private Class<?>[] annotatedClasses;
 
@@ -213,6 +217,15 @@ public class SessionFactoryBean extends LocalSessionFactoryBean implements Defau
 			properties.put(AvailableSettings.MULTI_TENANT, MultiTenancyStrategy.SCHEMA);
 
 		properties.put(AvailableSettings.JPA_VALIDATION_FACTORY, validatorFactory);
+
+		if (dataSourceConfiguration != null && dataSourceConfiguration.isEnableMigrations()) {
+			String key = AvailableSettings.HBM2DDL_AUTO;
+			if (defaultProperties.get(key).equals(properties.getProperty(key))) {
+				value = Action.VALIDATE.name().toLowerCase(Locale.ROOT);
+				log.info("Enforce {}={} since database schema migrations enabled", key, value);
+				properties.put(key, value);
+			}
+		}
 
 		setHibernateProperties(properties);
 	}
