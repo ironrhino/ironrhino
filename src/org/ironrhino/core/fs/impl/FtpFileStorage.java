@@ -59,6 +59,11 @@ public class FtpFileStorage extends AbstractFileStorage {
 
 	@Getter
 	@Setter
+	@Value("${ftp.defaultTimeout:10000}")
+	protected int defaultTimeout = 10000;
+
+	@Getter
+	@Setter
 	@Value("${ftp.dataTimeout:10000}")
 	protected int dataTimeout = 10000;
 
@@ -116,6 +121,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 			@Override
 			public FTPClient create() throws Exception {
 				FTPClient ftpClient = uri.getScheme().equals("ftps") ? new FTPSClient() : new FTPClient();
+				ftpClient.setDefaultTimeout(defaultTimeout);
 				ftpClient.setDataTimeout(dataTimeout);
 				ftpClient.setControlEncoding(controlEncoding);
 				ftpClient.connect(uri.getHost(), uri.getPort() > 0 ? uri.getPort() : ftpClient.getDefaultPort());
