@@ -18,12 +18,12 @@ public class FileStorageInstrumentation extends BaseAspect {
 
 	@Around("execution(* *.*(..)) and target(fileStorage)")
 	public Object timing(ProceedingJoinPoint pjp, FileStorage fileStorage) throws Throwable {
+		if (!org.ironrhino.core.metrics.Metrics.isEnabled())
+			return pjp.proceed();
 		Object[] args = pjp.getArgs();
 		Method method = ((MethodSignature) pjp.getSignature()).getMethod();
 		String methodName = method.getName();
 		if (methodName.startsWith("get") || methodName.startsWith("is"))
-			return pjp.proceed();
-		if (!org.ironrhino.core.metrics.Metrics.isMicrometerPresent())
 			return pjp.proceed();
 		boolean error = false;
 		long start = System.nanoTime();

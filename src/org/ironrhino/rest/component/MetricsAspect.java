@@ -19,7 +19,7 @@ public class MetricsAspect extends AbstractInstrumentAspect {
 
 	@Around("execution(public * *(..)) and @within(restController)")
 	public Object timing(ProceedingJoinPoint pjp, RestController restController) throws Throwable {
-		if (Metrics.isMicrometerPresent())
+		if (Metrics.isEnabled())
 			return pjp.proceed();
 		Mapping mapping = getMapping(pjp);
 		if (mapping == null)

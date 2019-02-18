@@ -36,6 +36,8 @@ public class TimedAspect extends BaseAspect {
 
 	@Around("execution(* *.*(..)) and @annotation(timed)")
 	public Object timing(ProceedingJoinPoint pjp, Timed timed) throws Throwable {
+		if (!org.ironrhino.core.metrics.Metrics.isEnabled())
+			return pjp.proceed();
 		MeterRegistry registry = Metrics.globalRegistry;
 		String name = timed.value();
 		if (name.isEmpty()) {
@@ -70,6 +72,8 @@ public class TimedAspect extends BaseAspect {
 
 	@Around("execution(* *.*(..)) and @annotation(scheduled) and not @annotation(io.micrometer.core.annotation.Timed)")
 	public Object timing(ProceedingJoinPoint pjp, Scheduled scheduled) throws Throwable {
+		if (!org.ironrhino.core.metrics.Metrics.isEnabled())
+			return pjp.proceed();
 		if (scheduled.cron().isEmpty())
 			return pjp.proceed();
 		Timed timed = AnnotationUtils.synthesizeAnnotation(Collections.singletonMap("longTask", true), Timed.class,

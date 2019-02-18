@@ -91,7 +91,7 @@ public class CircuitBreaking {
 		return circuitBreakers.computeIfAbsent(key, name -> {
 			CircuitBreaker circuitBreaker = CircuitBreaker.of(name,
 					CircuitBreakerConfig.custom().recordFailure(predicate).build());
-			if (Metrics.isMicrometerPresent()) {
+			if (Metrics.isEnabled()) {
 				String prefix = "circuitbreaker.";
 				Metrics.gauge(prefix + name + '.' + STATE, circuitBreaker, cb -> cb.getState().getOrder());
 				Metrics.gauge(prefix + name + '.' + BUFFERED_MAX, circuitBreaker,

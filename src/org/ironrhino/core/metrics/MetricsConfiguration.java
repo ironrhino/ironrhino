@@ -25,7 +25,6 @@ import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.binder.MeterBinder;
 import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
 import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
 @Order(0)
 @Configuration
@@ -48,8 +47,10 @@ public class MetricsConfiguration {
 	@PostConstruct
 	public void init() {
 		meterRegistryProviders.forEach(p -> p.get().ifPresent(Metrics::addRegistry));
-		if (Metrics.globalRegistry.getRegistries().isEmpty())
-			Metrics.addRegistry(new SimpleMeterRegistry());
+		if (Metrics.globalRegistry.getRegistries().isEmpty()) {
+			org.ironrhino.core.metrics.Metrics.disable();
+			return;
+		}
 		Metrics.globalRegistry.config().commonTags("app", AppInfo.getAppName(), "instance",
 				AppInfo.getInstanceId(true, true));
 		instrument();
