@@ -16,7 +16,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 public class Main {
-	private final String[] jettyJars = { "WEB-INF/libext/bootstrap.jar" };
+	private final String[] jettyJars = { "BOOT-INF/lib/bootstrap.jar" };
 
 	public static void main(String[] args) throws Exception {
 		String javaVersion = System.getProperty("java.version");

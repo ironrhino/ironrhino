@@ -518,8 +518,8 @@
 				project.executeTarget('pre-war-standalone');
 			]]>
 			</script>
-			<mkdir dir="${webapp.dir}/WEB-INF/libext" />
-			<copy tofile="${webapp.dir}/WEB-INF/libext/bootstrap.jar" failonerror="false">
+			<mkdir dir="${webapp.dir}/BOOT-INF/lib" />
+			<copy tofile="${webapp.dir}/BOOT-INF/lib/bootstrap.jar" failonerror="false">
 				<fileset file="${lib.dir}/bootstrap*.jar" />
 			</copy>
 			<script language="javascript">
@@ -529,10 +529,10 @@
 				} catch (e) {
 				}
 				importPackage(java.io);
-				var libext = new File(project.getProperty('webapp.dir') + '/WEB-INF/libext');
+				var lib = new File(project.getProperty('webapp.dir') + '/BOOT-INF/lib');
 				var ironrhinolib = new File(project.getProperty('basedir')
 						+ '/../ironrhino/lib');
-				var file = new File(libext, 'bootstrap.jar');
+				var file = new File(lib, 'bootstrap.jar');
 				if (!file.exists()) {
 					var copy = project.createTask('copy');
 					copy.setTofile(file);
@@ -551,7 +551,7 @@
 					<name name="bootstrap/Main.class" />
 					<archives>
 						<zips>
-							<fileset dir="${webapp.dir}/WEB-INF/libext" includes="bootstrap.jar" />
+							<fileset dir="${webapp.dir}/BOOT-INF/lib" includes="bootstrap.jar" />
 						</zips>
 					</archives>
 				</restrict>
@@ -573,7 +573,7 @@
 			<antcall target="reset-overrides" />
 			<antcall target="reset-append-revision-for-assets" />
 			<delete dir="${webapp.dir}/bootstrap" />
-			<delete dir="${webapp.dir}/WEB-INF/libext" />
+			<delete dir="${webapp.dir}/BOOT-INF" />
 			<delete dir="${target.dir}/classes" />
 			<script language="javascript">
 				<![CDATA[

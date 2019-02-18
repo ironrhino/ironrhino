@@ -60,8 +60,9 @@ public class JettyLauncher {
 			System.setProperty("executable-war", warUrl.getPath());
 		}
 		context.setTempDirectory(tempDir);
-		context.setServer(server);
 		context.addServlet(Default404Servlet.class, "*.class");
+		context.addServlet(Default404Servlet.class, "/BOOT-INF/*");
+		context.setServer(server);
 
 		StatisticsHandler statisticsHandler = new StatisticsHandler();
 		statisticsHandler.setHandler(context);
