@@ -64,12 +64,25 @@ public class MainContextLoaderListener extends ContextLoaderListener {
 			e.printStackTrace();
 		}
 		try {
+			String className = "org.mariadb.jdbc.internal.protocol.AbstractQueryProtocol";
+			if (ClassUtils.isPresent(className, cl)) {
+				Field f = ClassUtils.forName(className, cl).getDeclaredField("readScheduler");
+				f.setAccessible(true);
+				Object executor = f.get(null);
+				if (executor != null)
+					executor.getClass().getMethod("shutdown").invoke(executor);
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		try {
 			String className = "com.microsoft.sqlserver.jdbc.TimeoutTimer";
 			if (ClassUtils.isPresent(className, cl)) {
 				Field f = ClassUtils.forName(className, cl).getDeclaredField("executor");
 				f.setAccessible(true);
 				Object executor = f.get(null);
-				executor.getClass().getMethod("shutdown").invoke(executor);
+				if (executor != null)
+					executor.getClass().getMethod("shutdown").invoke(executor);
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
