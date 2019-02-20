@@ -63,6 +63,7 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 
 	@Getter
 	@Setter
+	@Autowired(required = false)
 	private HttpInvokerRequestExecutor httpInvokerRequestExecutor = new SimpleHttpInvokerRequestExecutor();
 
 	@Value("${httpInvoker.serializationType:}")
