@@ -438,6 +438,8 @@ public class AppInfo {
 
 		// configure timezone
 		String userTimezone = System.getProperty("user.timezone");
+		if (StringUtils.isBlank(userTimezone))
+			userTimezone = System.getenv("TZ");
 		if (StringUtils.isBlank(userTimezone) || !TimeZone.getTimeZone(userTimezone).getID().equals(userTimezone)) {
 			userTimezone = "Asia/Shanghai";
 			TimeZone older = TimeZone.getDefault();
