@@ -1,4 +1,4 @@
-package org.ironrhino.core.remoting;
+package org.ironrhino.core.remoting.server;
 
 import static org.mockito.Mockito.spy;
 
@@ -12,7 +12,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 import org.aopalliance.intercept.MethodInvocation;
-import org.ironrhino.core.remoting.BaseHttpInvokerTest.HttpInvokerConfiguration;
+import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.client.HttpInvokerClient;
 import org.ironrhino.core.remoting.client.HttpInvokerRequestExecutor;
 import org.ironrhino.core.remoting.client.RemotingServiceRegistryPostProcessor;
@@ -20,7 +20,10 @@ import org.ironrhino.core.remoting.impl.StandaloneServiceRegistry;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializer;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializers;
 import org.ironrhino.core.remoting.server.HttpInvokerServer;
+import org.ironrhino.core.remoting.server.AbstractHttpInvokerServerTest.HttpInvokerConfiguration;
+import org.ironrhino.core.servlet.AccessFilter;
 import org.ironrhino.core.util.AppInfo;
+import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.sample.remoting.FooService;
 import org.ironrhino.sample.remoting.TestService;
 import org.ironrhino.sample.remoting.TestServiceImpl;
@@ -40,7 +43,7 @@ import org.springframework.remoting.support.RemoteInvocationResult;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration(classes = HttpInvokerConfiguration.class)
-public abstract class BaseHttpInvokerTest {
+public abstract class AbstractHttpInvokerServerTest {
 
 	protected static MockHttpServletRequest mockHttpServletRequest;
 	protected static MockHttpServletResponse mockHttpServletResponse;
@@ -161,6 +164,7 @@ public abstract class BaseHttpInvokerTest {
 			mockAsyncContext = spy(new MockAsyncContext(mockHttpServletRequest, mockHttpServletResponse));
 			mockHttpServletRequest.setRequestURI(URI.create(serviceUrl).getPath());
 			mockHttpServletRequest.addHeader(HttpHeaders.CONTENT_TYPE, this.getSerializer().getContentType());
+			mockHttpServletRequest.addHeader(AccessFilter.HTTP_HEADER_REQUEST_ID, CodecUtils.nextId());
 			mockHttpServletRequest.setContent(baos.toByteArray());
 			mockHttpServletRequest.setAsyncContext(mockAsyncContext);
 

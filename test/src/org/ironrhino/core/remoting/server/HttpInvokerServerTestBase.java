@@ -14,7 +14,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -26,9 +25,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.aopalliance.intercept.MethodInvocation;
-import org.ironrhino.core.remoting.BaseHttpInvokerTest;
 import org.ironrhino.core.remoting.RemotingContext;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializers;
+import org.ironrhino.core.servlet.AccessFilter;
+import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.sample.remoting.FooService;
 import org.ironrhino.sample.remoting.TestService;
 import org.ironrhino.sample.remoting.TestService.FutureType;
@@ -39,12 +39,11 @@ import org.mockito.Mockito;
 import org.springframework.http.HttpHeaders;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.concurrent.ListenableFuture;
 
 @RunWith(SpringRunner.class)
-public class HttpInvokerServerTest extends BaseHttpInvokerTest {
+public abstract class HttpInvokerServerTestBase extends AbstractHttpInvokerServerTest {
 
 	@Test
 	public void testServiceRegistry() {
@@ -69,6 +68,7 @@ public class HttpInvokerServerTest extends BaseHttpInvokerTest {
 		MockHttpServletRequest request = new MockHttpServletRequest();
 		request.setRequestURI(TestService.class.getName());
 		request.addHeader(HttpHeaders.CONTENT_TYPE, serializer.getContentType());
+		request.addHeader(AccessFilter.HTTP_HEADER_REQUEST_ID, CodecUtils.nextId());
 
 		MockHttpServletResponse response = new MockHttpServletResponse();
 		httpInvokerServer.handleRequest(request, response);
@@ -239,23 +239,6 @@ public class HttpInvokerServerTest extends BaseHttpInvokerTest {
 				argThat(ri -> "test".equals(ri.getMethodName())), any(MethodInvocation.class));
 		assertEquals(HttpServletResponse.SC_OK, mockHttpServletResponse.getStatus());
 		verify(mockFooService).test("test");
-
-		RemoteInvocation remoteInvocation = new RemoteInvocation();
-		remoteInvocation.setMethodName("test");
-		remoteInvocation.setParameterTypes(new Class[] { String.class });
-		remoteInvocation.setArguments(new Object[] { "hello" });
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		serializer.writeRemoteInvocation(remoteInvocation, baos);
-		baos.close();
-
-		MockHttpServletRequest request = new MockHttpServletRequest();
-		request.setRequestURI(serviceUri(FooService.class));
-		request.addHeader(HttpHeaders.CONTENT_TYPE, serializer.getContentType());
-		request.setContent(baos.toByteArray());
-
-		MockHttpServletResponse response = new MockHttpServletResponse();
-		httpInvokerServer.handleRequest(request, response);
-		assertEquals(HttpServletResponse.SC_OK, response.getStatus());
 	}
 
 }
