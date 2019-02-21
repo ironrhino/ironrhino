@@ -1,244 +1,184 @@
 package org.ironrhino.core.remoting.server;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.spy;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.net.URI;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.AsyncContext;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 
 import org.aopalliance.intercept.MethodInvocation;
-import org.ironrhino.core.remoting.RemotingContext;
+import org.ironrhino.core.remoting.ServiceRegistry;
+import org.ironrhino.core.remoting.client.HttpInvokerClient;
+import org.ironrhino.core.remoting.client.HttpInvokerRequestExecutor;
+import org.ironrhino.core.remoting.client.RemotingServiceRegistryPostProcessor;
+import org.ironrhino.core.remoting.impl.StandaloneServiceRegistry;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializers;
+import org.ironrhino.core.remoting.server.HttpInvokerServerTestBase.HttpInvokerConfiguration;
 import org.ironrhino.core.servlet.AccessFilter;
+import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.sample.remoting.FooService;
 import org.ironrhino.sample.remoting.TestService;
-import org.ironrhino.sample.remoting.TestService.FutureType;
-import org.ironrhino.security.domain.User;
-import org.junit.Test;
+import org.ironrhino.sample.remoting.TestServiceImpl;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
+import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+import org.springframework.lang.Nullable;
+import org.springframework.mock.web.MockAsyncContext;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.remoting.support.RemoteInvocationResult;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.concurrent.ListenableFuture;
 
 @RunWith(SpringRunner.class)
-public abstract class HttpInvokerServerTestBase extends AbstractHttpInvokerServerTest {
+@ContextConfiguration(classes = HttpInvokerConfiguration.class)
+public abstract class HttpInvokerServerTestBase {
 
-	@Test
-	public void testServiceRegistry() {
-		Map<String, Object> exportedServices = serviceRegistry.getExportedServices();
-		assertTrue(exportedServices.containsKey(TestService.class.getName()));
-		assertTrue(exportedServices.containsKey(FooService.class.getName()));
-		assertSame(mockTestService, exportedServices.get(TestService.class.getName()));
-		assertSame(mockFooService, exportedServices.get(FooService.class.getName()));
+	protected static MockHttpServletRequest mockHttpServletRequest;
+	protected static MockHttpServletResponse mockHttpServletResponse;
+	protected static MockAsyncContext mockAsyncContext;
+
+	protected static String serviceUrl(Class<?> serviceClass) {
+		return "http://" + AppInfo.getHostAddress() + ':'
+				+ (AppInfo.getHttpPort() > 0 ? AppInfo.getHttpPort() : ServiceRegistry.DEFAULT_HTTP_PORT)
+				+ "/remoting/httpinvoker/" + serviceClass.getName();
 	}
 
-	@Test
-	public void testServiceNotFound() throws ServletException, IOException {
-		MockHttpServletRequest request = new MockHttpServletRequest();
-		request.setRequestURI("/dummyService");
-		MockHttpServletResponse response = new MockHttpServletResponse();
-		httpInvokerServer.handleRequest(request, response);
-		assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatus());
-	}
+	@Configuration
+	static class HttpInvokerConfiguration {
 
-	@Test
-	public void testSerializationFailed() throws ServletException, IOException {
-		MockHttpServletRequest request = new MockHttpServletRequest();
-		request.setRequestURI(TestService.class.getName());
-		request.addHeader(HttpHeaders.CONTENT_TYPE, serializer.getContentType());
-		request.addHeader(AccessFilter.HTTP_HEADER_REQUEST_ID, CodecUtils.nextId());
+		@Value("${httpInvoker.serializationType:}")
+		protected String serializationType;
 
-		MockHttpServletResponse response = new MockHttpServletResponse();
-		httpInvokerServer.handleRequest(request, response);
-		if (HttpInvokerSerializers.DEFAULT_SERIALIZER.getSerializationType()
-				.equals(serializer.getSerializationType())) {
-			assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, response.getStatus());
-		} else {
-			assertEquals(RemotingContext.SC_SERIALIZATION_FAILED, response.getStatus());
+		@Bean
+		public RemotingServiceRegistryPostProcessor remotingServiceRegistryPostProcessor() {
+			RemotingServiceRegistryPostProcessor registryPostProcessor = new RemotingServiceRegistryPostProcessor();
+			registryPostProcessor.setAnnotatedClasses(new Class[] { TestService.class, FooService.class });
+			return registryPostProcessor;
+		}
+
+		@Bean
+		public ServiceRegistry serviceRegistry() {
+			return new StandaloneServiceRegistry();
+		}
+
+		@Bean
+		public HttpInvokerServer httpInvokerServer() {
+			return new HttpInvokerServer();
+		}
+
+		@Bean
+		public HttpInvokerClient testService() {
+			HttpInvokerClient httpInvokerClient = new HttpInvokerClient();
+			httpInvokerClient.setServiceInterface(TestService.class);
+			return httpInvokerClient;
+		}
+
+		@Bean
+		public HttpInvokerClient fooService() {
+			HttpInvokerClient httpInvokerClient = new HttpInvokerClient();
+			httpInvokerClient.setServiceInterface(FooService.class);
+			return httpInvokerClient;
+		}
+
+		@Bean
+		public TestService mockTestService() {
+			return spy(new TestServiceImpl());
+		}
+
+		@Bean
+		public FooServiceFactoryBean mockFooService() {
+			return new FooServiceFactoryBean();
+		}
+
+		@Bean
+		public HttpInvokerRequestExecutor mockHttpInvokerRequestExecutor() {
+			return spy(new MockHttpInvokerRequestExecutor());
 		}
 	}
 
-	@Test
-	public void testPing() throws Exception {
-		testService.ping();
-		verify(mockHttpInvokerRequestExecutor).executeRequest(eq(serviceUrl(TestService.class)),
-				argThat(ri -> "ping".equals(ri.getMethodName())), any(MethodInvocation.class));
-		assertEquals(HttpServletResponse.SC_OK, mockHttpServletResponse.getStatus());
-		verify(mockTestService).ping();
-	}
-
-	@Test
-	public void testEcho() throws Exception {
-		assertEquals("", testService.echo());
-		verify(mockHttpInvokerRequestExecutor).executeRequest(eq(serviceUrl(TestService.class)),
-				argThat(ri -> "echo".equals(ri.getMethodName())), any(MethodInvocation.class));
-		assertEquals(HttpServletResponse.SC_OK, mockHttpServletResponse.getStatus());
-		verify(mockTestService).echo();
-	}
-
-	@Test
-	public void testDefaultEcho() throws Exception {
-		assertEquals("", testService.defaultEcho(""));
-		verify(mockTestService, Mockito.never()).defaultEcho("");
-		verify(mockHttpInvokerRequestExecutor, Mockito.never()).executeRequest(eq(serviceUrl(TestService.class)),
-				argThat(ri -> "defaultEcho".equals(ri.getMethodName())), any(MethodInvocation.class));
-		verify(mockHttpInvokerRequestExecutor).executeRequest(eq(serviceUrl(TestService.class)),
-				argThat(ri -> "echo".equals(ri.getMethodName())), any(MethodInvocation.class));
-		assertEquals(HttpServletResponse.SC_OK, mockHttpServletResponse.getStatus());
-		verify(mockTestService).echo("");
-	}
-
-	@Test
-	public void testThrowException() throws Exception {
-		boolean error = false;
-		try {
-			testService.throwException("");
-		} catch (Exception e) {
-			error = true;
-		}
-		assertTrue(error);
-		verify(mockHttpInvokerRequestExecutor).executeRequest(eq(serviceUrl(TestService.class)),
-				argThat(ri -> "throwException".equals(ri.getMethodName())), any(MethodInvocation.class));
-		assertEquals(HttpServletResponse.SC_OK, mockHttpServletResponse.getStatus());
-		verify(mockTestService).throwException("");
-	}
-
-	@Test
-	public void testOptional() {
-		assertFalse(testService.loadOptionalUserByUsername("").isPresent());
-		assertEquals(HttpServletResponse.SC_OK, mockHttpServletResponse.getStatus());
-		verify(mockTestService).loadOptionalUserByUsername("");
-
-		assertTrue(testService.loadOptionalUserByUsername("test").isPresent());
-		assertEquals(HttpServletResponse.SC_OK, mockHttpServletResponse.getStatus());
-		verify(mockTestService).loadOptionalUserByUsername("test");
-
-		doReturn(null).when(mockTestService).loadOptionalUserByUsername(null);
-		assertNull(mockTestService.loadOptionalUserByUsername(null));
-		assertNotNull(testService.loadOptionalUserByUsername(null));
-		verify(mockTestService, atLeast(2)).loadOptionalUserByUsername(null);
-	}
-
-	@Test
-	public void testCallable() throws Exception {
-		Callable<User> callable = testService.loadCallableUserByUsername("username");
-		verifyNoMoreInteractions(mockHttpInvokerRequestExecutor);
-		verifyNoMoreInteractions(mockTestService);
-
-		assertEquals("username", callable.call().getUsername());
-		verify(mockHttpInvokerRequestExecutor).executeRequest(eq(serviceUrl(TestService.class)),
-				argThat(ri -> "loadCallableUserByUsername".equals(ri.getMethodName())), any(MethodInvocation.class));
-		verify(mockHttpServletRequest).startAsync();
-		verify(mockAsyncContext).start(any(Runnable.class));
-		verify(mockAsyncContext).complete();
-		verify(mockTestService).loadCallableUserByUsername("username");
-	}
-
-	@Test
-	public void testFuture() throws Exception {
-		for (FutureType futureType : FutureType.values()) {
-			Future<User> future = testService.loadFutureUserByUsername("username", futureType);
-			assertEquals("username", future.get().getUsername());
-			verify(mockHttpInvokerRequestExecutor).executeRequest(eq(serviceUrl(TestService.class)),
-					argThat(ri -> "loadFutureUserByUsername".equals(ri.getMethodName())), any(MethodInvocation.class));
-			verify(mockHttpServletRequest).startAsync();
-			if (futureType == FutureType.RUNNABLE)
-				verify(mockAsyncContext).start(any(Runnable.class));
-			verify(mockAsyncContext).complete();
-			verify(mockTestService).loadFutureUserByUsername("username", futureType);
-			reset();
-		}
-	}
-
-	@Test
-	public void testFutureWithNullUsername() throws Exception {
-		for (FutureType futureType : FutureType.values()) {
-			boolean error = false;
-			try {
-				testService.loadFutureUserByUsername(null, futureType).get();
-			} catch (ExecutionException e) {
-				assertTrue(e.getCause() instanceof IllegalArgumentException);
-				error = true;
+	static class MockAsyncHttpServletRequest extends MockHttpServletRequest {
+		@Override
+		public AsyncContext startAsync(ServletRequest request, @Nullable ServletResponse response) {
+			if (this.getAsyncContext() == null) {
+				this.setAsyncContext(new MockAsyncContext(request, response));
 			}
-			assertTrue(error);
-			verify(mockHttpInvokerRequestExecutor).executeRequest(eq(serviceUrl(TestService.class)),
-					argThat(ri -> "loadFutureUserByUsername".equals(ri.getMethodName())), any(MethodInvocation.class));
-			verify(mockTestService).loadFutureUserByUsername(null, futureType);
-			verify(mockHttpServletRequest, Mockito.never()).startAsync();
-			verifyNoMoreInteractions(mockAsyncContext);
-			reset();
+			setAsyncStarted(true);
+			return this.getAsyncContext();
 		}
 	}
 
-	@Test
-	public void testFutureWithBlankUsername() throws Exception {
-		for (FutureType futureType : FutureType.values()) {
-			boolean error = false;
-			try {
-				testService.loadFutureUserByUsername("", futureType).get();
-			} catch (ExecutionException e) {
-				assertTrue(e.getCause() instanceof IllegalArgumentException);
-				error = true;
+	static class MockHttpInvokerRequestExecutor extends HttpInvokerRequestExecutor {
+
+		@Autowired
+		private HttpInvokerServer httpInvokerServer;
+
+		@Value("${httpInvoker.serializationType:}")
+		private void setSerializationType(String serializationType) {
+			setSerializer(HttpInvokerSerializers.ofSerializationType(serializationType));
+		}
+
+		@Override
+		protected RemoteInvocationResult doExecuteRequest(String serviceUrl, MethodInvocation methodInvocation,
+				ByteArrayOutputStream baos) throws Exception {
+
+			mockHttpServletRequest = spy(new MockAsyncHttpServletRequest());
+			mockHttpServletResponse = spy(new MockHttpServletResponse());
+			mockAsyncContext = spy(new MockAsyncContext(mockHttpServletRequest, mockHttpServletResponse));
+			URI uri = URI.create(serviceUrl);
+			mockHttpServletRequest.setServerName(uri.getHost());
+			mockHttpServletRequest.setServerPort(uri.getPort());
+			mockHttpServletRequest.setRequestURI(uri.getPath());
+			mockHttpServletRequest.addHeader(HttpHeaders.CONTENT_TYPE, this.getSerializer().getContentType());
+			mockHttpServletRequest.addHeader(AccessFilter.HTTP_HEADER_REQUEST_ID, CodecUtils.nextId());
+			mockHttpServletRequest.setContent(baos.toByteArray());
+			mockHttpServletRequest.setAsyncContext(mockAsyncContext);
+
+			httpInvokerServer.handleRequest(mockHttpServletRequest, mockHttpServletResponse);
+			byte[] content;
+			// wait async task finish
+			while ((content = mockHttpServletResponse.getContentAsByteArray()).length == 0
+					&& mockHttpServletRequest.isAsyncStarted()) {
+				Thread.sleep(50);
 			}
-			assertTrue(error);
-			verify(mockHttpInvokerRequestExecutor).executeRequest(eq(serviceUrl(TestService.class)),
-					argThat(ri -> "loadFutureUserByUsername".equals(ri.getMethodName())), any(MethodInvocation.class));
-			verify(mockHttpServletRequest).startAsync();
-			if (futureType == FutureType.RUNNABLE)
-				verify(mockAsyncContext).start(any(Runnable.class));
-			verify(mockAsyncContext).complete();
-			verify(mockTestService).loadFutureUserByUsername("", futureType);
-			reset();
+			return this.getSerializer().readRemoteInvocationResult(methodInvocation, new ByteArrayInputStream(content));
 		}
 	}
 
-	@Test
-	public void testListenableFuture() throws Exception {
-		ListenableFuture<User> listenableFuture = testService.loadListenableFutureUserByUsername("username");
-		AtomicBoolean b1 = new AtomicBoolean();
-		AtomicBoolean b2 = new AtomicBoolean();
-		listenableFuture.addCallback(u -> b1.set(u != null && "username".equals(u.getUsername())), e -> b2.set(true));
-		Thread.sleep(1000);
-		assertTrue(b1.get());
-		assertFalse(b2.get());
-		assertEquals("username", listenableFuture.get().getUsername());
-		verify(mockHttpInvokerRequestExecutor).executeRequest(eq(serviceUrl(TestService.class)),
-				argThat(ri -> "loadListenableFutureUserByUsername".equals(ri.getMethodName())),
-				any(MethodInvocation.class));
-		verify(mockHttpServletRequest).startAsync();
-		verify(mockAsyncContext).complete();
-		verify(mockTestService).loadListenableFutureUserByUsername("username");
+	// must public
+	public static class FooServiceImpl implements FooService {
+
+		@Override
+		public String test(String value) {
+			return value;
+		}
 	}
 
-	@Test
-	public void testServiceImplementedByFactoryBean() throws Exception {
-		fooService.test("test");
-		verify(mockHttpInvokerRequestExecutor).executeRequest(eq(serviceUrl(FooService.class)),
-				argThat(ri -> "test".equals(ri.getMethodName())), any(MethodInvocation.class));
-		assertEquals(HttpServletResponse.SC_OK, mockHttpServletResponse.getStatus());
-		verify(mockFooService).test("test");
-	}
+	static class FooServiceFactoryBean implements FactoryBean<FooService> {
 
+		public FooService service;
+
+		public FooServiceFactoryBean() {
+			this.service = spy(new FooServiceImpl());
+		}
+
+		@Override
+		public FooService getObject() throws Exception {
+			return service;
+		}
+
+		@Override
+		public Class<?> getObjectType() {
+			return FooService.class;
+		}
+	}
 }
