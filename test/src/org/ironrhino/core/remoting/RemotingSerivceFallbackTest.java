@@ -74,7 +74,12 @@ public class RemotingSerivceFallbackTest {
 
 		@Bean
 		public ServiceRegistry serviceRegistry() {
-			return new StandaloneServiceRegistry();
+			return new StandaloneServiceRegistry() {
+				@Override
+				protected void lookup(String serviceName) {
+					// skip lookup force ServiceNotFoundException
+				}
+			};
 		}
 
 		@Bean

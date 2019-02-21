@@ -20,6 +20,7 @@ import org.ironrhino.core.remoting.impl.StandaloneServiceRegistry;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializer;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializers;
 import org.ironrhino.core.remoting.server.HttpInvokerServer;
+import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.sample.remoting.FooService;
 import org.ironrhino.sample.remoting.TestService;
 import org.ironrhino.sample.remoting.TestServiceImpl;
@@ -30,8 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.Nullable;
 import org.springframework.mock.web.MockAsyncContext;
@@ -67,8 +66,10 @@ public abstract class BaseHttpInvokerTest {
 
 	protected HttpInvokerSerializer serializer;
 
-	protected static String serviceUrl(Class<?> serviceClass) {
-		return "http://localhost:8080" + serviceUri(serviceClass);
+	protected String serviceUrl(Class<?> serviceClass) {
+		return "http://" + AppInfo.getHostAddress() + ':'
+				+ (AppInfo.getHttpPort() > 0 ? AppInfo.getHttpPort() : ServiceRegistry.DEFAULT_HTTP_PORT)
+				+ serviceUri(serviceClass);
 	}
 
 	protected static String serviceUri(Class<?> serviceClass) {
@@ -97,13 +98,7 @@ public abstract class BaseHttpInvokerTest {
 
 		@Bean
 		public ServiceRegistry serviceRegistry() {
-			return new StandaloneServiceRegistry() {
-				@Override
-				@EventListener
-				public void onApplicationEvent(ContextRefreshedEvent event) {
-					init();
-				}
-			};
+			return new StandaloneServiceRegistry();
 		}
 
 		@Bean
@@ -115,7 +110,6 @@ public abstract class BaseHttpInvokerTest {
 		public HttpInvokerClient testService() {
 			HttpInvokerClient httpInvokerClient = new HttpInvokerClient();
 			httpInvokerClient.setServiceInterface(TestService.class);
-			httpInvokerClient.setHost("localhost");
 			return httpInvokerClient;
 		}
 
@@ -123,7 +117,6 @@ public abstract class BaseHttpInvokerTest {
 		public HttpInvokerClient fooService() {
 			HttpInvokerClient httpInvokerClient = new HttpInvokerClient();
 			httpInvokerClient.setServiceInterface(FooService.class);
-			httpInvokerClient.setHost("localhost");
 			return httpInvokerClient;
 		}
 
