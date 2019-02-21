@@ -9,14 +9,8 @@ public class FooServiceImpl implements FactoryBean<FooService> {
 	private final FooService service;
 
 	public FooServiceImpl() {
-		service = new FooService() {
+		service = s -> s;
 
-			@Override
-			public String test(String value) {
-				return value;
-			}
-
-		};
 	}
 
 	@Override
