@@ -214,7 +214,7 @@ public class HttpInvokerServer implements HttpRequestHandler {
 			response.setStatus(RemotingContext.SC_SERIALIZATION_FAILED);
 		} catch (Exception ex) {
 			try {
-				if (!serializer.handleException(ex, response)) {
+				if (!serializer.handleException(ex, request, response)) {
 					log.error(ex.getMessage(), ex);
 					response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				}

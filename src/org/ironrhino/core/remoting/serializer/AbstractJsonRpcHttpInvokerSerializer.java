@@ -17,10 +17,13 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.ironrhino.core.model.NullObject;
+import org.ironrhino.core.remoting.RemotingContext;
+import org.ironrhino.core.servlet.AccessFilter;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.JsonSerializationUtils;
 import org.ironrhino.core.util.ReflectionUtils;
@@ -60,6 +63,21 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 	private final static String CODE = "code";
 	private final static String MESSAGE = "message";
 	private final static String DATA = "data";
+	private final static int CODE_PARSE_ERROR = -32700;
+	private final static int CODE_INVALID_REQUEST = -32600;
+	private final static int CODE_METHOD_NOT_FOUND = -32601;
+	private final static int CODE_INVALID_PARAMS = -32602;
+	private final static int CODE_INTERNAL_ERROR = -32603;
+	private static final Map<Integer, String> PREDEFINED_ERRORS;
+	static {
+		Map<Integer, String> map = new HashMap<>(8);
+		map.put(CODE_PARSE_ERROR, "Parse error");
+		map.put(CODE_INVALID_REQUEST, "Invalid request");
+		map.put(CODE_METHOD_NOT_FOUND, "Method not found");
+		map.put(CODE_INVALID_PARAMS, "Invalid params");
+		map.put(CODE_INTERNAL_ERROR, "Internal error");
+		PREDEFINED_ERRORS = Collections.unmodifiableMap(map);
+	}
 
 	private final ObjectMapper objectMapper;
 
@@ -95,8 +113,10 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 		JsonNode tree;
 		try {
 			tree = objectMapper.readTree(is);
+			if (tree == null)
+				throw new JsonRpcException(CODE_PARSE_ERROR, "", NullObject.get());
 		} catch (JsonParseException e) {
-			throw new JsonRpcException(-32700, e.getMessage(), NullObject.get());
+			throw new JsonRpcException(CODE_PARSE_ERROR, e.getMessage(), NullObject.get());
 		}
 		Serializable id = null;
 		JsonNode idNode = tree.get(ID);
@@ -104,7 +124,7 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 			id = idNode.isNull() ? NullObject.get()
 					: idNode.isNumber() ? idNode.asLong() : idNode.isTextual() ? idNode.asText() : NullObject.get();
 		if (!isValid(tree))
-			throw new JsonRpcException(-32600, id != null ? id : NullObject.get());
+			throw new JsonRpcException(CODE_INVALID_REQUEST, id != null ? id : NullObject.get());
 		invocation.setId(id);
 		invocation.setMethodName(tree.get(METHOD).asText());
 		Class<?>[] parameterTypes = null;
@@ -148,7 +168,7 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 				}
 			}
 			if (ex != null || methodNameExists && invocation.getMethod() == null)
-				throw new JsonRpcException(-32602, id);
+				throw new JsonRpcException(CODE_INVALID_PARAMS, id);
 		} else {
 			try {
 				invocation.setMethod(serviceInterface.getMethod(invocation.getMethodName()));
@@ -158,7 +178,7 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 			arguments = new Object[0];
 		}
 		if (invocation.getMethod() == null)
-			throw new JsonRpcException(-32601, id);
+			throw new JsonRpcException(CODE_METHOD_NOT_FOUND, id);
 		invocation.setParameterTypes(parameterTypes);
 		invocation.setArguments(arguments);
 		return invocation;
@@ -179,7 +199,7 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 			InvocationTargetException ex = ((InvocationTargetException) result.getException());
 			if (ex != null) {
 				Throwable exception = ex.getTargetException();
-				error.setCode(-32603);
+				error.setCode(CODE_INTERNAL_ERROR);
 				error.setMessage(exception.getMessage());
 				error.setData(exception.getClass().getName());
 				response.setError(error);
@@ -204,7 +224,7 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 				id = idNode.isNumber() ? idNode.asLong() : idNode.asText();
 			if (!tree.has(ERROR)) {
 				tree = tree.get(RESULT);
-				if (tree != null) {
+				if (tree != null && !tree.isNull()) {
 					Type type = methodInvocation.getMethod().getGenericReturnType();
 					if (type instanceof ParameterizedType) {
 						ParameterizedType pt = (ParameterizedType) type;
@@ -224,7 +244,7 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 				tree = tree.get(ERROR);
 				int code = tree.get(CODE).asInt();
 				String message = tree.get(MESSAGE).asText();
-				if (code == -32700)
+				if (code == CODE_PARSE_ERROR)
 					throw new SerializationFailedException(message);
 				Exception exception = null;
 				if (tree.has(DATA)) {
@@ -246,16 +266,23 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 	}
 
 	@Override
-	public boolean handleException(Exception ex, HttpServletResponse response) throws IOException {
+	public boolean handleException(Exception ex, HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
 		if (ex instanceof JsonRpcException) {
 			JsonRpcException e = (JsonRpcException) ex;
 			Response rsp = new Response();
 			rsp.setId(e.getId());
 			Error error = new Error();
 			error.setCode(e.getCode());
-			if (error.getMessage() == null)
-				error.setMessage(e.getMessage());
+			String message = PREDEFINED_ERRORS.get(e.getCode());
+			if (message == null)
+				message = e.getMessage();
+			error.setMessage(message);
 			rsp.setError(error);
+			if (e.getCode() == CODE_PARSE_ERROR && request.getHeader(AccessFilter.HTTP_HEADER_REQUEST_ID) != null) {
+				// invoked via HttpInvokerClient
+				response.setStatus(RemotingContext.SC_SERIALIZATION_FAILED);
+			}
 			response.setContentType(getContentType());
 			objectMapper.writeValue(response.getOutputStream(), rsp);
 			return true;
@@ -324,28 +351,11 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 	@Setter
 	private static class Error {
 
-		private static final Map<Integer, String> PREDEFINED_ERRORS;
-
-		static {
-			Map<Integer, String> map = new HashMap<>(8);
-			map.put(-32700, "Parse error");
-			map.put(-32600, "Invalid Request");
-			map.put(-32601, "Method not found");
-			map.put(-32602, "Invalid params");
-			map.put(-32603, "Internal error");
-			PREDEFINED_ERRORS = Collections.unmodifiableMap(map);
-		}
-
 		private int code;
 
 		private String message;
 
 		private Object data;
-
-		public void setCode(int code) {
-			this.code = code;
-			this.message = PREDEFINED_ERRORS.get(code);
-		}
 
 	}
 
