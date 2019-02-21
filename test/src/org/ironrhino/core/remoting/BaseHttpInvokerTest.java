@@ -4,6 +4,7 @@ import static org.mockito.Mockito.spy;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.net.URI;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.AsyncContext;
@@ -42,9 +43,9 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration(classes = HttpInvokerConfiguration.class)
 public abstract class BaseHttpInvokerTest {
 
-	public static MockHttpServletRequest mockHttpServletRequest;
-	public static MockHttpServletResponse mockHttpServletResponse;
-	public static MockAsyncContext mockAsyncContext;
+	protected static MockHttpServletRequest mockHttpServletRequest;
+	protected static MockHttpServletResponse mockHttpServletResponse;
+	protected static MockAsyncContext mockAsyncContext;
 
 	@Autowired
 	protected ServiceRegistry serviceRegistry;
@@ -66,8 +67,12 @@ public abstract class BaseHttpInvokerTest {
 
 	protected HttpInvokerSerializer serializer;
 
-	protected String serviceUrl(Class<?> serviceClazz) {
-		return "http://localhost:8080/remoting/httpinvoker/" + serviceClazz.getName();
+	protected static String serviceUrl(Class<?> serviceClass) {
+		return "http://localhost:8080" + serviceUri(serviceClass);
+	}
+
+	protected static String serviceUri(Class<?> serviceClass) {
+		return "/remoting/httpinvoker/" + serviceClass.getName();
 	}
 
 	@PostConstruct
@@ -77,26 +82,7 @@ public abstract class BaseHttpInvokerTest {
 
 	@Before
 	public void reset() {
-		Mockito.reset(mockHttpInvokerRequestExecutor, mockTestService);
-		if (mockHttpServletRequest != null)
-			Mockito.reset(mockHttpServletRequest);
-		if (mockHttpServletResponse != null)
-			Mockito.reset(mockHttpServletResponse);
-		if (mockAsyncContext != null)
-			Mockito.reset(mockAsyncContext);
-
-	}
-
-	public static MockHttpServletRequest mockHttpServletRequest() {
-		return mockHttpServletRequest = spy(new MockAsyncHttpServletRequest());
-	}
-
-	public static MockHttpServletResponse mockHttpServletResponse() {
-		return mockHttpServletResponse = spy(new MockHttpServletResponse());
-	}
-
-	public static MockAsyncContext mockAsyncContext(MockHttpServletRequest request, MockHttpServletResponse response) {
-		return mockAsyncContext = spy(new MockAsyncContext(request, response));
+		Mockito.reset(mockHttpInvokerRequestExecutor, mockTestService, mockFooService);
 	}
 
 	@Configuration
@@ -177,17 +163,19 @@ public abstract class BaseHttpInvokerTest {
 		protected RemoteInvocationResult doExecuteRequest(String serviceUrl, MethodInvocation methodInvocation,
 				ByteArrayOutputStream baos) throws Exception {
 
-			MockHttpServletRequest request = mockHttpServletRequest();
-			MockHttpServletResponse response = mockHttpServletResponse();
-			request.setRequestURI(serviceUrl);
-			request.addHeader(HttpHeaders.CONTENT_TYPE, this.getSerializer().getContentType());
-			request.setContent(baos.toByteArray());
-			request.setAsyncContext(mockAsyncContext(request, response));
+			mockHttpServletRequest = spy(new MockAsyncHttpServletRequest());
+			mockHttpServletResponse = spy(new MockHttpServletResponse());
+			mockAsyncContext = spy(new MockAsyncContext(mockHttpServletRequest, mockHttpServletResponse));
+			mockHttpServletRequest.setRequestURI(URI.create(serviceUrl).getPath());
+			mockHttpServletRequest.addHeader(HttpHeaders.CONTENT_TYPE, this.getSerializer().getContentType());
+			mockHttpServletRequest.setContent(baos.toByteArray());
+			mockHttpServletRequest.setAsyncContext(mockAsyncContext);
 
-			httpInvokerServer.handleRequest(request, response);
+			httpInvokerServer.handleRequest(mockHttpServletRequest, mockHttpServletResponse);
 			byte[] content;
 			// wait async task finish
-			while ((content = response.getContentAsByteArray()).length == 0 && request.isAsyncSupported()) {
+			while ((content = mockHttpServletResponse.getContentAsByteArray()).length == 0
+					&& mockHttpServletRequest.isAsyncSupported()) {
 				Thread.sleep(50);
 			}
 			return this.getSerializer().readRemoteInvocationResult(methodInvocation, new ByteArrayInputStream(content));

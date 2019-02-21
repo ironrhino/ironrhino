@@ -249,7 +249,7 @@ public class HttpInvokerServerTest extends BaseHttpInvokerTest {
 		baos.close();
 
 		MockHttpServletRequest request = new MockHttpServletRequest();
-		request.setRequestURI(serviceUrl(FooService.class));
+		request.setRequestURI(serviceUri(FooService.class));
 		request.addHeader(HttpHeaders.CONTENT_TYPE, serializer.getContentType());
 		request.setContent(baos.toByteArray());
 
