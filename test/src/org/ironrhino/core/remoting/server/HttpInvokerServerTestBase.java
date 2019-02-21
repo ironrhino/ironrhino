@@ -1,14 +1,11 @@
 package org.ironrhino.core.remoting.server;
 
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.spy;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
-
-import javax.servlet.AsyncContext;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.ironrhino.core.remoting.ServiceRegistry;
@@ -31,7 +28,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
-import org.springframework.lang.Nullable;
 import org.springframework.mock.web.MockAsyncContext;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -106,17 +102,6 @@ public abstract class HttpInvokerServerTestBase {
 		}
 	}
 
-	static class MockAsyncHttpServletRequest extends MockHttpServletRequest {
-		@Override
-		public AsyncContext startAsync(ServletRequest request, @Nullable ServletResponse response) {
-			if (this.getAsyncContext() == null) {
-				this.setAsyncContext(new MockAsyncContext(request, response));
-			}
-			setAsyncStarted(true);
-			return this.getAsyncContext();
-		}
-	}
-
 	static class MockHttpInvokerRequestExecutor extends HttpInvokerRequestExecutor {
 
 		@Autowired
@@ -131,7 +116,7 @@ public abstract class HttpInvokerServerTestBase {
 		protected RemoteInvocationResult doExecuteRequest(String serviceUrl, MethodInvocation methodInvocation,
 				ByteArrayOutputStream baos) throws Exception {
 
-			mockHttpServletRequest = spy(new MockAsyncHttpServletRequest());
+			mockHttpServletRequest = spy(new MockHttpServletRequest());
 			mockHttpServletResponse = spy(new MockHttpServletResponse());
 			mockAsyncContext = spy(new MockAsyncContext(mockHttpServletRequest, mockHttpServletResponse));
 			URI uri = URI.create(serviceUrl);
@@ -141,7 +126,11 @@ public abstract class HttpInvokerServerTestBase {
 			mockHttpServletRequest.addHeader(HttpHeaders.CONTENT_TYPE, this.getSerializer().getContentType());
 			mockHttpServletRequest.addHeader(AccessFilter.HTTP_HEADER_REQUEST_ID, CodecUtils.nextId());
 			mockHttpServletRequest.setContent(baos.toByteArray());
-			mockHttpServletRequest.setAsyncContext(mockAsyncContext);
+			mockHttpServletRequest.setAsyncSupported(true);
+			doAnswer(i -> {
+				mockHttpServletRequest.setAsyncStarted(true);
+				return mockAsyncContext;
+			}).when(mockHttpServletRequest).startAsync();
 
 			httpInvokerServer.handleRequest(mockHttpServletRequest, mockHttpServletResponse);
 			byte[] content;
