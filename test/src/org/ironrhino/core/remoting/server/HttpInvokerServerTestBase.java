@@ -52,9 +52,6 @@ public abstract class HttpInvokerServerTestBase {
 	@Configuration
 	static class HttpInvokerConfiguration {
 
-		@Value("${httpInvoker.serializationType:}")
-		protected String serializationType;
-
 		@Bean
 		public RemotingServiceRegistryPostProcessor remotingServiceRegistryPostProcessor() {
 			RemotingServiceRegistryPostProcessor registryPostProcessor = new RemotingServiceRegistryPostProcessor();
