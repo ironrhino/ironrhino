@@ -31,6 +31,7 @@ public class DefaultAuthenticationManager extends ProviderManager {
 		super(providers);
 	}
 
+	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		String username = authentication.getName();
 		if (StringUtils.isBlank(username))

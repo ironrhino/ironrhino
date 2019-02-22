@@ -206,7 +206,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			list = findListByCriteria(dc);
 		}
 		if (list.size() > 0) {
-			for (final T obj : list)
+			for (T obj : list)
 				checkDelete(obj);
 			for (T obj : list)
 				delete(obj, true);
@@ -538,7 +538,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<T> find(final String queryString, final Object... args) {
+	public List<T> find(String queryString, final Object... args) {
 		Query query = sessionFactory.getCurrentSession().createQuery(queryString);
 		for (int i = 0; i < args.length; i++)
 			query.setParameter(i + 1, args[i]);
@@ -547,7 +547,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<T> find(final String queryString, Map<String, ?> args) {
+	public List<T> find(String queryString, Map<String, ?> args) {
 		Query query = sessionFactory.getCurrentSession().createQuery(queryString);
 		for (Map.Entry<String, ?> entry : args.entrySet())
 			query.setParameter(entry.getKey(), entry.getValue());

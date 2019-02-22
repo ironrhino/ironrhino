@@ -92,7 +92,7 @@ public abstract class RedisTopic<T extends Serializable> implements org.ironrhin
 	}
 
 	@Override
-	public void publish(final T message, Scope scope) {
+	public void publish(T message, Scope scope) {
 		if (scope == null)
 			scope = Scope.GLOBAL;
 		if (scope == Scope.LOCAL) {

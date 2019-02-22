@@ -201,7 +201,7 @@ public class HttpClientUtils {
 		}
 
 		@Override
-		public String handleResponse(final HttpResponse response) throws HttpResponseException, IOException {
+		public String handleResponse(HttpResponse response) throws HttpResponseException, IOException {
 			try {
 				StatusLine statusLine = response.getStatusLine();
 				HttpEntity entity = response.getEntity();

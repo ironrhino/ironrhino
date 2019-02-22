@@ -24,7 +24,7 @@ public class LazyCommitResponseWrapper extends HttpServletResponseWrapper {
 
 	private boolean committed;
 
-	public LazyCommitResponseWrapper(final HttpServletResponse response) {
+	public LazyCommitResponseWrapper(HttpServletResponse response) {
 		super(response);
 	}
 

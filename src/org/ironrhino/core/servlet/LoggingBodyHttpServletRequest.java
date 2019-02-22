@@ -76,27 +76,27 @@ public class LoggingBodyHttpServletRequest extends HttpServletRequestWrapper {
 		}
 
 		@Override
-		public int readLine(final byte[] b, final int off, final int len) throws IOException {
+		public int readLine(byte[] b, final int off, final int len) throws IOException {
 			int count = is.readLine(b, off, len);
 			cache(b, off, count);
 			return count;
 		}
 
 		@Override
-		public int read(final byte[] b) throws IOException {
+		public int read(byte[] b) throws IOException {
 			int count = super.read(b);
 			cachedContent.write(b, 0, count);
 			return count;
 		}
 
 		@Override
-		public int read(final byte[] b, final int off, final int len) throws IOException {
+		public int read(byte[] b, final int off, final int len) throws IOException {
 			int count = is.read(b, off, len);
 			cache(b, off, count);
 			return count;
 		}
 
-		private void cache(final byte[] b, final int off, final int count) {
+		private void cache(byte[] b, final int off, final int count) {
 			cachedContent.write(b, off, count);
 		}
 

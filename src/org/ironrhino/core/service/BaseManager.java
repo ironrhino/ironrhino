@@ -50,7 +50,7 @@ public interface BaseManager<T extends Persistable<?>> {
 
 	public List<T> findListByCriteria(DetachedCriteria dc);
 
-	public List<T> findBetweenListByCriteria(final DetachedCriteria dc, int from, int end);
+	public List<T> findBetweenListByCriteria(DetachedCriteria dc, int from, int end);
 
 	public List<T> findListByCriteria(DetachedCriteria dc, int pageNo, int pageSize);
 

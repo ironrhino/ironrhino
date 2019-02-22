@@ -66,7 +66,7 @@ public class CacheBasedHttpSessionStore implements HttpSessionStore {
 	}
 
 	@Override
-	public void save(final WrappedHttpSession session) {
+	public void save(WrappedHttpSession session) {
 		String sessionString = sessionCompressorManager.compress(session);
 		if (session.isDirty() && StringUtils.isBlank(sessionString)) {
 			cacheManager.delete(session.getId(), CACHE_NAMESPACE);

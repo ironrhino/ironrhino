@@ -28,7 +28,7 @@ public class PageViewHandler extends AccessHandler {
 	private HttpSessionManager httpSessionManager;
 
 	@Override
-	public boolean handle(final HttpServletRequest request, HttpServletResponse response) {
+	public boolean handle(HttpServletRequest request, HttpServletResponse response) {
 		String uri = RequestUtils.getRequestUri(request);
 		if (pageViewService != null && request.getMethod().equalsIgnoreCase("GET")
 				&& !RequestUtils.isInternalTesting(request) && !uri.startsWith("/assets/")

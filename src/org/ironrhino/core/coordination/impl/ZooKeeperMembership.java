@@ -49,7 +49,7 @@ public class ZooKeeperMembership implements Membership {
 	}
 
 	@Override
-	public void join(final String group) throws Exception {
+	public void join(String group) throws Exception {
 		LeaderLatch latch = latchs.computeIfAbsent(group, key -> {
 			LeaderLatch newLatch = new LeaderLatch(curatorFramework, zooKeeperPath + '/' + key,
 					AppInfo.getInstanceId());
@@ -78,7 +78,7 @@ public class ZooKeeperMembership implements Membership {
 	}
 
 	@Override
-	public void leave(final String group) throws Exception {
+	public void leave(String group) throws Exception {
 		LeaderLatch latch = latchs.remove(group);
 		if (latch == null)
 			throw new IllegalStateException("Please join group " + group + " first");

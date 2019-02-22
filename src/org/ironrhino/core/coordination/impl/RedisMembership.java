@@ -103,13 +103,13 @@ public class RedisMembership implements Membership {
 	}
 
 	@Override
-	public void join(final String group) {
+	public void join(String group) {
 		coordinationStringRedisTemplate.opsForList().leftPush(NAMESPACE + group, AppInfo.getInstanceId());
 		groups.add(group);
 	}
 
 	@Override
-	public void leave(final String group) {
+	public void leave(String group) {
 		coordinationStringRedisTemplate.opsForList().remove(NAMESPACE + group, 0, AppInfo.getInstanceId());
 		groups.remove(group);
 	}

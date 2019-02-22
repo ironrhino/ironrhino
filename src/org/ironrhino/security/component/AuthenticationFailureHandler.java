@@ -39,7 +39,7 @@ public class AuthenticationFailureHandler extends DefaultAuthenticationFailureHa
 			save(loginRecord);
 	}
 
-	private void save(final LoginRecord loginRecord) {
+	private void save(LoginRecord loginRecord) {
 		userManager.execute(session -> session.save(loginRecord));
 	}
 }

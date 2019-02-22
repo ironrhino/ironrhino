@@ -48,7 +48,7 @@ public class TotpVerificationCodeChecker implements VerificationCodeChecker {
 
 	public Totp of(UserDetails userDetails) {
 		String identity = userDetails.getUsername() + '@' + key;
-		String secret = Totp.BASE32.encodeToString(CodecUtils.sha256(identity));
+		String secret = Hotp.BASE32.encodeToString(CodecUtils.sha256(identity));
 		return new Totp(secret, digits, period);
 	}
 

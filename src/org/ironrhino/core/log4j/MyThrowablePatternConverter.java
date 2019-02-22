@@ -16,7 +16,7 @@ public class MyThrowablePatternConverter extends ThrowablePatternConverter {
 	}
 
 	@Override
-	public void format(final LogEvent event, final StringBuilder buffer) {
+	public void format(LogEvent event, final StringBuilder buffer) {
 		boolean b = event.getThrown() != null && options.anyLines();
 		if (b)
 			buffer.append('\t');

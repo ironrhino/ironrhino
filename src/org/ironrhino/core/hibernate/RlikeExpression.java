@@ -25,6 +25,7 @@ public class RlikeExpression implements Criterion {
 		this.value = value;
 	}
 
+	@Override
 	public String toSqlString(Criteria criteria, CriteriaQuery criteriaQuery) throws HibernateException {
 		String[] columns = criteriaQuery.getColumnsUsingProjection(criteria, propertyName);
 		if (columns.length != 1)
@@ -44,6 +45,7 @@ public class RlikeExpression implements Criterion {
 					"rlike is not supported with the configured dialect " + dialect.getClass().getCanonicalName());
 	}
 
+	@Override
 	public TypedValue[] getTypedValues(Criteria criteria, CriteriaQuery criteriaQuery) throws HibernateException {
 		return new TypedValue[] { criteriaQuery.getTypedValue(criteria, propertyName, value) };
 	}

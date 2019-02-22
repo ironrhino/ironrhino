@@ -52,7 +52,7 @@ public abstract class MethodInterceptorFactoryBean implements MethodInterceptor,
 	private Validator validator;
 
 	@Override
-	public Object invoke(final MethodInvocation methodInvocation) throws Throwable {
+	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
 		Method method = methodInvocation.getMethod();
 		if (AopUtils.isToStringMethod(methodInvocation.getMethod())) {
 			Class<?> objectType = getObjectType();

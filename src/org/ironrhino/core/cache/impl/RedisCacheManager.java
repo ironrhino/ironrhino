@@ -213,7 +213,7 @@ public class RedisCacheManager implements CacheManager {
 	}
 
 	@Override
-	public void mdelete(final Set<String> keys, final String namespace) {
+	public void mdelete(Set<String> keys, final String namespace) {
 		if (keys == null)
 			return;
 		try {
