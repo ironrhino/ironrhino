@@ -4,11 +4,6 @@
 	xmlns:security="http://www.springframework.org/schema/security"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
 
-	<security:authentication-manager alias="authenticationManager" erase-credentials="true">
-		<security:authentication-provider ref="daoAuthenticationProvider" />
-		<security:authentication-provider ref="rememberMeAuthenticationProvider" />
-	</security:authentication-manager>
-
 	<bean id="accessDecisionManager"
 		class="org.springframework.security.access.vote.AffirmativeBased">
 		<constructor-arg>
@@ -33,8 +28,21 @@
 		p:rememberMeServices-ref="rememberMeServices">
 	</bean>
 	
+	<bean id="authenticationManager"
+		class="org.ironrhino.core.spring.security.DefaultAuthenticationManager">
+		<constructor-arg>
+			<list>
+				<ref bean="daoAuthenticationProvider"/>
+				<ref bean="rememberMeAuthenticationProvider"/>
+			</list>
+		</constructor-arg>
+		<property name="authenticationEventPublisher">
+			<bean class="org.springframework.security.authentication.DefaultAuthenticationEventPublisher"/>
+		</property>
+	</bean>	
+	
 	<bean id="daoAuthenticationProvider"
-		class="org.ironrhino.core.spring.security.DefaultDaoAuthenticationProvider" />	
+		class="org.ironrhino.core.spring.security.DefaultDaoAuthenticationProvider" />
 
 	<bean id="rememberMeAuthenticationProvider"
 		class="org.springframework.security.authentication.RememberMeAuthenticationProvider">
