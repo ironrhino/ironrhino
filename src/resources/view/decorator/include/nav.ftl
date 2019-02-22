@@ -38,4 +38,7 @@
 	  	</ul>
 	</li>
   	</@authorize>
+  	<@authorize ifAnyGranted="ROLE_AUDITOR">
+  	<li><a href="<@url value="${ssoServerBase!}/auditEvent"/>" class="ajax view">${getText('auditEvent')}</a></li>
+  	</@authorize>
 </ul>

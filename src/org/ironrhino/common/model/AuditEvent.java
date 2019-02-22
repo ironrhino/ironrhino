@@ -29,8 +29,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AutoConfig
-@Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
+@AutoConfig(namespace = "/")
+@Authorize(ifAnyGranted = { UserRole.ROLE_ADMINISTRATOR, UserRole.ROLE_AUDITOR })
 @Entity
 @Table(indexes = { @javax.persistence.Index(columnList = "username,date desc") })
 @Searchable
