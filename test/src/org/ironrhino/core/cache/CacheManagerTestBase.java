@@ -144,6 +144,7 @@ public abstract class CacheManagerTestBase {
 		}
 		assertTrue(cacheManager.putIfAbsent(key, value, 2, TimeUnit.SECONDS, NAMESPACE));
 		cacheManager.delete(key, NAMESPACE);
+		assertEquals(0, cacheManager.increment(key, 0, 2, TimeUnit.SECONDS, NAMESPACE));
 		assertEquals(2, cacheManager.increment(key, 2, 2, TimeUnit.SECONDS, NAMESPACE));
 		assertEquals(5, cacheManager.increment(key, 3, 2, TimeUnit.SECONDS, NAMESPACE));
 		assertEquals(4, cacheManager.decrement(key, 1, 2, TimeUnit.SECONDS, NAMESPACE));

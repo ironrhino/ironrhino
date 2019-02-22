@@ -38,17 +38,11 @@ public interface CacheManager {
 	public long increment(String key, long delta, int timeToLive, TimeUnit timeUnit, String namespace);
 
 	public default long decrement(String key, long delta, int timeToLive, TimeUnit timeUnit, String namespace) {
-		if (key == null)
-			throw new IllegalArgumentException("key should not be null");
-		if (delta <= 0)
-			throw new IllegalArgumentException("delta should great than 0");
 		return increment(key, -delta, timeToLive, timeUnit, namespace);
 	}
 
 	public default long decrementAndReturnNonnegative(String key, long delta, int timeToLive, TimeUnit timeUnit,
 			String namespace) {
-		if (key == null)
-			throw new IllegalArgumentException("key should not be null");
 		if (delta <= 0)
 			throw new IllegalArgumentException("delta should great than 0");
 		long result = increment(key, -delta, timeToLive, timeUnit, namespace);

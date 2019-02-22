@@ -151,10 +151,6 @@ public class Cache2kCacheManager implements CacheManager {
 
 	@Override
 	public long increment(String key, long delta, int timeToLive, TimeUnit timeUnit, String namespace) {
-		if (key == null)
-			throw new IllegalArgumentException("key should not be null");
-		if (delta == 0)
-			throw new IllegalArgumentException("delta should not be 0");
 		Cache<String, Object> cache = getCache(namespace, true);
 		CacheEntry<String, Object> ce = cache.invoke(key, e -> {
 			if (e.exists()) {
@@ -174,8 +170,6 @@ public class Cache2kCacheManager implements CacheManager {
 	@Override
 	public long decrementAndReturnNonnegative(String key, long delta, int timeToLive, TimeUnit timeUnit,
 			String namespace) {
-		if (key == null)
-			throw new IllegalArgumentException("key should not be null");
 		if (delta <= 0)
 			throw new IllegalArgumentException("delta should great than 0");
 		Cache<String, Object> cache = getCache(namespace, true);

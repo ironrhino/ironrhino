@@ -238,8 +238,6 @@ public class RedisCacheManager implements CacheManager {
 
 	@Override
 	public long increment(String key, long delta, int timeToLive, TimeUnit timeUnit, String namespace) {
-		if (delta == 0)
-			throw new IllegalArgumentException("delta should not be 0");
 		String actualkey = generateKey(key, namespace);
 		RedisTemplate redisTemplate = findRedisTemplate(namespace);
 		Long result = redisTemplate.opsForValue().increment(actualkey, delta);
