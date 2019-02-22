@@ -8,7 +8,6 @@ import org.ironrhino.core.security.verfication.VerificationCodeGenerator;
 import org.ironrhino.core.security.verfication.VerificationCodeNotifier;
 import org.ironrhino.core.security.verfication.VerificationService;
 import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
-import org.ironrhino.core.throttle.ThrottleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -26,9 +25,6 @@ public class DefaultVerificationService implements VerificationService {
 
 	@Autowired
 	private CacheManager cacheManager;
-
-	@Autowired
-	private ThrottleService throttleService;
 
 	@Autowired
 	private VerificationCodeGenerator verficationCodeGenerator;
@@ -87,7 +83,6 @@ public class DefaultVerificationService implements VerificationService {
 			} else {
 				cacheManager.increment(receiver + SUFFIX_THRESHOLD, 1, expiry, TimeUnit.SECONDS, CACHE_NAMESPACE);
 			}
-			throttleService.delay("verification:" + receiver, verifyInterval, TimeUnit.SECONDS, verifyInterval / 2);
 		} else {
 			cacheManager.delete(receiver, CACHE_NAMESPACE);
 			cacheManager.delete(receiver + SUFFIX_THRESHOLD, CACHE_NAMESPACE);
