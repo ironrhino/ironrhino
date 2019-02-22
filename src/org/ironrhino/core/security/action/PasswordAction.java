@@ -1,8 +1,9 @@
 package org.ironrhino.core.security.action;
 
-import static org.ironrhino.core.security.action.LoginAction.KEY_LOGIN_DEFAULT_TARGET_URL;
 import static org.ironrhino.core.security.action.LoginAction.DEFAULT_VALUE_LOGIN_DEFAULT_TARGET_URL;
+import static org.ironrhino.core.security.action.LoginAction.KEY_LOGIN_DEFAULT_TARGET_URL;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.struts2.ServletActionContext;
@@ -12,7 +13,10 @@ import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.security.event.PasswordChangedEvent;
 import org.ironrhino.core.security.role.UserRole;
+import org.ironrhino.core.security.verfication.VerificationManager;
 import org.ironrhino.core.session.HttpSessionManager;
+import org.ironrhino.core.spring.security.VerificationCodeChecker;
+import org.ironrhino.core.spring.security.WrongVerificationCodeException;
 import org.ironrhino.core.spring.security.password.PasswordMutator;
 import org.ironrhino.core.spring.security.password.PasswordStrengthChecker;
 import org.ironrhino.core.struts.BaseAction;
@@ -49,6 +53,10 @@ public class PasswordAction extends BaseAction {
 	private String confirmPassword;
 
 	@Getter
+	@Setter
+	private String verificationCode;
+
+	@Getter
 	@Value("${user.password.readonly:false}")
 	private boolean userPasswordReadonly;
 
@@ -65,6 +73,13 @@ public class PasswordAction extends BaseAction {
 	@Autowired(required = false)
 	private List<PasswordMutator<?>> passwordMutators;
 
+	@Autowired(required = false)
+	@Getter
+	protected VerificationManager verificationManager;
+
+	@Autowired(required = false)
+	private List<VerificationCodeChecker> verificationCodeCheckers = Collections.emptyList();
+
 	@Autowired
 	protected EventPublisher eventPublisher;
 
@@ -80,6 +95,22 @@ public class PasswordAction extends BaseAction {
 			return ACCESSDENIED;
 		}
 		UserDetails user = AuthzUtils.getUserDetails();
+		if (!verificationCodeCheckers.isEmpty()) {
+			WrongVerificationCodeException ex = null;
+			for (VerificationCodeChecker checker : verificationCodeCheckers) {
+				try {
+					checker.verify(user, null, verificationCode);
+					ex = null;
+					break;
+				} catch (WrongVerificationCodeException e) {
+					ex = e;
+				}
+			}
+			if (ex != null) {
+				addFieldError("verificationCode", getText(WrongVerificationCodeException.class.getName()));
+				return "password";
+			}
+		}
 		if (passwordStrengthChecker != null)
 			passwordStrengthChecker.check(user, password);
 		if (isUserCurrentPasswordNeeded()) {

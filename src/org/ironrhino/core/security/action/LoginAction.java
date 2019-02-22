@@ -21,6 +21,7 @@ import org.ironrhino.core.spring.security.DefaultAuthenticationSuccessHandler;
 import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationFilter;
 import org.ironrhino.core.spring.security.WrongVerificationCodeException;
 import org.ironrhino.core.struts.BaseAction;
+import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.ExceptionUtils;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -173,14 +174,18 @@ public class LoginAction extends BaseAction {
 		String method = ServletActionContext.getRequest().getMethod();
 		if (!method.equalsIgnoreCase("POST")) {
 			addActionError(getText("validation.error"));
-		} else if (verificationManager != null && StringUtils.isNotBlank(username)) {
+			return JSON;
+		}
+		if (StringUtils.isBlank(username))
+			username = AuthzUtils.getUsername();
+		if (verificationManager != null && StringUtils.isNotBlank(username)) {
 			try {
 				verificationManager.send(username);
+				setActionSuccessMessage(getText("send.success"));
 			} catch (AuthenticationException e) {
 				addFieldError("username", getText(e.getClass().getName()));
 			}
 		}
-		setActionSuccessMessage(getText("send.success"));
 		return JSON;
 	}
 

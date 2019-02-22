@@ -21,10 +21,10 @@
 	<div class="hero-unit">
 	<#assign verificationCodeEnabled = (properties['verification.code.enabled']!)=='true'>
 	<#assign verificationCodeRequired = false>
-	<#assign passwordCodeRequired = true>
+	<#assign passwordRequired = true>
 	<#if verificationCodeEnabled && username?has_content>
 		<#assign verificationCodeRequired = verificationManager.isVerificationRequired(username)>
-		<#assign passwordCodeRequired = verificationManager.isPasswordRequired(username)>
+		<#assign passwordRequired = verificationManager.isPasswordRequired(username)>
 	</#if>
 	<#assign totpEnabled = (properties['totp.enabled']!)=='true'>
 	<@s.form id="login" action=actionBaseUrl method="post" class="ajax focus form-horizontal well">
@@ -35,7 +35,7 @@
 		</#if>
 		<@s.textfield name="username" class="required span2${verificationCodeEnabled?then(' conjunct','')}" dynamicAttributes=dynamicAttributes/>
 		<#if verificationCodeEnabled><div id="verification"></#if>
-		<#if passwordCodeRequired>
+		<#if passwordRequired>
 		<@s.password name="password" class="required span2 input-pattern submit sha"/>
 		</#if>
 		<#if verificationCodeRequired || totpEnabled>

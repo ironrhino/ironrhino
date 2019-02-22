@@ -41419,13 +41419,12 @@ Observation._patterninput = function(container) {
 			var data = {};
 			data[userparam] = userinput.val();
 			if (Form.validate(userinput)) {
-				ajax({
+				$.ajax({
 							type : 'POST',
 							url : btn.data('url') || f.prop('action')
 									+ '/sendVerificationCode',
-							target : f[0],
 							data : data,
-							onsuccess : function() {
+							success : function() {
 								var input = f.find('[name="verificationCode"]');
 								Form.clearError(input);
 								input.val('').focus();
