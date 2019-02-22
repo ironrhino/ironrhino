@@ -80,18 +80,14 @@ public class DefaultVerificationService implements VerificationService {
 		boolean verified = verificationCode != null
 				&& verificationCode.equals(cacheManager.get(receiver, CACHE_NAMESPACE));
 		if (!verified) {
-			throttleService.delay("verification:" + receiver, verifyInterval, TimeUnit.SECONDS, verifyInterval / 2);
-			Integer times = (Integer) cacheManager.get(receiver + SUFFIX_THRESHOLD, CACHE_NAMESPACE);
-			if (times == null)
-				times = 1;
-			else
-				times = times + 1;
-			if (times >= maxAttempts) {
+			long times = cacheManager.increment(receiver + SUFFIX_THRESHOLD, 0, 0, TimeUnit.SECONDS, CACHE_NAMESPACE);
+			if (times + 1 >= maxAttempts) {
 				cacheManager.delete(receiver, CACHE_NAMESPACE);
 				cacheManager.delete(receiver + SUFFIX_THRESHOLD, CACHE_NAMESPACE);
 			} else {
-				cacheManager.put(receiver + SUFFIX_THRESHOLD, times, expiry, TimeUnit.SECONDS, CACHE_NAMESPACE);
+				cacheManager.increment(receiver + SUFFIX_THRESHOLD, 1, expiry, TimeUnit.SECONDS, CACHE_NAMESPACE);
 			}
+			throttleService.delay("verification:" + receiver, verifyInterval, TimeUnit.SECONDS, verifyInterval / 2);
 		} else {
 			cacheManager.delete(receiver, CACHE_NAMESPACE);
 			cacheManager.delete(receiver + SUFFIX_THRESHOLD, CACHE_NAMESPACE);
