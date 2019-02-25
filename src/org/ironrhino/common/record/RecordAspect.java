@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -91,8 +92,7 @@ public class RecordAspect implements TransactionSynchronization, Ordered {
 					EntityMetamodel em = pie.getPersister().getEntityMetamodel();
 					String[] propertyNames = em.getPropertyNames();
 					Type[] propertyTypes = em.getPropertyTypes();
-					StringBuilder sb = new StringBuilder();
-					boolean sep = false;
+					StringJoiner sj = new StringJoiner("\n------\n");
 					for (int i = 0; i < propertyNames.length; i++) {
 						if (propertyTypes[i].getName().toLowerCase(Locale.ROOT).endsWith("lob"))
 							continue;
@@ -100,14 +100,13 @@ public class RecordAspect implements TransactionSynchronization, Ordered {
 						if (value == null || value instanceof Collection && ((Collection<?>) value).isEmpty()
 								|| value.getClass().isArray() && Array.getLength(value) == 0)
 							continue;
-						if (sep)
-							sb.append("\n------\n");
-						sb.append(propertyNames[i]);
-						sb.append(": ");
-						sb.append(StringUtils.toString(value));
-						sep = true;
+						StringBuilder line = new StringBuilder();
+						line.append(propertyNames[i]);
+						line.append(": ");
+						line.append(StringUtils.toString(value));
+						sj.add(line);
 					}
-					payload = sb.toString();
+					payload = sj.toString();
 				} else if (event instanceof PostUpdateEvent) {
 					PostUpdateEvent pue = (PostUpdateEvent) event;
 					entity = pue.getEntity();
@@ -120,8 +119,7 @@ public class RecordAspect implements TransactionSynchronization, Ordered {
 					EntityMetamodel em = pue.getPersister().getEntityMetamodel();
 					String[] propertyNames = em.getPropertyNames();
 					Type[] propertyTypes = em.getPropertyTypes();
-					StringBuilder sb = new StringBuilder();
-					boolean sep = false;
+					StringJoiner sj = new StringJoiner("\n------\n");
 					for (int i = 0; i < dirtyProperties.length; i++) {
 						if (propertyTypes[dirtyProperties[i]].getName().toLowerCase(Locale.ROOT).endsWith("lob"))
 							continue;
@@ -159,16 +157,15 @@ public class RecordAspect implements TransactionSynchronization, Ordered {
 								|| newValue instanceof Collection && ((Collection<?>) newValue).isEmpty()
 										&& oldValue == null)
 							continue;
-						if (sep)
-							sb.append("\n------\n");
-						sb.append(propertyName);
-						sb.append(": ");
-						sb.append(StringUtils.toString(oldValue));
-						sb.append(" -> ");
-						sb.append(StringUtils.toString(newValue));
-						sep = true;
+						StringBuilder line = new StringBuilder();
+						line.append(propertyName);
+						line.append(": ");
+						line.append(StringUtils.toString(oldValue));
+						line.append(" -> ");
+						line.append(StringUtils.toString(newValue));
+						sj.add(line);
 					}
-					payload = sb.toString();
+					payload = sj.toString();
 					if (payload.isEmpty())
 						continue;
 				} else if (event instanceof PostDeleteEvent) {

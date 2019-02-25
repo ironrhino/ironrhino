@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.DateUtils;
@@ -121,9 +122,9 @@ public class JobParameterHelper {
 		Map<String, JobParameter> parameters = jobParameters.getParameters();
 		if (parameters == null || parameters.isEmpty())
 			return "{}";
-		StringBuilder sb = new StringBuilder();
-		sb.append("{");
+		StringJoiner sj = new StringJoiner(",", "{", "}");
 		for (Map.Entry<String, JobParameter> entry : parameters.entrySet()) {
+			StringBuilder sb = new StringBuilder();
 			sb.append(entry.getKey()).append("=");
 			Object value = entry.getValue().getValue();
 			if (entry.getValue().getType() == ParameterType.DATE) {
@@ -131,11 +132,9 @@ public class JobParameterHelper {
 			} else {
 				sb.append(value);
 			}
-			sb.append(",");
+			sj.add(sb);
 		}
-		sb.deleteCharAt(sb.length() - 1);
-		sb.append("}");
-		return sb.toString();
+		return sj.toString();
 	}
 
 }
