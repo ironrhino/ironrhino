@@ -52,7 +52,9 @@ import org.ironrhino.core.hibernate.type.YearMonthType;
 import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.ironrhino.core.spring.DefaultPropertiesProvider;
 import org.ironrhino.core.spring.configuration.DataSourceConfiguration;
+import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.ClassScanner;
+import org.ironrhino.core.util.AppInfo.Stage;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -217,6 +219,11 @@ public class SessionFactoryBean extends LocalSessionFactoryBean implements Defau
 			properties.put(AvailableSettings.MULTI_TENANT, MultiTenancyStrategy.SCHEMA);
 
 		properties.put(AvailableSettings.JPA_VALIDATION_FACTORY, validatorFactory);
+
+		if (AppInfo.getStage() != Stage.DEVELOPMENT && "true".equals(properties.get(AvailableSettings.SHOW_SQL))) {
+			log.warn("Remove {} if stage is not development", AvailableSettings.SHOW_SQL);
+			properties.remove(AvailableSettings.SHOW_SQL);
+		}
 
 		if (dataSourceConfiguration != null && dataSourceConfiguration.isEnableMigrations()) {
 			String key = AvailableSettings.HBM2DDL_AUTO;
