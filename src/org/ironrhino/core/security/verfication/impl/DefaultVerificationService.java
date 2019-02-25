@@ -76,12 +76,11 @@ public class DefaultVerificationService implements VerificationService {
 		boolean verified = verificationCode != null
 				&& verificationCode.equals(cacheManager.get(receiver, CACHE_NAMESPACE));
 		if (!verified) {
-			long times = cacheManager.increment(receiver + SUFFIX_THRESHOLD, 0, 0, TimeUnit.SECONDS, CACHE_NAMESPACE);
-			if (times + 1 >= maxAttempts) {
+			long times = cacheManager.increment(receiver + SUFFIX_THRESHOLD, 1, expiry, TimeUnit.SECONDS,
+					CACHE_NAMESPACE);
+			if (times >= maxAttempts) {
 				cacheManager.delete(receiver, CACHE_NAMESPACE);
 				cacheManager.delete(receiver + SUFFIX_THRESHOLD, CACHE_NAMESPACE);
-			} else {
-				cacheManager.increment(receiver + SUFFIX_THRESHOLD, 1, expiry, TimeUnit.SECONDS, CACHE_NAMESPACE);
 			}
 		} else {
 			cacheManager.delete(receiver, CACHE_NAMESPACE);
