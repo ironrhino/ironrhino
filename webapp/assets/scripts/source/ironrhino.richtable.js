@@ -1,7 +1,7 @@
 Richtable = {
 	getBaseUrl : function(form) {
 		form = form || $('form.richtable');
-		url = form.data('actionbaseurl') || form.prop('action');
+		url = form.data('actionbaseurl') || form.formAction();
 		var p = url.indexOf('?');
 		if (p > 0)
 			url = url.substring(0, p);
@@ -43,7 +43,7 @@ Richtable = {
 			}
 		}
 		if (includeParams) {
-			var action = form.prop('action');
+			var action = form.formAction();
 			var qs = '';
 			var index = action.indexOf('?');
 			if (index > -1)
@@ -73,7 +73,7 @@ Richtable = {
 			if (entity) {
 				entity = entity.substring(0, entity.indexOf('.'));
 			} else {
-				entity = form.prop('action');
+				entity = form.formAction();
 				entity = entity.substring(entity.lastIndexOf('/') + 1);
 			}
 		}
@@ -145,7 +145,7 @@ Richtable = {
 									});
 						}
 					}
-					var action = inputform.prop('action');
+					var action = inputform.formAction();
 					if (action.indexOf('http') != 0 && action.indexOf('/') != 0) {
 						action = pathname
 								+ (pathname.indexOf('/') == (pathname.length - 1)
@@ -701,7 +701,7 @@ Initialization.richtable = function() {
 							return parseInt(v) + 1
 						});
 				$.ajax({
-					url : form.prop('action'),
+					url : form.formAction(),
 					type : form.attr('method'),
 					data : form.serialize(),
 					success : function(data) {
@@ -816,7 +816,7 @@ Observation._richtable = function(container) {
 		var t = $(this);
 		var form = t.next('form.richtable');
 		if (form.length) {
-			t.prop('action', form.prop('action')).attr('data-replacement',
+			t.attr('action', form.formAction()).attr('data-replacement',
 					form.attr('id'));
 			$(':reset', t).click(function(e) {
 						$('.remove', t).click();
@@ -830,9 +830,9 @@ Observation._richtable = function(container) {
 		var t = $(this);
 		var form = t.prev('form.richtable');
 		var entity = Richtable.getEntityName(form);
-		t.prop('action', form.prop('action')).attr('data-replacement',
+		t.attr('action', form.formAction()).attr('data-replacement',
 				form.attr('id'));
-		var qs = t.prop('action');
+		var qs = t.formAction();
 		var index = qs.indexOf('?');
 		qs = index > -1 ? qs.substring(index + 1) : '';
 		if (qs) {
@@ -1024,7 +1024,7 @@ Observation._richtable = function(container) {
 		var maximum = t.data('maximum') || 10;
 		maxsize = maxsize ? parseInt(maxsize) : 15 * 1024 * 1024;
 		if (!url) {
-			var action = f.prop('action');
+			var action = f.formAction();
 			var abu = f.data('actionbaseurl');
 			var i = action.indexOf('?');
 			if (abu) {

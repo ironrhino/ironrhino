@@ -266,7 +266,7 @@ Observation.form = function(container) {
 		var t = $(this);
 		var f = $(this).closest('form');
 		var data = {};
-		var url = f.prop('action');
+		var url = f.formAction();
 		if (url.indexOf('/') > -1) {
 			if (url.substring(url.lastIndexOf('/') + 1) == 'save')
 				url = url.substring(0, url.lastIndexOf('/')) + '/input';

@@ -5,7 +5,7 @@
 			var t = $(this);
 			var folder = t.data('folder');
 			if (!folder) {
-				var action = t.prop('action');
+				var action = t.formAction();
 				var index = action.lastIndexOf('/');
 				if (index > 0 && action.substring(index + 1) == 'save') {
 					action = action.substring(0, index);

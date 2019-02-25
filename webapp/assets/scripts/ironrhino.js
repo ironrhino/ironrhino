@@ -31697,6 +31697,17 @@ MessageBundle = {
 			return value.startsWith(suffix, value.length - suffix.length);
 		};
 	}
+	$.fn.formAction = function() {
+		var t = $(this);
+		if (!t.is('form'))
+			return undefined;
+		var action = t.prop('action');
+		if (typeof action != 'string') {
+			// an input named as 'action'
+			action = t.attr('action') || window.location.pathname;
+		}
+		return action;
+	};
 	$.setClipboard = function(content) {
 		var input = document.createElement('textarea');
 		input.value = content;
@@ -33066,7 +33077,7 @@ Observation.common = function(container) {
 		var target = this;
 		if ($(target).is('form')) {
 			var _opt = ajaxOptions({
-						url : this.action,
+						url : $(target).formAction(),
 						target : target
 					});
 			var options = {
@@ -33091,7 +33102,7 @@ Observation.common = function(container) {
 							|| form.parents('.ui-dialog,.tab-content').length)
 						pushstate = false;
 					if (pushstate && HISTORY_ENABLED) {
-						var url = form.prop('action');
+						var url = form.formAction();
 						var index = url.indexOf('://');
 						if (index > -1) {
 							url = url.substring(index + 3);
@@ -33664,7 +33675,7 @@ DateUtils = {
 	$.fn.ajaxsubmit = function(options) {
 
 		var url = this.find('.clicked:submit').attr('formaction')
-				|| this.prop('action') || window.location.pathname;
+				|| this.formAction();
 
 		options = $.extend(true, {
 					url : url,
@@ -33870,7 +33881,7 @@ DateUtils = {
 						}
 						var url = t.data('checkurl');
 						if (!url) {
-							url = t.closest('form').prop('action');
+							url = t.closest('form').formAction();
 							url = url.substring(0, url.lastIndexOf('/'))
 									+ '/checkavailable';
 						}
@@ -35681,7 +35692,7 @@ Initialization.upload = function() {
 	$(document).on('click', '#files button.reload', function() {
 				ajax({
 							type : $('#upload_form').attr('method'),
-							url : $('#upload_form').prop('action'),
+							url : $('#upload_form').formAction(),
 							data : $('#upload_form').serialize(),
 							replacement : 'files'
 						});
@@ -35692,7 +35703,7 @@ Initialization.upload = function() {
 			callback : function(t) {
 				if (t) {
 					var folder = $('#current_folder').text() + t;
-					var url = $('#upload_form').prop('action');
+					var url = $('#upload_form').formAction();
 					if (!url)
 						url = CONTEXT_PATH + '/common/upload';
 					url += '/mkdir' + encodeURI(folder);
@@ -35704,7 +35715,7 @@ Initialization.upload = function() {
 									$('#files button.reload').click();
 									if (typeof history.pushState != 'undefined') {
 										var url = $('#upload_form')
-												.prop('action');
+												.formAction();
 										if (!url)
 											url = CONTEXT_PATH
 													+ '/common/upload';
@@ -35831,7 +35842,7 @@ Observation.upload = function(container) {
 		var oldvalue = $(this).data('oldvalue');
 		var newvalue = $(this).text();
 		if (oldvalue != newvalue) {
-			var url = $('#upload_form').prop('action');
+			var url = $('#upload_form').formAction();
 			if (!url)
 				url = CONTEXT_PATH + '/common/upload';
 			url += '/rename/' + encodeURI(oldvalue);
@@ -35876,7 +35887,7 @@ Observation.upload = function(container) {
 
 function deleteFiles(file) {
 	var func = function() {
-		var url = $('#upload_form').prop('action');
+		var url = $('#upload_form').formAction();
 		if (!url)
 			url = CONTEXT_PATH + '/common/upload';
 		url += '/delete';
@@ -35930,7 +35941,7 @@ function uploadFiles(files, filenames) {
 					data[this.name] = this.value;
 				});
 		return $.ajaxupload(files, ajaxOptions({
-							url : f.prop('action'),
+							url : f.formAction(),
 							name : f.find('input[type="file"]').attr('name'),
 							data : data,
 							replacement : 'files'
@@ -36556,7 +36567,7 @@ Observation.form = function(container) {
 		var t = $(this);
 		var f = $(this).closest('form');
 		var data = {};
-		var url = f.prop('action');
+		var url = f.formAction();
 		if (url.indexOf('/') > -1) {
 			if (url.substring(url.lastIndexOf('/') + 1) == 'save')
 				url = url.substring(0, url.lastIndexOf('/')) + '/input';
@@ -38010,7 +38021,7 @@ Observation.popwindow = function(container) {
 Richtable = {
 	getBaseUrl : function(form) {
 		form = form || $('form.richtable');
-		url = form.data('actionbaseurl') || form.prop('action');
+		url = form.data('actionbaseurl') || form.formAction();
 		var p = url.indexOf('?');
 		if (p > 0)
 			url = url.substring(0, p);
@@ -38052,7 +38063,7 @@ Richtable = {
 			}
 		}
 		if (includeParams) {
-			var action = form.prop('action');
+			var action = form.formAction();
 			var qs = '';
 			var index = action.indexOf('?');
 			if (index > -1)
@@ -38082,7 +38093,7 @@ Richtable = {
 			if (entity) {
 				entity = entity.substring(0, entity.indexOf('.'));
 			} else {
-				entity = form.prop('action');
+				entity = form.formAction();
 				entity = entity.substring(entity.lastIndexOf('/') + 1);
 			}
 		}
@@ -38154,7 +38165,7 @@ Richtable = {
 									});
 						}
 					}
-					var action = inputform.prop('action');
+					var action = inputform.formAction();
 					if (action.indexOf('http') != 0 && action.indexOf('/') != 0) {
 						action = pathname
 								+ (pathname.indexOf('/') == (pathname.length - 1)
@@ -38710,7 +38721,7 @@ Initialization.richtable = function() {
 							return parseInt(v) + 1
 						});
 				$.ajax({
-					url : form.prop('action'),
+					url : form.formAction(),
 					type : form.attr('method'),
 					data : form.serialize(),
 					success : function(data) {
@@ -38825,7 +38836,7 @@ Observation._richtable = function(container) {
 		var t = $(this);
 		var form = t.next('form.richtable');
 		if (form.length) {
-			t.prop('action', form.prop('action')).attr('data-replacement',
+			t.attr('action', form.formAction()).attr('data-replacement',
 					form.attr('id'));
 			$(':reset', t).click(function(e) {
 						$('.remove', t).click();
@@ -38839,9 +38850,9 @@ Observation._richtable = function(container) {
 		var t = $(this);
 		var form = t.prev('form.richtable');
 		var entity = Richtable.getEntityName(form);
-		t.prop('action', form.prop('action')).attr('data-replacement',
+		t.attr('action', form.formAction()).attr('data-replacement',
 				form.attr('id'));
-		var qs = t.prop('action');
+		var qs = t.formAction();
 		var index = qs.indexOf('?');
 		qs = index > -1 ? qs.substring(index + 1) : '';
 		if (qs) {
@@ -39033,7 +39044,7 @@ Observation._richtable = function(container) {
 		var maximum = t.data('maximum') || 10;
 		maxsize = maxsize ? parseInt(maxsize) : 15 * 1024 * 1024;
 		if (!url) {
-			var action = f.prop('action');
+			var action = f.formAction();
 			var abu = f.data('actionbaseurl');
 			var i = action.indexOf('?');
 			if (abu) {
@@ -39426,7 +39437,7 @@ if (window.FileReader)
 			var t = $(this);
 			var folder = t.data('folder');
 			if (!folder) {
-				var action = t.prop('action');
+				var action = t.formAction();
 				var index = action.lastIndexOf('/');
 				if (index > 0 && action.substring(index + 1) == 'save') {
 					action = action.substring(0, index);
@@ -41421,7 +41432,7 @@ Observation._patterninput = function(container) {
 			if (Form.validate(userinput)) {
 				$.ajax({
 							type : 'POST',
-							url : btn.data('url') || f.prop('action')
+							url : btn.data('url') || f.formAction()
 									+ '/sendVerificationCode',
 							data : data,
 							success : function() {

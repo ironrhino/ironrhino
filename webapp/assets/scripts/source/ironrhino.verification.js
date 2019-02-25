@@ -59,7 +59,7 @@
 			if (Form.validate(userinput)) {
 				$.ajax({
 							type : 'POST',
-							url : btn.data('url') || f.prop('action')
+							url : btn.data('url') || f.formAction()
 									+ '/sendVerificationCode',
 							data : data,
 							success : function() {

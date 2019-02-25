@@ -3,7 +3,7 @@
 	$.fn.ajaxsubmit = function(options) {
 
 		var url = this.find('.clicked:submit').attr('formaction')
-				|| this.prop('action') || window.location.pathname;
+				|| this.formAction();
 
 		options = $.extend(true, {
 					url : url,

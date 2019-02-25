@@ -34,6 +34,17 @@
 			return value.startsWith(suffix, value.length - suffix.length);
 		};
 	}
+	$.fn.formAction = function() {
+		var t = $(this);
+		if (!t.is('form'))
+			return undefined;
+		var action = t.prop('action');
+		if (typeof action != 'string') {
+			// an input named as 'action'
+			action = t.attr('action') || window.location.pathname;
+		}
+		return action;
+	};
 	$.setClipboard = function(content) {
 		var input = document.createElement('textarea');
 		input.value = content;
@@ -1403,7 +1414,7 @@ Observation.common = function(container) {
 		var target = this;
 		if ($(target).is('form')) {
 			var _opt = ajaxOptions({
-						url : this.action,
+						url : $(target).formAction(),
 						target : target
 					});
 			var options = {
@@ -1428,7 +1439,7 @@ Observation.common = function(container) {
 							|| form.parents('.ui-dialog,.tab-content').length)
 						pushstate = false;
 					if (pushstate && HISTORY_ENABLED) {
-						var url = form.prop('action');
+						var url = form.formAction();
 						var index = url.indexOf('://');
 						if (index > -1) {
 							url = url.substring(index + 3);

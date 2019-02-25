@@ -20,7 +20,7 @@
 						}
 						var url = t.data('checkurl');
 						if (!url) {
-							url = t.closest('form').prop('action');
+							url = t.closest('form').formAction();
 							url = url.substring(0, url.lastIndexOf('/'))
 									+ '/checkavailable';
 						}

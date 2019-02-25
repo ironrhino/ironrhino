@@ -2,7 +2,7 @@ Initialization.upload = function() {
 	$(document).on('click', '#files button.reload', function() {
 				ajax({
 							type : $('#upload_form').attr('method'),
-							url : $('#upload_form').prop('action'),
+							url : $('#upload_form').formAction(),
 							data : $('#upload_form').serialize(),
 							replacement : 'files'
 						});
@@ -13,7 +13,7 @@ Initialization.upload = function() {
 			callback : function(t) {
 				if (t) {
 					var folder = $('#current_folder').text() + t;
-					var url = $('#upload_form').prop('action');
+					var url = $('#upload_form').formAction();
 					if (!url)
 						url = CONTEXT_PATH + '/common/upload';
 					url += '/mkdir' + encodeURI(folder);
@@ -25,7 +25,7 @@ Initialization.upload = function() {
 									$('#files button.reload').click();
 									if (typeof history.pushState != 'undefined') {
 										var url = $('#upload_form')
-												.prop('action');
+												.formAction();
 										if (!url)
 											url = CONTEXT_PATH
 													+ '/common/upload';
@@ -152,7 +152,7 @@ Observation.upload = function(container) {
 		var oldvalue = $(this).data('oldvalue');
 		var newvalue = $(this).text();
 		if (oldvalue != newvalue) {
-			var url = $('#upload_form').prop('action');
+			var url = $('#upload_form').formAction();
 			if (!url)
 				url = CONTEXT_PATH + '/common/upload';
 			url += '/rename/' + encodeURI(oldvalue);
@@ -197,7 +197,7 @@ Observation.upload = function(container) {
 
 function deleteFiles(file) {
 	var func = function() {
-		var url = $('#upload_form').prop('action');
+		var url = $('#upload_form').formAction();
 		if (!url)
 			url = CONTEXT_PATH + '/common/upload';
 		url += '/delete';
@@ -251,7 +251,7 @@ function uploadFiles(files, filenames) {
 					data[this.name] = this.value;
 				});
 		return $.ajaxupload(files, ajaxOptions({
-							url : f.prop('action'),
+							url : f.formAction(),
 							name : f.find('input[type="file"]').attr('name'),
 							data : data,
 							replacement : 'files'
