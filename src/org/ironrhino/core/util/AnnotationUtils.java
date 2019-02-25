@@ -24,15 +24,16 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
+import lombok.Data;
 import lombok.experimental.UtilityClass;
 
 @SuppressWarnings("unchecked")
 @UtilityClass
 public class AnnotationUtils {
 
-	private static Map<String, Set<Method>> annotatedMethodsCache = new ConcurrentHashMap<>(64);
-	private static Map<String, Set<String>> annotatedPropertyNamesCache = new ConcurrentHashMap<>(64);
-	private static Map<String, Map<String, ? extends Annotation>> annotatedPropertyNameAndAnnotationsCache = new ConcurrentHashMap<>(
+	private static Map<Key, Set<Method>> annotatedMethodsCache = new ConcurrentHashMap<>(64);
+	private static Map<Key, Set<String>> annotatedPropertyNamesCache = new ConcurrentHashMap<>(64);
+	private static Map<Key, Map<String, ? extends Annotation>> annotatedPropertyNameAndAnnotationsCache = new ConcurrentHashMap<>(
 			64);
 
 	private static ValueThenKeyComparator<Method, Integer> comparator = new ValueThenKeyComparator<Method, Integer>() {
@@ -42,21 +43,17 @@ public class AnnotationUtils {
 		}
 	};
 
-	public static Method getAnnotatedMethod(Class<?> clazz, Class<? extends Annotation> annotaionClass) {
+	public static Method getAnnotatedMethod(Class<?> clazz, Class<? extends Annotation> annotationClass) {
 		clazz = ReflectionUtils.getActualClass(clazz);
-		Iterator<Method> it = getAnnotatedMethods(clazz, annotaionClass).iterator();
+		Iterator<Method> it = getAnnotatedMethods(clazz, annotationClass).iterator();
 		if (it.hasNext())
 			return it.next();
 		return null;
 	}
 
-	public static Set<Method> getAnnotatedMethods(Class<?> clazz, Class<? extends Annotation> annotaionClass) {
+	public static Set<Method> getAnnotatedMethods(Class<?> clazz, Class<? extends Annotation> annotationClass) {
 		clazz = ReflectionUtils.getActualClass(clazz);
-		StringBuilder sb = new StringBuilder();
-		sb.append(clazz.getName());
-		sb.append(',');
-		sb.append(annotaionClass.getName());
-		String key = sb.toString();
+		Key key = new Key(clazz, annotationClass);
 		Set<Method> methods = annotatedMethodsCache.get(key);
 		if (methods == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
 			final Map<Method, Integer> map = new HashMap<Method, Integer>();
@@ -64,7 +61,7 @@ public class AnnotationUtils {
 				for (Method m : clazz.getMethods()) {
 					// public methods include default methods on interface or
 					// super class
-					if (m.getAnnotation(annotaionClass) != null) {
+					if (m.getAnnotation(annotationClass) != null) {
 						int mod = m.getModifiers();
 						if (Modifier.isStatic(mod) || Modifier.isAbstract(mod))
 							continue;
@@ -75,7 +72,7 @@ public class AnnotationUtils {
 				for (Class<?> c = clazz; c != Object.class; c = c.getSuperclass()) {
 					for (Method m : c.getDeclaredMethods()) {
 						// protected and private methods on super class
-						if (m.getAnnotation(annotaionClass) != null) {
+						if (m.getAnnotation(annotationClass) != null) {
 							int mod = m.getModifiers();
 							if (Modifier.isStatic(mod) || Modifier.isAbstract(mod) || Modifier.isPublic(mod))
 								continue;
@@ -99,13 +96,9 @@ public class AnnotationUtils {
 		return methods;
 	}
 
-	public static Set<String> getAnnotatedPropertyNames(Class<?> clazz, Class<? extends Annotation> annotaionClass) {
+	public static Set<String> getAnnotatedPropertyNames(Class<?> clazz, Class<? extends Annotation> annotationClass) {
 		clazz = ReflectionUtils.getActualClass(clazz);
-		StringBuilder sb = new StringBuilder();
-		sb.append(clazz.getName());
-		sb.append(',');
-		sb.append(annotaionClass.getName());
-		String key = sb.toString();
+		Key key = new Key(clazz, annotationClass);
 		Set<String> set = annotatedPropertyNamesCache.get(key);
 		if (set == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
 			set = new HashSet<>();
@@ -113,12 +106,12 @@ public class AnnotationUtils {
 				for (Class<?> cls = clazz; cls != Object.class; cls = cls.getSuperclass()) {
 					Field[] fs = cls.getDeclaredFields();
 					for (Field f : fs)
-						if (f.getAnnotation(annotaionClass) != null)
+						if (f.getAnnotation(annotationClass) != null)
 							set.add(f.getName());
 				}
 				PropertyDescriptor[] pds = Introspector.getBeanInfo(clazz).getPropertyDescriptors();
 				for (PropertyDescriptor pd : pds)
-					if (pd.getReadMethod() != null && pd.getReadMethod().getAnnotation(annotaionClass) != null)
+					if (pd.getReadMethod() != null && pd.getReadMethod().getAnnotation(annotationClass) != null)
 						set.add(pd.getName());
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -131,12 +124,12 @@ public class AnnotationUtils {
 
 	@SafeVarargs
 	public static Map<String, Object> getAnnotatedPropertyNameAndValues(Object object,
-			Class<? extends Annotation>... annotaionClass) {
-		if (annotaionClass.length == 0)
+			Class<? extends Annotation>... annotationClass) {
+		if (annotationClass.length == 0)
 			return Collections.emptyMap();
 		Map<String, Object> map = new HashMap<String, Object>();
 		Set<String> propertyNames = new HashSet<>();
-		for (Class<? extends Annotation> clz : annotaionClass)
+		for (Class<? extends Annotation> clz : annotationClass)
 			propertyNames.addAll(getAnnotatedPropertyNames(object.getClass(), clz));
 		BeanWrapperImpl bw = new BeanWrapperImpl(object);
 		try {
@@ -150,13 +143,9 @@ public class AnnotationUtils {
 	}
 
 	public static <T extends Annotation> Map<String, T> getAnnotatedPropertyNameAndAnnotations(Class<?> clazz,
-			Class<T> annotaionClass) {
+			Class<T> annotationClass) {
 		clazz = ReflectionUtils.getActualClass(clazz);
-		StringBuilder sb = new StringBuilder();
-		sb.append(clazz.getName());
-		sb.append(',');
-		sb.append(annotaionClass.getName());
-		String key = sb.toString();
+		Key key = new Key(clazz, annotationClass);
 		Map<String, T> map = (Map<String, T>) annotatedPropertyNameAndAnnotationsCache.get(key);
 		if (map == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
 			map = new HashMap<String, T>();
@@ -164,13 +153,13 @@ public class AnnotationUtils {
 				for (Class<?> cls = clazz; cls != Object.class; cls = cls.getSuperclass()) {
 					Field[] fs = cls.getDeclaredFields();
 					for (Field f : fs)
-						if (f.getAnnotation(annotaionClass) != null)
-							map.put(f.getName(), f.getAnnotation(annotaionClass));
+						if (f.getAnnotation(annotationClass) != null)
+							map.put(f.getName(), f.getAnnotation(annotationClass));
 				}
 				PropertyDescriptor[] pds = Introspector.getBeanInfo(clazz).getPropertyDescriptors();
 				for (PropertyDescriptor pd : pds)
-					if (pd.getReadMethod() != null && pd.getReadMethod().getAnnotation(annotaionClass) != null)
-						map.put(pd.getName(), pd.getReadMethod().getAnnotation(annotaionClass));
+					if (pd.getReadMethod() != null && pd.getReadMethod().getAnnotation(annotationClass) != null)
+						map.put(pd.getName(), pd.getReadMethod().getAnnotation(annotationClass));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -214,6 +203,12 @@ public class AnnotationUtils {
 		if (r == null)
 			return null;
 		return r.value();
+	}
+
+	@Data
+	private static final class Key {
+		private final Class<?> clazz;
+		private final Class<? extends Annotation> annotationClass;
 	}
 
 }
