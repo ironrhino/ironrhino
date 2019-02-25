@@ -430,7 +430,7 @@ public class AppInfo {
 		if (System.getProperty("console.logger.level") == null)
 			System.setProperty("console.logger.level", AppInfo.getStage() == Stage.PRODUCTION
 					&& (System.getProperty("os.name") == null || !System.getProperty("os.name").startsWith("Windows"))
-							? "ERROR"
+							? "WARN"
 							: "INFO");
 		String kafkaBootstrapServers = getRawApplicationContextProperties().getProperty("kafka.bootstrap.servers");
 		if (StringUtils.isNotBlank(kafkaBootstrapServers))
