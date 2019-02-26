@@ -1,5 +1,6 @@
 package org.ironrhino.core.security.verfication.impl;
 
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import org.ironrhino.core.cache.CacheManager;
@@ -79,12 +80,10 @@ public class DefaultVerificationService implements VerificationService {
 			long times = cacheManager.increment(receiver + SUFFIX_THRESHOLD, 1, expiry, TimeUnit.SECONDS,
 					CACHE_NAMESPACE);
 			if (times >= maxAttempts) {
-				cacheManager.delete(receiver, CACHE_NAMESPACE);
-				cacheManager.delete(receiver + SUFFIX_THRESHOLD, CACHE_NAMESPACE);
+				cacheManager.mdelete(Arrays.asList(receiver, receiver + SUFFIX_THRESHOLD), CACHE_NAMESPACE);
 			}
 		} else {
-			cacheManager.delete(receiver, CACHE_NAMESPACE);
-			cacheManager.delete(receiver + SUFFIX_THRESHOLD, CACHE_NAMESPACE);
+			cacheManager.mdelete(Arrays.asList(receiver, receiver + SUFFIX_THRESHOLD), CACHE_NAMESPACE);
 		}
 		return verified;
 	}

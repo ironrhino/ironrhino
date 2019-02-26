@@ -2,6 +2,7 @@ package org.ironrhino.common.service;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -11,7 +12,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.common.util.Location;
@@ -19,6 +19,7 @@ import org.ironrhino.common.util.LocationUtils;
 import org.ironrhino.core.metadata.Trigger;
 import org.ironrhino.core.model.Tuple;
 import org.ironrhino.core.spring.configuration.PriorityQualifier;
+import org.ironrhino.core.throttle.Mutex;
 import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -248,46 +249,36 @@ public class PageViewServiceImpl implements PageViewService {
 	}
 
 	@Trigger
+	@Mutex
 	@Scheduled(cron = "${pageViewService.archive.cron:0 5 0 * * ?}")
 	public void archive() {
 		if (pageViewStringRedisTemplate == null)
 			return;
-		String lockName = "lock:pageViewService.archive()";
-		Boolean b = pageViewStringRedisTemplate.opsForValue().setIfAbsent(lockName, "");
-		if (b == null)
-			throw new RuntimeException("Unexpected null");
-		if (b)
-			try {
-				pageViewStringRedisTemplate.expire(lockName, 5, TimeUnit.MINUTES);
-				Calendar cal = Calendar.getInstance();
-				cal.add(Calendar.DAY_OF_YEAR, -1);
-				Date yesterday = cal.getTime();
-				String day = DateUtils.formatDate8(yesterday);
-				pageViewStringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append("uip:").append(day)
-						.append(KEY_HYPERLOGLOG_SUFFIX).toString());
-				pageViewStringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append("usid:").append(day)
-						.append(KEY_HYPERLOGLOG_SUFFIX).toString());
-				pageViewStringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append("uu:").append(day)
-						.append(KEY_HYPERLOGLOG_SUFFIX).toString());
-				updateMax(day, "pv", null);
-				updateMax(day, "uip", null);
-				updateMax(day, "usid", null);
-				updateMax(day, "uu", null);
-				for (String domain : getDomains()) {
-					pageViewStringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append(domain).append(":")
-							.append("uip:").append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
-					pageViewStringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append(domain).append(":")
-							.append("usid:").append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
-					pageViewStringRedisTemplate.delete(new StringBuilder(KEY_PAGE_VIEW).append(domain).append(":")
-							.append("uu:").append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString());
-					updateMax(day, "pv", domain);
-					updateMax(day, "uip", domain);
-					updateMax(day, "usid", domain);
-					updateMax(day, "uu", domain);
-				}
-			} finally {
-				pageViewStringRedisTemplate.delete(lockName);
-			}
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.DAY_OF_YEAR, -1);
+		Date yesterday = cal.getTime();
+		String day = DateUtils.formatDate8(yesterday);
+		pageViewStringRedisTemplate.delete(Arrays.asList(
+				new StringBuilder(KEY_PAGE_VIEW).append("uip:").append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString(),
+				new StringBuilder(KEY_PAGE_VIEW).append("usid:").append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString(),
+				new StringBuilder(KEY_PAGE_VIEW).append("uu:").append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString()));
+		updateMax(day, "pv", null);
+		updateMax(day, "uip", null);
+		updateMax(day, "usid", null);
+		updateMax(day, "uu", null);
+		for (String domain : getDomains()) {
+			pageViewStringRedisTemplate.delete(Arrays.asList(
+					new StringBuilder(KEY_PAGE_VIEW).append(domain).append(":").append("uip:").append(day)
+							.append(KEY_HYPERLOGLOG_SUFFIX).toString(),
+					new StringBuilder(KEY_PAGE_VIEW).append(domain).append(":").append("usid:").append(day)
+							.append(KEY_HYPERLOGLOG_SUFFIX).toString(),
+					new StringBuilder(KEY_PAGE_VIEW).append(domain).append(":").append("uu:").append(day)
+							.append(KEY_HYPERLOGLOG_SUFFIX).toString()));
+			updateMax(day, "pv", domain);
+			updateMax(day, "uip", domain);
+			updateMax(day, "usid", domain);
+			updateMax(day, "uu", domain);
+		}
 	}
 
 	private boolean addUnique(String day, String type, final String value, String domain) {
