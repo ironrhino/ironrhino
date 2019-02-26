@@ -3,12 +3,12 @@ package org.ironrhino.core.cache.impl;
 import static org.ironrhino.core.metadata.Profiles.CLOUD;
 import static org.ironrhino.core.metadata.Profiles.DUAL;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -192,7 +192,7 @@ public class RedisCacheManager implements CacheManager {
 	}
 
 	@Override
-	public Map<String, Object> mget(Set<String> keys, String namespace) {
+	public Map<String, Object> mget(Collection<String> keys, String namespace) {
 		if (keys == null)
 			return null;
 		keys = keys.stream().filter(StringUtils::isNotBlank).collect(Collectors.toCollection(HashSet::new));
@@ -213,7 +213,7 @@ public class RedisCacheManager implements CacheManager {
 	}
 
 	@Override
-	public void mdelete(Set<String> keys, final String namespace) {
+	public void mdelete(Collection<String> keys, final String namespace) {
 		if (keys == null)
 			return;
 		try {

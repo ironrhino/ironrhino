@@ -2,9 +2,9 @@ package org.ironrhino.core.cache.impl;
 
 import static org.ironrhino.core.metadata.Profiles.DEFAULT;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -117,7 +117,7 @@ public class Cache2kCacheManager implements CacheManager {
 	}
 
 	@Override
-	public Map<String, Object> mget(Set<String> keys, String namespace) {
+	public Map<String, Object> mget(Collection<String> keys, String namespace) {
 		if (keys == null)
 			return null;
 		Cache<String, Object> cache = getCache(namespace, false);
@@ -128,7 +128,7 @@ public class Cache2kCacheManager implements CacheManager {
 	}
 
 	@Override
-	public void mdelete(Set<String> keys, String namespace) {
+	public void mdelete(Collection<String> keys, String namespace) {
 		if (keys == null)
 			return;
 		Cache<String, Object> cache = getCache(namespace, false);
