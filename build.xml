@@ -86,12 +86,14 @@
 	</target>
 
 	<import file="build.jar.xml" />
+	<import file="build.sources.xml" />
 
 	<import file="build.compress.xml" />
 
 	<target name="dist">
 		<antcall target="compile" />
 		<antcall target="jar" />
+		<antcall target="jar-sources" />
 	</target>
 
 	<import file="build.create.xml" />
