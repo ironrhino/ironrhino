@@ -43,8 +43,9 @@
 +snakeyaml
 +jackson-module-mrbean
 +jackson-dataformat-smile
-+resilience4j-core
-+resilience4j-circuitbreaker
++resilience4j-all
+-resilience4j-core
+-resilience4j-circuitbreaker
 +micrometer-core
 +micrometer-registry-influx
 +micrometer-registry-prometheus
