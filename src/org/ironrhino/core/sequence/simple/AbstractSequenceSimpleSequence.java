@@ -32,29 +32,30 @@ public abstract class AbstractSequenceSimpleSequence extends AbstractDatabaseSim
 	public void afterPropertiesSet() {
 		try (Connection conn = getDataSource().getConnection(); Statement stmt = conn.createStatement()) {
 			conn.setAutoCommit(true);
-			DatabaseMetaData dbmd = conn.getMetaData();
-			boolean sequenceExists = false;
-			String sequenceName = getActualSequenceName();
-			String catalog = conn.getCatalog();
-			String schema = null;
-			try {
-				schema = conn.getSchema();
-			} catch (Throwable t) {
-			}
-			for (String sequence : new LinkedHashSet<>(Arrays.asList(sequenceName.toUpperCase(Locale.ROOT),
-					sequenceName, sequenceName.toLowerCase(Locale.ROOT)))) {
-				try (ResultSet rs = dbmd.getTables(catalog, schema, sequence, new String[] { "SEQUENCE" })) {
-					if (rs.next()) {
-						sequenceExists = true;
-						break;
-					}
-				}
-			}
-			if (!sequenceExists)
+			if (!isSequenceExists(conn, getActualSequenceName()))
 				stmt.execute(getCreateSequenceStatement());
 		} catch (SQLException ex) {
 			logger.warn(ex.getMessage());
 		}
+	}
+
+	protected boolean isSequenceExists(Connection conn, String sequenceName) throws SQLException {
+		DatabaseMetaData dbmd = conn.getMetaData();
+		String catalog = conn.getCatalog();
+		String schema = null;
+		try {
+			schema = conn.getSchema();
+		} catch (Throwable t) {
+		}
+		for (String sequence : new LinkedHashSet<>(Arrays.asList(sequenceName.toUpperCase(Locale.ROOT), sequenceName,
+				sequenceName.toLowerCase(Locale.ROOT)))) {
+			try (ResultSet rs = dbmd.getTables(catalog, schema, sequence, new String[] { "SEQUENCE" })) {
+				if (rs.next()) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	@Override
