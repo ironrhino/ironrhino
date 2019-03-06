@@ -20,6 +20,7 @@ import org.hibernate.type.StringType;
 import org.ironrhino.core.event.EntityOperationEvent;
 import org.ironrhino.core.event.EntityOperationType;
 import org.ironrhino.core.model.BaseTreeableEntity;
+import org.ironrhino.core.throttle.Mutex;
 import org.ironrhino.core.util.BeanUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,7 +84,8 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 	}
 
 	@Transactional
-	public synchronized void updateFullIdAndLevel() {
+	@Mutex
+	public void repairHierarchy() {
 		entityManager.execute(session -> {
 			String tableName = entityClass.getSimpleName();
 			if (entityClass.isAnnotationPresent(Table.class))
