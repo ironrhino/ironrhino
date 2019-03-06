@@ -168,20 +168,6 @@
 					console.log(e);
 				}
 			}
-			if (n.toLowerCase().endsWith('password')
-					&& typeof $.rc4EncryptStr != 'undefined') {
-				try {
-					var key = $.cookie('X');
-					if (!key) {
-						key = '' + Math.random();
-						$.cookie('X', key);
-					}
-					if (key && key.length > 10)
-						key = key.substring(key.length - 10, key.length);
-					value = $.rc4EncryptStr(value + key, key);
-				} catch (e) {
-				}
-			}
 		}
 		return value;
 	};
