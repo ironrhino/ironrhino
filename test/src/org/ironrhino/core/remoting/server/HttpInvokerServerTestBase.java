@@ -16,8 +16,11 @@ import org.ironrhino.core.remoting.impl.StandaloneServiceRegistry;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializers;
 import org.ironrhino.core.remoting.server.HttpInvokerServerTestBase.HttpInvokerConfiguration;
 import org.ironrhino.core.servlet.AccessFilter;
+import org.ironrhino.core.spring.configuration.Fallback;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.CodecUtils;
+import org.ironrhino.sample.remoting.BarService;
+import org.ironrhino.sample.remoting.BarServiceImpl;
 import org.ironrhino.sample.remoting.FooService;
 import org.ironrhino.sample.remoting.TestService;
 import org.ironrhino.sample.remoting.TestServiceImpl;
@@ -34,6 +37,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.remoting.support.RemoteInvocationResult;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = HttpInvokerConfiguration.class)
@@ -55,7 +59,8 @@ public abstract class HttpInvokerServerTestBase {
 		@Bean
 		public RemotingServiceRegistryPostProcessor remotingServiceRegistryPostProcessor() {
 			RemotingServiceRegistryPostProcessor registryPostProcessor = new RemotingServiceRegistryPostProcessor();
-			registryPostProcessor.setAnnotatedClasses(new Class[] { TestService.class, FooService.class });
+			registryPostProcessor
+					.setAnnotatedClasses(new Class[] { TestService.class, FooService.class, BarService.class });
 			return registryPostProcessor;
 		}
 
@@ -84,6 +89,14 @@ public abstract class HttpInvokerServerTestBase {
 		}
 
 		@Bean
+		public HttpInvokerClient barService() {
+			HttpInvokerClient httpInvokerClient = new HttpInvokerClient();
+			httpInvokerClient.setServiceInterface(BarService.class);
+			httpInvokerClient.setHost("localhost");
+			return httpInvokerClient;
+		}
+
+		@Bean
 		public TestService mockTestService() {
 			return spy(new TestServiceImpl());
 		}
@@ -94,8 +107,23 @@ public abstract class HttpInvokerServerTestBase {
 		}
 
 		@Bean
+		public BarService mockBarService() {
+			return spy(new BarServiceImpl());
+		}
+
+		@Bean
+		public BarService fallbackBarService() {
+			return spy(new FallbackBarService());
+		}
+
+		@Bean
 		public HttpInvokerRequestExecutor mockHttpInvokerRequestExecutor() {
 			return spy(new MockHttpInvokerRequestExecutor());
+		}
+
+		@Bean
+		public LocalValidatorFactoryBean validatorFactory() {
+			return new LocalValidatorFactoryBean();
 		}
 	}
 
@@ -165,6 +193,15 @@ public abstract class HttpInvokerServerTestBase {
 		@Override
 		public Class<?> getObjectType() {
 			return FooService.class;
+		}
+	}
+
+	@Fallback
+	static class FallbackBarService implements BarService {
+
+		@Override
+		public String test(String value) {
+			return "fallback:" + value;
 		}
 	}
 }
