@@ -91,7 +91,8 @@ public class MainAppInitializer implements WebApplicationInitializer {
 
 		filterDynamic = servletContext.addFilter("accessFilter", DelegatingFilter.class);
 		filterDynamic.setAsyncSupported(true);
-		filterDynamic.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST, DispatcherType.ASYNC), true, "/*");
+		filterDynamic.addMappingForUrlPatterns(
+				EnumSet.of(DispatcherType.REQUEST, DispatcherType.ASYNC, DispatcherType.ERROR), true, "/*");
 
 		filterDynamic = servletContext.addFilter("httpSessionFilter", DelegatingFilter.class);
 		filterDynamic.setAsyncSupported(true);
