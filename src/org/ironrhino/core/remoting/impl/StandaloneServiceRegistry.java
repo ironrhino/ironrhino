@@ -22,17 +22,15 @@ public class StandaloneServiceRegistry extends AbstractServiceRegistry {
 
 	@Override
 	protected void doRegister(String serviceName, String host) {
-		List<String> hosts = services.putIfAbsent(serviceName, new CopyOnWriteArrayList<>());
-		if (hosts == null)
-			hosts = services.get(serviceName);
-		hosts.add(host);
+		services.computeIfAbsent(serviceName, key -> new CopyOnWriteArrayList<>()).add(host);
 	}
 
 	@Override
 	protected void doUnregister(String serviceName, String host) {
-		List<String> hosts = services.get(serviceName);
-		if (hosts != null)
+		services.computeIfPresent(serviceName, (key, hosts) -> {
 			hosts.remove(host);
+			return hosts;
+		});
 	}
 
 	@Override

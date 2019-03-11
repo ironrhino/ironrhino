@@ -328,12 +328,7 @@ public class RegionSetup {
 				}
 			}
 			if (name != null) {
-				List<String> list = map.get(name);
-				if (list == null) {
-					list = new ArrayList<>();
-					map.put(name, list);
-				}
-				list.add(coordinate + ' ' + parentName);
+				map.computeIfAbsent(name, key -> new ArrayList<>()).add(coordinate + ' ' + parentName);
 			}
 		}
 		return map;
