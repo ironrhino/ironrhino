@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.lang.model.SourceVersion;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -69,6 +70,14 @@ public class AutoConfigResult extends FreemarkerResult {
 		if (resultCode == null || !SourceVersion.isIdentifier(resultCode))
 			throw new IllegalArgumentException("Result code must be legal java identifier");
 		String namespace = invocation.getProxy().getNamespace();
+		HttpServletRequest request = (HttpServletRequest) invocation.getInvocationContext()
+				.get(StrutsStatics.HTTP_REQUEST);
+		String uri = (String) request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI);
+		if (uri != null) {
+			uri = uri.substring(request.getContextPath().length());
+			int index = uri.lastIndexOf('/');
+			namespace = (index == 0 ? "/" : uri.substring(0, index));
+		}
 		String actionName = invocation.getInvocationContext().getName();
 		if (namespace.equals("/"))
 			namespace = "";
