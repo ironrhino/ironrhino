@@ -183,9 +183,13 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	@Override
 	public void evict(String host) {
 		for (Map.Entry<String, List<String>> entry : importedServiceCandidates.entrySet()) {
+			String serviceName = entry.getKey();
 			List<String> hosts = entry.getValue();
 			List<String> tobeRemoved = hosts.stream().filter(s -> isSame(s, host)).collect(Collectors.toList());
-			hosts.removeAll(tobeRemoved);
+			if (!tobeRemoved.isEmpty()) {
+				hosts.removeAll(tobeRemoved);
+				logger.info("Evict {} for service {}", tobeRemoved, serviceName);
+			}
 		}
 	}
 
@@ -233,7 +237,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	protected void onDiscover(String serviceName, String host, boolean polling) {
 		importedServices.put(serviceName, host);
 		if (!polling) {
-			logger.info("Discovered " + serviceName + " from " + host);
+			logger.info("Discovered {} from {}", serviceName, host);
 			if (ready)
 				writeDiscoveredServices();
 		}
