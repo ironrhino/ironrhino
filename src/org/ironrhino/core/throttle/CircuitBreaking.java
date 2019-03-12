@@ -90,7 +90,7 @@ public class CircuitBreaking {
 	private static CircuitBreaker of(String key, Predicate<Throwable> predicate) {
 		return circuitBreakers.computeIfAbsent(key, name -> {
 			CircuitBreaker circuitBreaker = CircuitBreaker.of(name,
-					CircuitBreakerConfig.custom().recordFailure(predicate).build());
+					CircuitBreakerConfig.custom().failureRateThreshold(80).recordFailure(predicate).build());
 			if (Metrics.isEnabled()) {
 				String prefix = "circuitbreaker.";
 				Metrics.gauge(prefix + name + '.' + STATE, circuitBreaker, cb -> cb.getState().getOrder());

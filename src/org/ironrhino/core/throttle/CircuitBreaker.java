@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface CircuitBreaker {
 
-	float failureRateThreshold() default 50;
+	float failureRateThreshold() default 80;
 
 	int waitDurationInOpenState() default 60;
 

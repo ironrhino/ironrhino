@@ -76,7 +76,7 @@ public class CircuitBreakerAspectTest {
 
 		private volatile boolean recovered;
 
-		@CircuitBreaker(include = IOException.class, waitDurationInOpenState = WAIT_DURATION_IN_OPEN_STATE, ringBufferSizeInClosedState = SIZE_IN_CLOSED_STATE)
+		@CircuitBreaker(include = IOException.class, failureRateThreshold = 50, waitDurationInOpenState = WAIT_DURATION_IN_OPEN_STATE, ringBufferSizeInClosedState = SIZE_IN_CLOSED_STATE)
 		public String echo(String s) throws IOException {
 			if (recovered)
 				return s;

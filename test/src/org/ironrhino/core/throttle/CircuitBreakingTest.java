@@ -28,7 +28,7 @@ public class CircuitBreakingTest {
 		when(echoService.echo(anyString())).thenAnswer(new Answer<String>() {
 			@Override
 			public String answer(InvocationOnMock invocation) throws IOException {
-				if (count.incrementAndGet() % 2 == 0)
+				if (count.incrementAndGet() % 5 != 0)
 					throw new IOException("test");
 				Object[] args = invocation.getArguments();
 				return (String) args[0];
@@ -40,16 +40,15 @@ public class CircuitBreakingTest {
 			try {
 				CircuitBreaking.executeThrowableCallable(this.getClass().getName(), ex -> ex instanceof IOException,
 						() -> echoService.echo("test"));
-				assertTrue(success.get() == error.get());
+				assertTrue(success.get() < error.get());
 				success.incrementAndGet();
 			} catch (IOException e) {
 				error.incrementAndGet();
-				assertTrue(success.get() == error.get());
-			} finally {
-				assertTrue(success.get() <= 50);
-				assertTrue(error.get() <= 50);
+				assertTrue(success.get() < error.get());
 			}
 		}
+		assertTrue(success.get() <= 20);
+		assertTrue(error.get() >= 80);
 	}
 
 	public static interface EchoService {
