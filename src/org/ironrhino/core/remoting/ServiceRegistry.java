@@ -37,9 +37,9 @@ public interface ServiceRegistry {
 	Map<String, String> getImportedServicesByHost(String host);
 
 	// key: service provider host, value: service consumer hosts
-	Map<String, Collection<String>> getExportedHostsByService(String service);
+	Map<String, Collection<String>> getExportedHostsByService(String serviceName);
 
 	// key: service consumer host, value: service provider host
-	Map<String, String> getImportedHostsByService(String service);
+	Map<String, String> getImportedHostsByService(String serviceName);
 
 }

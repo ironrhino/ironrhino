@@ -127,10 +127,10 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	}
 
 	@Override
-	protected Map<String, Collection<String>> doGetExportedHostsByService(String service) {
+	protected Map<String, Collection<String>> doGetExportedHostsByService(String serviceName) {
 		Map<String, Collection<String>> result = new TreeMap<>();
-		Map<String, String> map = getImportedHostsByService(service);
-		List<String> hosts = remotingStringRedisTemplate.opsForList().range(NAMESPACE_SERVICES + service, 0, -1);
+		Map<String, String> map = getImportedHostsByService(serviceName);
+		List<String> hosts = remotingStringRedisTemplate.opsForList().range(NAMESPACE_SERVICES + serviceName, 0, -1);
 		if (hosts == null)
 			return Collections.emptyMap();
 		for (String host : hosts) {
@@ -145,7 +145,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	}
 
 	@Override
-	public Map<String, String> getImportedHostsByService(String service) {
+	public Map<String, String> getImportedHostsByService(String serviceName) {
 		Map<String, String> result = new TreeMap<>();
 		Set<String> hosts = remotingStringRedisTemplate.<Set<String>>execute((RedisConnection conn) -> {
 			Set<String> set = new HashSet<>();
@@ -159,8 +159,8 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 			return Collections.emptyMap();
 		for (String key : hosts) {
 			Map<Object, Object> map = remotingStringRedisTemplate.opsForHash().entries(key);
-			if (map.containsKey(service))
-				result.put(key.substring(NAMESPACE_HOSTS.length()), (String) map.get(service));
+			if (map.containsKey(serviceName))
+				result.put(key.substring(NAMESPACE_HOSTS.length()), (String) map.get(serviceName));
 		}
 		return result;
 	}

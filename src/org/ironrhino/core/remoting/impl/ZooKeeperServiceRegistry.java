@@ -121,12 +121,12 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	}
 
 	@Override
-	protected Map<String, Collection<String>> doGetExportedHostsByService(String service) {
+	protected Map<String, Collection<String>> doGetExportedHostsByService(String serviceName) {
 		try {
 			Map<String, Collection<String>> result = new TreeMap<>();
-			Map<String, String> map = getImportedHostsByService(service);
+			Map<String, String> map = getImportedHostsByService(serviceName);
 			List<String> children = curatorFramework.getChildren().watched()
-					.forPath(new StringBuilder().append(servicesParentPath).append("/").append(service).toString());
+					.forPath(new StringBuilder().append(servicesParentPath).append("/").append(serviceName).toString());
 			for (String host : children) {
 				host = unescapeSlash(host);
 				List<String> consumers = new ArrayList<>();
@@ -146,13 +146,13 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 	}
 
 	@Override
-	public Map<String, String> getImportedHostsByService(String service) {
+	public Map<String, String> getImportedHostsByService(String serviceName) {
 		try {
 			Map<String, String> result = new TreeMap<>();
 			for (String host : curatorFramework.getChildren().forPath(hostsParentPath)) {
 				Map<String, String> importedServices = getImportedServicesByHost(host);
-				if (importedServices.containsKey(service))
-					result.put(host, importedServices.get(service));
+				if (importedServices.containsKey(serviceName))
+					result.put(host, importedServices.get(serviceName));
 			}
 			return result;
 		} catch (NoNodeException e) {
