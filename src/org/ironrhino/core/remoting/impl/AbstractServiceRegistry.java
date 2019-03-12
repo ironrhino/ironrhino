@@ -18,8 +18,6 @@ import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 
 import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.core.event.EventPublisher;
-import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.remoting.DistanceMeasurer;
 import org.ironrhino.core.remoting.Remoting;
 import org.ironrhino.core.remoting.ServiceHostsChangedEvent;
@@ -67,9 +65,6 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
 	@Autowired
 	private ConfigurableApplicationContext ctx;
-
-	@Autowired(required = false)
-	protected EventPublisher eventPublisher;
 
 	@Getter
 	private Map<String, List<String>> importedServiceCandidates = new ConcurrentHashMap<>();
@@ -251,8 +246,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	}
 
 	protected void onServiceHostsChanged(String serviceName) {
-		if (eventPublisher != null)
-			eventPublisher.publish(new ServiceHostsChangedEvent(serviceName), Scope.LOCAL);
+		ctx.publishEvent(new ServiceHostsChangedEvent(serviceName));
 	}
 
 	protected void onReady() {

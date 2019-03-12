@@ -18,6 +18,7 @@ import java.util.concurrent.ExecutorService;
 import javax.annotation.PreDestroy;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.event.InstanceLifecycleEvent;
 import org.ironrhino.core.event.InstanceShutdownEvent;
 import org.ironrhino.core.metadata.Scope;
@@ -50,6 +51,9 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	@Qualifier("stringRedisTemplate")
 	@PriorityQualifier({ "remotingStringRedisTemplate", "globalStringRedisTemplate" })
 	private StringRedisTemplate remotingStringRedisTemplate;
+
+	@Autowired
+	private EventPublisher eventPublisher;
 
 	@Autowired(required = false)
 	private ExecutorService executorService;
