@@ -76,8 +76,8 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 
 	@Getter
 	@Setter
-	@Value("${httpInvoker.readTimeout:60000}")
-	private int readTimeout = 60000;
+	@Value("${httpInvoker.readTimeout:20000}")
+	private int readTimeout = 20000;
 
 	@Setter
 	@Value("${httpInvoker.loggingPayload:true}")
