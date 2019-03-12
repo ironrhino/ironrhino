@@ -18,7 +18,6 @@ import java.util.concurrent.ExecutorService;
 import javax.annotation.PreDestroy;
 
 import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.event.InstanceLifecycleEvent;
 import org.ironrhino.core.event.InstanceShutdownEvent;
 import org.ironrhino.core.metadata.Scope;
@@ -51,9 +50,6 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	@Qualifier("stringRedisTemplate")
 	@PriorityQualifier({ "remotingStringRedisTemplate", "globalStringRedisTemplate" })
 	private StringRedisTemplate remotingStringRedisTemplate;
-
-	@Autowired
-	private EventPublisher eventPublisher;
 
 	@Autowired(required = false)
 	private ExecutorService executorService;
@@ -227,8 +223,10 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 				String path = ev.getServicePaths().get(serviceName);
 				String ho = path != null ? host + path : host;
 				List<String> hosts = getImportedServiceCandidates().get(serviceName);
-				if (hosts != null && !hosts.contains(ho))
+				if (hosts != null && !hosts.contains(ho)) {
 					hosts.add(ho);
+					onServiceHostsChanged(serviceName);
+				}
 			}
 		}
 	}

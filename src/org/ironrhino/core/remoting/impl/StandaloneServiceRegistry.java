@@ -23,12 +23,14 @@ public class StandaloneServiceRegistry extends AbstractServiceRegistry {
 	@Override
 	protected void doRegister(String serviceName, String host) {
 		services.computeIfAbsent(serviceName, key -> new CopyOnWriteArrayList<>()).add(host);
+		onServiceHostsChanged(serviceName);
 	}
 
 	@Override
 	protected void doUnregister(String serviceName, String host) {
 		services.computeIfPresent(serviceName, (key, hosts) -> {
 			hosts.remove(host);
+			onServiceHostsChanged(serviceName);
 			return hosts;
 		});
 	}

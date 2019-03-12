@@ -13,6 +13,7 @@ import javax.annotation.PostConstruct;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.remoting.Remoting;
+import org.ironrhino.core.remoting.ServiceHostsChangedEvent;
 import org.ironrhino.core.remoting.ServiceNotFoundException;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializers;
@@ -33,6 +34,7 @@ import org.slf4j.MDC;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationListener;
 import org.springframework.core.env.Environment;
 import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.remoting.RemoteAccessException;
@@ -49,7 +51,8 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBean {
+public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBean
+		implements ApplicationListener<ServiceHostsChangedEvent> {
 
 	private static final String SERVLET_PATH_PREFIX = "/remoting/httpinvoker/";
 
@@ -146,7 +149,7 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 		if (port <= 0)
 			port = 8080;
 		if (serviceUrl == null && StringUtils.isNotBlank(host)) {
-			serviceUrl = discoverServiceUrl();
+			discoverServiceUrl();
 		}
 		if (serviceUrl == null) {
 			Assert.notNull(serviceRegistry, "serviceRegistry shouldn't be null");
@@ -255,14 +258,18 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 			method = ReflectionUtils.stringify(methodInvocation.getMethod(), false, true);
 		int remainingAttempts = maxAttempts;
 		do {
-			if (serviceUrl == null) {
-				serviceUrl = discoverServiceUrl();
-			} else if (polling) {
-				serviceUrl = discoverServiceUrl(true);
+			String targetServiceUrl;
+			if (polling) {
+				targetServiceUrl = discoverServiceUrl(true);
+			} else {
+				targetServiceUrl = serviceUrl;
+				if (targetServiceUrl == null) {
+					targetServiceUrl = discoverServiceUrl();
+				}
 			}
 			long time = System.currentTimeMillis();
 			try {
-				RemoteInvocationResult result = httpInvokerRequestExecutor.executeRequest(serviceUrl, invocation,
+				RemoteInvocationResult result = httpInvokerRequestExecutor.executeRequest(targetServiceUrl, invocation,
 						methodInvocation);
 				if (serviceStats != null) {
 					serviceStats.clientSideEmit(discoveredHost, getServiceInterface().getName(), method,
@@ -295,9 +302,9 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 							discoveredHost = null;
 						}
 						String newServiceUrl = discoverServiceUrl();
-						if (!newServiceUrl.equals(serviceUrl)) {
-							serviceUrl = newServiceUrl;
-							log.info("Relocate service url " + serviceUrl);
+						if (!newServiceUrl.equals(targetServiceUrl)) {
+							targetServiceUrl = newServiceUrl;
+							log.info("Relocate service url " + targetServiceUrl);
 						}
 					}
 				}
@@ -377,7 +384,15 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 		}
 		sb.append(SERVLET_PATH_PREFIX);
 		sb.append(serviceName);
-		return sb.toString();
+		return serviceUrl = sb.toString();
+	}
+
+	@Override
+	public void onApplicationEvent(ServiceHostsChangedEvent event) {
+		if (event.getServiceName().equals(getServiceInterface().getName())) {
+			// force discover service for balance
+			serviceUrl = null;
+		}
 	}
 
 }

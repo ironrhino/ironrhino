@@ -18,8 +18,11 @@ import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.event.EventPublisher;
+import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.remoting.DistanceMeasurer;
 import org.ironrhino.core.remoting.Remoting;
+import org.ironrhino.core.remoting.ServiceHostsChangedEvent;
 import org.ironrhino.core.remoting.ServiceNotFoundException;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.util.AppInfo;
@@ -64,6 +67,9 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
 	@Autowired
 	private ConfigurableApplicationContext ctx;
+
+	@Autowired(required = false)
+	protected EventPublisher eventPublisher;
 
 	@Getter
 	private Map<String, List<String>> importedServiceCandidates = new ConcurrentHashMap<>();
@@ -189,6 +195,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 			if (!tobeRemoved.isEmpty()) {
 				hosts.removeAll(tobeRemoved);
 				logger.info("Evict {} for service {}", tobeRemoved, serviceName);
+				onServiceHostsChanged(serviceName);
 			}
 		}
 	}
@@ -241,6 +248,11 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 			if (ready)
 				writeDiscoveredServices();
 		}
+	}
+
+	protected void onServiceHostsChanged(String serviceName) {
+		if (eventPublisher != null)
+			eventPublisher.publish(new ServiceHostsChangedEvent(serviceName), Scope.LOCAL);
 	}
 
 	protected void onReady() {

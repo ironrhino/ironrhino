@@ -237,6 +237,7 @@ public class ZooKeeperServiceRegistry extends AbstractServiceRegistry implements
 		for (String host : children)
 			hosts.add(unescapeSlash(host));
 		getImportedServiceCandidates().put(serviceName, new CopyOnWriteArrayList<>(hosts));
+		onServiceHostsChanged(serviceName);
 	}
 
 	@Override
