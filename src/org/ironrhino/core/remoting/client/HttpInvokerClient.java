@@ -304,7 +304,7 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 						String newServiceUrl = discoverServiceUrl();
 						if (!newServiceUrl.equals(targetServiceUrl)) {
 							targetServiceUrl = newServiceUrl;
-							log.info("Relocate service url " + targetServiceUrl);
+							log.info("Relocate service url {}", targetServiceUrl);
 						}
 					}
 				}
@@ -391,7 +391,13 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 	public void onApplicationEvent(ServiceHostsChangedEvent event) {
 		if (event.getServiceName().equals(getServiceInterface().getName())) {
 			// force discover service for balance
-			serviceUrl = null;
+			if (serviceUrl != null) {
+				String old = serviceUrl;
+				String newServiceUrl = discoverServiceUrl();
+				if (!newServiceUrl.equals(old)) {
+					log.info("Relocate service url {} for balancing", newServiceUrl);
+				}
+			}
 		}
 	}
 

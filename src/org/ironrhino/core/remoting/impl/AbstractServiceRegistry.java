@@ -246,6 +246,11 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	}
 
 	protected void onServiceHostsChanged(String serviceName) {
+		if (getImportedServices().remove(serviceName) != null)
+			publishServiceHostsChangedEvent(serviceName);
+	}
+
+	protected void publishServiceHostsChangedEvent(String serviceName) {
 		ctx.publishEvent(new ServiceHostsChangedEvent(serviceName));
 	}
 

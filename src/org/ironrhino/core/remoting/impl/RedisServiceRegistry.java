@@ -206,6 +206,13 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 		return services;
 	}
 
+	@Override
+	protected void publishServiceHostsChangedEvent(String serviceName) {
+		// remove serviceName from discovered for rebalance
+		remotingStringRedisTemplate.opsForHash().delete(NAMESPACE_HOSTS + getLocalHost(), serviceName);
+		super.publishServiceHostsChangedEvent(serviceName);
+	}
+
 	@PreDestroy
 	@Override
 	public void destroy() {
