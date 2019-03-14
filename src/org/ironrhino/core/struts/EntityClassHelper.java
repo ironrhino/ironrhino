@@ -457,8 +457,9 @@ public class EntityClassHelper {
 							if (url == null)
 								url = new StringBuilder("/")
 										.append(StringUtils.uncapitalize(returnType.getSimpleName())).toString();
-							uci.setListTemplate("<#if value?has_content&&value.id?has_content><a href=\"" + url
-									+ "/view/${value.id}\" class=\"view\" rel=\"richtable\" title=\"${action.getText('view')}\">${value?html}</a></#if>");
+							uci.setListTemplate("<#if value?has_content&&value.id?has_content><a href=\"<@url value='"
+									+ url
+									+ "/view/${value.id}'/>\" class=\"view\" rel=\"richtable\" title=\"${action.getText('view')}\">${value?html}</a></#if>");
 						}
 					} else if (collectionType == null && TypeUtils.isNumeric(returnType)) {
 						if (TypeUtils.isIntegralNumeric(returnType)) {
