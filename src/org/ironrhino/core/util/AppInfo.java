@@ -17,6 +17,8 @@ import java.util.TreeSet;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.ironrhino.core.log4j.SimpleMergeStrategy;
+import org.ironrhino.core.spring.configuration.YamlPropertySourceFactory;
+import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertiesPropertySource;
@@ -25,6 +27,7 @@ import org.springframework.core.env.PropertySourcesPropertyResolver;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.util.ClassUtils;
 
 import lombok.experimental.UtilityClass;
 
@@ -453,38 +456,35 @@ public class AppInfo {
 
 	private static Properties getRawApplicationContextProperties() {
 		Properties properties = new Properties();
-		Resource resource = new ClassPathResource("resources/spring/applicationContext.properties");
-		if (resource.exists()) {
-			try (InputStream is = resource.getInputStream()) {
-				properties.load(is);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		resource = new ClassPathResource(
-				"resources/spring/applicationContext." + AppInfo.getStage().name() + ".properties");
-		if (resource.exists()) {
-			try (InputStream is = resource.getInputStream()) {
-				properties.load(is);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		resource = new FileSystemResource(AppInfo.getAppHome() + "/conf/applicationContext.properties");
-		if (resource.exists()) {
-			try (InputStream is = resource.getInputStream()) {
-				properties.load(is);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		resource = new FileSystemResource(
-				AppInfo.getAppHome() + "/conf/applicationContext." + AppInfo.getStage().name() + ".properties");
-		if (resource.exists()) {
-			try (InputStream is = resource.getInputStream()) {
-				properties.load(is);
-			} catch (IOException e) {
-				e.printStackTrace();
+		boolean snakeyamlPresent = ClassUtils.isPresent("org.yaml.snakeyaml.Yaml",
+				YamlPropertySourceFactory.class.getClassLoader());
+		Resource[] resources = new Resource[] { new ClassPathResource("resources/spring/applicationContext.properties"),
+				new ClassPathResource("resources/spring/applicationContext.yaml"),
+				new ClassPathResource(
+						"resources/spring/applicationContext." + AppInfo.getStage().name() + ".properties"),
+				new ClassPathResource("resources/spring/applicationContext." + AppInfo.getStage().name() + ".yaml"),
+				new FileSystemResource(AppInfo.getAppHome() + "/conf/applicationContext.properties"),
+				new FileSystemResource(AppInfo.getAppHome() + "/conf/applicationContext.yaml"),
+				new FileSystemResource(
+						AppInfo.getAppHome() + "/conf/applicationContext." + AppInfo.getStage().name() + ".properties"),
+				new FileSystemResource(
+						AppInfo.getAppHome() + "/conf/applicationContext." + AppInfo.getStage().name() + ".yaml") };
+		for (Resource resource : resources) {
+			if (resource.exists()) {
+				if (resource.getFilename().endsWith(".yaml")) {
+					if (!snakeyamlPresent)
+						throw new IllegalArgumentException("missing snakeyaml");
+					YamlPropertiesFactoryBean factory = new YamlPropertiesFactoryBean();
+					factory.setResources(resource);
+					factory.afterPropertiesSet();
+					properties.putAll(factory.getObject());
+				} else {
+					try (InputStream is = resource.getInputStream()) {
+						properties.load(is);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 			}
 		}
 		return properties;
