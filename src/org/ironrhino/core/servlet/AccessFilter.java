@@ -93,9 +93,13 @@ public class AccessFilter implements Filter {
 	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
 			throws IOException, ServletException {
 		boolean isRequestDispatcher = req.getDispatcherType() == DispatcherType.REQUEST;
-		HttpServletRequest request = ProxySupportHttpServletRequest.wrap((HttpServletRequest) req);
-		LocaleContextHolder.setLocale(request.getLocale(), true);
+		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) resp;
+		if (ProxySupportHttpServletRequest.isProxyable(request)) {
+			request = new ProxySupportHttpServletRequest(request);
+			response = new ProxySupportHttpServletResponse(request, response);
+		}
+		LocaleContextHolder.setLocale(request.getLocale(), true);
 		String uri = request.getRequestURI();
 		uri = uri.substring(request.getContextPath().length());
 

@@ -49,7 +49,7 @@ public class AutoConfigResult extends FreemarkerResult {
 				&& !invocation.getProxy().getMethod().equals("execute")) {
 			String namespace = invocation.getProxy().getNamespace();
 			String url = namespace + (namespace.endsWith("/") ? "" : "/") + invocation.getProxy().getActionName();
-			response.sendRedirect(request.getContextPath() + url);
+			response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + url));
 			return;
 		}
 		if (!"XMLHttpRequest".equalsIgnoreCase(request.getHeader("X-Requested-With"))) {

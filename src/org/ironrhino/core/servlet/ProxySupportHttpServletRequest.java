@@ -209,12 +209,11 @@ public class ProxySupportHttpServletRequest extends HttpServletRequestWrapper {
 		return prefix;
 	}
 
-	public static HttpServletRequest wrap(HttpServletRequest request) {
-		boolean proxyable = !"true".equals(System.getProperty(SYSTEM_PROPERTY_PROXY_REQUEST_DISABLED))
+	public static boolean isProxyable(HttpServletRequest request) {
+		return !"true".equals(System.getProperty(SYSTEM_PROPERTY_PROXY_REQUEST_DISABLED))
 				&& (request.getHeader(ProxySupportHttpServletRequest.HEADER_NAME_X_REAL_IP) != null
 						|| request.getHeader(ProxySupportHttpServletRequest.HEADER_NAME_X_FORWARDED_FOR) != null
 						|| request.getHeader(ProxySupportHttpServletRequest.HEADER_NAME_X_FORWARDED_PREFIX) != null);
-		return proxyable ? new ProxySupportHttpServletRequest(request) : request;
 	}
 
 }
