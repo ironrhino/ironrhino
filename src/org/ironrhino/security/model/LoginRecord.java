@@ -21,7 +21,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @AutoConfig
-@Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
+@Authorize(ifAnyGranted = { UserRole.ROLE_ADMINISTRATOR, UserRole.ROLE_AUDITOR })
 @Entity
 @Searchable
 @Table(name = "loginrecord")
