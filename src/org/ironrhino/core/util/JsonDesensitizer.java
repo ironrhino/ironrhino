@@ -1,6 +1,7 @@
 package org.ironrhino.core.util;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
@@ -17,7 +18,6 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.PropertyWriter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
@@ -59,15 +59,22 @@ public class JsonDesensitizer {
 					Optional<Function<String, String>> func = mapper.entrySet().stream()
 							.filter(entry -> entry.getKey().test(name, obj)).findFirst().map(entry -> entry.getValue());
 					if (func.isPresent()) {
-						Object value = new BeanWrapperImpl(obj).getPropertyValue(name);
-						if (value instanceof String) {
-							try {
-								jgen.writeStringField(name, func.get().apply((String) value));
-							} catch (IOException e) {
-								e.printStackTrace();
+						BeanWrapperImpl bw = new BeanWrapperImpl(obj);
+						Object value = bw.getPropertyValue(name);
+						try {
+							String newValue = func.get().apply(value != null ? String.valueOf(value) : null);
+							Class<?> type = bw.getPropertyType(name);
+							if (TypeUtils.isNumeric(type)) {
+								jgen.writeFieldName(name);
+								jgen.writeNumber(newValue);
+							} else if ((type == Boolean.class || type == boolean.class)
+									&& ("true".equals(newValue) || "false".equals(newValue))) {
+								jgen.writeBooleanField(name, Boolean.getBoolean(newValue));
+							} else {
+								jgen.writeStringField(name, newValue);
 							}
-						} else {
-							writer.serializeAsField(obj, jgen, provider);
+						} catch (Exception e) {
+							e.printStackTrace();
 						}
 					} else {
 						writer.serializeAsField(obj, jgen, provider);
@@ -112,10 +119,22 @@ public class JsonDesensitizer {
 				JsonNode element = iterator.next();
 				desensitize(null, element, node);
 			}
-		} else if (parent instanceof ObjectNode && node instanceof TextNode) {
+		} else if (parent instanceof ObjectNode) {
 			mapping.entrySet().stream().forEach(entry -> {
-				if (entry.getKey().test(nodeName, parent))
-					((ObjectNode) parent).put(nodeName, entry.getValue().apply(node.asText()));
+				if (entry.getKey().test(nodeName, parent)) {
+					ObjectNode on = ((ObjectNode) parent);
+					String value = entry.getValue().apply(node.isNull() ? null : node.asText());
+					try {
+						if (node.isNumber())
+							on.put(nodeName, new BigDecimal(value));
+						else if (node.isBoolean())
+							on.put(nodeName, Boolean.valueOf(value));
+						else
+							on.put(nodeName, value);
+					} catch (Exception e) {
+						on.put(nodeName, value);
+					}
+				}
 			});
 		}
 	}

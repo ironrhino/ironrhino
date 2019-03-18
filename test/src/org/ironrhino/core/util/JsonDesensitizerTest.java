@@ -30,7 +30,7 @@ public class JsonDesensitizerTest {
 
 	@Test
 	public void testToJson() {
-		assertTrue(JsonDesensitizer.DEFAULT_INSTANCE.toJson(new User("username", "password")).contains("******"));
+		assertTrue(JsonDesensitizer.DEFAULT_INSTANCE.toJson(new User("username", "password", 12)).contains("******"));
 	}
 
 	@Test
@@ -38,11 +38,15 @@ public class JsonDesensitizerTest {
 		JsonDesensitizer desensitizer = new JsonDesensitizer();
 		Map<BiPredicate<String, Object>, Function<String, String>> mapping = desensitizer.getMapping();
 		mapping.clear();
-		assertFalse(desensitizer.toJson(new User("username", "password")).contains("******"));
+		assertFalse(desensitizer.toJson(new User("username", "password", 12)).contains("******"));
 		mapping.put((s, obj) -> s.equals("username") && obj instanceof User, s -> "------");
-		String json = desensitizer.toJson(new User("myname", "mypass"));
+		mapping.put((s, obj) -> s.equals("age") && obj instanceof User, s -> "0.0");
+		String json = desensitizer.toJson(new User("myname", "mypass", 12));
 		assertTrue(json.contains("------"));
 		assertTrue(json.contains("\"mypass\""));
+		assertFalse(json.contains("12"));
+		assertTrue(json.contains("0.0"));
+
 	}
 
 	@Data
@@ -51,6 +55,7 @@ public class JsonDesensitizerTest {
 	static class User {
 		String username;
 		String password;
+		int age;
 	}
 
 }
