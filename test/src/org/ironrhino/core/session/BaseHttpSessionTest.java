@@ -13,6 +13,7 @@ import org.ironrhino.core.session.impl.CookieBasedHttpSessionStore;
 import org.ironrhino.core.session.impl.DefaultHttpSessionManager;
 import org.ironrhino.core.session.impl.DefaultSessionCompressor;
 import org.ironrhino.core.session.impl.SecurityContextSessionCompressor;
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +30,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = HttpSessionConfiguration.class)
+@Ignore
 public abstract class BaseHttpSessionTest {
 
 	protected static final String SPRING_SECURITY_CONTEXT_KEY = HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;

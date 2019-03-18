@@ -30,7 +30,8 @@ public class StandaloneServiceRegistry extends AbstractServiceRegistry {
 	protected void doUnregister(String serviceName, String host) {
 		services.computeIfPresent(serviceName, (key, hosts) -> {
 			hosts.remove(host);
-			onServiceHostsChanged(serviceName);
+			// onServiceHostsChanged(serviceName);
+			// avoid org.springframework.beans.factory.BeanCreationNotAllowedException
 			return hosts;
 		});
 	}
