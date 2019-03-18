@@ -229,6 +229,10 @@ public class RequestUtils {
 	public static boolean isSameOrigin(String a, String b) {
 		if (StringUtils.isBlank(a) || StringUtils.isBlank(b))
 			return false;
+		if (a.startsWith("//"))
+			a = "http:" + a;
+		if (b.startsWith("//"))
+			b = "http:" + b;
 		if (b.indexOf("://") < 0 || a.indexOf("://") < 0)
 			return true;
 		try {
@@ -242,7 +246,6 @@ public class RequestUtils {
 		} catch (MalformedURLException e) {
 			return false;
 		}
-
 	}
 
 	public static String getValueFromQueryString(String queryString, String name) {
