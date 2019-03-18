@@ -22,8 +22,8 @@ ${getText('org.springframework.security.authentication.CredentialsExpiredExcepti
 	<#assign userProfileReadonly=userProfileReadonly!false>
 	<@s.password name="currentPassword" class="required input-pattern sha" readonly=userProfileReadonly/>
 	</#if>
-	<@s.password name="password" class="required input-pattern sha" readonly=userProfileReadonly/>
-	<@s.password name="confirmPassword" class="required repeat input-pattern submit sha" data\-repeatwith="password" readonly=userProfileReadonly/>
+	<@s.password name="password" class="required input-pattern" readonly=userProfileReadonly/>
+	<@s.password name="confirmPassword" class="required repeat input-pattern submit" data\-repeatwith="password" readonly=userProfileReadonly/>
 	<#if verificationCodeRequired || totpEnabled>
 	<@s.textfield name="verificationCode" class="required input-small" maxlength="${properties['verification.code.length']!'6'}">
 		<#if verificationCodeRequired>

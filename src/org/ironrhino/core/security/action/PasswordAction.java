@@ -108,16 +108,22 @@ public class PasswordAction extends BaseAction {
 			}
 			if (ex != null) {
 				addFieldError("verificationCode", getText(WrongVerificationCodeException.class.getName()));
-				return "password";
+				return SUCCESS;
 			}
 		}
-		if (passwordStrengthChecker != null)
-			passwordStrengthChecker.check(user, password);
+		if (passwordStrengthChecker != null) {
+			try {
+				passwordStrengthChecker.check(user, password);
+			} catch (Exception e) {
+				addFieldError("password", getText(e.getLocalizedMessage()));
+				return SUCCESS;
+			}
+		}
 		if (isUserCurrentPasswordNeeded()) {
 			boolean valid = currentPassword != null && AuthzUtils.isPasswordValid(currentPassword);
 			if (!valid) {
 				addFieldError("currentPassword", getText("currentPassword.error"));
-				return "password";
+				return SUCCESS;
 			}
 		}
 		boolean passwordExpired = !user.isCredentialsNonExpired();
