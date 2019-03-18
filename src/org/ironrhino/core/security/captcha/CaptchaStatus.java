@@ -3,9 +3,9 @@ package org.ironrhino.core.security.captcha;
 import java.io.Serializable;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 @AllArgsConstructor
 public class CaptchaStatus implements Serializable {
 
@@ -13,11 +13,11 @@ public class CaptchaStatus implements Serializable {
 
 	public static final CaptchaStatus EMPTY = new CaptchaStatus(false, 0, 0);
 
-	private final boolean required;
+	boolean required;
 
-	private final int threshold;
+	int threshold;
 
-	private final int count;
+	int count;
 
 	public boolean isFirstReachThreshold() {
 		return count > 0 && count == threshold;

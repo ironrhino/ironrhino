@@ -6,19 +6,19 @@ import java.util.List;
 import java.util.function.Function;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 @AllArgsConstructor
 public class Paged<T> implements Serializable {
 
 	private static final long serialVersionUID = 5016790873200595151L;
 
-	private final String marker;
+	String marker;
 
-	private final String nextMarker;
+	String nextMarker;
 
-	private final List<T> result;
+	List<T> result;
 
 	static <T> Paged<T> from(List<T> result, int limit, String marker, Function<T, String> markerMapper) {
 		int start;

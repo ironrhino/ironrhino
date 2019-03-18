@@ -6,7 +6,7 @@ import org.ironrhino.core.aop.BaseAspect;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import lombok.Data;
+import lombok.Value;
 
 abstract class AbstractInstrumentAspect extends BaseAspect {
 
@@ -38,10 +38,10 @@ abstract class AbstractInstrumentAspect extends BaseAspect {
 		return new Mapping(method, uri);
 	}
 
-	@Data
+	@Value
 	static class Mapping {
-		private final String method;
-		private final String uri;
+		String method;
+		String uri;
 	}
 
 }

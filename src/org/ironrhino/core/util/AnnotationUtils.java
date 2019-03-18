@@ -24,7 +24,7 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
-import lombok.Data;
+import lombok.Value;
 import lombok.experimental.UtilityClass;
 
 @SuppressWarnings("unchecked")
@@ -205,10 +205,10 @@ public class AnnotationUtils {
 		return r.value();
 	}
 
-	@Data
+	@Value
 	private static final class Key {
-		private final Class<?> clazz;
-		private final Class<? extends Annotation> annotationClass;
+		Class<?> clazz;
+		Class<? extends Annotation> annotationClass;
 	}
 
 }

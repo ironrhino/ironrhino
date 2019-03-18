@@ -39,7 +39,7 @@ import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtField;
 import javassist.util.proxy.ProxyObject;
-import lombok.Data;
+import lombok.Value;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -321,13 +321,10 @@ public class ReflectionUtils {
 		return mh.invokeWithArguments(arguments);
 	}
 
-	@Data
+	@Value
 	private static class MethodCacheKey {
-
-		private final Object object;
-
-		private final Method method;
-
+		Object object;
+		Method method;
 	}
 
 	private static final Map<MethodCacheKey, MethodHandle> defaultMethods = new ConcurrentHashMap<>();
