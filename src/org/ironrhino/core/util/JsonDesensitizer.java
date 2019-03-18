@@ -1,12 +1,12 @@
 package org.ironrhino.core.util;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 import org.springframework.beans.BeanWrapperImpl;
 
@@ -23,11 +23,14 @@ import com.fasterxml.jackson.databind.ser.PropertyWriter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
+import lombok.Getter;
+
 public class JsonDesensitizer {
 
 	public static JsonDesensitizer DEFAULT_INSTANCE = new JsonDesensitizer();
 
-	private final Map<Predicate<String>, Function<String, String>> mapper;
+	@Getter
+	private final Map<BiPredicate<String, Object>, Function<String, String>> mapping;
 
 	private final ObjectWriter objectWriter;
 
@@ -37,26 +40,26 @@ public class JsonDesensitizer {
 	}
 
 	public JsonDesensitizer() {
-		this(new HashMap<Predicate<String>, Function<String, String>>() {
+		this(new ConcurrentHashMap<BiPredicate<String, Object>, Function<String, String>>() {
 			private static final long serialVersionUID = 1L;
 			{
-				put(s -> s.equals("password") || s.endsWith("Password"), s -> "******");
+				put((s, obj) -> s.equals("password") || s.endsWith("Password"), s -> "******");
 			}
 		});
 	}
 
-	public JsonDesensitizer(Map<Predicate<String>, Function<String, String>> mapper) {
-		this.mapper = mapper;
+	public JsonDesensitizer(Map<BiPredicate<String, Object>, Function<String, String>> mapper) {
+		this.mapping = mapper;
 		FilterProvider filters = new SimpleFilterProvider().setDefaultFilter(new SimpleBeanPropertyFilter() {
 			@Override
-			public void serializeAsField(Object pojo, JsonGenerator jgen, SerializerProvider provider,
+			public void serializeAsField(Object obj, JsonGenerator jgen, SerializerProvider provider,
 					PropertyWriter writer) throws Exception {
 				if (include(writer)) {
 					String name = writer.getName();
 					Optional<Function<String, String>> func = mapper.entrySet().stream()
-							.filter(entry -> entry.getKey().test(name)).findFirst().map(entry -> entry.getValue());
+							.filter(entry -> entry.getKey().test(name, obj)).findFirst().map(entry -> entry.getValue());
 					if (func.isPresent()) {
-						Object value = new BeanWrapperImpl(pojo).getPropertyValue(name);
+						Object value = new BeanWrapperImpl(obj).getPropertyValue(name);
 						if (value instanceof String) {
 							try {
 								jgen.writeStringField(name, func.get().apply((String) value));
@@ -64,13 +67,13 @@ public class JsonDesensitizer {
 								e.printStackTrace();
 							}
 						} else {
-							writer.serializeAsField(pojo, jgen, provider);
+							writer.serializeAsField(obj, jgen, provider);
 						}
 					} else {
-						writer.serializeAsField(pojo, jgen, provider);
+						writer.serializeAsField(obj, jgen, provider);
 					}
 				} else if (!jgen.canOmitFields()) {
-					writer.serializeAsOmittedField(pojo, jgen, provider);
+					writer.serializeAsOmittedField(obj, jgen, provider);
 				}
 			}
 		}).setFailOnUnknownId(false);
@@ -110,8 +113,8 @@ public class JsonDesensitizer {
 				desensitize(null, element, node);
 			}
 		} else if (parent instanceof ObjectNode && node instanceof TextNode) {
-			mapper.entrySet().stream().forEach(entry -> {
-				if (entry.getKey().test(nodeName))
+			mapping.entrySet().stream().forEach(entry -> {
+				if (entry.getKey().test(nodeName, parent))
 					((ObjectNode) parent).put(nodeName, entry.getValue().apply(node.asText()));
 			});
 		}
