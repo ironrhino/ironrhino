@@ -2,7 +2,9 @@ package org.ironrhino.core.spring.configuration;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.ironrhino.core.util.NameableThreadFactory;
 import org.slf4j.LoggerFactory;
@@ -28,11 +30,11 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 public class SchedulingConfiguration implements SchedulingConfigurer, AsyncConfigurer {
 
-	@Value("${taskScheduler.poolSize:5}")
-	private int taskSchedulerPoolSize = 5;
+	@Value("${taskScheduler.poolSize:1}")
+	private int taskSchedulerPoolSize = 1;
 
-	@Value("${taskExecutor.poolSize:5}")
-	private int taskExecutorPoolSize = 5;
+	@Value("${taskExecutor.poolSize:1}")
+	private int taskExecutorPoolSize = 1;
 
 	@Override
 	public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
@@ -54,7 +56,8 @@ public class SchedulingConfiguration implements SchedulingConfigurer, AsyncConfi
 
 	@Bean
 	public ExecutorService taskExecutorThreadPool() {
-		return Executors.newFixedThreadPool(taskExecutorPoolSize, new NameableThreadFactory("taskExecutor"));
+		return new ThreadPoolExecutor(taskExecutorPoolSize, Integer.MAX_VALUE, 10, TimeUnit.SECONDS,
+				new LinkedBlockingQueue<Runnable>(), new NameableThreadFactory("taskExecutor"));
 	}
 
 	@Override
