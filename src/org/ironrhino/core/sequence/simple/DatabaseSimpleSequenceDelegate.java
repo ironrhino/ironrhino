@@ -49,6 +49,8 @@ public class DatabaseSimpleSequenceDelegate extends AbstractDatabaseSimpleSequen
 			seq = new HSQLSimpleSequence();
 		else if (databaseProduct == DatabaseProduct.DERBY)
 			seq = new DerbySimpleSequence();
+		else if (databaseProduct == DatabaseProduct.CUBRID)
+			seq = new CubridSimpleSequence();
 		else
 			throw new RuntimeException("not implemented for database " + databaseProduct);
 		seq.setDataSource(getDataSource());

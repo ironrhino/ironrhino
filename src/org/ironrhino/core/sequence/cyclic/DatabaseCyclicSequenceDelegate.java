@@ -49,6 +49,8 @@ public class DatabaseCyclicSequenceDelegate extends AbstractDatabaseCyclicSequen
 			seq = new HSQLCyclicSequence();
 		else if (databaseProduct == DatabaseProduct.DERBY)
 			seq = new DerbyCyclicSequence();
+		else if (databaseProduct == DatabaseProduct.CUBRID)
+			seq = new CubridCyclicSequence();
 		else
 			throw new RuntimeException("not implemented for database " + databaseProduct);
 		seq.setDataSource(getDataSource());

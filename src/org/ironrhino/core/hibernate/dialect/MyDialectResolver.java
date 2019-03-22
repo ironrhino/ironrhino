@@ -21,6 +21,9 @@ public class MyDialectResolver implements DialectResolver {
 			if (majorVersion == 5 && minorVersion == 6)
 				return new MySQL56Dialect();
 		}
+		if (database == DatabaseProduct.CUBRID) {
+			return new MyCUBRIDDialect();
+		}
 		return standardDialectResolver.resolveDialect(info);
 	}
 }
