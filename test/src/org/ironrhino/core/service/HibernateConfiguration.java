@@ -3,8 +3,10 @@ package org.ironrhino.core.service;
 import javax.sql.DataSource;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.AvailableSettings;
 import org.ironrhino.core.configuration.DataSourceConfiguration;
 import org.ironrhino.core.hibernate.SessionFactoryBean;
+import org.ironrhino.core.hibernate.dialect.MyDialectResolver;
 import org.ironrhino.core.spring.configuration.CommonConfiguration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -29,7 +31,9 @@ public class HibernateConfiguration extends CommonConfiguration {
 		SessionFactoryBean sfb = new SessionFactoryBean();
 		sfb.setDataSource(dataSource);
 		sfb.setAnnotatedClasses(annotatedClasses);
-		sfb.getHibernateProperties().setProperty("hibernate.hbm2ddl.auto", "update");
+		sfb.getHibernateProperties().setProperty(AvailableSettings.HBM2DDL_AUTO, "create-drop");
+		sfb.getHibernateProperties().setProperty(AvailableSettings.DIALECT_RESOLVERS,
+				MyDialectResolver.class.getName());
 		return sfb;
 	}
 

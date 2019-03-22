@@ -43,6 +43,7 @@ import org.hibernate.event.spi.PreInsertEventListener;
 import org.hibernate.event.spi.PreUpdateEventListener;
 import org.hibernate.tool.schema.Action;
 import org.hibernate.tool.schema.JdbcMetadaAccessStrategy;
+import org.ironrhino.core.hibernate.dialect.MyDialectResolver;
 import org.ironrhino.core.hibernate.event.SimpleDeleteEventListener;
 import org.ironrhino.core.hibernate.event.SimpleFlushEntityEventListener;
 import org.ironrhino.core.hibernate.event.SimpleMergeEventListener;
@@ -141,6 +142,7 @@ public class SessionFactoryBean extends LocalSessionFactoryBean implements Defau
 		map.put(AvailableSettings.XML_MAPPING_ENABLED, String.valueOf(false));
 		map.put(AvailableSettings.KEYWORD_AUTO_QUOTING_ENABLED, String.valueOf(true));
 		map.put(AvailableSettings.USE_SECOND_LEVEL_CACHE, String.valueOf(false));
+		map.put(AvailableSettings.DIALECT_RESOLVERS, MyDialectResolver.class.getName());
 		map.put(AvailableSettings.HBM2DDL_AUTO, Action.UPDATE.name().toLowerCase(Locale.ROOT));
 		defaultProperties = Collections.unmodifiableMap(map);
 	}
