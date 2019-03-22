@@ -28,7 +28,6 @@ import org.ironrhino.rest.doc.ApiDocInspector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.PropertySources;
@@ -43,7 +42,6 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpResponse;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
 import org.springframework.util.ClassUtils;
 import org.springframework.validation.Validator;
@@ -78,14 +76,8 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 	@Autowired
 	private SpringValidatorAdapter validator;
 
-	@Value("${spring.mvc.taskExecutor.corePoolSize:5}")
-	private int corePoolSize = 5;
-
-	@Value("${spring.mvc.taskExecutor.maxPoolSize:100}")
-	private int maxPoolSize = 100;
-
-	@Value("${spring.mvc.taskExecutor.queueCapacity:50}")
-	private int queueCapacity = 50;
+	@Autowired
+	private AsyncTaskExecutor taskExecutor;
 
 	@PostConstruct
 	private void init() {
@@ -121,15 +113,6 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 	public ObjectMapper objectMapper() {
 		ObjectMapper objectMapper = JsonUtils.createNewObjectMapper();
 		return objectMapper;
-	}
-
-	@Bean
-	public AsyncTaskExecutor taskExecutor() {
-		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-		taskExecutor.setCorePoolSize(corePoolSize);
-		taskExecutor.setMaxPoolSize(maxPoolSize);
-		taskExecutor.setQueueCapacity(queueCapacity);
-		return taskExecutor;
 	}
 
 	@Override
@@ -208,7 +191,7 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 	@Override
 	protected void configureAsyncSupport(AsyncSupportConfigurer configurer) {
 		configurer.setDefaultTimeout(30000);
-		configurer.setTaskExecutor(taskExecutor());
+		configurer.setTaskExecutor(taskExecutor);
 	}
 
 	@Bean

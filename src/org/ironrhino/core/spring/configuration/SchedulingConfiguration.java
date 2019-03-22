@@ -1,12 +1,7 @@
 package org.ironrhino.core.spring.configuration;
 
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
-import org.ironrhino.core.util.NameableThreadFactory;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,11 +10,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Role;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
@@ -43,7 +40,7 @@ public class SchedulingConfiguration implements SchedulingConfigurer, AsyncConfi
 
 	@Override
 	public Executor getAsyncExecutor() {
-		return taskExecutorThreadPool();
+		return taskExecutor();
 	}
 
 	@Bean
@@ -55,9 +52,11 @@ public class SchedulingConfiguration implements SchedulingConfigurer, AsyncConfi
 	}
 
 	@Bean
-	public ExecutorService taskExecutorThreadPool() {
-		return new ThreadPoolExecutor(taskExecutorPoolSize, Integer.MAX_VALUE, 10, TimeUnit.SECONDS,
-				new LinkedBlockingQueue<Runnable>(), new NameableThreadFactory("taskExecutor"));
+	public AsyncTaskExecutor taskExecutor() {
+		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+		executor.setCorePoolSize(taskExecutorPoolSize);
+		executor.setThreadNamePrefix("taskExecutor-");
+		return executor;
 	}
 
 	@Override
