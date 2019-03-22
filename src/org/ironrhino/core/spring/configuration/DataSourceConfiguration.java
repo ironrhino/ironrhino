@@ -72,6 +72,9 @@ public class DataSourceConfiguration {
 	@Value("${dataSource.registerMbeans:false}")
 	private boolean registerMbeans;
 
+	@Value("${dataSource.connectionTestQuery:}")
+	private String connectionTestQuery;
+
 	@Value("${dataSource.lazyConnect:false}")
 	private boolean lazyConnect;
 
@@ -106,6 +109,8 @@ public class DataSourceConfiguration {
 		ds.setMaxLifetime(maxLifetime);
 		ds.setAutoCommit(autoCommit);
 		ds.setRegisterMbeans(registerMbeans);
+		if (StringUtils.isNotBlank(connectionTestQuery))
+			ds.setConnectionTestQuery(connectionTestQuery);
 		ds.setPoolName("HikariPool-" + AppInfo.getAppName());
 		log.info("Using {} to connect {}", ds.getClass().getName(), ds.getJdbcUrl());
 

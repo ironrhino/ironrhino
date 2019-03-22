@@ -89,7 +89,7 @@ public enum DatabaseProduct {
 		}
 
 		@Override
-		public String getValidationQuery() {
+		public String getConnectionTestQuery() {
 			return "SELECT 1 FROM DUAL";
 		}
 	},
@@ -146,7 +146,7 @@ public enum DatabaseProduct {
 		}
 
 		@Override
-		public String getValidationQuery() {
+		public String getConnectionTestQuery() {
 			return "VALUES 1";
 		}
 	},
@@ -179,7 +179,7 @@ public enum DatabaseProduct {
 		}
 
 		@Override
-		public String getValidationQuery() {
+		public String getConnectionTestQuery() {
 			return "SELECT FIRST 1 CURRENT FROM SYSTABLES";
 		}
 	},
@@ -331,7 +331,7 @@ public enum DatabaseProduct {
 		}
 
 		@Override
-		public String getValidationQuery() {
+		public String getConnectionTestQuery() {
 			return "SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS";
 		}
 	},
@@ -364,7 +364,7 @@ public enum DatabaseProduct {
 		}
 
 		@Override
-		public String getValidationQuery() {
+		public String getConnectionTestQuery() {
 			return "SELECT 1 FROM SYSIBM.SYSDUMMY1";
 		}
 	};
@@ -424,7 +424,7 @@ public enum DatabaseProduct {
 		return Collections.emptyList();
 	}
 
-	public String getValidationQuery() {
+	public String getConnectionTestQuery() {
 		return "SELECT 1";
 	}
 
