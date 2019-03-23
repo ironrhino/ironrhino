@@ -39,13 +39,13 @@ import org.springframework.stereotype.Component;
 @ServiceImplementationConditional(profiles = { DUAL, CLOUD })
 public class RedisServiceRegistry extends AbstractServiceRegistry {
 
-	private static final String NAMESPACE = "remoting:";
+	protected static final String NAMESPACE = "remoting:";
 
-	private static final String NAMESPACE_SERVICES = NAMESPACE + "services:";
+	protected static final String NAMESPACE_SERVICES = NAMESPACE + "services:";
 
-	private static final String NAMESPACE_HOSTS = NAMESPACE + "hosts:";
+	protected static final String NAMESPACE_HOSTS = NAMESPACE + "hosts:";
 
-	private static final String NAMESPACE_APPS = NAMESPACE + "apps:";
+	protected static final String NAMESPACE_APPS = NAMESPACE + "apps:";
 
 	@Autowired
 	@Qualifier("stringRedisTemplate")
