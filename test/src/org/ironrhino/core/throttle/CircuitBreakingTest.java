@@ -1,6 +1,6 @@
 package org.ironrhino.core.throttle;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -28,7 +28,7 @@ public class CircuitBreakingTest {
 		when(echoService.echo(anyString())).thenAnswer(new Answer<String>() {
 			@Override
 			public String answer(InvocationOnMock invocation) throws IOException {
-				if (count.incrementAndGet() % 5 != 0)
+				if (count.incrementAndGet() > 5)
 					throw new IOException("test");
 				Object[] args = invocation.getArguments();
 				return (String) args[0];
@@ -36,19 +36,19 @@ public class CircuitBreakingTest {
 		});
 		AtomicInteger success = new AtomicInteger();
 		AtomicInteger error = new AtomicInteger();
-		for (int i = 0; i < 101; i++) {
+		for (int i = 0; i < 100; i++) {
 			try {
 				CircuitBreaking.executeThrowableCallable(this.getClass().getName(), ex -> ex instanceof IOException,
 						() -> echoService.echo("test"));
-				assertTrue(success.get() < error.get());
 				success.incrementAndGet();
 			} catch (IOException e) {
 				error.incrementAndGet();
-				assertTrue(success.get() < error.get());
 			}
 		}
-		assertTrue(success.get() <= 20);
-		assertTrue(error.get() >= 80);
+		assertEquals(5, success.get());
+		assertEquals(95, error.get());
+		CircuitBreaking.executeThrowableCallable(this.getClass().getName(), ex -> ex instanceof IOException,
+				() -> echoService.echo("test"));
 	}
 
 	public static interface EchoService {
