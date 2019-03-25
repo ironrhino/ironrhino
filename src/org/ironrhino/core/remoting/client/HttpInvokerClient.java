@@ -82,9 +82,15 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 	@Value("${httpInvoker.readTimeout:20000}")
 	private int readTimeout = 20000;
 
+	@Getter
 	@Setter
 	@Value("${httpInvoker.loggingPayload:true}")
 	private boolean loggingPayload;
+
+	@Getter
+	@Setter
+	@Value("${httpInvoker.circuitBreakerEnabled:true}")
+	private boolean circuitBreakerEnabled;
 
 	@Setter
 	@Autowired(required = false)
@@ -194,8 +200,10 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 
 	protected RemoteInvocationResult executeRequest(RemoteInvocation invocation, MethodInvocation methodInvocation)
 			throws Exception {
-		return CircuitBreaking.execute(getServiceInterface().getName(), ex -> ex instanceof IOException,
-				() -> doExecuteRequest(invocation, methodInvocation));
+		return circuitBreakerEnabled
+				? CircuitBreaking.execute(getServiceInterface().getName(), ex -> ex instanceof IOException,
+						() -> doExecuteRequest(invocation, methodInvocation))
+				: doExecuteRequest(invocation, methodInvocation);
 	}
 
 	protected RemoteInvocationResult doExecuteRequest(RemoteInvocation invocation, MethodInvocation methodInvocation)
