@@ -58,7 +58,7 @@ public class KafkaConsumerConfigBase {
 		ConsumerFactory<String, T> consumerFactory = createConsumerFactory(true);
 		ConcurrentKafkaListenerContainerFactory<String, T> factory = new ConcurrentKafkaListenerContainerFactory<>();
 		factory.setConsumerFactory(consumerFactory);
-		factory.setConcurrency(consumerConcurrency);
+		factory.setConcurrency(getConsumerConcurrency());
 		return factory;
 	}
 
@@ -67,7 +67,7 @@ public class KafkaConsumerConfigBase {
 		ConsumerFactory<String, T> consumerFactory = createConsumerFactory(false);
 		ConcurrentKafkaListenerContainerFactory<String, T> factory = new ConcurrentKafkaListenerContainerFactory<>();
 		factory.setConsumerFactory(consumerFactory);
-		factory.setConcurrency(consumerConcurrency);
+		factory.setConcurrency(getConsumerConcurrency());
 		factory.setBatchListener(true);
 		factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
 		return factory;
@@ -75,14 +75,14 @@ public class KafkaConsumerConfigBase {
 
 	protected <T> ConsumerFactory<String, T> createConsumerFactory(boolean autoCommit) {
 		Map<String, Object> consumerConfigs = new HashMap<>();
-		consumerConfigs.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+		consumerConfigs.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, getBootstrapServers());
 		consumerConfigs.put(ConsumerConfig.CLIENT_ID_CONFIG, AppInfo.getInstanceId(true));
 		consumerConfigs.put(ConsumerConfig.GROUP_ID_CONFIG, AppInfo.getAppName());
-		consumerConfigs.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, autoOffsetReset);
-		consumerConfigs.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, sessionTimeoutMs);
+		consumerConfigs.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, getAutoOffsetReset());
+		consumerConfigs.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, getSessionTimeoutMs());
 		consumerConfigs.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, autoCommit);
 		if (autoCommit)
-			consumerConfigs.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, autoCommitIntervalMs);
+			consumerConfigs.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, getAutoCommitIntervalMs());
 		DefaultKafkaConsumerFactory<String, T> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerConfigs);
 		consumerFactory.setKeyDeserializer(new StringDeserializer());
 		consumerFactory.setValueDeserializer(new TopicNameBasedJsonDeserializer<>(JsonUtils.createNewObjectMapper()));

@@ -56,14 +56,14 @@ public class KafkaProducerConfigBase {
 	@Bean
 	public <T> ProducerFactory<String, T> kafkaProducerFactory() {
 		Map<String, Object> producerConfigs = new HashMap<>();
-		producerConfigs.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+		producerConfigs.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, getBootstrapServers());
 		producerConfigs.put(ProducerConfig.CLIENT_ID_CONFIG, AppInfo.getInstanceId(true));
-		producerConfigs.put(ProducerConfig.ACKS_CONFIG, acks);
-		producerConfigs.put(ProducerConfig.RETRIES_CONFIG, retries);
-		producerConfigs.put(ProducerConfig.BATCH_SIZE_CONFIG, batchSize);
-		producerConfigs.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, maxBlockMs);
-		producerConfigs.put(ProducerConfig.LINGER_MS_CONFIG, lingerMs);
-		producerConfigs.put(ProducerConfig.BUFFER_MEMORY_CONFIG, bufferMemory);
+		producerConfigs.put(ProducerConfig.ACKS_CONFIG, getAcks());
+		producerConfigs.put(ProducerConfig.RETRIES_CONFIG, getRetries());
+		producerConfigs.put(ProducerConfig.BATCH_SIZE_CONFIG, getBatchSize());
+		producerConfigs.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, getMaxBlockMs());
+		producerConfigs.put(ProducerConfig.LINGER_MS_CONFIG, getLingerMs());
+		producerConfigs.put(ProducerConfig.BUFFER_MEMORY_CONFIG, getBufferMemory());
 		DefaultKafkaProducerFactory<String, T> producerFactory = new DefaultKafkaProducerFactory<>(producerConfigs);
 		producerFactory.setKeySerializer(new StringSerializer());
 		JsonSerializer<T> serializer = new JsonSerializer<>();
@@ -73,17 +73,17 @@ public class KafkaProducerConfigBase {
 	}
 
 	@Bean
-	public <T> KafkaTemplate<String, T> kafkaTemplate(ProducerFactory<String, T> producerFactory) {
-		return new KafkaTemplate<String, T>(producerFactory);
+	public <T> KafkaTemplate<String, T> kafkaTemplate() {
+		return new KafkaTemplate<String, T>(kafkaProducerFactory());
 	}
 
 	@Bean
 	public KafkaAdmin kafkaAdmin() {
 		Map<String, Object> adminConfigs = new HashMap<>();
-		adminConfigs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+		adminConfigs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, getBootstrapServers());
 		adminConfigs.put(AdminClientConfig.CLIENT_ID_CONFIG, AppInfo.getInstanceId(true).replaceAll(":", "_"));
 		KafkaAdmin ka = new KafkaAdmin(adminConfigs);
-		ka.setFatalIfBrokerNotAvailable(fatalIfBrokerNotAvailable);
+		ka.setFatalIfBrokerNotAvailable(isFatalIfBrokerNotAvailable());
 		return ka;
 	}
 
