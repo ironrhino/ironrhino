@@ -121,7 +121,7 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 
 	private boolean urlFromDiscovery;
 
-	private String discoveredHost;
+	private volatile String discoveredHost;
 
 	private Object serviceProxy;
 
@@ -306,13 +306,17 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 				} else {
 					if (urlFromDiscovery) {
 						if (discoveredHost != null) {
-							serviceRegistry.evict(discoveredHost);
+							String temp = discoveredHost;
 							discoveredHost = null;
+							serviceRegistry.evict(temp);
 						}
-						String newServiceUrl = discoverServiceUrl();
-						if (!newServiceUrl.equals(targetServiceUrl)) {
-							targetServiceUrl = newServiceUrl;
-							log.info("Relocate service url {}", targetServiceUrl);
+						if (targetServiceUrl.equals(serviceUrl)) {
+							// avoid duplicated discoverServiceUrl, normally evict will trigger relocate
+							String newServiceUrl = discoverServiceUrl();
+							if (!newServiceUrl.equals(targetServiceUrl)) {
+								targetServiceUrl = newServiceUrl;
+								log.info("Relocate service url {}", targetServiceUrl);
+							}
 						}
 					}
 				}
