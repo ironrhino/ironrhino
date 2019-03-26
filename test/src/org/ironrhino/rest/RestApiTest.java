@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.time.LocalDate;
@@ -132,6 +133,16 @@ public class RestApiTest {
 		assertNotNull(e);
 		assertEquals(RestStatus.CODE_NOT_FOUND, e.getCode());
 		assertTrue(e.getCause() instanceof HttpClientErrorException);
+	}
+
+	@Test
+	public void testPostStream() {
+		assertEquals("test", uploadClient.upload(new ByteArrayInputStream("test".getBytes())));
+	}
+
+	@Test
+	public void testPostByteArray() {
+		assertEquals("test", uploadClient.upload("test".getBytes()));
 	}
 
 	@Test

@@ -38,6 +38,7 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -213,6 +214,8 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 				continue;
 			if (argument instanceof InputStream) {
 				body = new InputStreamResource((InputStream) argument);
+			} else if (argument instanceof byte[]) {
+				body = new ByteArrayResource((byte[]) argument);
 			}
 			boolean annotationPresent = false;
 			for (Annotation anno : array[i]) {

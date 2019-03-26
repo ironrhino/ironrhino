@@ -23,6 +23,11 @@ public class UploadController {
 		return string;
 	}
 
+	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
+	public String upload(@RequestBody byte[] bytes) {
+		return new String(bytes);
+	}
+
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public Map<String, Object> upload(@RequestParam String name, @RequestParam MultipartFile file) {
 		Map<String, Object> result = new HashMap<>();

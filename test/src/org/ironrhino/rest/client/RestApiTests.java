@@ -26,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = RestClientConfiguration.class)
@@ -103,25 +102,22 @@ public class RestApiTests {
 	}
 
 	@Test
-	public void testPostStream() {
-		RestStatus rs = null;
-		try {
-			InputStream is = new ByteArrayInputStream("test".getBytes());
-			userClient.postStream(is);
-		} catch (RestStatus e) {
-			rs = e;
-		}
-		assertEquals(rs.getCode(), RestStatus.CODE_INTERNAL_SERVER_ERROR);
-		assertTrue(rs.getCause() instanceof HttpServerErrorException);
-	}
-
-	@Test
 	public void testGetStream() throws IOException {
 		InputStream is = userClient.getStream();
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
 			List<String> lines = br.lines().collect(Collectors.toList());
 			assertEquals(false, lines.isEmpty());
 		}
+	}
+
+	@Test
+	public void testPostStream() {
+		assertEquals("test", uploadClient.upload(new ByteArrayInputStream("test".getBytes())));
+	}
+
+	@Test
+	public void testPostByteArray() {
+		assertEquals("test", uploadClient.upload("test".getBytes()));
 	}
 
 	@Test

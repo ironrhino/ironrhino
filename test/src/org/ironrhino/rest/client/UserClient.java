@@ -62,6 +62,9 @@ public interface UserClient {
 	@RequestMapping(method = RequestMethod.POST)
 	public void postStream(InputStream is);
 
+	@RequestMapping(method = RequestMethod.POST)
+	public void postByteArray(byte[] bytes);
+
 	@RequestMapping(value = "/@self", method = RequestMethod.GET)
 	public InputStream getStream();
 

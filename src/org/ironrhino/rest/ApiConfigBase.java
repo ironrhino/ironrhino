@@ -36,8 +36,10 @@ import org.springframework.format.FormatterRegistry;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.server.ServerHttpResponse;
@@ -164,6 +166,8 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 		};
 		string.setWriteAcceptCharset(false);
 		converters.add(string);
+		converters.add(new ByteArrayHttpMessageConverter());
+		converters.add(new ResourceHttpMessageConverter());
 	}
 
 	@Override
