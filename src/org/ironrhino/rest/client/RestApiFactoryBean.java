@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
@@ -75,6 +76,9 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 
 	private static final Predicate<Throwable> IO_ERROR_PREDICATE = ex -> ex instanceof ResourceAccessException
 			&& ex.getCause() instanceof IOException;
+
+	private static final Predicate<MethodInvocation> NOT_RETRYABLE_PREDICATE = mi -> Stream.of(mi.getArguments())
+			.anyMatch(arg -> arg instanceof InputStream);
 
 	private Object serviceRegistry;
 
@@ -173,7 +177,8 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 				try {
 					return actualInvoke(methodInvocation);
 				} catch (Exception e) {
-					if (!IO_ERROR_PREDICATE.test(e) || remainingAttempts <= 1)
+					if (!IO_ERROR_PREDICATE.test(e) || NOT_RETRYABLE_PREDICATE.test(methodInvocation)
+							|| remainingAttempts <= 1)
 						throw e;
 				}
 			} while (--remainingAttempts > 0);
