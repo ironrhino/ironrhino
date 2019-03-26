@@ -148,19 +148,14 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 		httpInvokerRequestExecutor.setSerializer(HttpInvokerSerializers.ofSerializationType(serializationType));
 		httpInvokerRequestExecutor.setConnectTimeout(connectTimeout);
 		httpInvokerRequestExecutor.setReadTimeout(readTimeout);
-		if (StringUtils.isBlank(host))
+		if (StringUtils.isBlank(host)) {
 			Assert.notNull(serviceRegistry, "serviceRegistry is missing");
+			urlFromDiscovery = true;
+		}
 		if (port <= 0)
 			port = AppInfo.getHttpPort();
 		if (port <= 0)
 			port = 8080;
-		if (serviceUrl == null && StringUtils.isNotBlank(host)) {
-			discoverServiceUrl();
-		}
-		if (serviceUrl == null) {
-			Assert.notNull(serviceRegistry, "serviceRegistry shouldn't be null");
-			urlFromDiscovery = true;
-		}
 		ProxyFactory pf = new ProxyFactory(serviceInterface, this);
 		pf.addInterface(RemotingClientProxy.class);
 		this.serviceProxy = pf.getProxy(serviceInterface.getClassLoader());
@@ -248,7 +243,7 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 						remotingLogger.error("Error:", ite.getTargetException());
 				}
 			}
-			remotingLogger.info("Invoked to {} success in {}ms", discoveredHost, time);
+
 		} finally {
 			if (requestIdGenerated) {
 				MDC.remove(AccessFilter.MDC_KEY_REQUEST_ID);
@@ -272,24 +267,31 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 			} else {
 				targetServiceUrl = serviceUrl;
 				if (targetServiceUrl == null) {
-					targetServiceUrl = discoverServiceUrl();
+					targetServiceUrl = discoverServiceUrl(false);
 				}
 			}
+			String targetDiscoveredHost = discoveredHost;
 			long time = System.currentTimeMillis();
 			try {
 				RemoteInvocationResult result = httpInvokerRequestExecutor.executeRequest(targetServiceUrl, invocation,
 						methodInvocation);
-				if (serviceStats != null) {
-					serviceStats.clientSideEmit(discoveredHost, getServiceInterface().getName(), method,
-							System.currentTimeMillis() - time, false);
+				if (urlFromDiscovery) {
+					remotingLogger.info("Invoked to {} success in {}ms", targetDiscoveredHost, time);
+					if (serviceStats != null) {
+						serviceStats.clientSideEmit(targetDiscoveredHost, getServiceInterface().getName(), method,
+								System.currentTimeMillis() - time, false);
+					}
 				}
 				return result;
 			} catch (Exception e) {
 				remotingLogger.error("Exception:", e.getCause() != null ? e.getCause() : e);
-				remotingLogger.info("Invoked to {} fail in {}ms", discoveredHost, System.currentTimeMillis() - time);
-				if (serviceStats != null) {
-					serviceStats.clientSideEmit(discoveredHost, getServiceInterface().getName(), method,
-							System.currentTimeMillis() - time, true);
+				if (urlFromDiscovery) {
+					remotingLogger.info("Invoked to {} fail in {}ms", targetDiscoveredHost,
+							System.currentTimeMillis() - time);
+					if (serviceStats != null) {
+						serviceStats.clientSideEmit(targetDiscoveredHost, getServiceInterface().getName(), method,
+								System.currentTimeMillis() - time, true);
+					}
 				}
 				if (remainingAttempts <= 1)
 					throw e;
@@ -305,14 +307,12 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 					invocation = newInvocation;
 				} else {
 					if (urlFromDiscovery) {
-						if (discoveredHost != null) {
-							String temp = discoveredHost;
-							discoveredHost = null;
-							serviceRegistry.evict(temp);
+						if (targetDiscoveredHost != null) {
+							serviceRegistry.evict(targetDiscoveredHost);
 						}
-						if (targetServiceUrl.equals(serviceUrl)) {
+						if (!polling && targetServiceUrl.equals(serviceUrl)) {
 							// avoid duplicated discoverServiceUrl, normally evict will trigger relocate
-							String newServiceUrl = discoverServiceUrl();
+							String newServiceUrl = discoverServiceUrl(false);
 							if (!newServiceUrl.equals(targetServiceUrl)) {
 								targetServiceUrl = newServiceUrl;
 								log.info("Relocate service url {}", targetServiceUrl);
@@ -371,10 +371,6 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 		return result.getValue();
 	}
 
-	private String discoverServiceUrl() {
-		return discoverServiceUrl(false);
-	}
-
 	private String discoverServiceUrl(boolean polling) {
 		String serviceName = getServiceInterface().getName();
 		StringBuilder sb = new StringBuilder();
@@ -401,11 +397,11 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 
 	@Override
 	public void onApplicationEvent(ServiceHostsChangedEvent event) {
-		if (event.getServiceName().equals(getServiceInterface().getName())) {
+		if (!polling && event.getServiceName().equals(getServiceInterface().getName())) {
 			// force discover service for balance
 			if (serviceUrl != null) {
 				String old = serviceUrl;
-				String newServiceUrl = discoverServiceUrl();
+				String newServiceUrl = discoverServiceUrl(false);
 				if (!newServiceUrl.equals(old)) {
 					log.info("Relocate service url {} for balancing", newServiceUrl);
 				}
