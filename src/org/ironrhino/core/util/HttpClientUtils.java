@@ -13,6 +13,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.NoHttpResponseException;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
@@ -62,9 +63,12 @@ public class HttpClientUtils {
 	public static CloseableHttpClient create(int connectTimeout) {
 		RequestConfig requestConfig = RequestConfig.custom().setCircularRedirectsAllowed(true)
 				.setConnectTimeout(connectTimeout).setExpectContinueEnabled(true).build();
-		CloseableHttpClient httpclient = HttpClients.custom().disableAuthCaching().disableAutomaticRetries()
-				.disableConnectionState().disableCookieManagement().setConnectionTimeToLive(60, TimeUnit.SECONDS)
-				.setDefaultRequestConfig(requestConfig).setDefaultHeaders(DEFAULT_HEADERS).build();
+		CloseableHttpClient httpclient = HttpClients.custom().disableAuthCaching().disableConnectionState()
+				.disableCookieManagement().setConnectionTimeToLive(60, TimeUnit.SECONDS)
+				.setDefaultRequestConfig(requestConfig).setDefaultHeaders(DEFAULT_HEADERS)
+				.setRetryHandler(
+						(e, executionCount, httpCtx) -> executionCount < 3 && e instanceof NoHttpResponseException)
+				.build();
 		return httpclient;
 	}
 

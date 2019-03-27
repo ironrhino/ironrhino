@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Locale;
 
+import org.apache.http.NoHttpResponseException;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
@@ -120,8 +121,9 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 	private static class TrustAllHostsClientHttpRequestFactory extends HttpComponentsClientHttpRequestFactory {
 
 		public TrustAllHostsClientHttpRequestFactory(boolean trustAllHosts) {
-			HttpClientBuilder builder = HttpClients.custom().disableAuthCaching().disableAutomaticRetries()
-					.disableConnectionState().disableCookieManagement();
+			HttpClientBuilder builder = HttpClients.custom().disableAuthCaching().disableConnectionState()
+					.disableCookieManagement().setRetryHandler(
+							(e, executionCount, httpCtx) -> executionCount < 3 && e instanceof NoHttpResponseException);
 			if (trustAllHosts) {
 				try {
 					SSLContextBuilder sbuilder = SSLContexts.custom().loadTrustMaterial(null, (chain, authType) -> {
