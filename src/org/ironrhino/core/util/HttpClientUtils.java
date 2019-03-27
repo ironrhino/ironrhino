@@ -13,7 +13,6 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.NoHttpResponseException;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
@@ -29,6 +28,7 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
@@ -65,10 +65,18 @@ public class HttpClientUtils {
 				.setConnectTimeout(connectTimeout).setExpectContinueEnabled(true).build();
 		CloseableHttpClient httpclient = HttpClients.custom().disableAuthCaching().disableConnectionState()
 				.disableCookieManagement().setConnectionTimeToLive(60, TimeUnit.SECONDS)
-				.setDefaultRequestConfig(requestConfig).setDefaultHeaders(DEFAULT_HEADERS)
-				.setRetryHandler(
-						(e, executionCount, httpCtx) -> executionCount < 3 && e instanceof NoHttpResponseException)
+				.setDefaultRequestConfig(requestConfig).setDefaultHeaders(DEFAULT_HEADERS).setRetryHandler((e,
+						retryCount, httpCtx) -> retryCount < 3 && e instanceof org.apache.http.NoHttpResponseException)
 				.build();
+		try {
+			// some server doesn't respect HTTP/1.1 Keep-Alive
+			// https://issues.apache.org/jira/browse/HTTPCLIENT-1493
+			// https://issues.apache.org/jira/browse/HTTPCLIENT-1610
+			((PoolingHttpClientConnectionManager) ReflectionUtils.getFieldValue(httpclient, "connManager"))
+					.setValidateAfterInactivity(1); // change default 2000ms to 1ms
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return httpclient;
 	}
 

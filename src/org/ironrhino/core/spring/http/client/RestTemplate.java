@@ -8,15 +8,17 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Locale;
 
-import org.apache.http.NoHttpResponseException;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.SSLContexts;
 import org.ironrhino.core.servlet.AccessFilter;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.JsonUtils;
+import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -121,9 +123,8 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 	private static class TrustAllHostsClientHttpRequestFactory extends HttpComponentsClientHttpRequestFactory {
 
 		public TrustAllHostsClientHttpRequestFactory(boolean trustAllHosts) {
-			HttpClientBuilder builder = HttpClients.custom().disableAuthCaching().disableConnectionState()
-					.disableCookieManagement().setRetryHandler(
-							(e, executionCount, httpCtx) -> executionCount < 3 && e instanceof NoHttpResponseException);
+			HttpClientBuilder builder = HttpClients.custom().disableAuthCaching().disableAutomaticRetries()
+					.disableConnectionState().disableCookieManagement();
 			if (trustAllHosts) {
 				try {
 					SSLContextBuilder sbuilder = SSLContexts.custom().loadTrustMaterial(null, (chain, authType) -> {
@@ -134,7 +135,17 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 					e.printStackTrace();
 				}
 			}
-			setHttpClient(builder.build());
+			CloseableHttpClient httpclient = builder.build();
+			try {
+				// some server doesn't respect HTTP/1.1 Keep-Alive
+				// https://issues.apache.org/jira/browse/HTTPCLIENT-1493
+				// https://issues.apache.org/jira/browse/HTTPCLIENT-1610
+				((PoolingHttpClientConnectionManager) ReflectionUtils.getFieldValue(httpclient, "connManager"))
+						.setValidateAfterInactivity(1); // change default 2000ms to 1ms
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			setHttpClient(httpclient);
 		}
 
 	}
