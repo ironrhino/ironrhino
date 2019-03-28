@@ -11,8 +11,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 @ApplicationContextPropertiesConditional(key = "verification.code.enabled", value = "true")
 @Component("verificationManager")
+@Slf4j
 public class DefaultVerificationManager implements VerificationManager {
 
 	@Autowired
@@ -41,7 +44,12 @@ public class DefaultVerificationManager implements VerificationManager {
 
 	@Override
 	public void send(String username) {
-		verificationService.send(getReceiver(userDetailsService.loadUserByUsername(username)));
+		String receiver = getReceiver(userDetailsService.loadUserByUsername(username));
+		if (StringUtils.isBlank(receiver)) {
+			log.warn("user {} receiver is blank", username);
+		} else {
+			verificationService.send(receiver);
+		}
 	}
 
 	@Override
