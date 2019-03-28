@@ -60,6 +60,7 @@ public class RestClient implements BeanNameAware {
 	@Getter
 	protected final RestTemplate restTemplate = new RestClientTemplate(this);
 
+	@Getter
 	protected final RestTemplate internalRestTemplate = new RestTemplate();
 
 	@Autowired(required = false)

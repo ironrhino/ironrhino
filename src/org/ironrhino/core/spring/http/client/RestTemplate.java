@@ -1,24 +1,25 @@
 package org.ironrhino.core.spring.http.client;
 
 import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.net.HttpURLConnection;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Locale;
+import java.util.Set;
 
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.ssl.SSLContextBuilder;
-import org.apache.http.ssl.SSLContexts;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
 import org.ironrhino.core.servlet.AccessFilter;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.JsonUtils;
-import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -28,6 +29,7 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
@@ -80,7 +82,10 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 	@Value("${restTemplate.connectTimeout:" + DEFAULT_CONNECT_TIMEOUT + "}")
 	public void setConnectTimeout(int connectTimeout) {
 		this.connectTimeout = connectTimeout;
-		if (requestFactory instanceof HttpComponentsClientHttpRequestFactory) {
+		if (requestFactory instanceof SimpleClientHttpRequestFactory) {
+			SimpleClientHttpRequestFactory schrf = (SimpleClientHttpRequestFactory) requestFactory;
+			schrf.setConnectTimeout(connectTimeout);
+		} else if (requestFactory instanceof HttpComponentsClientHttpRequestFactory) {
 			HttpComponentsClientHttpRequestFactory hccrf = (HttpComponentsClientHttpRequestFactory) requestFactory;
 			hccrf.setConnectTimeout(connectTimeout);
 		}
@@ -89,7 +94,10 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 	@Value("${restTemplate.readTimeout:" + DEFAULT_READ_TIMEOUT + "}")
 	public void setReadTimeout(int readTimeout) {
 		this.readTimeout = readTimeout;
-		if (requestFactory instanceof HttpComponentsClientHttpRequestFactory) {
+		if (requestFactory instanceof SimpleClientHttpRequestFactory) {
+			SimpleClientHttpRequestFactory schrf = (SimpleClientHttpRequestFactory) requestFactory;
+			schrf.setReadTimeout(readTimeout);
+		} else if (requestFactory instanceof HttpComponentsClientHttpRequestFactory) {
 			HttpComponentsClientHttpRequestFactory hccrf = (HttpComponentsClientHttpRequestFactory) requestFactory;
 			hccrf.setReadTimeout(readTimeout);
 		}
@@ -120,34 +128,67 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 
 	}
 
-	private static class TrustAllHostsClientHttpRequestFactory extends HttpComponentsClientHttpRequestFactory {
+	private static class TrustAllHostsClientHttpRequestFactory extends SimpleClientHttpRequestFactory {
+
+		static {
+			allowPatchMethod();
+		}
+
+		private final boolean trustAllHosts;
 
 		public TrustAllHostsClientHttpRequestFactory(boolean trustAllHosts) {
-			HttpClientBuilder builder = HttpClients.custom().disableAuthCaching().disableAutomaticRetries()
-					.disableConnectionState().disableCookieManagement();
-			if (trustAllHosts) {
-				try {
-					SSLContextBuilder sbuilder = SSLContexts.custom().loadTrustMaterial(null, (chain, authType) -> {
-						return true;
-					});
-					builder.setSSLSocketFactory(new SSLConnectionSocketFactory(sbuilder.build()));
-				} catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e) {
-					e.printStackTrace();
-				}
+			this.trustAllHosts = trustAllHosts;
+		}
+
+		@Override
+		protected void prepareConnection(final HttpURLConnection connection, final String httpMethod)
+				throws IOException {
+			if (trustAllHosts && connection instanceof HttpsURLConnection) {
+				((HttpsURLConnection) connection).setHostnameVerifier((hostname, session) -> true);
+				((HttpsURLConnection) connection).setSSLSocketFactory(initSSLContext().getSocketFactory());
 			}
-			CloseableHttpClient httpclient = builder.build();
+			super.prepareConnection(connection, httpMethod);
+		}
+
+		private SSLContext initSSLContext() {
 			try {
-				// some server doesn't respect HTTP/1.1 Keep-Alive
-				// https://issues.apache.org/jira/browse/HTTPCLIENT-1493
-				// https://issues.apache.org/jira/browse/HTTPCLIENT-1610
-				((PoolingHttpClientConnectionManager) ReflectionUtils.getFieldValue(httpclient, "connManager"))
-						.setValidateAfterInactivity(1); // change default 2000ms to 1ms
+				TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+					public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+						return null;
+					}
+
+					public void checkClientTrusted(X509Certificate[] certs, String authType) {
+					}
+
+					public void checkServerTrusted(X509Certificate[] certs, String authType) {
+					}
+				} };
+				SSLContext sslContext = SSLContext.getInstance("SSL");
+				sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+				return sslContext;
+			} catch (final Exception ex) {
+				return null;
+			}
+		}
+
+		private static void allowPatchMethod() {
+			try {
+				Field methodsField = HttpURLConnection.class.getDeclaredField("methods");
+				Field modifiersField = Field.class.getDeclaredField("modifiers");
+				modifiersField.setAccessible(true);
+				modifiersField.setInt(methodsField, methodsField.getModifiers() & ~Modifier.FINAL);
+				methodsField.setAccessible(true);
+				String[] oldMethods = (String[]) methodsField.get(null);
+				Set<String> methodsSet = new LinkedHashSet<>(Arrays.asList(oldMethods));
+				if (!methodsSet.contains("PATCH")) {
+					methodsSet.add("PATCH");
+					String[] newMethods = methodsSet.toArray(new String[0]);
+					methodsField.set(null, newMethods);
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			setHttpClient(httpclient);
 		}
-
 	}
 
 }
