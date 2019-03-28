@@ -99,6 +99,10 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 	@Setter
 	private int maxAttempts = 3;
 
+	@Getter
+	@Setter
+	private boolean circuitBreakerEnabled = true;
+
 	public RestApiFactoryBean(Class<?> restApiClass) {
 		this(restApiClass, (RestTemplate) null);
 	}
@@ -185,7 +189,8 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 			} while (--remainingAttempts > 0);
 			throw new MaxAttemptsExceededException(maxAttempts);
 		};
-		return CircuitBreaking.execute(restApiClass.getName(), IO_ERROR_PREDICATE, callable);
+		return circuitBreakerEnabled ? CircuitBreaking.execute(restApiClass.getName(), IO_ERROR_PREDICATE, callable)
+				: callable.call();
 	}
 
 	@SuppressWarnings("unchecked")
