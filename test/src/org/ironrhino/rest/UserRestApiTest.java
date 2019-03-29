@@ -252,6 +252,7 @@ public class UserRestApiTest {
 		} catch (RestStatus e) {
 			rs = e;
 		}
+		assertNotNull(rs);
 		assertEquals(rs.getCode(), RestStatus.CODE_INTERNAL_SERVER_ERROR);
 		assertTrue(rs.getCause() instanceof HttpServerErrorException);
 	}

@@ -1,6 +1,7 @@
 package org.ironrhino.rest.client;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
@@ -97,6 +98,7 @@ public class RestApiTests {
 		} catch (RestStatus e) {
 			rs = e;
 		}
+		assertNotNull(rs);
 		assertEquals(rs.getCode(), RestStatus.CODE_NOT_FOUND);
 		assertTrue(rs.getCause() instanceof HttpClientErrorException);
 	}

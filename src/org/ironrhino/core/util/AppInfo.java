@@ -471,13 +471,16 @@ public class AppInfo {
 						AppInfo.getAppHome() + "/conf/applicationContext." + AppInfo.getStage().name() + ".yaml") };
 		for (Resource resource : resources) {
 			if (resource.exists()) {
-				if (resource.getFilename().endsWith(".yaml")) {
+				String filename = resource.getFilename();
+				if (filename != null && filename.endsWith(".yaml")) {
 					if (!snakeyamlPresent)
 						throw new IllegalArgumentException("missing snakeyaml");
 					YamlPropertiesFactoryBean factory = new YamlPropertiesFactoryBean();
 					factory.setResources(resource);
 					factory.afterPropertiesSet();
-					properties.putAll(factory.getObject());
+					Properties props = factory.getObject();
+					if (props != null)
+						properties.putAll(props);
 				} else {
 					try (InputStream is = resource.getInputStream()) {
 						properties.load(is);

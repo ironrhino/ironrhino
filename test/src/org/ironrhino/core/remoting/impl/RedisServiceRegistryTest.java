@@ -37,6 +37,7 @@ import org.ironrhino.core.remoting.client.RemotingServiceRegistryPostProcessor;
 import org.ironrhino.core.remoting.impl.RedisServiceRegistryTest.RedisServiceRegistryConfiguration;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializers;
 import org.ironrhino.core.util.AppInfo;
+import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.sample.remoting.BarService;
 import org.ironrhino.sample.remoting.FooService;
 import org.ironrhino.sample.remoting.FooServiceImpl;
@@ -97,12 +98,11 @@ public class RedisServiceRegistryTest {
 	}
 
 	private static void setServiceUrl(HttpInvokerClient client, String host) throws Exception {
-		Field serviceUrlField = HttpInvokerClient.class.getDeclaredField("serviceUrl");
-		serviceUrlField.setAccessible(true);
-		serviceUrlField.set(client, serviceUrl(host, client.getObjectType()));
-		Field discoveredHost = HttpInvokerClient.class.getDeclaredField("discoveredHost");
-		discoveredHost.setAccessible(true);
-		discoveredHost.set(client, host);
+		Class<?> serviceClass = client.getObjectType();
+		if (serviceClass != null) {
+			ReflectionUtils.setFieldValue(client, "serviceUrl", serviceUrl(host, serviceClass));
+			ReflectionUtils.setFieldValue(client, "discoveredHost", host);
+		}
 	}
 
 	private static String getServiceUrl(HttpInvokerClient client) throws Exception {
@@ -365,7 +365,8 @@ public class RedisServiceRegistryTest {
 
 		given(httpInvokerRequestExecutor.getSerializer()).willReturn(HttpInvokerSerializers.DEFAULT_SERIALIZER);
 		given(httpInvokerRequestExecutor.executeRequest(eq(serviceUrl(normalizeHost(provider1), BarService.class)),
-				any(RemoteInvocation.class), any(MethodInvocation.class))).willThrow(new RuntimeException("error"));
+				any(RemoteInvocation.class), any(MethodInvocation.class)))
+						.willThrow(new RuntimeException("intentional error"));
 		given(httpInvokerRequestExecutor.executeRequest(eq(serviceUrl(normalizeHost(provider2), BarService.class)),
 				any(RemoteInvocation.class), any(MethodInvocation.class)))
 						.willReturn(new RemoteInvocationResult("test"));
