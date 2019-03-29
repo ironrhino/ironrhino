@@ -9,6 +9,9 @@ import org.ironrhino.core.util.RequestUtils;
 
 import com.opensymphony.xwork2.ActionInvocation;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class RedirectResult extends StrutsResultSupport {
 
 	private static final long serialVersionUID = -6928786957584819539L;
@@ -34,6 +37,9 @@ public class RedirectResult extends StrutsResultSupport {
 				finalLocation = request.getContextPath() + finalLocation;
 			finalLocation = response.encodeRedirectURL(finalLocation);
 		} else if (!RequestUtils.isSameOrigin(request, finalLocation)) {
+			log.warn(
+					"{} is not same orgigin, recommend:\nServletActionContext.getResponse().sendRedirect(targetUrl);\nreturn NONE;",
+					finalLocation);
 			response.sendError(HttpServletResponse.SC_FORBIDDEN);
 		}
 		response.sendRedirect(finalLocation);
