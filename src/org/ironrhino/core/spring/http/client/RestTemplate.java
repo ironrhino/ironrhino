@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.HttpURLConnection;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,6 +32,7 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.stereotype.Component;
@@ -62,11 +64,12 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 		Iterator<HttpMessageConverter<?>> it = getMessageConverters().iterator();
 		while (it.hasNext()) {
 			HttpMessageConverter<?> mc = it.next();
-			if (mc instanceof MappingJackson2XmlHttpMessageConverter)
+			if (mc instanceof MappingJackson2XmlHttpMessageConverter || mc instanceof StringHttpMessageConverter)
 				it.remove();
 			else if (mc instanceof MappingJackson2HttpMessageConverter)
 				((MappingJackson2HttpMessageConverter) mc).setObjectMapper(JsonUtils.createNewObjectMapper());
 		}
+		getMessageConverters().add(new StringHttpMessageConverter(StandardCharsets.UTF_8));
 		setConnectTimeout(DEFAULT_CONNECT_TIMEOUT);
 		setReadTimeout(DEFAULT_READ_TIMEOUT);
 	}
