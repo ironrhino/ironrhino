@@ -51,7 +51,7 @@
 		</copy>
 	</target>
 
-	<target name="test" depends="compile">
+	<target name="compile-test" depends="compile">
 		<mkdir dir="${test.classes.dir}" />
 		<javac includeantruntime="false" debug="true" debuglevel="lines,vars,source" srcdir="${test.src.dir}" destdir="${test.classes.dir}" encoding="UTF-8">
 			<compilerarg line="-Xlint:unchecked" />
@@ -66,6 +66,9 @@
 				<exclude name="**/*.java" />
 			</fileset>
 		</copy>
+	</target>
+
+	<target name="test" depends="compile-test">
 		<mkdir dir="${test.results.dir}" />
 		<junit haltonfailure="true" haltonerror="true" printsummary="true">
 			<classpath>
@@ -77,7 +80,7 @@
 			<formatter type="plain" />
 			<formatter type="xml" />
 			<batchtest todir="${test.results.dir}">
-				<fileset dir="${test.classes.dir}" includes="**/*Test.class" />
+				<fileset dir="${test.classes.dir}" includes="**/*Test.class" excludes="**/generated/*.class"/>
 				<!--
 				<fileset dir="${test.classes.dir}" includes="**/*Tests.class" />
 				-->
