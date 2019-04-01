@@ -20,8 +20,7 @@ import org.springframework.web.client.ResourceAccessException;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = RestApiConfiguration.class)
-@TestPropertySource(properties = { "org.ironrhino.rest.client.UserClient.imported=false",
-		"org.ironrhino.rest.client.UploadClient.imported=false" })
+@TestPropertySource(properties = { "org.ironrhino.rest.client.TestClient.apiBaseUrl=http://localhost/api" })
 public class RestApiFallbackTest {
 
 	@Autowired
