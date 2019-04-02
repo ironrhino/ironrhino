@@ -205,6 +205,7 @@ public class JsonUtils {
 		objectMapper.addMixIn(GrantedAuthority.class, SimpleGrantedAuthorityMixin.class)
 				.addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityMixin.class);
 		objectMapper.registerModule(MODULE_TEMPORAL);
+		objectMapper.findAndRegisterModules();
 		if (AppInfo.getStage() == Stage.DEVELOPMENT)
 			objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 		return objectMapper;

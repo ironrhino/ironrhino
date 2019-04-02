@@ -99,6 +99,8 @@ public class JavaRemotingServiceTests {
 		assertTrue(Arrays.equals(new String[] { "echoWithArrayList" },
 				testService.echoArray(new String[] { "echoWithArrayList" })));
 		assertEquals(3, testService.countAndAdd(Collections.singletonList("test"), 2));
+		TestService.Immutable value = new TestService.Immutable(12, "test");
+		assertEquals(value, testService.echoImmutable(value));
 	}
 
 	@Test

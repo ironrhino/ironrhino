@@ -30,6 +30,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.Value;
 
 public class JsonUtilsTest {
 
@@ -76,6 +77,12 @@ public class JsonUtilsTest {
 		private LocalTime time = LocalTime.now().truncatedTo(ChronoUnit.SECONDS);
 		private YearMonth month = YearMonth.now();
 		private Duration duration = Duration.ofMillis(1000);
+	}
+
+	@Value
+	static class ImmutableObject {
+		private long id;
+		private String name;
 	}
 
 	@Test
@@ -177,6 +184,12 @@ public class JsonUtilsTest {
 		String s = JsonUtils.toJson(to);
 		TemporalObject to2 = JsonUtils.fromJson(s, TemporalObject.class);
 		assertEquals(to, to2);
+	}
+
+	@Test
+	public void testImmutable() throws IOException {
+		assertEquals(new ImmutableObject(12, "test"),
+				JsonUtils.fromJson("{\"id\":12,\"name\":\"test\"}", ImmutableObject.class));
 	}
 
 }

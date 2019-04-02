@@ -1,5 +1,6 @@
 package org.ironrhino.sample.remoting;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -15,11 +16,20 @@ import org.ironrhino.security.domain.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.concurrent.ListenableFuture;
 
+import lombok.Value;
+
 @Remoting
 public interface TestService {
 
 	enum FutureType {
 		RUNNABLE, COMPLETABLE, LISTENABLE;
+	}
+
+	@Value
+	class Immutable implements Serializable {
+		private static final long serialVersionUID = 1L;
+		private long id;
+		private String name;
 	}
 
 	public default String defaultEcho(String value) {
@@ -43,6 +53,8 @@ public interface TestService {
 	public Date echoDate(Date value);
 
 	public Scope echoScope(@NotNull Scope value);
+
+	public Immutable echoImmutable(Immutable value);
 
 	public User echoUser(@Valid User value);
 

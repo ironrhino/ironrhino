@@ -74,6 +74,11 @@ public class TestServiceImpl implements TestService {
 	}
 
 	@Override
+	public Immutable echoImmutable(Immutable value) {
+		return value;
+	}
+
+	@Override
 	public User echoUser(User value) {
 		return value;
 	}

@@ -16,7 +16,6 @@ import org.ironrhino.core.model.NullObject;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.jackson2.SimpleGrantedAuthorityMixin;
-import org.springframework.util.ClassUtils;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -38,7 +37,6 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.module.mrbean.MrBeanModule;
 
 import lombok.experimental.UtilityClass;
 
@@ -163,9 +161,7 @@ public class JsonSerializationUtils {
 						return NullObject.get();
 					}
 				})).setAnnotationIntrospector(SmartJacksonAnnotationIntrospector.INSTANCE);
-		if (ClassUtils.isPresent("com.fasterxml.jackson.module.mrbean.MrBeanModule",
-				ObjectMapper.class.getClassLoader()))
-			objectMapper.registerModule(new MrBeanModule());
+		objectMapper.findAndRegisterModules();
 		return objectMapper;
 	}
 
@@ -219,7 +215,7 @@ public class JsonSerializationUtils {
 					}
 				}
 				int modifier = mem.getModifiers();
-				return Modifier.isTransient(modifier) || Modifier.isFinal(modifier) || Modifier.isStatic(modifier);
+				return Modifier.isTransient(modifier) || Modifier.isStatic(modifier);
 			});
 		}
 

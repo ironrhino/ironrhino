@@ -1,6 +1,7 @@
 package org.ironrhino.core.util;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
@@ -125,64 +126,81 @@ public class SampleObjectCreator {
 			});
 			return object;
 		}
+		Object o = null;
 		try {
-			final Object obj = BeanUtils.instantiateClass(clazz);
-			references.add(clazz);
-			ReflectionUtils.doWithFields(obj.getClass(), field -> {
-				ReflectionUtils.makeAccessible(field);
-				Object value;
-				Type type = field.getGenericType();
-				if (type instanceof Class) {
-					if (!field.getType().isPrimitive() && field.get(obj) != null) {
-						return;
-					}
-					if (type == clazz) {
-						value = obj;
-					} else {
-						value = createValue(field.getType(), field.getName(), clazz);
-						if (value == null) {
-							if (!references.contains(clazz)) {
-								value = createObject(field.getType(), references);
-							} else {
-								return;
-							}
-						}
-					}
-				} else if (type instanceof ParameterizedType) {
-					ParameterizedType pt = (ParameterizedType) type;
-					if (!(pt.getRawType() instanceof Class) || pt.getActualTypeArguments().length != 1
-							|| !(pt.getActualTypeArguments()[0] instanceof Class))
-						return;
-					Class<?> raw = (Class<?>) pt.getRawType();
-					Class<?> clazz2 = (Class<?>) pt.getActualTypeArguments()[0];
-					if (Set.class.isAssignableFrom(raw)) {
-						Set<Object> set = new HashSet<>();
-						if (!references.contains(clazz2))
-							set.add((clazz2 == clazz) ? obj : createObject(clazz2, references));
-						value = set;
-					} else if (Iterable.class.isAssignableFrom(raw)) {
-						List<Object> list = new ArrayList<>();
-						if (!references.contains(clazz2))
-							list.add((clazz2 == clazz) ? obj : createObject(clazz2, references));
-						value = list;
-					} else {
-						return;
-					}
-				} else {
-					return;
-				}
-				field.set(obj, value);
-			}, field -> {
-				if (field.getType() == clazz)
-					return false;
-				int mod = field.getModifiers();
-				return !(Modifier.isFinal(mod) || Modifier.isStatic(mod));
-			});
-			return obj;
+			o = BeanUtils.instantiateClass(clazz);
 		} catch (Exception e) {
+			Constructor<?> c = clazz.getConstructors()[0];
+			Type[] types = c.getGenericParameterTypes();
+			if (types.length > 0) {
+				Object[] arr = new Object[types.length];
+				for (int i = 0; i < types.length; i++)
+					arr[i] = createSample(types[i]);
+				try {
+					o = c.newInstance(arr);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
+		if (o == null) {
 			System.err.println("SampleObjectCreator can not instantiate :" + clazz);
 			return null;
 		}
+		Object obj = o;
+		references.add(clazz);
+		ReflectionUtils.doWithFields(obj.getClass(), field -> {
+			ReflectionUtils.makeAccessible(field);
+			Object value;
+			Type type = field.getGenericType();
+			if (type instanceof Class) {
+				if (!field.getType().isPrimitive() && field.get(obj) != null) {
+					return;
+				}
+				if (type == clazz) {
+					value = obj;
+				} else {
+					value = createValue(field.getType(), field.getName(), clazz);
+					if (value == null) {
+						if (!references.contains(clazz)) {
+							value = createObject(field.getType(), references);
+						} else {
+							return;
+						}
+					}
+				}
+			} else if (type instanceof ParameterizedType) {
+				ParameterizedType pt = (ParameterizedType) type;
+				if (!(pt.getRawType() instanceof Class) || pt.getActualTypeArguments().length != 1
+						|| !(pt.getActualTypeArguments()[0] instanceof Class))
+					return;
+				Class<?> raw = (Class<?>) pt.getRawType();
+				Class<?> clazz2 = (Class<?>) pt.getActualTypeArguments()[0];
+				if (Set.class.isAssignableFrom(raw)) {
+					Set<Object> set = new HashSet<>();
+					if (!references.contains(clazz2))
+						set.add((clazz2 == clazz) ? obj : createObject(clazz2, references));
+					value = set;
+				} else if (Iterable.class.isAssignableFrom(raw)) {
+					List<Object> list = new ArrayList<>();
+					if (!references.contains(clazz2))
+						list.add((clazz2 == clazz) ? obj : createObject(clazz2, references));
+					value = list;
+				} else {
+					return;
+				}
+			} else {
+				return;
+			}
+			field.set(obj, value);
+		}, field -> {
+			if (field.getType() == clazz)
+				return false;
+			int mod = field.getModifiers();
+			return !(Modifier.isFinal(mod) || Modifier.isStatic(mod));
+		});
+		return obj;
+
 	}
 
 	private Object createValue(Class<?> type, String fieldName, Class<?> sampleClass) {
@@ -244,7 +262,8 @@ public class SampleObjectCreator {
 			return "admin";
 		if (fieldName.toLowerCase(Locale.ROOT).endsWith("password"))
 			return "********";
-		if (fieldName.toLowerCase(Locale.ROOT).endsWith("phone") || fieldName.toLowerCase(Locale.ROOT).endsWith("mobile"))
+		if (fieldName.toLowerCase(Locale.ROOT).endsWith("phone")
+				|| fieldName.toLowerCase(Locale.ROOT).endsWith("mobile"))
 			return "13888888888";
 		if (fieldName.toLowerCase(Locale.ROOT).endsWith("code"))
 			return "123456";

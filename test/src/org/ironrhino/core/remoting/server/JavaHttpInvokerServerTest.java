@@ -161,6 +161,12 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 				argThat(ri -> "echo".equals(ri.getMethodName())), any(MethodInvocation.class));
 		assertEquals(HttpServletResponse.SC_OK, mockHttpServletResponse.getStatus());
 		verify(mockTestService).echo();
+		TestService.Immutable value = new TestService.Immutable(12, "test");
+		assertEquals(value, testService.echoImmutable(value));
+		verify(mockHttpInvokerRequestExecutor).executeRequest(eq(serviceUrl(TestService.class)),
+				argThat(ri -> "echoImmutable".equals(ri.getMethodName())), any(MethodInvocation.class));
+		assertEquals(HttpServletResponse.SC_OK, mockHttpServletResponse.getStatus());
+		verify(mockTestService).echoImmutable(value);
 	}
 
 	@Test
