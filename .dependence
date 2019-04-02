@@ -41,6 +41,7 @@
 -aopalliance
 -aspectjrt
 +snakeyaml
++jackson-datatype-jsr310
 +jackson-module-parameter-names
 +jackson-module-mrbean
 +jackson-dataformat-smile

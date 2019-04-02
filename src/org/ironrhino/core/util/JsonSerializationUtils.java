@@ -4,11 +4,6 @@ import java.io.IOException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.YearMonth;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,16 +19,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -93,74 +85,16 @@ public class JsonSerializationUtils {
 				.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
 				.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS).addMixIn(Throwable.class, ThrowableMixin.class)
 				.addMixIn(GrantedAuthority.class, SimpleGrantedAuthorityMixin.class)
-				.addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityMixin.class)
-				.registerModule(new SimpleModule().addDeserializer(LocalDate.class, new JsonDeserializer<LocalDate>() {
-					@Override
-					public LocalDate deserialize(JsonParser jsonparser, DeserializationContext deserializationcontext)
-							throws IOException, JsonProcessingException {
-						return LocalDate.parse(jsonparser.getText());
-					}
-				}).addSerializer(LocalDate.class, new JsonSerializer<LocalDate>() {
-					@Override
-					public void serialize(LocalDate localDate, JsonGenerator jsonGenerator,
-							SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
-						jsonGenerator.writeString(localDate.toString());
-					}
-				}).addDeserializer(LocalDateTime.class, new JsonDeserializer<LocalDateTime>() {
-					@Override
-					public LocalDateTime deserialize(JsonParser jsonparser,
-							DeserializationContext deserializationcontext) throws IOException, JsonProcessingException {
-						return LocalDateTime.parse(jsonparser.getText());
-					}
-				}).addSerializer(LocalDateTime.class, new JsonSerializer<LocalDateTime>() {
-					@Override
-					public void serialize(LocalDateTime localDateTime, JsonGenerator jsonGenerator,
-							SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
-						jsonGenerator.writeString(localDateTime.toString());
-					}
-				}).addDeserializer(LocalTime.class, new JsonDeserializer<LocalTime>() {
-					@Override
-					public LocalTime deserialize(JsonParser jsonparser, DeserializationContext deserializationcontext)
-							throws IOException, JsonProcessingException {
-						return LocalTime.parse(jsonparser.getText());
-					}
-				}).addSerializer(LocalTime.class, new JsonSerializer<LocalTime>() {
-					@Override
-					public void serialize(LocalTime localTime, JsonGenerator jsonGenerator,
-							SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
-						jsonGenerator.writeString(localTime.toString());
-					}
-				}).addDeserializer(YearMonth.class, new JsonDeserializer<YearMonth>() {
-					@Override
-					public YearMonth deserialize(JsonParser jsonparser, DeserializationContext deserializationcontext)
-							throws IOException, JsonProcessingException {
-						return YearMonth.parse(jsonparser.getText());
-					}
-				}).addSerializer(YearMonth.class, new JsonSerializer<YearMonth>() {
-					@Override
-					public void serialize(YearMonth yearMonth, JsonGenerator jsonGenerator,
-							SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
-						jsonGenerator.writeString(yearMonth.toString());
-					}
-				}).addDeserializer(Duration.class, new JsonDeserializer<Duration>() {
-					@Override
-					public Duration deserialize(JsonParser jsonparser, DeserializationContext deserializationcontext)
-							throws IOException, JsonProcessingException {
-						return Duration.parse(jsonparser.getText());
-					}
-				}).addSerializer(Duration.class, new JsonSerializer<Duration>() {
-					@Override
-					public void serialize(Duration duration, JsonGenerator jsonGenerator,
-							SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
-						jsonGenerator.writeString(duration.toString());
-					}
-				}).addDeserializer(NullObject.class, new JsonDeserializer<NullObject>() {
-					@Override
-					public NullObject deserialize(JsonParser jsonparser, DeserializationContext deserializationcontext)
-							throws IOException, JsonProcessingException {
-						return NullObject.get();
-					}
-				})).setAnnotationIntrospector(SmartJacksonAnnotationIntrospector.INSTANCE);
+				.addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityMixin.class).registerModule(
+						new SimpleModule().addDeserializer(NullObject.class, new JsonDeserializer<NullObject>() {
+							@Override
+							public NullObject deserialize(JsonParser jsonparser,
+									DeserializationContext deserializationcontext)
+									throws IOException, JsonProcessingException {
+								return NullObject.get();
+							}
+						}))
+				.setAnnotationIntrospector(SmartJacksonAnnotationIntrospector.INSTANCE);
 		objectMapper.findAndRegisterModules();
 		return objectMapper;
 	}
