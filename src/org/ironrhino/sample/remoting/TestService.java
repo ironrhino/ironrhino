@@ -80,9 +80,10 @@ public interface TestService {
 
 	public Optional<? extends UserDetails> loadOptionalUserDetailsByUsername(String username);
 
-	public Future<User> loadFutureUserByUsername(String username, FutureType futureType);
+	public Future<User> loadFutureUserByUsername(String username, @NotNull FutureType futureType);
 
-	public Future<? extends UserDetails> loadFutureUserDetailsByUsername(String username, FutureType futureType);
+	public Future<? extends UserDetails> loadFutureUserDetailsByUsername(String username,
+			@NotNull FutureType futureType);
 
 	public ListenableFuture<User> loadListenableFutureUserByUsername(String username);
 
