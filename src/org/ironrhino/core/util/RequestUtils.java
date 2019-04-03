@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.conn.util.PublicSuffixMatcherLoader;
 
 import lombok.experimental.UtilityClass;
 
@@ -166,7 +167,7 @@ public class RequestUtils {
 		String domain = null;
 		String path = "".equals(request.getContextPath()) ? "/" : request.getContextPath();
 		if (global) {
-			domain = parseGlobalDomain(request.getServerName());
+			domain = getDomainRoot(request.getServerName());
 			path = "/";
 		}
 		saveCookie(request, response, cookieName, cookieValue, maxAge, domain, path, httpOnly);
@@ -211,7 +212,7 @@ public class RequestUtils {
 			String path, boolean global) {
 		String domain = null;
 		if (global) {
-			domain = parseGlobalDomain(request.getServerName());
+			domain = getDomainRoot(request.getServerName());
 			path = "/";
 		}
 		Cookie cookie = new Cookie(cookieName, null);
@@ -242,7 +243,7 @@ public class RequestUtils {
 			String host2 = new URL(b).getHost();
 			if (host2 == null)
 				host2 = "localhost";
-			return host1.equalsIgnoreCase(host2) || parseGlobalDomain(host1).equalsIgnoreCase(parseGlobalDomain(host2));
+			return host1.equalsIgnoreCase(host2) || getDomainRoot(host1).equalsIgnoreCase(getDomainRoot(host2));
 		} catch (MalformedURLException e) {
 			return false;
 		}
@@ -265,9 +266,12 @@ public class RequestUtils {
 		return null;
 	}
 
-	private static String parseGlobalDomain(String host) {
+	public static String getDomainRoot(String host) {
 		if (host.matches("^(\\d+\\.){3}\\d+$") || host.indexOf('.') < 0)
 			return host;
+		String s = PublicSuffixMatcherLoader.getDefault().getDomainRoot(host);
+		if (s != null)
+			return s;
 		int length = 2;
 		for (String tld : TLDS) {
 			if (host.endsWith(tld)) {
