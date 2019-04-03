@@ -117,8 +117,8 @@ public class AppInfo {
 			RUNLEVEL = r;
 		else
 			RUNLEVEL = RunLevel.NORMAL;
-		String name = System.getProperty("host.name");
-		String address = System.getProperty("host.address");
+		String name = getEnv("host.name");
+		String address = getEnv("host.address");
 		if (address == null)
 			try {
 				Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
@@ -389,8 +389,7 @@ public class AppInfo {
 
 		// configure spring profiles
 		if (StringUtils.isBlank(System.getProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME))) {
-			String defaultProfiles = System.getenv(
-					AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME.replaceAll("\\.", "_").toUpperCase(Locale.ROOT));
+			String defaultProfiles = getEnv(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME);
 			if (StringUtils.isNotBlank(defaultProfiles)) {
 				System.setProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME, defaultProfiles);
 				AppInfo.setDefaultProfiles(defaultProfiles);
@@ -403,7 +402,7 @@ public class AppInfo {
 		}
 		String featureProfiles = getFeatureProfiles();
 		if (StringUtils.isNotBlank(featureProfiles)) {
-			String defaultProfiles = System.getProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME);
+			String defaultProfiles = getEnv(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME);
 			if (StringUtils.isBlank(defaultProfiles))
 				defaultProfiles = "default";
 			defaultProfiles = defaultProfiles + ',' + featureProfiles;
@@ -524,6 +523,11 @@ public class AppInfo {
 		String value = System.getProperty(key);
 		if (value == null)
 			value = System.getenv(key);
+		// SystemEnvironmentPropertySource.checkPropertyName()
+		if (value == null)
+			value = System.getenv(key.replace('.', '_'));
+		if (value == null)
+			value = System.getenv(key.replace('.', '_').toUpperCase());
 		return value;
 	}
 
