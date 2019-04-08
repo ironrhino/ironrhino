@@ -25,15 +25,19 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
 
+import lombok.Getter;
+
 @Component("lockService")
 @ServiceImplementationConditional(profiles = { DUAL, CLOUD })
 public class RedisLockService implements LockService {
 
 	private static final String NAMESPACE = "lock:";
 
+	@Getter
 	@Value("${lockService.maxHoldTime:18000}")
 	private int maxHoldTime = 18000;
 
+	@Getter
 	@Value("${lockService.suspiciousHoldTime:600}")
 	private int suspiciousHoldTime = 600;
 
