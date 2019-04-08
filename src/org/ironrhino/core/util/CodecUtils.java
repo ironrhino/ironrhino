@@ -5,6 +5,7 @@ import java.lang.ref.SoftReference;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -16,6 +17,10 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class CodecUtils {
+
+	private static class Holder {
+		static final SecureRandom numberGenerator = new SecureRandom();
+	}
 
 	public static final String DEFAULT_ENCODING = "UTF-8";
 
@@ -278,9 +283,10 @@ public class CodecUtils {
 	}
 
 	public static String nextId() {
-		String id = UUID.randomUUID().toString().replace("-", "");
-		id = encodeBase62(id);
-		return StringUtils.leftPad(id, 22, '0');
+		SecureRandom ng = Holder.numberGenerator;
+		byte[] bytes = new byte[16];
+		ng.nextBytes(bytes);
+		return StringUtils.leftPad(encodeBase62(new BigInteger(Hex.encodeHexString(bytes), 16)), 22, '0');
 	}
 
 	public static String nextId(String salt) {
@@ -294,16 +300,19 @@ public class CodecUtils {
 	}
 
 	public static String encodeBase62(String hex) {
-		char[] buf = new char[hex.length()];
-		int charPos = hex.length() - 1;
-		BigInteger i = new BigInteger(hex, 16);
+		return encodeBase62(new BigInteger(hex, 16));
+	}
+
+	private static String encodeBase62(BigInteger value) {
+		char[] buf = new char[22];
+		int charPos = 21;
 		BigInteger radix = BigInteger.valueOf(62);
-		while (i.compareTo(radix) >= 0) {
-			buf[charPos--] = NumberUtils.NUMBERS.charAt(i.mod(radix).intValue());
-			i = i.divide(radix);
+		while (value.compareTo(radix) >= 0) {
+			buf[charPos--] = NumberUtils.NUMBERS.charAt(value.mod(radix).intValue());
+			value = value.divide(radix);
 		}
-		buf[charPos] = NumberUtils.NUMBERS.charAt(i.intValue());
-		return new String(buf, charPos, (hex.length() - charPos));
+		buf[charPos] = NumberUtils.NUMBERS.charAt(value.intValue());
+		return new String(buf, charPos, (22 - charPos));
 	}
 
 }
