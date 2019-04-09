@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @ApplicationContextPropertiesConditional(key = "verification.code.enabled", value = "true")
@@ -36,12 +37,14 @@ public class DefaultVerificationService implements VerificationService {
 	@Value("${verification.code.length:6}")
 	private int length = 6;
 
+	@Getter
 	@Value("${verification.code.resend.interval:60}")
 	private int resendInterval = 60;
 
 	@Value("${verification.code.verify.interval:5}")
 	private int verifyInterval = 5;
 
+	@Getter
 	@Value("${verification.code.verify.max.attempts:5}")
 	private int maxAttempts = 5;
 
