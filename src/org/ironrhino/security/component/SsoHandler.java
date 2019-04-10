@@ -81,8 +81,8 @@ public class SsoHandler extends AccessHandler {
 	@Autowired
 	protected UserDetailsService userDetailsService;
 
-	@Autowired
-	protected RestTemplate restTemplate;
+	@Autowired(required = false)
+	protected RestTemplate restTemplate = new RestTemplate();
 
 	@PostConstruct
 	private void init() {
@@ -129,7 +129,7 @@ public class SsoHandler extends AccessHandler {
 			RequestEntity<?> requestEntity = RequestEntity.get(apiUri).header("Cookie", cookie.toString())
 					.header("X-Real-IP", request.getRemoteAddr()).build();
 			try {
-				User userFromApi = restTemplate.exchange(requestEntity, User.class).getBody();
+				User userFromApi = exchange(requestEntity);
 				if (userFromApi != null) {
 					UserDetails ud = map(userFromApi);
 					auth = new UsernamePasswordAuthenticationToken(ud, ud.getPassword(), ud.getAuthorities());
@@ -161,6 +161,10 @@ public class SsoHandler extends AccessHandler {
 		redirectUrl.append(portalLoginUrl).append(portalLoginUrl.indexOf('?') > 0 ? '&' : '?');
 		redirectUrl.append("targetUrl=").append(URLEncoder.encode(targetUrl, "UTF-8"));
 		response.sendRedirect(redirectUrl.toString());
+	}
+
+	protected User exchange(RequestEntity<?> requestEntity) {
+		return restTemplate.exchange(requestEntity, User.class).getBody();
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
