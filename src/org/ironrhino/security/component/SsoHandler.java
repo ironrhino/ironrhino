@@ -22,7 +22,6 @@ import org.ironrhino.core.session.HttpSessionManager;
 import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.RequestUtils;
-import org.ironrhino.security.model.User;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,6 +42,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @ApplicationContextPropertiesConditional(key = "portal.baseUrl", value = ANY)
@@ -189,6 +189,15 @@ public class SsoHandler extends AccessHandler {
 			log.error(e.getMessage());
 			throw new ErrorMessage("access.denied");
 		}
+	}
+
+	@Data
+	static class User {
+		private String username;
+		private String name;
+		private String email;
+		private String phone;
+		private Set<String> roles;
 	}
 
 }
