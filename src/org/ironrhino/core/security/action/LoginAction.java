@@ -16,7 +16,6 @@ import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.security.event.LoginEvent;
 import org.ironrhino.core.security.verfication.VerificationManager;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
-import org.ironrhino.core.spring.security.CredentialsNeedResetException;
 import org.ironrhino.core.spring.security.DefaultAuthenticationSuccessHandler;
 import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationFilter;
 import org.ironrhino.core.spring.security.WrongVerificationCodeException;
@@ -120,8 +119,6 @@ public class LoginAction extends BaseAction {
 		} catch (UsernameNotFoundException | DisabledException | LockedException | AccountExpiredException failed) {
 			usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
 			addFieldError("username", getText(failed.getClass().getName()));
-		} catch (CredentialsNeedResetException failed) {
-			addFieldError("password", getText(failed.getClass().getName()));
 		} catch (BadCredentialsException failed) {
 			usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
 			addFieldError("password", getText(failed.getClass().getName()));

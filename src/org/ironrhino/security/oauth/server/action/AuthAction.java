@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.ironrhino.core.metadata.AutoConfig;
-import org.ironrhino.core.spring.security.CredentialsNeedResetException;
 import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationFilter;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
@@ -142,7 +141,7 @@ public class AuthAction extends BaseAction {
 			} catch (UsernameNotFoundException | DisabledException | LockedException | AccountExpiredException failed) {
 				addFieldError("username", getText(failed.getClass().getName()));
 				return HOME;
-			} catch (BadCredentialsException | CredentialsExpiredException | CredentialsNeedResetException failed) {
+			} catch (BadCredentialsException | CredentialsExpiredException failed) {
 				usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
 				addFieldError("password", getText(failed.getClass().getName()));
 				captchaManager.addCaptchaCount(request);
