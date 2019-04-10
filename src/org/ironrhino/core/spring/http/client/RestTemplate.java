@@ -5,18 +5,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Set;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import org.ironrhino.core.servlet.AccessFilter;
 import org.ironrhino.core.util.AppInfo;
@@ -52,14 +46,32 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 
 	private ClientHttpRequestFactory requestFactory;
 
+	static {
+		try {
+			Field methodsField = HttpURLConnection.class.getDeclaredField("methods");
+			Field modifiersField = Field.class.getDeclaredField("modifiers");
+			modifiersField.setAccessible(true);
+			modifiersField.setInt(methodsField, methodsField.getModifiers() & ~Modifier.FINAL);
+			methodsField.setAccessible(true);
+			String[] oldMethods = (String[]) methodsField.get(null);
+			Set<String> methodsSet = new LinkedHashSet<>(Arrays.asList(oldMethods));
+			if (!methodsSet.contains("PATCH")) {
+				methodsSet.add("PATCH");
+				String[] newMethods = methodsSet.toArray(new String[0]);
+				methodsField.set(null, newMethods);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	public RestTemplate() {
-		this(new TrustAllHostsClientHttpRequestFactory(false));
+		this(new SimpleClientHttpRequestFactory());
 	}
 
 	public RestTemplate(ClientHttpRequestFactory requestFactory) {
 		super();
-		this.requestFactory = requestFactory;
-		super.setRequestFactory(requestFactory);
+		setRequestFactory(requestFactory);
 		this.getInterceptors().add(new AddHeadersClientHttpRequestInterceptor());
 		Iterator<HttpMessageConverter<?>> it = getMessageConverters().iterator();
 		while (it.hasNext()) {
@@ -70,8 +82,6 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 				((MappingJackson2HttpMessageConverter) mc).setObjectMapper(JsonUtils.createNewObjectMapper());
 		}
 		getMessageConverters().add(new StringHttpMessageConverter(StandardCharsets.UTF_8));
-		setConnectTimeout(DEFAULT_CONNECT_TIMEOUT);
-		setReadTimeout(DEFAULT_READ_TIMEOUT);
 	}
 
 	@Override
@@ -108,7 +118,8 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 
 	@Value("${restTemplate.trustAllHosts:" + TRUST_ALL_HOSTS + "}")
 	public void setTrustAllHosts(boolean trustAllHosts) {
-		setRequestFactory(new TrustAllHostsClientHttpRequestFactory(trustAllHosts));
+		setRequestFactory(
+				trustAllHosts ? new TrustAllHostsClientHttpRequestFactory() : new SimpleClientHttpRequestFactory());
 	}
 
 	private static class AddHeadersClientHttpRequestInterceptor implements ClientHttpRequestInterceptor {
@@ -129,69 +140,6 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 			return execution.execute(request, body);
 		}
 
-	}
-
-	private static class TrustAllHostsClientHttpRequestFactory extends SimpleClientHttpRequestFactory {
-
-		static {
-			allowPatchMethod();
-		}
-
-		private final boolean trustAllHosts;
-
-		public TrustAllHostsClientHttpRequestFactory(boolean trustAllHosts) {
-			this.trustAllHosts = trustAllHosts;
-		}
-
-		@Override
-		protected void prepareConnection(final HttpURLConnection connection, final String httpMethod)
-				throws IOException {
-			if (trustAllHosts && connection instanceof HttpsURLConnection) {
-				((HttpsURLConnection) connection).setHostnameVerifier((hostname, session) -> true);
-				((HttpsURLConnection) connection).setSSLSocketFactory(initSSLContext().getSocketFactory());
-			}
-			super.prepareConnection(connection, httpMethod);
-		}
-
-		private SSLContext initSSLContext() {
-			try {
-				TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
-					public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-						return null;
-					}
-
-					public void checkClientTrusted(X509Certificate[] certs, String authType) {
-					}
-
-					public void checkServerTrusted(X509Certificate[] certs, String authType) {
-					}
-				} };
-				SSLContext sslContext = SSLContext.getInstance("SSL");
-				sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
-				return sslContext;
-			} catch (final Exception ex) {
-				return null;
-			}
-		}
-
-		private static void allowPatchMethod() {
-			try {
-				Field methodsField = HttpURLConnection.class.getDeclaredField("methods");
-				Field modifiersField = Field.class.getDeclaredField("modifiers");
-				modifiersField.setAccessible(true);
-				modifiersField.setInt(methodsField, methodsField.getModifiers() & ~Modifier.FINAL);
-				methodsField.setAccessible(true);
-				String[] oldMethods = (String[]) methodsField.get(null);
-				Set<String> methodsSet = new LinkedHashSet<>(Arrays.asList(oldMethods));
-				if (!methodsSet.contains("PATCH")) {
-					methodsSet.add("PATCH");
-					String[] newMethods = methodsSet.toArray(new String[0]);
-					methodsField.set(null, newMethods);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
 	}
 
 }
