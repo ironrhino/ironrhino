@@ -18,6 +18,7 @@ ${getText('org.springframework.security.authentication.CredentialsExpiredExcepti
 </#if>
 <#assign totpEnabled = (properties['totp.enabled']!)=='true'>
 <@s.form action="${actionBaseUrl}" method="post" class="form-horizontal ajax focus reset">
+	<#if targetUrl?has_content><@s.hidden name="targetUrl" /></#if>
 	<#if userCurrentPasswordNeeded!true>
 	<#assign userProfileReadonly=userProfileReadonly!false>
 	<@s.password name="currentPassword" class="required input-pattern sha" readonly=userProfileReadonly/>

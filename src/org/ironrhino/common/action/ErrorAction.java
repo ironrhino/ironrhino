@@ -1,5 +1,8 @@
 package org.ironrhino.common.action;
 
+import static org.ironrhino.core.security.action.PasswordAction.DEFAULT_VALUE_PASSWORD_ENTRY_POINT;
+import static org.ironrhino.core.security.action.PasswordAction.KEY_PASSWORD_ENTRY_POINT;
+
 import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
@@ -38,7 +41,7 @@ public class ErrorAction extends ActionSupport {
 	@Getter
 	private Throwable exception;
 
-	@Value("${password.entryPoint:/password}")
+	@Value("${" + KEY_PASSWORD_ENTRY_POINT + ":" + DEFAULT_VALUE_PASSWORD_ENTRY_POINT + "}")
 	private String passwordEntryPoint;
 
 	public String getUid() {

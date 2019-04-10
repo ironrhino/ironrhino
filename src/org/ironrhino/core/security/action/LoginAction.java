@@ -1,5 +1,10 @@
 package org.ironrhino.core.security.action;
 
+import static org.ironrhino.core.security.action.PasswordAction.DEFAULT_VALUE_PASSWORD_ENTRY_POINT;
+import static org.ironrhino.core.security.action.PasswordAction.KEY_PASSWORD_ENTRY_POINT;
+
+import java.net.URLEncoder;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -72,6 +77,9 @@ public class LoginAction extends BaseAction {
 	@Value("${" + KEY_LOGIN_DEFAULT_TARGET_URL + ":" + DEFAULT_VALUE_LOGIN_DEFAULT_TARGET_URL + "}")
 	protected String defaultTargetUrl;
 
+	@Value("${" + KEY_PASSWORD_ENTRY_POINT + ":" + DEFAULT_VALUE_PASSWORD_ENTRY_POINT + "}")
+	private String passwordEntryPoint;
+
 	@Autowired
 	protected UserDetailsService userDetailsService;
 
@@ -103,6 +111,7 @@ public class LoginAction extends BaseAction {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();
 		Authentication authResult = null;
+		boolean credentialsExpired = false;
 		try {
 			UsernamePasswordAuthenticationToken attempt = new UsernamePasswordAuthenticationToken(username, password);
 			attempt.setDetails(authenticationDetailsSource.buildDetails(request));
@@ -128,6 +137,7 @@ public class LoginAction extends BaseAction {
 			if (ud instanceof Persistable) {
 				addActionMessage(getText(failed.getClass().getName()));
 				authResult = new UsernamePasswordAuthenticationToken(ud, ud.getPassword(), ud.getAuthorities());
+				credentialsExpired = true;
 			} else {
 				usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
 				addFieldError("password", getText(failed.getClass().getName()));
@@ -136,7 +146,7 @@ public class LoginAction extends BaseAction {
 			usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
 			addFieldError("verificationCode", getText(failed.getClass().getName()));
 		}
-		if (authResult != null)
+		if (authResult != null) {
 			try {
 				usernamePasswordAuthenticationFilter.success(request, response, authResult);
 				Object principal = authResult.getPrincipal();
@@ -147,8 +157,15 @@ public class LoginAction extends BaseAction {
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}
-		if (StringUtils.isBlank(targetUrl) || !RequestUtils.isSameOrigin(request, targetUrl))
-			targetUrl = defaultTargetUrl;
+			if (credentialsExpired) {
+				String s = passwordEntryPoint;
+				if (StringUtils.isNotBlank(targetUrl))
+					s += "?targetUrl=" + URLEncoder.encode(targetUrl, "UTF-8");
+				targetUrl = s;
+			} else if (StringUtils.isBlank(targetUrl)) {
+				targetUrl = defaultTargetUrl;
+			}
+		}
 		return REDIRECT;
 	}
 

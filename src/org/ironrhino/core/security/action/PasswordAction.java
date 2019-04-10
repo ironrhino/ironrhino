@@ -6,6 +6,7 @@ import static org.ironrhino.core.security.action.LoginAction.KEY_LOGIN_DEFAULT_T
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.metadata.Authorize;
@@ -39,6 +40,10 @@ import lombok.Setter;
 public class PasswordAction extends BaseAction {
 
 	private static final long serialVersionUID = 5706895776974935953L;
+
+	public final static String KEY_PASSWORD_ENTRY_POINT = "password.entryPoint";
+
+	public final static String DEFAULT_VALUE_PASSWORD_ENTRY_POINT = "/password";
 
 	@Getter
 	@Setter
@@ -146,7 +151,8 @@ public class PasswordAction extends BaseAction {
 		ServletActionContext.getRequest().setAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_SESSION_MARK_AS_DIRTY,
 				true);
 		if (passwordExpired) {
-			targetUrl = defaultTargetUrl;
+			if (StringUtils.isBlank(targetUrl))
+				targetUrl = defaultTargetUrl;
 			return REDIRECT;
 		}
 		return SUCCESS;

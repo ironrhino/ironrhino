@@ -1,5 +1,8 @@
 package org.ironrhino.core.session;
 
+import static org.ironrhino.core.security.action.PasswordAction.DEFAULT_VALUE_PASSWORD_ENTRY_POINT;
+import static org.ironrhino.core.security.action.PasswordAction.KEY_PASSWORD_ENTRY_POINT;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SessionCompressorManager {
 
-	@Value("${password.entryPoint:/password}")
+	@Value("${" + KEY_PASSWORD_ENTRY_POINT + ":" + DEFAULT_VALUE_PASSWORD_ENTRY_POINT + "}")
 	private String passwordEntryPoint;
 
 	@Autowired(required = false)
