@@ -113,7 +113,9 @@ public class SessionCompressorManager {
 										boolean isPasswordEntryPoint = StringUtils.isNotBlank(passwordEntryPoint)
 												? uri.equals(passwordEntryPoint)
 												: uri.endsWith("/password");
-										if (!isPasswordEntryPoint && !uri.startsWith("/assets/"))
+										String accept = session.getRequest().getHeader("Accept");
+										if (!isPasswordEntryPoint && !uri.startsWith("/assets/")
+												&& (accept != null && accept.contains("text/html")))
 											throw new CredentialsExpiredException(username);
 									}
 								}

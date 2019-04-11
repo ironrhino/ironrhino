@@ -27,6 +27,7 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -127,7 +128,7 @@ public class SsoHandler extends AccessHandler {
 			if (session != null)
 				cookie.append("; ").append(sessionCookieName).append("=").append(URLEncoder.encode(session, "UTF-8"));
 			RequestEntity<?> requestEntity = RequestEntity.get(apiUri).header("Cookie", cookie.toString())
-					.header("X-Real-IP", request.getRemoteAddr()).build();
+					.header("X-Real-IP", request.getRemoteAddr()).accept(MediaType.APPLICATION_JSON).build();
 			try {
 				User userFromApi = exchange(requestEntity);
 				if (userFromApi != null) {
