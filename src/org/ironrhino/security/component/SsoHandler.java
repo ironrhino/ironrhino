@@ -32,7 +32,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -51,7 +50,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SsoHandler extends AccessHandler {
 
-	public static final String ROLE_BUILTIN_SSO = "ROLE_BUILTIN_SSO";
+	public static final String REQUEST_ATTRIBUTE_KEY_SSO = "SSO";
 
 	private static final String EXCLUDED_PATTERN = "/setup,/oauth/oauth2/*,/assets/*,/remoting/*";
 
@@ -139,6 +138,7 @@ public class SsoHandler extends AccessHandler {
 					Map<String, Object> sessionMap = new HashMap<>(2, 1);
 					sessionMap.put(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, sc);
 					request.setAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API, sessionMap);
+					request.setAttribute(REQUEST_ATTRIBUTE_KEY_SSO, true);
 				}
 			} catch (HttpClientErrorException e) {
 				if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
@@ -178,9 +178,6 @@ public class SsoHandler extends AccessHandler {
 				bw.setPropertyValue("passwordModifyDate", null);
 			Collection authorities = user.getAuthorities();
 			try {
-				GrantedAuthority sso = new SimpleGrantedAuthority(ROLE_BUILTIN_SSO);
-				if (!authorities.contains(sso))
-					authorities.add(sso);
 				Set<String> roles = userFromApi.getRoles();
 				if (roles != null && !roles.isEmpty()) {
 					List<GrantedAuthority> list = AuthorityUtils

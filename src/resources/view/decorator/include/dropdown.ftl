@@ -20,19 +20,15 @@
 	<li><a href="<@url value="${ssoServerBase!}/${user.class.simpleName?uncap_first}/profile"/>" class="popmodal nocache">${getText('profile')}</a></li>
 	<#if !user.getAttribute('oauth_provider')??>
 	<#assign passwordUrl=getUrl('/password')>
-	<#if ssoServerBase?has_content><#assign passwordUrl=ssoServerBase!+'/password'></#if>
-	<@authorize ifAnyGranted="ROLE_BUILTIN_SSO"><#assign passwordUrl=properties['portal.baseUrl']+'/password'></@authorize>
+	<#if request.getAttribute('SSO')??><#assign passwordUrl=properties['portal.baseUrl']+'/password'><#elseif ssoServerBase?has_content><#assign passwordUrl=ssoServerBase!+'/password'></#if>
 	<li><a href="${passwordUrl}" class="popmodal">${getText('change')}${getText('password')}</a></li>
 	</#if>
 	<#assign divider=true/>
 	</#if>
 	<#if !request.getAttribute("javax.servlet.request.X509Certificate")?? && beans['logoutSuccessHandler']??>
-	<#if divider>
-	<li class="divider"></li>
-	</#if>
+	<#if divider><li class="divider"></li></#if>
 	<#assign logoutUrl=getUrl('/logout')>
-	<#if ssoServerBase?has_content><#assign logoutUrl=ssoServerBase!+'/logout'></#if>
-	<@authorize ifAnyGranted="ROLE_BUILTIN_SSO"><#assign logoutUrl=properties['portal.baseUrl']+'/logout'></@authorize>
+	<#if request.getAttribute('SSO')??><#assign logoutUrl=properties['portal.baseUrl']+'/logout'><#elseif ssoServerBase?has_content><#assign logoutUrl=ssoServerBase!+'/logout'></#if>
 	<li><a href="${logoutUrl}">${getText('logout')}</a></li>
 	</#if>
 </ul>
