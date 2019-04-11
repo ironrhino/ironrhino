@@ -2,7 +2,7 @@ package org.ironrhino.core.hibernate.dialect;
 
 import java.sql.Types;
 
-import org.hibernate.cfg.Environment;
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.dialect.CUBRIDDialect;
 import org.hibernate.dialect.function.NoArgSQLFunction;
 import org.hibernate.dialect.function.StandardSQLFunction;
@@ -229,8 +229,8 @@ public class MyCUBRIDDialect extends CUBRIDDialect {
 	}
 
 	protected void registerDefaultProperties() {
-		getDefaultProperties().setProperty(Environment.USE_STREAMS_FOR_BINARY, "true");
-		getDefaultProperties().setProperty(Environment.STATEMENT_BATCH_SIZE, DEFAULT_BATCH_SIZE);
+		getDefaultProperties().setProperty(AvailableSettings.USE_STREAMS_FOR_BINARY, "true");
+		getDefaultProperties().setProperty(AvailableSettings.STATEMENT_BATCH_SIZE, DEFAULT_BATCH_SIZE);
 	}
 
 }
