@@ -27,8 +27,7 @@
 		<#assign passwordRequired = verificationManager.isPasswordRequired(username)>
 	</#if>
 	<#assign totpEnabled = (properties['totp.enabled']!)=='true'>
-	<@s.form id="login" action=actionBaseUrl method="post" class="ajax focus form-horizontal well">
-		<#if targetUrl?has_content><@s.hidden name="targetUrl" /></#if>
+	<@s.form id="login" action=request.requestURI+request.queryString???then('?'+request.queryString,'') method="post" class="ajax focus form-horizontal well">
 		<#assign dynamicAttributes={}>
 		<#if verificationCodeEnabled>
 		<#assign dynamicAttributes+={'data-replacement':'verification'}>
