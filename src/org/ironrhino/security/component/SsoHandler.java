@@ -23,6 +23,7 @@ import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesCondi
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.RequestUtils;
 import org.slf4j.MDC;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -171,6 +172,10 @@ public class SsoHandler extends AccessHandler {
 	protected UserDetails map(User userFromApi) {
 		try {
 			UserDetails user = userDetailsService.loadUserByUsername(userFromApi.getUsername());
+			// reset passwordModifyDate to avoid CredentialsExpiredException
+			BeanWrapperImpl bw = new BeanWrapperImpl(user);
+			if (bw.isWritableProperty("passwordModifyDate"))
+				bw.setPropertyValue("passwordModifyDate", null);
 			Collection authorities = user.getAuthorities();
 			try {
 				GrantedAuthority sso = new SimpleGrantedAuthority(ROLE_BUILTIN_SSO);
