@@ -3,11 +3,15 @@ package org.ironrhino.common.action;
 import static org.ironrhino.core.security.action.PasswordAction.DEFAULT_VALUE_PASSWORD_ENTRY_POINT;
 import static org.ironrhino.core.security.action.PasswordAction.KEY_PASSWORD_ENTRY_POINT;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.struts.BaseAction;
@@ -69,6 +73,16 @@ public class ErrorAction extends ActionSupport {
 					UserDetails ud = AuthzUtils.getUserDetails();
 					if (ud != null) {
 						targetUrl = passwordEntryPoint;
+						String s = (String) request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI);
+						if (StringUtils.isNotBlank(s)) {
+							String qs = request.getQueryString();
+							if (qs != null)
+								s += "?" + qs;
+							try {
+								targetUrl += "?targetUrl=" + URLEncoder.encode(s, "UTF-8");
+							} catch (UnsupportedEncodingException e) {
+							}
+						}
 						return BaseAction.REDIRECT;
 					}
 				}
