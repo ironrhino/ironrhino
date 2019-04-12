@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -111,6 +112,9 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			BaseTreeableEntity entity = (BaseTreeableEntity) obj;
 			boolean positionChanged = false;
 			if (isnew) {
+				entity.setFullId(UUID.randomUUID().toString());
+				// assign any temporary unique value to fullId
+				// sqlserver treat duplicated <NULL> as violation of UNIQUE KEY constraint
 				session.save(entity);
 				session.flush();
 				positionChanged = true;
