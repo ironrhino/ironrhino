@@ -400,10 +400,14 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 		if (!polling && event.getServiceName().equals(getServiceInterface().getName())) {
 			// force discover service for balance
 			if (serviceUrl != null) {
-				String old = serviceUrl;
-				String newServiceUrl = discoverServiceUrl(false);
-				if (!newServiceUrl.equals(old)) {
-					log.info("Relocate service url {} for balancing", newServiceUrl);
+				try {
+					String old = serviceUrl;
+					String newServiceUrl = discoverServiceUrl(false);
+					if (!newServiceUrl.equals(old)) {
+						log.info("Relocate service url {} for balancing", newServiceUrl);
+					}
+				} catch (ServiceNotFoundException ignored) {
+
 				}
 			}
 		}
