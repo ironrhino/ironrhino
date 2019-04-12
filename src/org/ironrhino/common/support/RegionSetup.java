@@ -35,6 +35,7 @@ import org.ironrhino.core.util.XmlUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StreamUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -59,6 +60,7 @@ public class RegionSetup {
 
 	@Setup
 	@Async
+	@Transactional
 	public void setup() throws Exception {
 		entityManager.setEntityClass(Region.class);
 		if (entityManager.countAll() > 0)
