@@ -115,7 +115,7 @@ public class SessionCompressorManager {
 												: uri.endsWith("/password");
 										String accept = session.getRequest().getHeader("Accept");
 										if (!isPasswordEntryPoint && !uri.startsWith("/assets/")
-												&& (accept != null && accept.contains("text/html")))
+												&& (accept == null || !accept.contains("application/json")))
 											throw new CredentialsExpiredException(username);
 									}
 								}
