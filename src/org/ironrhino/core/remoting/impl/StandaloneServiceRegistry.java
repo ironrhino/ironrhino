@@ -38,7 +38,9 @@ public class StandaloneServiceRegistry extends AbstractServiceRegistry {
 
 	@Override
 	protected void lookup(String serviceName) {
-		getImportedServiceCandidates().put(serviceName, services.get(serviceName));
+		List<String> list = services.get(serviceName);
+		if (list != null)
+			getImportedServiceCandidates().put(serviceName, list);
 	}
 
 	@Override
