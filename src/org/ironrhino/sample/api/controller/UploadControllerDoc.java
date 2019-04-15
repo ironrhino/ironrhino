@@ -13,6 +13,12 @@ import org.springframework.web.multipart.MultipartFile;
 public class UploadControllerDoc extends UploadController {
 
 	@Override
+	@Api("上传文本")
+	public String upload(String string) {
+		return string;
+	}
+
+	@Override
 	@Api("上传文件")
 	public Map<String, Object> upload(String name, MultipartFile file) {
 		Map<String, Object> result = new HashMap<>();

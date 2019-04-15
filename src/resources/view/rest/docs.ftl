@@ -120,7 +120,9 @@
 					<#if apiDoc.requiredAuthorities?has_content>
 					<tr><td style="width:100px;">所需授权</td><td><#list apiDoc.requiredAuthorities as auth><span class="label label-info">${getText(auth)}</span> </#list></td></tr>
 					</#if>
-					<tr><td>请求方法</td><td><#list apiDoc.methods as method><span class="label label-info">${method}</span> </#list></td></tr>
+					<tr><td>请求方法</td><td><#list apiDoc.methods as method><span class="label label-info">${method}</span><#sep> </#list></td></tr>
+					<#if apiDoc.consumes?has_content><tr><td>接受类型</td><td><#list apiDoc.consumes as type>${type}<#sep> </#list></td></tr></#if>
+					<#if apiDoc.produces?has_content><tr><td>输出类型</td><td><#list apiDoc.consumes as type>${type}<#sep> </#list></td></tr></#if>
 					<tr><td>请求URL</td><td>${apiBaseUrl}${apiDoc.url}</td></tr>
 					<#if apiDoc.pathVariables?has_content><tr><td>URI变量</td><td class="compact-horizontal"><@listFields fields=apiDoc.pathVariables/></td></tr></#if>
 					<#if apiDoc.requestParams?has_content><tr><td>请求参数</td><td class="compact-horizontal"><@listFields fields=apiDoc.requestParams/></td></tr></#if>

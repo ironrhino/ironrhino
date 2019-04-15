@@ -3,6 +3,8 @@
 <#assign url=apiBaseUrl+apiDoc.url>
 <#assign url=url?replace('\\{([^{}]+)\\}','<span style="background:yellow;border-bottom:1px solid;padding:2px;" contenteditable="plaintext-only">$1</span>','r')>
 <form class="api-playground" method="${method}">
+<#if apiDoc.consumes?has_content && apiDoc.consumes[0]!='multipart/form-data'><input type="hidden" name="Content-Type" value="${apiDoc.consumes[0]}"/></#if>
+<#if apiDoc.produces?has_content><input type="hidden" name="Accept" value="${apiDoc.produces[0]}"/></#if>
 <table class="table">
 <tbody>
 <@classPresentConditional value="org.ironrhino.security.oauth.server.model.Authorization">
@@ -71,7 +73,11 @@
 </#if>
 <#if apiDoc.requestBodySample?has_content>
 <tr><td>请求消息体</td><td>
+<#if apiDoc.consumes?has_content && apiDoc.consumes[0]?starts_with('text/')>
+<textarea class="requestBody input-xxlarge">${apiDoc.requestBodySample}</textarea>
+<#else>
 <code class="requestBody block json" contenteditable>${apiDoc.requestBodySample}</code>
+</#if>
 </td></tr>
 </#if>
 <tr><td>响应状态</td><td>

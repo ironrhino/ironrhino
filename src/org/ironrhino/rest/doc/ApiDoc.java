@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.util.ClassUtils;
@@ -62,6 +63,10 @@ public class ApiDoc implements Serializable {
 	protected String url;
 
 	protected String[] methods;
+
+	protected String[] consumes;
+
+	protected String[] produces;
 
 	protected List<FieldObject> pathVariables = new ArrayList<>();
 
@@ -170,6 +175,8 @@ public class ApiDoc implements Serializable {
 				for (int i = 0; i < rms.length; i++)
 					methods[i] = rms[i].name();
 			}
+			consumes = requestMapping.consumes();
+			produces = requestMapping.produces();
 		}
 
 		Class<?> responseBodyClass = method.getReturnType();
@@ -306,8 +313,11 @@ public class ApiDoc implements Serializable {
 							requestBodyClass = (Class<?>) pt.getActualTypeArguments()[0];
 						}
 						if (requestBodyClass == String.class) {
-							requestBodySample = objectMapper
-									.writeValueAsString(ApiDocHelper.createSample(String.class));
+							String sample = (String) ApiDocHelper.createSample(String.class);
+							if (consumes != null && MediaType.parseMediaType(consumes[0]).getType().equals("text"))
+								requestBodySample = sample;
+							else
+								requestBodySample = objectMapper.writeValueAsString(sample);
 						} else {
 							requestBody = FieldObject.createList(requestBodyClass, requestFields, true);
 							if (requestBody != null) {

@@ -41757,9 +41757,14 @@ Initialization.apiplayground = function() {
 			data = formdata;
 			processData = false;
 		} else {
-			if (form.find('.requestBody').length) {
-				data = form.find('.requestBody').text();
-				contentType = 'application/json; charset=UTF-8';
+			var rb = form.find('.requestBody');
+			if (rb.length) {
+				if (rb.is(':input')) {
+					data = rb.val();
+				} else {
+					data = rb.text();
+					contentType = 'application/json; charset=UTF-8';
+				}
 			}
 			var params = [];
 			form.find('table.requestParams tr').each(function(i, v) {
@@ -41818,7 +41823,14 @@ Initialization.apiplayground = function() {
 				form.find('.responseBody').text(responseText);
 			}
 		};
-
+		var hidden = form.find('input[name="Content-Type"]');
+		if (hidden.length)
+			options.contentType = hidden.val();
+		hidden = form.find('input[name="Accept"]');
+		if (hidden.length)
+			options.accepts = {
+				text : hidden.val()
+			};
 		$.ajax(options);
 		return false;
 	}).on('click', 'form.api-playground .last-accessToken', function() {
