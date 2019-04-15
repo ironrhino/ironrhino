@@ -85,7 +85,7 @@ public class LoggingBodyHttpServletRequest extends HttpServletRequestWrapper {
 		@Override
 		public int read(byte[] b) throws IOException {
 			int count = super.read(b);
-			cachedContent.write(b, 0, count);
+			cache(b, 0, count);
 			return count;
 		}
 
@@ -97,7 +97,8 @@ public class LoggingBodyHttpServletRequest extends HttpServletRequestWrapper {
 		}
 
 		private void cache(byte[] b, final int off, final int count) {
-			cachedContent.write(b, off, count);
+			if (count != -1)
+				cachedContent.write(b, off, count);
 		}
 
 		@Override
