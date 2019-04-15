@@ -13,6 +13,7 @@ import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.JsonDesensitizer;
 import org.slf4j.Logger;
+import org.slf4j.MDC;
 import org.springframework.util.FastByteArrayOutputStream;
 import org.springframework.web.util.WebUtils;
 
@@ -151,7 +152,13 @@ public class LoggingBodyHttpServletResponse extends HttpServletResponseWrapper {
 				String str = new String(bytes, 0, bytes.length, encoding);
 				if (AppInfo.getStage() != Stage.DEVELOPMENT)
 					str = JsonDesensitizer.DEFAULT_INSTANCE.desensitize(str);
+				String method = MDC.get("method");
+				String url = MDC.get("url");
+				MDC.remove("method");
+				MDC.remove("url");
 				logger.info("\n{}", str);
+				MDC.put("method", method);
+				MDC.put("url", url);
 			}
 		}
 	}
