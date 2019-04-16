@@ -34,7 +34,10 @@ public class JettyLauncher {
 			port = 8080;
 			while (getTempDirectory(port).exists() || !available(port))
 				port++;
-			System.setProperty("port.http", String.valueOf(port));
+			if (System.getenv("CONTAINER") == null) {
+				// Only 1 instance per container, log file will not conflict
+				System.setProperty("port.http", String.valueOf(port));
+			}
 		}
 		File tempDir = getTempDirectory(port);
 		tempDir.mkdirs();
