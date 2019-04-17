@@ -49,13 +49,12 @@ import org.ironrhino.core.hibernate.event.SimpleFlushEntityEventListener;
 import org.ironrhino.core.hibernate.event.SimpleMergeEventListener;
 import org.ironrhino.core.hibernate.event.SimplePersistEventListener;
 import org.ironrhino.core.hibernate.event.SimpleSaveOrUpdateEventListener;
-import org.ironrhino.core.hibernate.type.YearMonthType;
 import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.ironrhino.core.spring.DefaultPropertiesProvider;
 import org.ironrhino.core.spring.configuration.DataSourceConfiguration;
 import org.ironrhino.core.util.AppInfo;
-import org.ironrhino.core.util.ClassScanner;
 import org.ironrhino.core.util.AppInfo.Stage;
+import org.ironrhino.core.util.ClassScanner;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -319,7 +318,6 @@ public class SessionFactoryBean extends LocalSessionFactoryBean implements Defau
 				log.info(ac.getClass().getName());
 			}
 		}
-		sfb.registerTypeOverride(YearMonthType.INSTANCE);
 		SessionFactory sessionFactory = super.buildSessionFactory(sfb);
 		EventListenerRegistry registry = ((SessionFactoryImplementor) sessionFactory).getServiceRegistry()
 				.getService(EventListenerRegistry.class);

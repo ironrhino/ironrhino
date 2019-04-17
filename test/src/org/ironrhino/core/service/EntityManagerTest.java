@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,6 +28,7 @@ import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.transform.Transformers;
@@ -256,6 +258,18 @@ public class EntityManagerTest {
 		assertEquals(0, males.size());
 	}
 
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testSql() {
+		prepareData();
+		List<Object[]> list = entityManager.executeFind(session -> {
+			NativeQuery<Object[]> query = session.createSQLQuery("select * from Person where gender=:gender");
+			query.setParameter("gender", 0);
+			return query.getResultList();
+		});
+		assertEquals(5, list.size());
+	}
+
 	@SuppressWarnings({ "unchecked", "deprecation" })
 	@Test
 	public void testResultTransformer() {
@@ -405,6 +419,7 @@ public class EntityManagerTest {
 			person.setCode("code" + i);
 			person.setGender(i % 2 == 0 ? Gender.MALE : Gender.FEMALE);
 			person.setDateOfBirth(new Date());
+			person.setCreateYearMonth(YearMonth.now());
 			entityManager.save(person);
 		}
 	}

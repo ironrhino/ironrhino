@@ -1,5 +1,6 @@
 package org.ironrhino.core.service;
 
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -48,6 +49,8 @@ public class Person extends BaseEntity {
 	@Column(nullable = false)
 	@CreationTimestamp
 	private Date createDate;
+
+	private YearMonth createYearMonth;
 
 	@Version
 	private int version = -1;
