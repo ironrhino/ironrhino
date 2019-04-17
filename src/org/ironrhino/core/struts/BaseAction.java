@@ -44,7 +44,9 @@ import com.opensymphony.xwork2.util.ValueStack;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class BaseAction extends ActionSupport {
 
 	private static final long serialVersionUID = -3183957331611790404L;
@@ -83,7 +85,6 @@ public class BaseAction extends ActionSupport {
 	protected String originalMethod;
 
 	@Getter
-	@Setter
 	protected String targetUrl;
 
 	@Getter
@@ -108,6 +109,14 @@ public class BaseAction extends ActionSupport {
 
 	@Getter
 	private String actionSuccessMessage;
+
+	public void setTargetUrl(String targetUrl) {
+		if (!RequestUtils.isSameOrigin(ServletActionContext.getRequest(), targetUrl)) {
+			log.warn("targetUrl '{}' is not same origin", targetUrl);
+			return;
+		}
+		this.targetUrl = targetUrl;
+	}
 
 	public String getCsrf() {
 		if (csrf == null) {
