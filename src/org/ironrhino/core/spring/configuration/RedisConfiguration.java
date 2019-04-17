@@ -92,8 +92,8 @@ public class RedisConfiguration {
 	@Value("${redis.readTimeout:5000}")
 	private int readTimeout = 5000;
 
-	@Value("${redis.shutdownTimeout:0}")
-	private int shutdownTimeout = 0;
+	@Value("${redis.shutdownTimeout:100}")
+	private int shutdownTimeout = 100;
 
 	@Value("${redis.useSsl:false}")
 	private boolean useSsl;
