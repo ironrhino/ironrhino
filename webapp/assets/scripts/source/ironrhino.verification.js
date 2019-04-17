@@ -49,7 +49,10 @@
 						t.data('autosend', true);
 					}
 				}).on('click', '.sendVerificationCode', function() {
-			var btn = $(this).addClass('clicked');
+			var btn = $(this);
+			if (btn.hasClass('clicked'))
+				return;
+			btn.addClass('clicked');
 			var f = btn.closest('form');
 			var cooldown = parseInt(btn.data('cooldown') || 60);
 			var userparam = btn.data('username') || 'username';
@@ -73,7 +76,9 @@
 											var cd = parseInt(btn.text()) - 1;
 											if (cd <= 0) {
 												clearInterval(intv);
-												btn.prop('disabled', false)
+												btn
+														.removeClass('clicked')
+														.prop('disabled', false)
 														.text(btn.data('text'));
 											} else {
 												btn.text(parseInt(btn.text())
