@@ -30,30 +30,9 @@
 	
 	<bean id="authenticationManager"
 		class="org.ironrhino.core.spring.security.DefaultAuthenticationManager">
-		<constructor-arg>
-			<list>
-				<ref bean="daoAuthenticationProvider"/>
-				<ref bean="rememberMeAuthenticationProvider"/>
-			</list>
-		</constructor-arg>
 		<property name="authenticationEventPublisher">
 			<bean class="org.springframework.security.authentication.DefaultAuthenticationEventPublisher"/>
 		</property>
-	</bean>	
-	
-	<bean id="daoAuthenticationProvider"
-		class="org.ironrhino.core.spring.security.DefaultDaoAuthenticationProvider" />
-
-	<bean id="rememberMeAuthenticationProvider"
-		class="org.springframework.security.authentication.RememberMeAuthenticationProvider">
-		<constructor-arg value="${rememberMe.key:youcannotguessme}"/>
-	</bean>	
-
-	<bean id="rememberMeServices"
-		class="org.ironrhino.core.spring.security.DefaultTokenBasedRememberMeServices"
-		p:parameter="rememberme" p:cookieName="rm">
-		<constructor-arg value="${rememberMe.key:youcannotguessme}" />
-		<constructor-arg ref="userDetailsService" />
 	</bean>
 
 	<bean id="passwordEncoder" class="org.ironrhino.core.spring.security.password.MixedPasswordEncoder" />

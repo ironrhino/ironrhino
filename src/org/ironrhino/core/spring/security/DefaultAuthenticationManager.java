@@ -1,5 +1,6 @@
 package org.ironrhino.core.spring.security;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -14,6 +15,8 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
+import lombok.Getter;
+
 public class DefaultAuthenticationManager extends ProviderManager {
 
 	private static final String CACHE_NAMESPACE = "fla"; // Failed Login Attempts
@@ -27,8 +30,23 @@ public class DefaultAuthenticationManager extends ProviderManager {
 	@Value("${authenticationManager.maxAttempts:5}")
 	private int maxAttempts = 5;
 
-	public DefaultAuthenticationManager(List<AuthenticationProvider> providers) {
-		super(providers);
+	@Autowired
+	@Getter
+	private List<AuthenticationProvider> providers;
+
+	public DefaultAuthenticationManager() {
+		// use dummy AuthenticationProvider to avoid exception throws by super class
+		super(Collections.singletonList(new AuthenticationProvider() {
+			@Override
+			public Authentication authenticate(Authentication auth) throws AuthenticationException {
+				return null;
+			}
+
+			@Override
+			public boolean supports(Class<?> paramClass) {
+				return false;
+			}
+		}));
 	}
 
 	@Override

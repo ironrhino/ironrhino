@@ -17,8 +17,8 @@ import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
-@ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
 @Slf4j
+@ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
 public class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
 	@Autowired

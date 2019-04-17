@@ -3,16 +3,24 @@ package org.ironrhino.core.spring.security;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.RequestUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+@Component("rememberMeServices")
+@ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
 public class DefaultTokenBasedRememberMeServices extends TokenBasedRememberMeServices {
 
-	public DefaultTokenBasedRememberMeServices(String key, UserDetailsService userDetailsService) {
+	public DefaultTokenBasedRememberMeServices(@Value("${rememberMe.key:youcannotguessme}") String key,
+			UserDetailsService userDetailsService) {
 		super(key, userDetailsService);
+		setParameter("rememberme");
+		setCookieName("rm");
 	}
 
 	@Override

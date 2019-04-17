@@ -3,7 +3,9 @@ package org.ironrhino.core.spring.security;
 import java.util.Collections;
 import java.util.List;
 
+import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.AuthenticationException;
@@ -11,7 +13,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsChecker;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
+@Component("daoAuthenticationProvider")
+@Order(0)
+@ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
 public class DefaultDaoAuthenticationProvider extends DaoAuthenticationProvider {
 
 	@Autowired(required = false)
