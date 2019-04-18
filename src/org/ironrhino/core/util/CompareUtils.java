@@ -2,6 +2,7 @@ package org.ironrhino.core.util;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
+import java.time.temporal.Temporal;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -41,6 +42,8 @@ public class CompareUtils {
 			return false;
 		if (Objects.equals(a, b))
 			return true;
+		if (a.getClass() != b.getClass())
+			return false;
 		if (a instanceof Persistable && b instanceof Persistable)
 			return Objects.equals(((Persistable<?>) a).getId(), ((Persistable<?>) b).getId());
 		else if (a.getClass().isArray() && b.getClass().isArray()) {
@@ -73,13 +76,13 @@ public class CompareUtils {
 						|| !equals(it1.next().getValue(), it2.next().getValue(), treatEmptySequenceAsNull))
 					return false;
 			return true;
-		} else if (!BeanUtils.isSimpleProperty(a.getClass()) && !BeanUtils.isSimpleProperty(b.getClass())) {
+		} else if (!isSimpleValueType(a.getClass()) && !isSimpleValueType(b.getClass())) {
 			BeanWrapperImpl abw = new BeanWrapperImpl(a);
 			BeanWrapperImpl bbw = new BeanWrapperImpl(b);
 			PropertyDescriptor[] pds = abw.getPropertyDescriptors();
 			if (pds.length > 1) {
 				for (PropertyDescriptor pd : pds) {
-					if (pd.getReadMethod() == null || pd.getWriteMethod() == null)
+					if (pd.getReadMethod() == null)
 						continue;
 					if (!equals(abw.getPropertyValue(pd.getName()), bbw.getPropertyValue(pd.getName()),
 							treatEmptySequenceAsNull))
@@ -89,6 +92,10 @@ public class CompareUtils {
 			}
 		}
 		return false;
+	}
+
+	private static boolean isSimpleValueType(Class<?> clazz) {
+		return BeanUtils.isSimpleValueType(clazz) || Temporal.class.isAssignableFrom(clazz);
 	}
 
 }

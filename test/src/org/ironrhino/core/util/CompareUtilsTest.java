@@ -3,6 +3,7 @@ package org.ironrhino.core.util;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -15,8 +16,12 @@ public class CompareUtilsTest {
 
 	@Test
 	public void testEquals() {
+		assertTrue(CompareUtils.equals(null, null));
 		assertFalse(CompareUtils.equals(1, 2));
 		assertTrue(CompareUtils.equals(1, 1));
+		assertFalse(CompareUtils.equals(1, 1L));
+		assertTrue(CompareUtils.equals(YearMonth.of(2012, 8), YearMonth.of(2012, 8)));
+		assertFalse(CompareUtils.equals(YearMonth.of(2012, 9), YearMonth.of(2012, 8)));
 		assertTrue(CompareUtils.equals(new int[] { 1, 2 }, new int[] { 1, 2 }));
 		assertFalse(CompareUtils.equals(new int[] { 1, 2 }, new int[] { 1, 2, 3 }));
 		assertFalse(CompareUtils.equals(new Object[] { 1, "" }, new Object[] { 1, "", "" }));
