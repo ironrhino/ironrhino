@@ -228,12 +228,10 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 			}
 			remotingLogger.info("Request: {}", JsonDesensitizer.DEFAULT_INSTANCE.toJson(payload));
 		}
-		long time = System.currentTimeMillis();
 		RemoteInvocationResult result;
 		try {
 			result = doExecuteRequest(invocation, methodInvocation, maxAttempts);
 			result = transformResult(invocation, methodInvocation, result);
-			time = System.currentTimeMillis() - time;
 			if (loggingPayload) {
 				if (!result.hasInvocationTargetException()) {
 					remotingLogger.info("Response: {}", JsonDesensitizer.DEFAULT_INSTANCE.toJson(result.getValue()));
@@ -276,21 +274,22 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 				RemoteInvocationResult result = httpInvokerRequestExecutor.executeRequest(targetServiceUrl, invocation,
 						methodInvocation);
 				if (urlFromDiscovery) {
+					time = System.currentTimeMillis() - time;
 					remotingLogger.info("Invoked to {} success in {}ms", targetDiscoveredHost, time);
 					if (serviceStats != null) {
-						serviceStats.clientSideEmit(targetDiscoveredHost, getServiceInterface().getName(), method,
-								System.currentTimeMillis() - time, false);
+						serviceStats.clientSideEmit(targetDiscoveredHost, getServiceInterface().getName(), method, time,
+								false);
 					}
 				}
 				return result;
 			} catch (Exception e) {
 				remotingLogger.error("Exception:", e.getCause() != null ? e.getCause() : e);
 				if (urlFromDiscovery) {
-					remotingLogger.info("Invoked to {} fail in {}ms", targetDiscoveredHost,
-							System.currentTimeMillis() - time);
+					time = System.currentTimeMillis() - time;
+					remotingLogger.info("Invoked to {} fail in {}ms", targetDiscoveredHost, time);
 					if (serviceStats != null) {
-						serviceStats.clientSideEmit(targetDiscoveredHost, getServiceInterface().getName(), method,
-								System.currentTimeMillis() - time, true);
+						serviceStats.clientSideEmit(targetDiscoveredHost, getServiceInterface().getName(), method, time,
+								true);
 					}
 				}
 				if (remainingAttempts <= 1)
