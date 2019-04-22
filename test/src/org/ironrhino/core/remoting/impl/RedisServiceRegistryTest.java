@@ -57,10 +57,12 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = RedisServiceRegistryConfiguration.class)
+@TestPropertySource(properties = "httpInvoker.polling=false")
 public class RedisServiceRegistryTest {
 
 	private static boolean firstSetUp = true;

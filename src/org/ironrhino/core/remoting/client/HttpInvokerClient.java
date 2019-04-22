@@ -116,8 +116,8 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 	private int maxAttempts = 3;
 
 	@Setter
-	@Value("${httpInvoker.polling:false}")
-	private boolean polling;
+	@Value("${httpInvoker.polling:true}")
+	private boolean polling = true;
 
 	private boolean urlFromDiscovery;
 
