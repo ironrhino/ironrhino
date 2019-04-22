@@ -3,8 +3,6 @@
 <#assign url=apiBaseUrl+apiDoc.url>
 <#assign url=url?replace('\\{([^{}]+)\\}','<span style="background:yellow;border-bottom:1px solid;padding:2px;" contenteditable="plaintext-only">$1</span>','r')>
 <form class="api-playground" method="${method}">
-<#if apiDoc.consumes?has_content && apiDoc.consumes[0]!='multipart/form-data'><input type="hidden" name="Content-Type" value="${apiDoc.consumes[0]}"/></#if>
-<#if apiDoc.produces?has_content><input type="hidden" name="Accept" value="${apiDoc.produces[0]}"/></#if>
 <table class="table">
 <tbody>
 <@classPresentConditional value="org.ironrhino.security.oauth.server.model.Authorization">
@@ -25,6 +23,20 @@
 </td></tr>
 </@classPresentConditional>
 <tr><td style="width:100px;"><span class="label label-info">${method}</span></td><td><div class="url">${url?no_esc}</div></td></tr>
+<#if apiDoc.consumes?has_content && apiDoc.consumes[0]!='multipart/form-data'>
+<#if apiDoc.consumes?size == 1>
+<input type="hidden" name="Content-Type" value="${apiDoc.consumes[0]}"/>
+<#else>
+<tr><td>请求类型</td><td><@s.select name="Content-Type" theme="simple" list="apiDoc.consumes"/></td></tr>
+</#if>
+</#if>
+<#if apiDoc.produces?has_content>
+<#if apiDoc.produces?size == 1>
+<input type="hidden" name="Accept" value="${apiDoc.produces[0]}"/>
+<#else>
+<tr><td>响应类型</td><td><@s.select name="Accept" theme="simple" list="apiDoc.produces"/></td></tr>
+</#if>
+</#if>
 <#if apiDoc.requestParams?has_content>
 <tr><td>请求参数</td><td class="compact-horizontal">
 	<table class="requestParams table datagrid adaptive"><tbody>

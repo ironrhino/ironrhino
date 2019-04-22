@@ -81,7 +81,7 @@ Initialization.apiplayground = function() {
 			processData : processData,
 			method : method,
 			headers : headers,
-			dataType : 'text',
+			dataType : 'json',
 			beforeSend : function() {
 				if (typeof $.fn.mask != 'undefined')
 					form.mask();
@@ -109,13 +109,13 @@ Initialization.apiplayground = function() {
 				form.find('.responseBody').text(responseText);
 			}
 		};
-		var hidden = form.find('input[name="Content-Type"]');
+		var hidden = form.find(':input[name="Content-Type"]');
 		if (hidden.length)
 			options.contentType = hidden.val();
-		hidden = form.find('input[name="Accept"]');
+		hidden = form.find(':input[name="Accept"]');
 		if (hidden.length)
 			options.accepts = {
-				text : hidden.val()
+				json : hidden.val()
 			};
 		$.ajax(options);
 		return false;

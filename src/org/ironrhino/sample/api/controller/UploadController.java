@@ -18,7 +18,9 @@ import org.springframework.web.multipart.MultipartFile;
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 public class UploadController {
 
-	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
+	@RequestMapping(method = RequestMethod.POST, consumes = { MediaType.TEXT_PLAIN_VALUE,
+			MediaType.APPLICATION_JSON_UTF8_VALUE }, produces = { MediaType.TEXT_PLAIN_VALUE,
+					MediaType.APPLICATION_JSON_UTF8_VALUE })
 	public String upload(@RequestBody String string) {
 		return string;
 	}
