@@ -18,8 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ExecutorServiceFactoryBean implements FactoryBean<ExecutorService>, InitializingBean, DisposableBean {
 
-	@Value("${executorService.corePoolSize:1}")
-	private int corePoolSize = 1;
+	@Value("${executorService.corePoolSize:50}")
+	private int corePoolSize = 50;
 
 	@Value("${executorService.maximumPoolSize:100}")
 	private int maximumPoolSize = 100;
@@ -27,18 +27,20 @@ public class ExecutorServiceFactoryBean implements FactoryBean<ExecutorService>,
 	@Value("${executorService.keepAliveTime:60}")
 	private long keepAliveTime = 60;
 
-	@Value("${executorService.workQueueCapacity:1000000}")
-	private int workQueueCapacity = 1000000;
+	@Value("${executorService.queueCapacity:10000}")
+	private int queueCapacity = 10000;
 
 	private ExecutorService executorService;
 
 	@Override
 	public void afterPropertiesSet() {
-		executorService = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS,
-				new LinkedBlockingQueue<>(workQueueCapacity), new NameableThreadFactory("executorService"),
+		ThreadPoolExecutor tpe = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS,
+				new LinkedBlockingQueue<>(queueCapacity), new NameableThreadFactory("executorService"),
 				(runnable, executor) -> {
 					log.error("{} is rejected: {}", runnable, executor);
 				});
+		tpe.allowCoreThreadTimeOut(true);
+		executorService = tpe;
 	}
 
 	@Override

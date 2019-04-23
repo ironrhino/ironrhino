@@ -27,11 +27,17 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 public class SchedulingConfiguration implements SchedulingConfigurer, AsyncConfigurer {
 
-	@Value("${taskScheduler.poolSize:1}")
-	private int taskSchedulerPoolSize = 1;
+	@Value("${taskScheduler.poolSize:5}")
+	private int taskSchedulerPoolSize = 5;
 
-	@Value("${taskExecutor.poolSize:1}")
-	private int taskExecutorPoolSize = 1;
+	@Value("${taskExecutor.corePoolSize:50}")
+	private int taskExecutorCorePoolSize = 50;
+
+	@Value("${taskExecutor.maxPoolSize:100}")
+	private int taskExecutorMaxPoolSize = 100;
+
+	@Value("${taskExecutor.queueCapacity:10000}")
+	private int taskExecutorQueueCapacity = 10000;
 
 	@Override
 	public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
@@ -54,8 +60,11 @@ public class SchedulingConfiguration implements SchedulingConfigurer, AsyncConfi
 	@Bean
 	public AsyncTaskExecutor taskExecutor() {
 		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-		executor.setCorePoolSize(taskExecutorPoolSize);
+		executor.setCorePoolSize(taskExecutorCorePoolSize);
+		executor.setMaxPoolSize(taskExecutorMaxPoolSize);
+		executor.setQueueCapacity(taskExecutorQueueCapacity);
 		executor.setThreadNamePrefix("taskExecutor-");
+		executor.setAllowCoreThreadTimeOut(true);
 		return executor;
 	}
 
