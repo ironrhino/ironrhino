@@ -41,6 +41,12 @@ public class KafkaConsumerConfigBase {
 	@Value("${kafka.autoCommitIntervalMs:1000}")
 	private int autoCommitIntervalMs = 1000;
 
+	@Value("${kafka.maxPollIntervalMs:300}")
+	private int maxPollIntervalMs = 300;
+
+	@Value("${kafka.maxPollRecords:500}")
+	private int maxPollRecords = 500;
+
 	@Value("${kafka.consumerConcurrency:1}")
 	private int consumerConcurrency = 1;
 
@@ -80,7 +86,10 @@ public class KafkaConsumerConfigBase {
 		consumerConfigs.put(ConsumerConfig.GROUP_ID_CONFIG, AppInfo.getAppName());
 		consumerConfigs.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, getAutoOffsetReset());
 		consumerConfigs.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, getSessionTimeoutMs());
+		consumerConfigs.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, getMaxPollIntervalMs());
+		consumerConfigs.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, getMaxPollRecords());
 		consumerConfigs.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, autoCommit);
+
 		if (autoCommit)
 			consumerConfigs.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, getAutoCommitIntervalMs());
 		DefaultKafkaConsumerFactory<String, T> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerConfigs);
