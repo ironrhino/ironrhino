@@ -95,6 +95,7 @@ public abstract class AnnotationBeanDefinitionRegistryPostProcessor<A extends An
 			beanDefinition.setPrimary(true);
 			beanDefinition.setTargetType(annotatedClass);
 			beanDefinition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_NO);
+			beanDefinition.setAttribute(getClass().getName(), true);
 			processBeanDefinition(annotation, annotatedClass, beanDefinition);
 			registry.registerBeanDefinition(beanName, beanDefinition);
 			log.info("Register bean [{}] for @{} [{}]", beanName, annotationClass.getSimpleName(),
@@ -147,7 +148,7 @@ public abstract class AnnotationBeanDefinitionRegistryPostProcessor<A extends An
 		}
 		if (beanClass == null || annotatedClass.isAssignableFrom(beanClass)
 				|| ResolvableType.forClassWithGenerics(FactoryBean.class, annotatedClass).isAssignableFrom(beanClass)
-				|| beanClass.equals(factoryBeanClass)) {
+				|| !bd.hasAttribute(getClass().getName()) && beanClass.equals(factoryBeanClass)) {
 			return true;
 		}
 		if (!beanClass.isAnnotationPresent(Fallback.class)) {
