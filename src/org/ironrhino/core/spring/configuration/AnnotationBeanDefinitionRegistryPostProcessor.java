@@ -3,8 +3,9 @@ package org.ironrhino.core.spring.configuration;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Comparator;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.spring.NameGenerator;
@@ -61,7 +62,7 @@ public abstract class AnnotationBeanDefinitionRegistryPostProcessor<A extends An
 
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
-		Set<Class<?>> classes = new HashSet<>();
+		Set<Class<?>> classes = new TreeSet<>(Comparator.comparing(Class::getName));
 		if (annotatedClasses != null)
 			classes.addAll(Arrays.asList(annotatedClasses));
 		if (packagesToScan != null)
