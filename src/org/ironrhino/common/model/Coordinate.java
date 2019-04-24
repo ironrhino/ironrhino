@@ -3,7 +3,10 @@ package org.ironrhino.common.model;
 import java.io.Serializable;
 import java.util.Locale;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,8 +22,14 @@ public class Coordinate implements Serializable {
 
 	private static double EARTH_RADIUS = 6371000;
 
+	@Min(-90)
+	@Max(90)
+	@Column(precision = 8, scale = 6)
 	private Double latitude;
 
+	@Min(-180)
+	@Max(180)
+	@Column(precision = 9, scale = 6)
 	private Double longitude;
 
 	public Coordinate(String latLng) {

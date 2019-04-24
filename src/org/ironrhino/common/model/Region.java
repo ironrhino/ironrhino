@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.validation.Valid;
 
 import org.ironrhino.common.util.LocationUtils;
 import org.ironrhino.core.aop.PublishAware;
@@ -40,7 +41,7 @@ public class Region extends BaseTreeableEntity<Region> {
 
 	@Embedded
 	@UiConfig(cssClass = "latlng", embeddedAsSingle = true, dynamicAttributes = "{\"data-address\":\"${region.fullname!}\"}")
-	private Coordinate coordinate;
+	private @Valid Coordinate coordinate;
 
 	@UiConfig(hidden = true)
 	private String fullname;
