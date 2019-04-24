@@ -27,6 +27,7 @@ import org.springframework.core.env.PropertySourcesPropertyResolver;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.jndi.JndiLocatorDelegate;
 import org.springframework.util.ClassUtils;
 
 import lombok.experimental.UtilityClass;
@@ -409,6 +410,8 @@ public class AppInfo {
 			System.setProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME,
 					String.join(",", new TreeSet<>(Arrays.asList(defaultProfiles.split("\\s*,\\s*")))));
 		}
+		if (StringUtils.isBlank(System.getProperty(JndiLocatorDelegate.IGNORE_JNDI_PROPERTY_NAME)))
+			System.setProperty(JndiLocatorDelegate.IGNORE_JNDI_PROPERTY_NAME, Boolean.toString(true));
 
 		// configure log4j2
 		StringBuilder sb = new StringBuilder("classpath:log4j2.xml");
