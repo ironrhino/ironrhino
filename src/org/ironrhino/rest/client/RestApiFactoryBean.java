@@ -332,22 +332,26 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 	private String getRequestUrl(RequestMapping classRequestMapping, RequestMapping methodRequestMapping)
 			throws Exception {
 		ApplicationContext ctx = getApplicationContext();
+		String pathFromClass = getPathFromRequestMapping(classRequestMapping);
+		String pathFromMethod = getPathFromRequestMapping(methodRequestMapping);
 		String baseUrl = apiBaseUrl;
 		if (ctx != null) {
+			pathFromClass = ctx.getEnvironment().resolvePlaceholders(pathFromClass);
+			pathFromMethod = ctx.getEnvironment().resolvePlaceholders(pathFromMethod);
 			baseUrl = ctx.getEnvironment().getProperty(restApiClass.getName() + ".apiBaseUrl", baseUrl);
-			if (StringUtils.isBlank(baseUrl) && serviceRegistry != null) {
+			if (StringUtils.isBlank(baseUrl) && pathFromClass.indexOf("://") < 0 && pathFromMethod.indexOf("://") < 0
+					&& serviceRegistry != null && !(restTemplate instanceof RestClientTemplate)) {
 				baseUrl = ((ServiceRegistry) serviceRegistry).discover(restApiClass.getName(), true);
 				if (baseUrl.indexOf("://") < 0)
 					baseUrl = "http://" + baseUrl;
+			} else if (StringUtils.isNotBlank(baseUrl)) {
+				baseUrl = ctx.getEnvironment().resolvePlaceholders(baseUrl);
 			}
 		}
 		StringBuilder sb = new StringBuilder(baseUrl);
-		sb.append(getPathFromRequestMapping(classRequestMapping));
-		sb.append(getPathFromRequestMapping(methodRequestMapping));
-		String url = sb.toString().trim();
-		if (ctx != null)
-			url = ctx.getEnvironment().resolvePlaceholders(url);
-		return url;
+		sb.append(pathFromClass);
+		sb.append(pathFromMethod);
+		return sb.toString().trim();
 	}
 
 	private MultiValueMap<String, String> createHeaders(RequestMapping classRequestMapping,
