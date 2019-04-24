@@ -35,22 +35,22 @@ public class KafkaConsumerConfigBase {
 	@Value("${kafka.bootstrap.servers:localhost:9092}")
 	private String bootstrapServers;
 
-	@Value("${kafka.sessionTimeoutMs:30000}")
+	@Value("${kafka.session.timeout.ms:30000}")
 	private int sessionTimeoutMs;
 
-	@Value("${kafka.autoCommitIntervalMs:1000}")
+	@Value("${kafka.auto.commit.interval.ms:1000}")
 	private int autoCommitIntervalMs = 1000;
 
-	@Value("${kafka.maxPollIntervalMs:300}")
+	@Value("${kafka.max.poll.interval.ms:300}")
 	private int maxPollIntervalMs = 300;
 
-	@Value("${kafka.maxPollRecords:500}")
+	@Value("${kafka.max.poll.records:500}")
 	private int maxPollRecords = 500;
 
-	@Value("${kafka.consumerConcurrency:1}")
+	@Value("${kafka.consumer.concurrency:1}")
 	private int consumerConcurrency = 1;
 
-	@Value("${kafka.autoOffsetReset:latest}")
+	@Value("${kafka.auto.offset.reset:latest}")
 	private String autoOffsetReset = "";
 
 	@Bean

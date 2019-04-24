@@ -32,19 +32,19 @@ public class KafkaProducerConfigBase {
 	@Value("${kafka.retries:3}")
 	private int retries;
 
-	@Value("${kafka.batchSize:16384}")
+	@Value("${kafka.batch.size:16384}")
 	private int batchSize;
 
-	@Value("${kafka.maxBlockMs:10000}")
+	@Value("${kafka.max.block.ms:10000}")
 	private int maxBlockMs;
 
-	@Value("${kafka.lingerMs:1}")
+	@Value("${kafka.linger.ms:1}")
 	private int lingerMs;
 
-	@Value("${kafka.bufferMemory:33554432}")
+	@Value("${kafka.buffer.memory:33554432}")
 	private int bufferMemory;
 
-	@Value("${kafka.fatalIfBrokerNotAvailable:true}")
+	@Value("${kafka.fatal.if.broker.not.available:true}")
 	private boolean fatalIfBrokerNotAvailable;
 
 	@Bean
