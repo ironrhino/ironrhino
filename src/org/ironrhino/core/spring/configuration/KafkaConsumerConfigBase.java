@@ -1,7 +1,10 @@
 package org.ironrhino.core.spring.configuration;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,10 +14,13 @@ import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.ironrhino.core.metrics.KafkaConsumerMetrics;
+import org.ironrhino.core.spring.DefaultPropertiesProvider;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.JsonUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
@@ -25,33 +31,32 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.Getter;
-import lombok.Setter;
 
 @EnableKafka
-@Getter
-@Setter
-public class KafkaConsumerConfigBase {
+public class KafkaConsumerConfigBase implements DefaultPropertiesProvider {
 
-	@Value("${kafka.bootstrap.servers:localhost:9092}")
-	private String bootstrapServers;
+	@Autowired
+	private Environment environment;
 
-	@Value("${kafka.session.timeout.ms:30000}")
-	private int sessionTimeoutMs;
-
-	@Value("${kafka.auto.commit.interval.ms:1000}")
-	private int autoCommitIntervalMs = 1000;
-
-	@Value("${kafka.max.poll.interval.ms:300}")
-	private int maxPollIntervalMs = 300;
-
-	@Value("${kafka.max.poll.records:500}")
-	private int maxPollRecords = 500;
-
+	@Getter
 	@Value("${kafka.consumer.concurrency:1}")
 	private int consumerConcurrency = 1;
 
-	@Value("${kafka.auto.offset.reset:latest}")
-	private String autoOffsetReset = "";
+	@Getter
+	private final Map<String, String> defaultProperties;
+
+	public KafkaConsumerConfigBase() {
+		Map<String, String> map = new HashMap<>();
+		map.put(getConfigKeyPrefix() + ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+		map.put(getConfigKeyPrefix() + ConsumerConfig.CLIENT_ID_CONFIG, AppInfo.getInstanceId(true));
+		map.put(getConfigKeyPrefix() + ConsumerConfig.GROUP_ID_CONFIG, AppInfo.getAppName());
+		map.put(getConfigKeyPrefix() + ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "1000");
+		defaultProperties = Collections.unmodifiableMap(map);
+	}
+
+	protected String getConfigKeyPrefix() {
+		return "kafka.";
+	}
 
 	@Bean
 	@ClassPresentConditional("io.micrometer.core.instrument.Metrics")
@@ -81,17 +86,28 @@ public class KafkaConsumerConfigBase {
 
 	protected <T> ConsumerFactory<String, T> createConsumerFactory(boolean autoCommit) {
 		Map<String, Object> consumerConfigs = new HashMap<>();
-		consumerConfigs.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, getBootstrapServers());
-		consumerConfigs.put(ConsumerConfig.CLIENT_ID_CONFIG, AppInfo.getInstanceId(true));
-		consumerConfigs.put(ConsumerConfig.GROUP_ID_CONFIG, AppInfo.getAppName());
-		consumerConfigs.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, getAutoOffsetReset());
-		consumerConfigs.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, getSessionTimeoutMs());
-		consumerConfigs.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, getMaxPollIntervalMs());
-		consumerConfigs.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, getMaxPollRecords());
+		for (Field f : ConsumerConfig.class.getFields()) {
+			int mod = f.getModifiers();
+			if (Modifier.isStatic(mod) && Modifier.isFinal(mod) && f.getType() == String.class
+					&& !f.getName().endsWith("_DOC")) {
+				try {
+					String key = (String) f.get(null);
+					if (key.equals(ConsumerConfig.DEFAULT_ISOLATION_LEVEL))
+						continue;
+					String prefixedKey = getConfigKeyPrefix() + key;
+					String value = environment.getProperty(prefixedKey);
+					if (value == null)
+						value = defaultProperties.get(prefixedKey);
+					if (value != null)
+						consumerConfigs.put(key, value);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
 		consumerConfigs.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, autoCommit);
-
-		if (autoCommit)
-			consumerConfigs.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, getAutoCommitIntervalMs());
+		if (!autoCommit)
+			consumerConfigs.remove(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG);
 		DefaultKafkaConsumerFactory<String, T> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerConfigs);
 		consumerFactory.setKeyDeserializer(new StringDeserializer());
 		consumerFactory.setValueDeserializer(new TopicNameBasedJsonDeserializer<>(JsonUtils.createNewObjectMapper()));
