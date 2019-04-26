@@ -41567,7 +41567,7 @@ Observation._patterninput = function(container) {
 					token = token.substring(0, index);
 				$.ajax({
 							global : false,
-							type : "POST",
+							type : 'POST',
 							url : CONTEXT_PATH + '/verifyCaptcha',
 							data : {
 								captcha : t.val(),
@@ -41603,6 +41603,7 @@ Observation._patterninput = function(container) {
 							url : btn.data('url') || f.formAction()
 									+ '/sendVerificationCode',
 							data : data,
+							dataType : 'json',
 							success : function() {
 								var input = f.find('[name="verificationCode"]');
 								Form.clearError(input);
