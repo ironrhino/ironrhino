@@ -6,13 +6,21 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,10 +35,10 @@ import org.ironrhino.rest.client.RestApiFactoryBean;
 import org.ironrhino.rest.client.UserClient;
 import org.ironrhino.security.domain.User;
 import org.ironrhino.security.service.UserManager;
-import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -43,10 +51,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.client.MockMvcClientHttpRequestFactory;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.request.async.DeferredResultProcessingInterceptor;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -56,14 +65,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class UserRestApiTest {
 
 	@Autowired
-	private WebApplicationContext wac;
-	@Autowired
 	private UserManager userManager;
 	@Autowired
 	private UserDetailsService userDetailsService;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-
+	@Autowired
+	private DeferredResultProcessingInterceptor deferredResultProcessingInterceptor;
+	@Autowired
 	private MockMvc mockMvc;
 
 	private UserClient userClient;
@@ -87,7 +96,6 @@ public class UserRestApiTest {
 
 	@PostConstruct
 	public void afterPropertiesSet() throws Exception {
-		mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 		MainAppInitializer.SERVLET_CONTEXT = mockMvc.getDispatcherServlet().getServletContext();
 
 		RestTemplate restTemplate = new RestTemplate(new MockMvcClientHttpRequestFactory(mockMvc));
@@ -109,11 +117,7 @@ public class UserRestApiTest {
 		when(userManager.loadUserByUsername("disabled")).thenReturn(disabled);
 		when(userManager.findAll()).thenReturn(Arrays.asList(admin, builtin));
 		when(userManager.findByResultPage(any())).thenReturn(rp);
-	}
-
-	@After
-	public void clearInvocation() {
-		clearInvocations(userDetailsService, userManager);
+		clearInvocations(userDetailsService, userManager, deferredResultProcessingInterceptor);
 	}
 
 	@Test
@@ -255,5 +259,72 @@ public class UserRestApiTest {
 		assertNotNull(rs);
 		assertEquals(rs.getCode(), RestStatus.CODE_INTERNAL_SERVER_ERROR);
 		assertTrue(rs.getCause() instanceof HttpServerErrorException);
+	}
+
+	@Test
+	@WithUserDetails("admin")
+	public void testDeferredResult() throws Exception {
+		MvcResult mvcResult = this.mockMvc.perform(get("/user/admin")).andExpect(status().isOk())
+				.andExpect(request().asyncStarted()).andExpect(request().asyncResult(admin)).andReturn();
+
+		then(deferredResultProcessingInterceptor).should().beforeConcurrentHandling(any(), any());
+		then(deferredResultProcessingInterceptor).should().preProcess(any(), any());
+		then(deferredResultProcessingInterceptor).should().postProcess(any(), any(), any());
+		then(deferredResultProcessingInterceptor).shouldHaveNoMoreInteractions();
+
+		this.mockMvc.perform(asyncDispatch(mvcResult)).andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(jsonPoint("/username").value("admin")).andExpect(jsonPoint("/name").value("admin"))
+				.andExpect(jsonPoint("/roles/0").value("ROLE_ADMINISTRATOR")).andReturn();
+
+		then(deferredResultProcessingInterceptor).should().afterCompletion(any(), any());
+		then(deferredResultProcessingInterceptor).shouldHaveNoMoreInteractions();
+	}
+
+	@Test
+	@WithUserDetails("admin")
+	public void testDeferredResultNotFound() throws Exception {
+		given(userManager.loadUserByUsername("test")).willReturn(null);
+		MvcResult mvcResult = this.mockMvc.perform(get("/user/test")).andExpect(status().isOk())
+				.andExpect(request().asyncStarted()).andExpect(request().asyncResult(RestStatus.NOT_FOUND)).andReturn();
+
+		then(deferredResultProcessingInterceptor).should().beforeConcurrentHandling(any(), any());
+		then(deferredResultProcessingInterceptor).should().preProcess(any(), any());
+		then(deferredResultProcessingInterceptor).should().postProcess(any(),
+				argThat(result -> RestStatus.NOT_FOUND.equals(result.getResult())), any());
+		then(deferredResultProcessingInterceptor).shouldHaveNoMoreInteractions();
+
+		this.mockMvc.perform(asyncDispatch(mvcResult)).andExpect(status().isNotFound())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(jsonPoint("/status").value("NOT_FOUND")).andExpect(jsonPoint("/message").value("Not Found"))
+				.andReturn();
+
+		then(deferredResultProcessingInterceptor).should().afterCompletion(any(), any());
+		then(deferredResultProcessingInterceptor).shouldHaveNoMoreInteractions();
+	}
+
+	static JacksonResultMatchers jsonPoint(String expression) {
+		return new JacksonResultMatchers(expression);
+	}
+
+	static class JacksonResultMatchers {
+
+		private String expression;
+
+		protected JacksonResultMatchers(String expression) {
+			this.expression = expression;
+		}
+
+		public ResultMatcher value(String expectedValue) {
+			return result -> {
+				JsonNode jsonNode = JsonUtils.getObjectMapper().readTree(getContent(result));
+				assertEquals(expectedValue, jsonNode.at(expression).asText());
+			};
+		}
+
+		private String getContent(MvcResult result) throws UnsupportedEncodingException {
+			return result.getResponse().getContentAsString();
+		}
+
 	}
 }

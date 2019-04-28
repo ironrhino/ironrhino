@@ -28,6 +28,11 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.request.async.DeferredResultProcessingInterceptor;
+import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -36,6 +41,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableWebSecurity
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 public class UserRestApiConfig implements WebMvcConfigurer {
+
+	@Bean
+	public MockMvc mockMvc(WebApplicationContext wac) {
+		return MockMvcBuilders.webAppContextSetup(wac).build();
+	}
 
 	@Bean
 	public UserDetailsService userDetailsService() {
@@ -75,6 +85,16 @@ public class UserRestApiConfig implements WebMvcConfigurer {
 	@Bean
 	public MyJsonValidator myJsonValidator() {
 		return new MyJsonValidator();
+	}
+
+	@Bean
+	public DeferredResultProcessingInterceptor deferredResultProcessingInterceptor() {
+		return mock(DeferredResultProcessingInterceptor.class);
+	}
+
+	@Override
+	public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
+		configurer.registerDeferredResultInterceptors(deferredResultProcessingInterceptor());
 	}
 
 	@Override
