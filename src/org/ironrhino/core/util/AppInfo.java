@@ -522,7 +522,7 @@ public class AppInfo {
 		return propertyResolver.resolveRequiredPlaceholders(text);
 	}
 
-	private static String getEnv(String key) {
+	public static String getEnv(String key) {
 		String value = System.getProperty(key);
 		if (value == null)
 			value = System.getenv(key);
