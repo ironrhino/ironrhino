@@ -303,6 +303,46 @@ public class UserRestApiTest {
 		then(deferredResultProcessingInterceptor).shouldHaveNoMoreInteractions();
 	}
 
+	@Test
+	@WithUserDetails("admin")
+	public void testFlux() throws Exception {
+		MvcResult mvcResult = this.mockMvc.perform(get("/user/flux")).andExpect(status().isOk())
+				.andExpect(request().asyncStarted()).andReturn();
+
+		then(deferredResultProcessingInterceptor).should().beforeConcurrentHandling(any(), any());
+		then(deferredResultProcessingInterceptor).should().preProcess(any(), any());
+		then(deferredResultProcessingInterceptor).should().postProcess(any(), any(), any());
+		then(deferredResultProcessingInterceptor).shouldHaveNoMoreInteractions();
+
+		this.mockMvc.perform(asyncDispatch(mvcResult)).andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(jsonPoint("/0/username").value("admin")).andExpect(jsonPoint("/0/name").value("admin"))
+				.andExpect(jsonPoint("/0/roles/0").value("ROLE_ADMINISTRATOR"));
+
+		then(deferredResultProcessingInterceptor).should().afterCompletion(any(), any());
+		then(deferredResultProcessingInterceptor).shouldHaveNoMoreInteractions();
+	}
+
+	@Test
+	@WithUserDetails("admin")
+	public void testMono() throws Exception {
+		MvcResult mvcResult = this.mockMvc.perform(get("/user/mono")).andExpect(status().isOk())
+				.andExpect(request().asyncStarted()).andReturn();
+
+		then(deferredResultProcessingInterceptor).should().beforeConcurrentHandling(any(), any());
+		then(deferredResultProcessingInterceptor).should().preProcess(any(), any());
+		then(deferredResultProcessingInterceptor).should().postProcess(any(), any(), any());
+		then(deferredResultProcessingInterceptor).shouldHaveNoMoreInteractions();
+
+		this.mockMvc.perform(asyncDispatch(mvcResult)).andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(jsonPoint("/username").value("admin")).andExpect(jsonPoint("/name").value("admin"))
+				.andExpect(jsonPoint("/roles/0").value("ROLE_ADMINISTRATOR"));
+
+		then(deferredResultProcessingInterceptor).should().afterCompletion(any(), any());
+		then(deferredResultProcessingInterceptor).shouldHaveNoMoreInteractions();
+	}
+
 	static JacksonResultMatchers jsonPoint(String expression) {
 		return new JacksonResultMatchers(expression);
 	}
