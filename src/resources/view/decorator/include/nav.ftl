@@ -34,6 +34,7 @@
 		  	<li><a href="<@url value="/sample/boss"/>" class="ajax view">${getText('boss')}</a></li>
 		  	<li><a href="<@url value="/sample/employee"/>" class="ajax view">${getText('employee')}</a></li>
 		  	<li><a href="<@url value="/sample/task"/>" class="ajax view">${getText('task')}</a></li>
+		  	<li><a href="<@url value="/sample/message"/>" class="ajax view">${getText('message')}</a></li>
 		  	<li><a href="<@url value="/sample/person"/>" class="ajax view">${getText('person')}</a></li>
 	  	</ul>
 	</li>

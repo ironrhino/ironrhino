@@ -36,7 +36,7 @@ public class Task implements Persistable<String> {
 	@Column(name = "taskNo", length = 15)
 	private String id;
 
-	@UiConfig(width = "200px")
+	@UiConfig(width = "200px", cssClass = "input-xxlarge")
 	@SearchableComponent
 	@Column(nullable = false)
 	private String title;
