@@ -66,7 +66,8 @@ public class HttpClientUtils {
 				.setSocketTimeout(socketTimeout).setExpectContinueEnabled(true).build();
 		CloseableHttpClient httpclient = HttpClients.custom().disableAuthCaching().disableConnectionState()
 				.disableCookieManagement().setConnectionTimeToLive(60, TimeUnit.SECONDS)
-				.setDefaultRequestConfig(requestConfig).setDefaultHeaders(DEFAULT_HEADERS)
+				.setDefaultRequestConfig(requestConfig).setDefaultHeaders(DEFAULT_HEADERS).setMaxConnTotal(100)
+				.setMaxConnPerRoute(10)
 				.setRetryHandler(
 						(e, executionCount, httpCtx) -> executionCount < 3 && e instanceof NoHttpResponseException)
 				.build();
