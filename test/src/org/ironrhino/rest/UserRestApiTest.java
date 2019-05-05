@@ -273,7 +273,7 @@ public class UserRestApiTest {
 		then(deferredResultProcessingInterceptor).shouldHaveNoMoreInteractions();
 
 		this.mockMvc.perform(asyncDispatch(mvcResult)).andExpect(status().isOk())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPoint("/username").value("admin")).andExpect(jsonPoint("/name").value("admin"))
 				.andExpect(jsonPoint("/roles/0").value("ROLE_ADMINISTRATOR")).andReturn();
 
@@ -295,7 +295,7 @@ public class UserRestApiTest {
 		then(deferredResultProcessingInterceptor).shouldHaveNoMoreInteractions();
 
 		this.mockMvc.perform(asyncDispatch(mvcResult)).andExpect(status().isNotFound())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPoint("/status").value("NOT_FOUND")).andExpect(jsonPoint("/message").value("Not Found"))
 				.andReturn();
 
@@ -315,7 +315,7 @@ public class UserRestApiTest {
 		then(deferredResultProcessingInterceptor).shouldHaveNoMoreInteractions();
 
 		this.mockMvc.perform(asyncDispatch(mvcResult)).andExpect(status().isOk())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPoint("/0/username").value("admin")).andExpect(jsonPoint("/0/name").value("admin"))
 				.andExpect(jsonPoint("/0/roles/0").value("ROLE_ADMINISTRATOR"));
 
@@ -335,7 +335,7 @@ public class UserRestApiTest {
 		then(deferredResultProcessingInterceptor).shouldHaveNoMoreInteractions();
 
 		this.mockMvc.perform(asyncDispatch(mvcResult)).andExpect(status().isOk())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPoint("/username").value("admin")).andExpect(jsonPoint("/name").value("admin"))
 				.andExpect(jsonPoint("/roles/0").value("ROLE_ADMINISTRATOR"));
 

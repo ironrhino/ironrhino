@@ -19,8 +19,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class UploadController {
 
 	@RequestMapping(method = RequestMethod.POST, consumes = { MediaType.TEXT_PLAIN_VALUE,
-			MediaType.APPLICATION_JSON_UTF8_VALUE }, produces = { MediaType.TEXT_PLAIN_VALUE,
-					MediaType.APPLICATION_JSON_UTF8_VALUE })
+			MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.TEXT_PLAIN_VALUE,
+					MediaType.APPLICATION_JSON_VALUE })
 	public String upload(@RequestBody String string) {
 		return string;
 	}

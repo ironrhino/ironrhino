@@ -25,7 +25,7 @@ public class OAuthErrorHandler {
 			throws IOException {
 		int status = determineHttpStatusCode(oauthError);
 		response.setStatus(status);
-		response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
+		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 		if (!legacy) {
 			response.getWriter().write(JsonUtils.toJson(oauthError));
 		} else {
