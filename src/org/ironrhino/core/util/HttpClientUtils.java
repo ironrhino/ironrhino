@@ -28,6 +28,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
@@ -64,14 +65,12 @@ public class HttpClientUtils {
 		RequestConfig requestConfig = RequestConfig.custom().setCircularRedirectsAllowed(true)
 				.setConnectionRequestTimeout(connectTimeout).setConnectTimeout(connectTimeout)
 				.setSocketTimeout(socketTimeout).setExpectContinueEnabled(true).build();
-		CloseableHttpClient httpclient = HttpClients.custom().disableAuthCaching().disableConnectionState()
-				.disableCookieManagement().setConnectionTimeToLive(60, TimeUnit.SECONDS)
-				.setDefaultRequestConfig(requestConfig).setDefaultHeaders(DEFAULT_HEADERS).setMaxConnTotal(100)
-				.setMaxConnPerRoute(10)
-				.setRetryHandler(
-						(e, executionCount, httpCtx) -> executionCount < 3 && e instanceof NoHttpResponseException)
-				.build();
-		return httpclient;
+		HttpClientBuilder builder = HttpClients.custom();
+		builder.disableAuthCaching().disableConnectionState().disableCookieManagement()
+				.setConnectionTimeToLive(60, TimeUnit.SECONDS).setDefaultRequestConfig(requestConfig)
+				.setDefaultHeaders(DEFAULT_HEADERS).setMaxConnTotal(100).setMaxConnPerRoute(10).setRetryHandler(
+						(e, executionCount, httpCtx) -> executionCount < 3 && e instanceof NoHttpResponseException);
+		return builder.build();
 	}
 
 	public static String getResponseText(String url) throws IOException {
