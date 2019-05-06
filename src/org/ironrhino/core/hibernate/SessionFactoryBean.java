@@ -221,7 +221,8 @@ public class SessionFactoryBean extends LocalSessionFactoryBean implements Defau
 
 		properties.put(AvailableSettings.JPA_VALIDATION_FACTORY, validatorFactory);
 
-		if (AppInfo.getStage() != Stage.DEVELOPMENT && "true".equals(properties.get(AvailableSettings.SHOW_SQL))) {
+		if (AppInfo.getStage() != Stage.DEVELOPMENT && AppInfo.getContextPath() != null
+				&& "true".equals(properties.get(AvailableSettings.SHOW_SQL))) {
 			log.warn("Remove {} if stage is not development", AvailableSettings.SHOW_SQL);
 			properties.remove(AvailableSettings.SHOW_SQL);
 		}
