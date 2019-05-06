@@ -8,6 +8,7 @@
 	</Appenders>
 	
 	<Loggers>
+		<Logger name="org.springframework.mock.web.MockServletContext" level="ERROR"/>
 		<Root level="INFO">
 			<AppenderRef ref="CONSOLE"/>
 		</Root>
