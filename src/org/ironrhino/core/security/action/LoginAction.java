@@ -131,7 +131,9 @@ public class LoginAction extends BaseAction {
 		} catch (BadCredentialsException failed) {
 			usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
 			addFieldError("password", getText(failed.getClass().getName()));
-			captchaManager.addCaptchaCount(request);
+			if (captchaManager != null) {
+				captchaManager.addCaptchaCount(request);
+			}
 		} catch (CredentialsExpiredException failed) {
 			UserDetails ud = userDetailsService.loadUserByUsername(username);
 			if (ud instanceof Persistable) {
