@@ -222,7 +222,7 @@ public class SampleObjectCreator {
 		if ((Integer.TYPE == type) || (Integer.class == type))
 			return 100;
 		if ((Long.TYPE == type) || (Long.class == type))
-			return 1000;
+			return 1000L;
 		if ((Float.TYPE == type) || (Float.class == type))
 			return 9.9f;
 		if ((Double.TYPE == type) || (Double.class == type) || (Number.class == type))
