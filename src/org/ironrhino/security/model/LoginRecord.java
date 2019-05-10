@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -24,7 +25,7 @@ import lombok.Setter;
 @Authorize(ifAnyGranted = { UserRole.ROLE_ADMINISTRATOR, UserRole.ROLE_AUDITOR })
 @Entity
 @Searchable
-@Table(name = "loginrecord")
+@Table(name = "loginrecord", indexes = @Index(columnList = "date desc"))
 @Richtable(searchable = true, order = "date desc", readonly = @Readonly(true))
 @Getter
 @Setter
