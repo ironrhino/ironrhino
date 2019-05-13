@@ -41,6 +41,10 @@ public class RedisLockService implements LockService {
 	@Value("${lockService.suspiciousHoldTime:600}")
 	private int suspiciousHoldTime = 600;
 
+	@Getter
+	@Value("${lockService.heartbeatInterval:10}")
+	private int heartbeatInterval = 10;
+
 	@Autowired
 	@Qualifier("stringRedisTemplate")
 	@PriorityQualifier
@@ -72,7 +76,15 @@ public class RedisLockService implements LockService {
 				String currentHolder = coordinationStringRedisTemplate.opsForValue().get(key);
 				if (currentHolder == null || currentHolder.startsWith(AppInfo.getInstanceId())) // self
 					return false;
-				if (!isAlive(currentHolder)) {
+				boolean alive;
+				String hbKey = NAMESPACE + "hb:" + currentHolder;
+				String hbValue = "1";
+				if (!(alive = hbValue.equals(coordinationStringRedisTemplate.opsForValue().get(hbKey)))) {
+					if (alive = isAlive(currentHolder))
+						coordinationStringRedisTemplate.opsForValue().set(hbKey, hbValue, heartbeatInterval,
+								TimeUnit.SECONDS);
+				}
+				if (!alive) {
 					Long ret = coordinationStringRedisTemplate.execute(compareAndDeleteScript,
 							Collections.singletonList(key), currentHolder);
 					if (ret != null && ret != 0)
