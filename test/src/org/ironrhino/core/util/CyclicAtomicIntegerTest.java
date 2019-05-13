@@ -1,8 +1,7 @@
 package org.ironrhino.core.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Arrays;
 
@@ -55,18 +54,18 @@ public class CyclicAtomicIntegerTest {
 	@Test
 	public void testSet() {
 		CyclicAtomicInteger cai = new CyclicAtomicInteger(1, -1, 4);
-		assertEquals(1, cai.get());
+		assertThat(cai.get(), equalTo(1));
 		cai.set(-1);
-		assertEquals(-1, cai.get());
+		assertThat(cai.get(), equalTo(-1));
 	}
 
 	@Test
 	public void testCompareAndSet() {
 		CyclicAtomicInteger cai = new CyclicAtomicInteger(1, -1, 4);
-		assertTrue(cai.compareAndSet(1, -1));
-		assertEquals(-1, cai.get());
-		assertFalse(cai.compareAndSet(1, 2));
-		assertEquals(-1, cai.get());
+		assertThat(cai.compareAndSet(1, -1), equalTo(true));
+		assertThat(cai.get(), equalTo(-1));
+		assertThat(cai.compareAndSet(1, 2), equalTo(false));
+		assertThat(cai.get(), equalTo(-1));
 	}
 
 	@Test
@@ -76,31 +75,31 @@ public class CyclicAtomicIntegerTest {
 		Integer[] arr2 = new Integer[arr.length];
 		for (int i = 0; i < arr2.length; i++)
 			arr2[i] = cai.getAndAdd(1);
-		assertTrue(Arrays.equals(arr, arr2));
+		assertThat(Arrays.equals(arr, arr2), equalTo(true));
 		cai = new CyclicAtomicInteger(1, 0, 3);
 		arr = new Integer[] { 1, 2, 0, 1, 2, 0 };
 		arr2 = new Integer[arr.length];
 		for (int i = 0; i < arr2.length; i++)
 			arr2[i] = cai.getAndAdd(1);
-		assertTrue(Arrays.equals(arr, arr2));
+		assertThat(Arrays.equals(arr, arr2), equalTo(true));
 		cai = new CyclicAtomicInteger(1, 1, 3);
 		arr = new Integer[] { 1, 2, 1, 2, 1, 2 };
 		arr2 = new Integer[arr.length];
 		for (int i = 0; i < arr2.length; i++)
 			arr2[i] = cai.getAndAdd(1);
-		assertTrue(Arrays.equals(arr, arr2));
+		assertThat(Arrays.equals(arr, arr2), equalTo(true));
 		cai = new CyclicAtomicInteger(1, -1, 3);
 		arr = new Integer[] { 1, 2, -1, 0, 1, 2, -1, 0 };
 		arr2 = new Integer[arr.length];
 		for (int i = 0; i < arr2.length; i++)
 			arr2[i] = cai.getAndAdd(1);
-		assertTrue(Arrays.equals(arr, arr2));
+		assertThat(Arrays.equals(arr, arr2), equalTo(true));
 		cai = new CyclicAtomicInteger(1, -1, 3);
 		arr = new Integer[] { 1, -1, 1, -1 };
 		arr2 = new Integer[arr.length];
 		for (int i = 0; i < arr2.length; i++)
 			arr2[i] = cai.getAndAdd(2);
-		assertTrue(Arrays.equals(arr, arr2));
+		assertThat(Arrays.equals(arr, arr2), equalTo(true));
 	}
 
 	@Test
@@ -110,31 +109,31 @@ public class CyclicAtomicIntegerTest {
 		Integer[] arr2 = new Integer[arr.length];
 		for (int i = 0; i < arr2.length; i++)
 			arr2[i] = cai.addAndGet(1);
-		assertTrue(Arrays.equals(arr, arr2));
+		assertThat(Arrays.equals(arr, arr2), equalTo(true));
 		cai = new CyclicAtomicInteger(1, 0, 3);
 		arr = new Integer[] { 2, 0, 1, 2, 0 };
 		arr2 = new Integer[arr.length];
 		for (int i = 0; i < arr2.length; i++)
 			arr2[i] = cai.addAndGet(1);
-		assertTrue(Arrays.equals(arr, arr2));
+		assertThat(Arrays.equals(arr, arr2), equalTo(true));
 		cai = new CyclicAtomicInteger(1, 1, 3);
 		arr = new Integer[] { 2, 1, 2, 1, 2 };
 		arr2 = new Integer[arr.length];
 		for (int i = 0; i < arr2.length; i++)
 			arr2[i] = cai.addAndGet(1);
-		assertTrue(Arrays.equals(arr, arr2));
+		assertThat(Arrays.equals(arr, arr2), equalTo(true));
 		cai = new CyclicAtomicInteger(1, -1, 3);
 		arr = new Integer[] { 2, -1, 0, 1, 2, -1, 0 };
 		arr2 = new Integer[arr.length];
 		for (int i = 0; i < arr2.length; i++)
 			arr2[i] = cai.addAndGet(1);
-		assertTrue(Arrays.equals(arr, arr2));
+		assertThat(Arrays.equals(arr, arr2), equalTo(true));
 		cai = new CyclicAtomicInteger(1, -1, 3);
 		arr = new Integer[] { -1, 1, -1 };
 		arr2 = new Integer[arr.length];
 		for (int i = 0; i < arr2.length; i++)
 			arr2[i] = cai.addAndGet(2);
-		assertTrue(Arrays.equals(arr, arr2));
+		assertThat(Arrays.equals(arr, arr2), equalTo(true));
 	}
 
 }

@@ -1,7 +1,7 @@
 package org.ironrhino.core.util;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -16,40 +16,40 @@ public class CompareUtilsTest {
 
 	@Test
 	public void testEquals() {
-		assertTrue(CompareUtils.equals(null, null));
-		assertFalse(CompareUtils.equals(1, 2));
-		assertTrue(CompareUtils.equals(1, 1));
-		assertFalse(CompareUtils.equals(1, 1L));
-		assertTrue(CompareUtils.equals(YearMonth.of(2012, 8), YearMonth.of(2012, 8)));
-		assertFalse(CompareUtils.equals(YearMonth.of(2012, 9), YearMonth.of(2012, 8)));
-		assertTrue(CompareUtils.equals(new int[] { 1, 2 }, new int[] { 1, 2 }));
-		assertFalse(CompareUtils.equals(new int[] { 1, 2 }, new int[] { 1, 2, 3 }));
-		assertFalse(CompareUtils.equals(new Object[] { 1, "" }, new Object[] { 1, "", "" }));
-		assertTrue(CompareUtils.equals(new Object[] { 1, "" }, new Object[] { 1, "" }));
-		assertTrue(CompareUtils.equals(new Object[] {}, new Object[] {}));
-		assertTrue(CompareUtils.equals(new Object[] {}, null));
-		assertTrue(CompareUtils.equals(new ArrayList<String>(), new ArrayList<String>()));
-		assertTrue(CompareUtils.equals(new ArrayList<String>(), null));
+		assertThat(CompareUtils.equals(null, null), equalTo(true));
+		assertThat(CompareUtils.equals(1, 2), equalTo(false));
+		assertThat(CompareUtils.equals(1, 1), equalTo(true));
+		assertThat(CompareUtils.equals(1, 1L), equalTo(false));
+		assertThat(CompareUtils.equals(YearMonth.of(2012, 8), YearMonth.of(2012, 8)), equalTo(true));
+		assertThat(CompareUtils.equals(YearMonth.of(2012, 9), YearMonth.of(2012, 8)), equalTo(false));
+		assertThat(CompareUtils.equals(new int[] { 1, 2 }, new int[] { 1, 2 }), equalTo(true));
+		assertThat(CompareUtils.equals(new int[] { 1, 2 }, new int[] { 1, 2, 3 }), equalTo(false));
+		assertThat(CompareUtils.equals(new Object[] { 1, "" }, new Object[] { 1, "", "" }), equalTo(false));
+		assertThat(CompareUtils.equals(new Object[] { 1, "" }, new Object[] { 1, "" }), equalTo(true));
+		assertThat(CompareUtils.equals(new Object[] {}, new Object[] {}), equalTo(true));
+		assertThat(CompareUtils.equals(new Object[] {}, null), equalTo(true));
+		assertThat(CompareUtils.equals(new ArrayList<String>(), new ArrayList<String>()), equalTo(true));
+		assertThat(CompareUtils.equals(new ArrayList<String>(), null), equalTo(true));
 		Customer c1 = new Customer();
 		c1.setId("id");
 		c1.setName("name");
 		Customer c2 = new Customer();
-		assertFalse(CompareUtils.equals(c1, c2));
+		assertThat(CompareUtils.equals(c1, c2), equalTo(false));
 		c2.setId("id");
-		assertTrue(CompareUtils.equals(c1, c2));
-		assertTrue(CompareUtils.equals(Collections.singletonList(c1), Collections.singletonList(c2)));
-		assertTrue(CompareUtils.equals(new Customer[] { c1 }, new Customer[] { c2 }));
+		assertThat(CompareUtils.equals(c1, c2), equalTo(true));
+		assertThat(CompareUtils.equals(Collections.singletonList(c1), Collections.singletonList(c2)), equalTo(true));
+		assertThat(CompareUtils.equals(new Customer[] { c1 }, new Customer[] { c2 }), equalTo(true));
 		CustomerAddress ca1 = new CustomerAddress();
 		CustomerAddress ca2 = new CustomerAddress();
-		assertTrue(CompareUtils.equals(ca1, ca2));
+		assertThat(CompareUtils.equals(ca1, ca2), equalTo(true));
 		Employee emp1 = new Employee();
 		ca1.setReceiver(emp1);
-		assertFalse(CompareUtils.equals(ca1, ca2));
+		assertThat(CompareUtils.equals(ca1, ca2), equalTo(false));
 		Employee emp2 = new Employee();
 		ca2.setReceiver(emp2);
-		assertTrue(CompareUtils.equals(ca1, ca2));
-		assertTrue(CompareUtils.equals(Collections.singletonList(ca1), Collections.singletonList(ca2)));
-		assertTrue(CompareUtils.equals(new CustomerAddress[] { ca1 }, new CustomerAddress[] { ca2 }));
+		assertThat(CompareUtils.equals(ca1, ca2), equalTo(true));
+		assertThat(CompareUtils.equals(Collections.singletonList(ca1), Collections.singletonList(ca2)), equalTo(true));
+		assertThat(CompareUtils.equals(new CustomerAddress[] { ca1 }, new CustomerAddress[] { ca2 }), equalTo(true));
 	}
 
 }

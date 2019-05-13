@@ -1,7 +1,9 @@
 package org.ironrhino.core.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.isA;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -95,13 +97,12 @@ public class JsonUtilsTest {
 		u.setContent("this is a lob");
 		String json = JsonUtils.toJson(u);
 		User u2 = JsonUtils.fromJson(json, User.class);
-		assertEquals(u.getUsername(), u2.getUsername());
-		assertEquals(u.getAge(), u2.getAge());
-		assertEquals(u.getStatus(), u2.getStatus());
-		assertEquals(u.getDate().getTime(), u2.getDate().getTime());
-		assertNull(u2.getPassword());
-		assertNull(u2.getContent());
-
+		assertThat(u.getUsername(), u2.getUsername(), equalTo(u.getUsername()));
+		assertThat(u2.getAge(), equalTo(u.getAge()));
+		assertThat(u2.getStatus(), equalTo(u.getStatus()));
+		assertThat(u2.getDate().getTime(), equalTo(u.getDate().getTime()));
+		assertThat(u2.getPassword(), nullValue());
+		assertThat(u2.getContent(), nullValue());
 	}
 
 	@Test
@@ -114,9 +115,9 @@ public class JsonUtilsTest {
 		u.setContent("this is a lob");
 		String json = JsonUtils.toJsonWithView(u, View.Summary.class);
 		JsonNode jsonNode = JsonUtils.fromJson(json, JsonNode.class);
-		assertEquals(1, jsonNode.size());
+		assertThat(jsonNode.size(), equalTo(1));
 		jsonNode = jsonNode.get("username");
-		assertEquals(u.getUsername(), jsonNode.asText());
+		assertThat(jsonNode.asText(), equalTo(u.getUsername()));
 	}
 
 	@Test
@@ -124,15 +125,15 @@ public class JsonUtilsTest {
 		Date d = new Date();
 		String json = "{\"date\":" + d.getTime() + "}";
 		User u = JsonUtils.fromJson(json, User.class);
-		assertEquals(d, u.getDate());
+		assertThat(u.getDate(), equalTo(d));
 
 		json = "{\"date\":\"" + DateUtils.formatDate10(d) + "\"}";
 		u = JsonUtils.fromJson(json, User.class);
-		assertEquals(DateUtils.beginOfDay(d), u.getDate());
+		assertThat(u.getDate(), equalTo(DateUtils.beginOfDay(d)));
 
 		json = "{\"date\":\"" + DateUtils.formatDatetime(d) + "\"}";
 		u = JsonUtils.fromJson(json, User.class);
-		assertEquals(d.getTime() / 1000, u.getDate().getTime() / 1000);
+		assertThat(u.getDate().getTime() / 1000, equalTo(d.getTime() / 1000));
 	}
 
 	@Test
@@ -149,11 +150,10 @@ public class JsonUtilsTest {
 		String json = JsonUtils.toJson(users);
 		List<User> list = JsonUtils.fromJson(json, new TypeReference<List<User>>() {
 		});
-		assertEquals(users.size(), list.size());
-		assertEquals(users.get(0).getUsername(), list.get(0).getUsername());
-		assertEquals(users.get(0).getAge(), list.get(0).getAge());
-		assertEquals(users.get(0).getStatus(), list.get(0).getStatus());
-
+		assertThat(list.size(), equalTo(users.size()));
+		assertThat(list.get(0).getUsername(), equalTo(users.get(0).getUsername()));
+		assertThat(list.get(0).getAge(), equalTo(users.get(0).getAge()));
+		assertThat(list.get(0).getStatus(), equalTo(users.get(0).getStatus()));
 	}
 
 	@Test
@@ -172,10 +172,10 @@ public class JsonUtilsTest {
 		String json = JsonUtils.toJson(rp);
 		ResultPage<User> rp2 = JsonUtils.fromJson(json, new TypeReference<ResultPage<User>>() {
 		});
-		assertEquals(rp.getResult().size(), rp2.getResult().size());
-		assertEquals(User.class, rp2.getResult().iterator().next().getClass());
+		assertThat(rp2.getResult().size(), equalTo(rp.getResult().size()));
+		assertThat(rp2.getResult().iterator().next(), isA(User.class));
 		String json2 = JsonUtils.toJson(rp2);
-		assertEquals(json, json2);
+		assertThat(json2, equalTo(json));
 	}
 
 	@Test
@@ -183,13 +183,13 @@ public class JsonUtilsTest {
 		TemporalObject to = new TemporalObject();
 		String s = JsonUtils.toJson(to);
 		TemporalObject to2 = JsonUtils.fromJson(s, TemporalObject.class);
-		assertEquals(to, to2);
+		assertThat(to2, equalTo(to));
 	}
 
 	@Test
 	public void testImmutable() throws IOException {
-		assertEquals(new ImmutableObject(12, "test"),
-				JsonUtils.fromJson("{\"id\":12,\"name\":\"test\"}", ImmutableObject.class));
+		assertThat(JsonUtils.fromJson("{\"id\":12,\"name\":\"test\"}", ImmutableObject.class),
+				equalTo(new ImmutableObject(12, "test")));
 	}
 
 }

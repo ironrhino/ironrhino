@@ -1,6 +1,7 @@
 package org.ironrhino.core.util;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.lang.reflect.Method;
 
@@ -19,7 +20,7 @@ public class AopUtilsTest {
 		Method targetMethod = targetClass.getDeclaredMethod(methodName, Dog.class);
 		Method originalMethod = AnimalService.class.getDeclaredMethod(methodName, Animal.class);
 		Method actualMethod = AopUtils.getMostSpecificMethod(originalMethod, targetClass);
-		assertEquals("Please ensure class compiled with javac not eclipse", targetMethod, actualMethod);
+		assertThat("Please ensure class compiled with javac not eclipse", actualMethod, equalTo(targetMethod));
 	}
 
 	public static class Animal {

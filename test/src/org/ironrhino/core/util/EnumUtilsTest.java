@@ -1,6 +1,7 @@
 package org.ironrhino.core.util;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
 import java.util.Map;
@@ -21,21 +22,21 @@ public class EnumUtilsTest {
 	@Test
 	public void testEnumToMap() {
 		Map<String, String> map = EnumUtils.enumToMap(Enum1.class);
-		assertEquals(2, map.size());
-		assertEquals("TEST1", map.get("TEST1"));
+		assertThat(map.size(), equalTo(2));
+		assertThat(map.get("TEST1"), equalTo("TEST1"));
 		map = EnumUtils.enumToMap(Enum2.class);
-		assertEquals(2, map.size());
-		assertEquals("TEST1", map.get("TEST1"));
+		assertThat(map.size(), equalTo(2));
+		assertThat(map.get("TEST1"), equalTo("TEST1"));
 	}
 
 	@Test
 	public void testEnumToList() {
 		List<String> list = EnumUtils.enumToList(Enum1.class);
-		assertEquals(2, list.size());
-		assertEquals("TEST1", list.get(0));
+		assertThat(list.size(), equalTo(2));
+		assertThat(list.get(0), equalTo("TEST1"));
 		list = EnumUtils.enumToList(Enum2.class);
-		assertEquals(2, list.size());
-		assertEquals("TEST1", list.get(0));
+		assertThat(list.size(), equalTo(2));
+		assertThat(list.get(0), equalTo("TEST1"));
 	}
 
 }

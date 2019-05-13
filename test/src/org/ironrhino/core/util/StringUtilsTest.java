@@ -1,8 +1,7 @@
 package org.ironrhino.core.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.ironrhino.core.metadata.Scope;
 import org.junit.Test;
@@ -11,75 +10,75 @@ public class StringUtilsTest {
 
 	@Test
 	public void testToCamelCase() {
-		assertEquals("fooBar", StringUtils.toCamelCase("foo_bar"));
+		assertThat(StringUtils.toCamelCase("foo_bar"), equalTo("fooBar"));
 	}
 
 	@Test
 	public void testToUpperCaseWithUnderscores() {
-		assertEquals("FOO_BAR", StringUtils.toUpperCaseWithUnderscores("fooBar"));
+		assertThat(StringUtils.toUpperCaseWithUnderscores("fooBar"), equalTo("FOO_BAR"));
 	}
 
 	@Test
 	public void testToLowerCaseWithUnderscores() {
-		assertEquals("foo_bar", StringUtils.toLowerCaseWithUnderscores("fooBar"));
+		assertThat(StringUtils.toLowerCaseWithUnderscores("fooBar"), equalTo("foo_bar"));
 	}
 
 	@Test
 	public void testMatchesWildcard() {
-		assertTrue(StringUtils.matchesWildcard("test", "t?st"));
-		assertTrue(StringUtils.matchesWildcard("test", "t*"));
-		assertFalse(StringUtils.matchesWildcard("test", "t?"));
-		assertFalse(StringUtils.matchesWildcard("test", "T*"));
+		assertThat(StringUtils.matchesWildcard("test", "t?st"), equalTo(true));
+		assertThat(StringUtils.matchesWildcard("test", "t*"), equalTo(true));
+		assertThat(StringUtils.matchesWildcard("test", "t?"), equalTo(false));
+		assertThat(StringUtils.matchesWildcard("test", "T*"), equalTo(false));
 	}
 
 	@Test
 	public void testTrimTail() {
-		assertEquals("fooB", StringUtils.trimTail("fooBar", "ar"));
-		assertEquals("fooBar", StringUtils.trimTail("fooBar", "bar"));
+		assertThat(StringUtils.trimTail("fooBar", "ar"), equalTo("fooB"));
+		assertThat(StringUtils.trimTail("fooBar", "bar"), equalTo("fooBar"));
 	}
 
 	@Test
 	public void testTrimTailSlash() {
-		assertEquals("foo", StringUtils.trimTailSlash("foo/"));
-		assertEquals("foo", StringUtils.trimTailSlash("foo"));
+		assertThat(StringUtils.trimTailSlash("foo/"), equalTo("foo"));
+		assertThat(StringUtils.trimTailSlash("foo"), equalTo("foo"));
 	}
 
 	@Test
 	public void testCompressRepeat() {
-		assertEquals("foo", StringUtils.compressRepeat("foo", "/"));
-		assertEquals("foo/", StringUtils.compressRepeat("foo/", "/"));
-		assertEquals("foo/", StringUtils.compressRepeat("foo////", "/"));
+		assertThat(StringUtils.compressRepeat("foo", "/"), equalTo("foo"));
+		assertThat(StringUtils.compressRepeat("foo/", "/"), equalTo("foo/"));
+		assertThat(StringUtils.compressRepeat("foo////", "/"), equalTo("foo/"));
 	}
 
 	@Test
 	public void testCompressRepeatSlash() {
-		assertEquals("foo", StringUtils.compressRepeatSlash("foo"));
-		assertEquals("foo/", StringUtils.compressRepeatSlash("foo/"));
-		assertEquals("foo/", StringUtils.compressRepeatSlash("foo////"));
-		assertEquals("fo/o/", StringUtils.compressRepeatSlash("fo///o////"));
+		assertThat("foo", StringUtils.compressRepeatSlash("foo"), equalTo("foo"));
+		assertThat(StringUtils.compressRepeatSlash("foo/"), equalTo("foo/"));
+		assertThat(StringUtils.compressRepeatSlash("foo////"), equalTo("foo/"));
+		assertThat(StringUtils.compressRepeatSlash("fo///o////"), equalTo("fo/o/"));
 	}
 
 	@Test
 	public void testCompressRepeatSpaces() {
-		assertEquals("foo", StringUtils.compressRepeatSpaces("foo"));
-		assertEquals("foo", StringUtils.compressRepeatSpaces("foo "));
-		assertEquals("foo", StringUtils.compressRepeatSpaces("foo    "));
-		assertEquals("fo o", StringUtils.compressRepeatSpaces("fo   o   "));
+		assertThat(StringUtils.compressRepeatSpaces("foo"), equalTo("foo"));
+		assertThat(StringUtils.compressRepeatSpaces("foo "), equalTo("foo"));
+		assertThat(StringUtils.compressRepeatSpaces("foo    "), equalTo("foo"));
+		assertThat(StringUtils.compressRepeatSpaces("fo   o   "), equalTo("fo o"));
 	}
 
 	@Test
 	public void testTrimLocale() {
-		assertEquals("foo", StringUtils.trimLocale("foo"));
-		assertEquals("foo", StringUtils.trimLocale("foo_zh"));
-		assertEquals("foo", StringUtils.trimLocale("foo_zh_CN"));
+		assertThat(StringUtils.trimLocale("foo"), equalTo("foo"));
+		assertThat(StringUtils.trimLocale("foo_zh"), equalTo("foo"));
+		assertThat(StringUtils.trimLocale("foo_zh_CN"), equalTo("foo"));
 	}
 
 	@Test
 	public void testToString() {
-		assertEquals("GLOBAL", StringUtils.toString(Scope.GLOBAL));
-		assertEquals("[1, 2, 3]", StringUtils.toString(new Integer[] { 1, 2, 3 }));
-		assertEquals("foo", StringUtils.toString("foo"));
-		assertEquals("1", StringUtils.toString(1));
+		assertThat(StringUtils.toString(Scope.GLOBAL), equalTo("GLOBAL"));
+		assertThat(StringUtils.toString(new Integer[] { 1, 2, 3 }), equalTo("[1, 2, 3]"));
+		assertThat(StringUtils.toString("foo"), equalTo("foo"));
+		assertThat(StringUtils.toString(1), equalTo("1"));
 	}
 
 }

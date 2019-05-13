@@ -1,8 +1,8 @@
 package org.ironrhino.core.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -108,8 +108,9 @@ public class AnnotationUtilsTest {
 	}
 
 	private void doTestGetAnnotatedMethod() {
-		assertEquals("validateUpdate", AnnotationUtils.getAnnotatedMethod(User.class, PreUpdate.class).getName());
-		assertNull(AnnotationUtils.getAnnotatedMethod(User.class, Trigger.class));
+		assertThat(AnnotationUtils.getAnnotatedMethod(User.class, PreUpdate.class).getName(),
+				equalTo("validateUpdate"));
+		assertThat(AnnotationUtils.getAnnotatedMethod(User.class, Trigger.class), nullValue());
 	}
 
 	@Test
@@ -119,8 +120,8 @@ public class AnnotationUtilsTest {
 	}
 
 	public void doTestGetAnnotatedMethods() {
-		assertEquals(4, AnnotationUtils.getAnnotatedMethods(User.class, PrePersist.class).size());
-		assertTrue(AnnotationUtils.getAnnotatedMethods(User.class, Trigger.class).isEmpty());
+		assertThat(AnnotationUtils.getAnnotatedMethods(User.class, PrePersist.class).size(), equalTo(4));
+		assertThat(AnnotationUtils.getAnnotatedMethods(User.class, Trigger.class).isEmpty(), equalTo(true));
 	}
 
 	@Test
@@ -130,8 +131,8 @@ public class AnnotationUtilsTest {
 	}
 
 	public void doTestGetAnnotatedPropertyNames() {
-		assertEquals(4, AnnotationUtils.getAnnotatedPropertyNames(User.class, UiConfig.class).size());
-		assertTrue(AnnotationUtils.getAnnotatedMethods(User.class, Trigger.class).isEmpty());
+		assertThat(AnnotationUtils.getAnnotatedPropertyNames(User.class, UiConfig.class).size(), equalTo(4));
+		assertThat(AnnotationUtils.getAnnotatedMethods(User.class, Trigger.class).isEmpty(), equalTo(true));
 	}
 
 	@Test
@@ -144,9 +145,9 @@ public class AnnotationUtilsTest {
 		User user = new User();
 		user.setUsername("username");
 		Map<String, Object> map = AnnotationUtils.getAnnotatedPropertyNameAndValues(user, UiConfig.class);
-		assertEquals(4, map.size());
-		assertEquals("username", map.get("username"));
-		assertTrue(AnnotationUtils.getAnnotatedPropertyNameAndValues(user, Trigger.class).isEmpty());
+		assertThat(map.size(), equalTo(4));
+		assertThat(map.get("username"), equalTo("username"));
+		assertThat(AnnotationUtils.getAnnotatedPropertyNameAndValues(user, Trigger.class).isEmpty(), equalTo(true));
 	}
 
 	@Test
@@ -157,9 +158,10 @@ public class AnnotationUtilsTest {
 
 	public void doTestGetAnnotatedPropertyNameAndAnnnotations() {
 		Map<String, UiConfig> map = AnnotationUtils.getAnnotatedPropertyNameAndAnnotations(User.class, UiConfig.class);
-		assertEquals(4, map.size());
-		assertTrue(map.get("attributes").hidden());
-		assertTrue(AnnotationUtils.getAnnotatedPropertyNameAndAnnotations(User.class, Trigger.class).isEmpty());
+		assertThat(map.size(), equalTo(4));
+		assertThat(map.get("attributes").hidden(), equalTo(true));
+		assertThat(AnnotationUtils.getAnnotatedPropertyNameAndAnnotations(User.class, Trigger.class).isEmpty(),
+				equalTo(true));
 	}
 
 	@Test
@@ -170,8 +172,8 @@ public class AnnotationUtilsTest {
 				.getResource("org/ironrhino/core/spring/configuration/RedisConfiguration.class");
 		MetadataReader metadataReader = metadataReaderFactory.getMetadataReader(resource);
 		AnnotatedTypeMetadata metadata = metadataReader.getAnnotationMetadata();
-		assertEquals(1, AnnotationUtils.getAnnotationsByType(metadata, ClassPresentConditional.class).length);
-		assertEquals(0, AnnotationUtils.getAnnotationsByType(metadata, UiConfig.class).length);
+		assertThat(AnnotationUtils.getAnnotationsByType(metadata, ClassPresentConditional.class).length, equalTo(1));
+		assertThat(AnnotationUtils.getAnnotationsByType(metadata, UiConfig.class).length, equalTo(0));
 	}
 
 }

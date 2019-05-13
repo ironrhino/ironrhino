@@ -1,10 +1,11 @@
 package org.ironrhino.core.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -204,30 +205,31 @@ public class BeanUtilsTest {
 		leaf1.addChild(new TreeA("leaf3"), new TreeA("leaf4"));
 		leaf2.addChild(new TreeA("leaf5"), new TreeA("leaf6"));
 		root.addChild(leaf1, leaf2);
-		assertEquals(1, root.getLevel());
-		assertEquals(2, leaf1.getLevel());
-		assertEquals(2, leaf2.getLevel());
+		assertThat(root.getLevel(), equalTo(1));
+		assertThat(leaf1.getLevel(), equalTo(2));
+		assertThat(leaf2.getLevel(), equalTo(2));
 		TreeA rootCopy = BeanUtils.copyTree(root);
-		assertEquals(1, rootCopy.getLevel());
-		assertEquals(2, rootCopy.getChildren().size());
+		assertThat(rootCopy.getLevel(), equalTo(1));
+		assertThat(rootCopy.getChildren().size(), equalTo(2));
 		TreeA leaf1Copy = rootCopy.getChildren().iterator().next();
-		assertEquals("leaf1", leaf1Copy.getName());
-		assertEquals(2, leaf1Copy.getLevel());
-		assertEquals(2, leaf1Copy.getChildren().size());
+		assertThat(leaf1Copy.getName(), equalTo("leaf1"));
+		assertThat(leaf1Copy.getLevel(), equalTo(2));
+		assertThat(leaf1Copy.getChildren().size(), equalTo(2));
 		TreeB rootCopyB = BeanUtils.copyTree(root, TreeB::new);
-		assertEquals(1, rootCopyB.getLevel());
-		assertEquals(2, rootCopyB.getChildren().size());
+		assertThat(rootCopyB.getLevel(), equalTo(1));
+		assertThat(rootCopyB.getChildren().size(), equalTo(2));
 		TreeB leaf1CopyB = rootCopyB.getChildren().iterator().next();
-		assertEquals("leaf1", leaf1CopyB.getName());
-		assertEquals(2, leaf1CopyB.getLevel());
-		assertEquals(2, leaf1CopyB.getChildren().size());
+		assertThat(leaf1CopyB.getName(), equalTo("leaf1"));
+		assertThat(leaf1CopyB.getLevel(), equalTo(2));
+		assertThat(leaf1CopyB.getChildren().size(), equalTo(2));
 	}
 
 	@Test
 	public void testHasProperty() {
-		assertTrue(BeanUtils.hasProperty(User.class, "id"));
-		assertTrue(BeanUtils.hasProperty(User.class, "username"));
-		assertTrue(!BeanUtils.hasProperty(User.class, "test"));
+		assertThat(BeanUtils.hasProperty(User.class, "id"), equalTo(true));
+		assertThat(BeanUtils.hasProperty(User.class, "id"), equalTo(true));
+		assertThat(BeanUtils.hasProperty(User.class, "username"), equalTo(true));
+		assertThat(!BeanUtils.hasProperty(User.class, "test"), equalTo(true));
 	}
 
 	@Test
@@ -239,27 +241,28 @@ public class BeanUtilsTest {
 
 		User user2 = new User();
 		BeanUtils.copyProperties(user1, user2);
-		assertNotNull(user2.getId());
-		assertNotNull(user2.getUsername());
-		assertNull(user2.getPassword());
+		assertThat(user2.getId(), notNullValue());
+		assertThat(user2.getId(), notNullValue());
+		assertThat(user2.getUsername(), notNullValue());
+		assertThat(user2.getPassword(), nullValue());
 
 		user2 = new User();
 		BeanUtils.copyProperties(user1, user2, "id");
-		assertNull(user2.getId());
-		assertNotNull(user2.getUsername());
-		assertNull(user2.getPassword());
+		assertThat(user2.getId(), nullValue());
+		assertThat(user2.getUsername(), notNullValue());
+		assertThat(user2.getPassword(), nullValue());
 
 		user2 = new User();
 		BeanUtils.copyProperties(user1, user2, "id", "username");
-		assertNull(user2.getId());
-		assertNull(user2.getUsername());
-		assertNull(user2.getPassword());
+		assertThat(user2.getId(), nullValue());
+		assertThat(user2.getUsername(), nullValue());
+		assertThat(user2.getPassword(), nullValue());
 
 		User user3 = new User();
 		BeanUtils.copyProperties(user1, user3, false);
-		assertNotNull(user3.getId());
-		assertNotNull(user3.getUsername());
-		assertNotNull(user3.getPassword());
+		assertThat(user3.getId(), notNullValue());
+		assertThat(user3.getUsername(), notNullValue());
+		assertThat(user3.getPassword(), notNullValue());
 
 	}
 
@@ -272,17 +275,17 @@ public class BeanUtilsTest {
 		User user2 = new User();
 		user2.setPassword("password");
 		BeanUtils.copyPropertiesIfNotNull(user1, user2, "id", "username", "password");
-		assertEquals(user2.getId(), "test");
-		assertEquals(user2.getUsername(), "username");
-		assertEquals(user2.getPassword(), "password");
+		assertThat(user2.getId(), equalTo("test"));
+		assertThat(user2.getUsername(), equalTo("username"));
+		assertThat(user2.getPassword(), equalTo("password"));
 	}
 
 	@Test
 	public void testGetPropertyDescriptor() {
-		assertNull(BeanUtils.getPropertyDescriptor(User.class, "none"));
-		assertNull(BeanUtils.getPropertyDescriptor(User.class, "team.none"));
-		assertNotNull(BeanUtils.getPropertyDescriptor(User.class, "team"));
-		assertNotNull(BeanUtils.getPropertyDescriptor(User.class, "team.owner.id"));
+		assertThat(BeanUtils.getPropertyDescriptor(User.class, "none"), nullValue());
+		assertThat(BeanUtils.getPropertyDescriptor(User.class, "team.none"), nullValue());
+		assertThat(BeanUtils.getPropertyDescriptor(User.class, "team"), notNullValue());
+		assertThat(BeanUtils.getPropertyDescriptor(User.class, "team.owner.id"), notNullValue());
 	}
 
 	@Test
@@ -290,18 +293,18 @@ public class BeanUtilsTest {
 		User u = new User();
 		Team team = new Team();
 		team.setName("test");
-		assertNull(u.getTeam());
+		assertThat(u.getTeam(), nullValue());
 		BeanUtils.setPropertyValue(u, "team", team);
-		assertNotNull(u.getTeam());
+		assertThat(u.getTeam(), notNullValue());
 		u = new User();
 		BeanUtils.setPropertyValue(u, "team.name", "test");
-		assertNotNull(u.getTeam());
-		assertEquals("test", u.getTeam().getName());
+		assertThat(u.getTeam(), notNullValue());
+		assertThat(u.getTeam().getName(), equalTo("test"));
 		u = new User();
 		BeanUtils.setPropertyValue(u, "team.owner.username", "test");
-		assertNotNull(u.getTeam());
-		assertNotNull(u.getTeam().getOwner());
-		assertEquals("test", u.getTeam().getOwner().getUsername());
+		assertThat(u.getTeam(), notNullValue());
+		assertThat(u.getTeam().getOwner(), notNullValue());
+		assertThat(u.getTeam().getOwner().getUsername(), equalTo("test"));
 	}
 
 	@Test
@@ -311,12 +314,12 @@ public class BeanUtilsTest {
 		team.setType(TeamType.A);
 		Team team1 = new Team();
 		BeanUtils.copyProperties(team, team1);
-		assertEquals(team.getName(), team1.getName());
-		assertEquals(team.getType().name(), team1.getType().name());
+		assertThat(team1.getName(), equalTo(team.getName()));
+		assertThat(team1.getType().name(), equalTo(team.getType().name()));
 		Team2 team2 = new Team2();
 		BeanUtils.copyProperties(team, team2);
-		assertEquals(team.getName(), team2.getName());
-		assertEquals(team.getType().name(), team2.getType().name());
+		assertThat(team2.getName(), equalTo(team.getName()));
+		assertThat(team2.getType().name(), equalTo(team.getType().name()));
 	}
 
 	@Test
@@ -331,29 +334,29 @@ public class BeanUtilsTest {
 
 		Team team1 = new Team();
 		BeanUtils.copyProperties(team, team1);
-		assertNotNull(team1.getOwner());
-		assertEquals(1, team1.getUsers().size());
-		assertEquals("username", team1.getUsers().get(0).getUsername());
-		assertEquals("A", team1.getUsers().get(0).getType().name());
+		assertThat(team1.getOwner(), notNullValue());
+		assertThat(team1.getUsers().size(), equalTo(1));
+		assertThat(team1.getUsers().get(0).getUsername(), equalTo("username"));
+		assertThat(team1.getUsers().get(0).getType().name(), equalTo("A"));
 
 		Team2 team2 = new Team2();
 		BeanUtils.copyProperties(team, team2);
-		assertNotNull(team2.getOwner());
-		assertEquals(1, team2.getUsers().size());
-		assertEquals("username", team2.getUsers().get(0).getUsername());
-		assertEquals("A", team2.getUsers().get(0).getType().name());
-		assertEquals(User2.class, team2.getUsers().get(0).getClass());
+		assertThat(team2.getOwner(), notNullValue());
+		assertThat(team2.getUsers().size(), equalTo(1));
+		assertThat(team2.getUsers().get(0).getUsername(), equalTo("username"));
+		assertThat(team2.getUsers().get(0).getType().name(), equalTo("A"));
+		assertThat(team2.getUsers().get(0).getClass(), equalTo(User2.class));
 
 		Team3 team3 = new Team3();
 		BeanUtils.copyProperties(team, team3);
-		assertEquals(team.getOwner().getId(), team3.getOwner());
-		assertNotNull(team3.getName());
-		assertNotNull(team3.getCreateDate());
+		assertThat(team3.getOwner(), equalTo(team.getOwner().getId()));
+		assertThat(team3.getName(), notNullValue());
+		assertThat(team3.getCreateDate(), notNullValue());
 
 		Team4 team4 = CustomConversionService.getSharedInstance().convert(team, Team4.class);
-		assertNotNull(team4);
-		assertEquals(team1.getOwner(), team4.getOwner());
-		assertEquals(team1.getCreateDate(), team4.getCreateDate());
+		assertThat(team4, notNullValue());
+		assertThat(team4.getOwner(), equalTo(team1.getOwner()));
+		assertThat(team4.getCreateDate(), equalTo(team1.getCreateDate()));
 	}
 
 	@Test
@@ -362,9 +365,9 @@ public class BeanUtilsTest {
 		user.setId("id");
 		user.setUsername("username");
 		BeanUtils.normalizeCollectionFields(user);
-		assertNull(user.getNames());
-		assertNull(user.getTags());
-		assertNull(user.getAttributes());
+		assertThat(user.getNames(), nullValue());
+		assertThat(user.getTags(), nullValue());
+		assertThat(user.getAttributes(), nullValue());
 		List<String> names = new ArrayList<>();
 		names.add("abc");
 		Set<String> tags = new HashSet<>();
@@ -375,9 +378,9 @@ public class BeanUtilsTest {
 		user.setTags(tags);
 		user.setAttributes(attributes);
 		BeanUtils.normalizeCollectionFields(user);
-		assertTrue(user.getNames() == names);
-		assertTrue(user.getTags() == tags);
-		assertTrue(user.getAttributes() == attributes);
+		assertThat(user.getNames(), sameInstance(names));
+		assertThat(user.getTags(), sameInstance(tags));
+		assertThat(user.getAttributes(), sameInstance(attributes));
 
 		List<String> names2 = new MyList<>();
 		names2.addAll(names);
@@ -388,50 +391,50 @@ public class BeanUtilsTest {
 		user.setNames(names2);
 		user.setTags(tags2);
 		user.setAttributes(attributes2);
-		assertTrue(user.getNames() == names2);
-		assertTrue(user.getTags() == tags2);
-		assertTrue(user.getAttributes() == attributes2);
+		assertThat(user.getNames(), sameInstance(names2));
+		assertThat(user.getTags(), sameInstance(tags2));
+		assertThat(user.getAttributes(), sameInstance(attributes2));
 		BeanUtils.normalizeCollectionFields(user);
-		assertFalse(user.getNames() == names2);
-		assertFalse(user.getTags() == tags2);
-		assertFalse(user.getAttributes() == attributes2);
-		assertEquals(user.getNames(), names);
-		assertEquals(user.getTags(), tags);
-		assertEquals(user.getAttributes(), attributes);
+		assertThat(user.getNames(), not(sameInstance(names2)));
+		assertThat(user.getTags(), not(sameInstance(tags2)));
+		assertThat(user.getAttributes(), not(sameInstance(attributes2)));
+		assertThat(user.getNames(), equalTo(names));
+		assertThat(user.getTags(), equalTo(tags));
+		assertThat(user.getAttributes(), equalTo(attributes));
 	}
 
 	@Test
 	public void testCreateParentIfNull() {
 		User u = new User();
-		assertNull(u.getAttributes());
-		assertNull(u.getTeam());
+		assertThat(u.getAttributes(), nullValue());
+		assertThat(u.getTeam(), nullValue());
 		BeanUtils.createParentIfNull(u, "attributes");
-		assertNull(u.getAttributes());
+		assertThat(u.getAttributes(), nullValue());
 		BeanUtils.createParentIfNull(u, "attributes['test']");
-		assertNotNull(u.getAttributes());
+		assertThat(u.getAttributes(), notNullValue());
 		BeanUtils.createParentIfNull(u, "team");
-		assertNull(u.getTeam());
+		assertThat(u.getTeam(), nullValue());
 		BeanUtils.createParentIfNull(u, "team.owner");
-		assertNotNull(u.getTeam());
+		assertThat(u.getTeam(), notNullValue());
 		u = new User();
 		Team t = new Team();
 		u.setTeam(t);
 		BeanUtils.createParentIfNull(u, "team.owner");
 		BeanUtils.createParentIfNull(u, "team.owner.username");
-		assertNotNull(u.getTeam());
-		assertEquals(t, u.getTeam());
-		assertNotNull(u.getTeam().getOwner());
+		assertThat(u.getTeam(), notNullValue());
+		assertThat(u.getTeam(), equalTo(t));
+		assertThat(u.getTeam().getOwner(), notNullValue());
 		u = new User();
 		BeanUtils.createParentIfNull(u, "team.users[0].username");
-		assertNotNull(u.getTeam().getUsers());
+		assertThat(u.getTeam().getUsers(), notNullValue());
 	}
 
 	@Test
 	public void testIsEmpty() {
 		Team3 team = new Team3();
-		assertTrue(BeanUtils.isEmpty(team));
+		assertThat(BeanUtils.isEmpty(team), equalTo(true));
 		team.setCreateDate("");
-		assertTrue(!BeanUtils.isEmpty(team));
+		assertThat(!BeanUtils.isEmpty(team), equalTo(true));
 	}
 
 }

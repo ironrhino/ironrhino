@@ -1,8 +1,8 @@
 package org.ironrhino.core.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.junit.Test;
 
@@ -12,42 +12,42 @@ public class SemanticVersionTest {
 	public void test() {
 
 		SemanticVersion version = new SemanticVersion("10");
-		assertEquals(10, version.getMajor());
-		assertEquals(0, version.getMinor());
-		assertNull(version.getPatch());
+		assertThat(version.getMajor(), equalTo(10));
+		assertThat(version.getMinor(), equalTo(0));
+		assertThat(version.getPatch(), nullValue());
 
 		version = new SemanticVersion("10.3");
-		assertEquals(10, version.getMajor());
-		assertEquals(3, version.getMinor());
-		assertNull(version.getPatch());
+		assertThat(version.getMajor(), equalTo(10));
+		assertThat(version.getMinor(), equalTo(3));
+		assertThat(version.getPatch(), nullValue());
 
 		version = new SemanticVersion("10.3.1");
-		assertEquals(10, version.getMajor());
-		assertEquals(3, version.getMinor());
-		assertEquals(Integer.valueOf(1), version.getPatch());
+		assertThat(version.getMajor(), equalTo(10));
+		assertThat(version.getMinor(), equalTo(3));
+		assertThat(version.getPatch(), equalTo(1));
 
 		version = new SemanticVersion("10.3.1-RC4");
-		assertEquals(10, version.getMajor());
-		assertEquals(3, version.getMinor());
-		assertEquals(Integer.valueOf(1), version.getPatch());
-		assertEquals("RC4", version.getPrerelease());
+		assertThat(version.getMajor(), equalTo(10));
+		assertThat(version.getMinor(), equalTo(3));
+		assertThat(version.getPatch(), equalTo(1));
+		assertThat(version.getPrerelease(), equalTo("RC4"));
 
 		version = new SemanticVersion("10.3.1-RC4+b2");
-		assertEquals(10, version.getMajor());
-		assertEquals(3, version.getMinor());
-		assertEquals(Integer.valueOf(1), version.getPatch());
-		assertEquals("RC4", version.getPrerelease());
-		assertEquals("b2", version.getBuild());
+		assertThat(version.getMajor(), equalTo(10));
+		assertThat(version.getMinor(), equalTo(3));
+		assertThat(version.getPatch(), equalTo(1));
+		assertThat(version.getPrerelease(), equalTo("RC4"));
+		assertThat(version.getBuild(), equalTo("b2"));
 
 	}
 
 	@Test
 	public void testCompare() {
-		assertTrue(new SemanticVersion("10").equals(new SemanticVersion("10.0")));
-		assertTrue(new SemanticVersion("10.3.1-RC4").equals(new SemanticVersion("10.3.1-RC4")));
-		assertTrue(new SemanticVersion("10").compareTo(new SemanticVersion("10.1")) < 0);
-		assertTrue(new SemanticVersion("10.0.2").compareTo(new SemanticVersion("10.0.10")) < 0);
-		assertTrue(new SemanticVersion("10.1.2").compareTo(new SemanticVersion("10.0.10")) > 0);
+		assertThat(new SemanticVersion("10").equals(new SemanticVersion("10.0")), equalTo(true));
+		assertThat(new SemanticVersion("10.3.1-RC4").equals(new SemanticVersion("10.3.1-RC4")), equalTo(true));
+		assertThat(new SemanticVersion("10").compareTo(new SemanticVersion("10.1")) < 0, equalTo(true));
+		assertThat(new SemanticVersion("10.0.2").compareTo(new SemanticVersion("10.0.10")) < 0, equalTo(true));
+		assertThat(new SemanticVersion("10.1.2").compareTo(new SemanticVersion("10.0.10")) > 0, equalTo(true));
 	}
 
 }

@@ -1,7 +1,8 @@
 package org.ironrhino.core.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,13 +20,13 @@ public class ExpressionUtilsTest {
 		context.put("bool", true);
 		context.put("$bool", false);
 		Object result = ExpressionUtils.evalExpression("string+12", context);
-		assertEquals("IAMSTRING12", result);
+		assertThat(result, equalTo("IAMSTRING12"));
 		result = ExpressionUtils.evalExpression("integer+12", context);
-		assertEquals(24, result);
+		assertThat(result, equalTo(24));
 		result = ExpressionUtils.evalExpression("!bool", context);
-		assertEquals(false, result);
+		assertThat(result, equalTo(false));
 		result = ExpressionUtils.evalExpression("!$bool", context);
-		assertEquals(true, result);
+		assertThat(result, equalTo(true));
 	}
 
 	@Test
@@ -34,12 +35,12 @@ public class ExpressionUtilsTest {
 		context.put("number1", 1);
 		context.put("number2", 2);
 		context.put("number3", 3);
-		assertEquals(2, ExpressionUtils.evalExpression("min(number2,number3)", context));
-		assertEquals(1, ExpressionUtils.evalExpression("min(number1,number2,number3)", context));
-		assertEquals(2, ExpressionUtils.evalExpression("max(number1,number2)", context));
-		assertEquals(3, ExpressionUtils.evalExpression("max(number1,number2,number3)", context));
-		assertEquals(6, ExpressionUtils.evalExpression("sum(number1,number2,number3)", context));
-		assertEquals(2.0, ExpressionUtils.evalExpression("avg(number1,number2,number3)", context));
+		assertThat(ExpressionUtils.evalExpression("min(number2,number3)", context), equalTo(2));
+		assertThat(ExpressionUtils.evalExpression("min(number1,number2,number3)", context), equalTo(1));
+		assertThat(ExpressionUtils.evalExpression("max(number1,number2)", context), equalTo(2));
+		assertThat(ExpressionUtils.evalExpression("max(number1,number2,number3)", context), equalTo(3));
+		assertThat(ExpressionUtils.evalExpression("sum(number1,number2,number3)", context), equalTo(6));
+		assertThat(ExpressionUtils.evalExpression("avg(number1,number2,number3)", context), equalTo(2.0));
 	}
 
 	@Test
@@ -49,17 +50,17 @@ public class ExpressionUtilsTest {
 		context.put("integer", 12);
 		context.put("bool", true);
 		Object result = ExpressionUtils.eval("${string+12}", context);
-		assertEquals("IAMSTRING12", result);
+		assertThat(result, equalTo("IAMSTRING12"));
 		result = ExpressionUtils.eval("${string+12}12", context);
-		assertEquals("IAMSTRING1212", result);
+		assertThat(result, equalTo("IAMSTRING1212"));
 		result = ExpressionUtils.eval("${integer+12}", context);
-		assertEquals(24, result);
+		assertThat(result, equalTo(24));
 		result = ExpressionUtils.eval("${integer+12}12", context);
-		assertEquals("2412", result);
+		assertThat(result, equalTo("2412"));
 		result = ExpressionUtils.eval("${!bool}", context);
-		assertEquals(false, result);
+		assertThat(result, equalTo(false));
 		result = ExpressionUtils.eval("${!bool}12", context);
-		assertEquals("false12", result);
+		assertThat(result, equalTo("false12"));
 	}
 
 	@Test
@@ -68,13 +69,13 @@ public class ExpressionUtilsTest {
 		context.put("string", "IAMSTRING");
 		context.put("integer", 12);
 		Object result = ExpressionUtils.evalString("${string+12}", context);
-		assertEquals("IAMSTRING12", result);
+		assertThat(result, equalTo("IAMSTRING12"));
 		result = ExpressionUtils.evalString("${integer+12}12", context);
-		assertEquals("2412", result);
+		assertThat(result, equalTo("2412"));
 		result = ExpressionUtils.evalString("${null}", context);
-		assertNull(result);
+		assertThat(result, nullValue());
 		result = ExpressionUtils.evalString("iam@if{integer > 10}large@else{}small@end{}", context);
-		assertEquals("iamlarge", result);
+		assertThat(result, equalTo("iamlarge"));
 	}
 
 	@Test
@@ -82,7 +83,7 @@ public class ExpressionUtilsTest {
 		Map<String, Object> context = new HashMap<>();
 		context.put("integer", 12);
 		Object result = ExpressionUtils.evalBoolean("${integer > 10}", context, false);
-		assertEquals(true, result);
+		assertThat(result, equalTo(true));
 	}
 
 	@Test
@@ -90,9 +91,9 @@ public class ExpressionUtilsTest {
 		Map<String, Object> context = new HashMap<>();
 		context.put("integer", 12);
 		Object result = ExpressionUtils.evalInt("${integer - 10}", context, 12);
-		assertEquals(2, result);
+		assertThat(result, equalTo(2));
 		result = ExpressionUtils.evalInt("${integer - 10}0", context, 12);
-		assertEquals(20, result);
+		assertThat(result, equalTo(20));
 	}
 
 	@Test
@@ -100,9 +101,9 @@ public class ExpressionUtilsTest {
 		Map<String, Object> context = new HashMap<>();
 		context.put("integer", 12);
 		Object result = ExpressionUtils.evalLong("${integer - 10}", context, 12);
-		assertEquals(2L, result);
+		assertThat(result, equalTo(2L));
 		result = ExpressionUtils.evalLong("${integer - 10}0", context, 12);
-		assertEquals(20L, result);
+		assertThat(result, equalTo(20L));
 	}
 
 	@Test
@@ -110,9 +111,9 @@ public class ExpressionUtilsTest {
 		Map<String, Object> context = new HashMap<>();
 		context.put("integer", 12);
 		Object result = ExpressionUtils.evalDouble("${integer - 10.00}", context, 12);
-		assertEquals(2D, result);
+		assertThat(result, equalTo(2D));
 		result = ExpressionUtils.evalDouble("${integer - 10.00}0", context, 12);
-		assertEquals(2D, result);
+		assertThat(result, equalTo(2D));
 	}
 
 	@Test
@@ -120,11 +121,11 @@ public class ExpressionUtilsTest {
 		Map<String, Object> context = new HashMap<>();
 		context.put("string", "STRING");
 		List<String> result = ExpressionUtils.evalList("${[string]}", context);
-		assertEquals(1, result.size());
-		assertEquals("STRING", result.get(0));
+		assertThat(result.size(), equalTo(1));
+		assertThat(result.get(0), equalTo("STRING"));
 		result = ExpressionUtils.evalList("${string}", context);
-		assertEquals(1, result.size());
-		assertEquals("STRING", result.get(0));
+		assertThat(result.size(), equalTo(1));
+		assertThat(result.get(0), equalTo("STRING"));
 	}
 
 }

@@ -1,6 +1,7 @@
 package org.ironrhino.core.util;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -14,10 +15,10 @@ public class RoundRobinTest {
 	@Test
 	public void testSimple() {
 		RoundRobin<String> rr = new RoundRobin<>(Arrays.asList("a", "b", "c"));
-		assertEquals("a", rr.pick());
-		assertEquals("b", rr.pick());
-		assertEquals("c", rr.pick());
-		assertEquals("a", rr.pick());
+		assertThat(rr.pick(), equalTo("a"));
+		assertThat(rr.pick(), equalTo("b"));
+		assertThat(rr.pick(), equalTo("c"));
+		assertThat(rr.pick(), equalTo("a"));
 	}
 
 	@Test
@@ -33,9 +34,9 @@ public class RoundRobinTest {
 			AtomicInteger ai = counters.computeIfAbsent(s, k -> new AtomicInteger());
 			ai.incrementAndGet();
 		}
-		assertEquals(100, counters.get("a").get());
-		assertEquals(200, counters.get("b").get());
-		assertEquals(300, counters.get("c").get());
+		assertThat(counters.get("a").get(), equalTo(100));
+		assertThat(counters.get("b").get(), equalTo(200));
+		assertThat(counters.get("c").get(), equalTo(300));
 	}
 
 	@Test
@@ -53,9 +54,9 @@ public class RoundRobinTest {
 			AtomicInteger ai = counters.computeIfAbsent(s, k -> new AtomicInteger());
 			ai.incrementAndGet();
 		}
-		assertEquals(100, counters.get("a").get());
-		assertEquals(200, counters.get("b").get());
-		assertEquals(300, counters.get("c").get());
+		assertThat(counters.get("a").get(), equalTo(100));
+		assertThat(counters.get("b").get(), equalTo(200));
+		assertThat(counters.get("c").get(), equalTo(300));
 
 		counters = new LinkedHashMap<>();
 		final Map<String, AtomicInteger> mc = counters;
@@ -72,9 +73,9 @@ public class RoundRobinTest {
 			AtomicInteger ai = counters.computeIfAbsent(s, k -> new AtomicInteger());
 			ai.incrementAndGet();
 		}
-		assertEquals(167, counters.get("a").get());
-		assertEquals(333, counters.get("b").get());
-		assertEquals(100, counters.get("c").get());
+		assertThat(counters.get("a").get(), equalTo(167));
+		assertThat(counters.get("b").get(), equalTo(333));
+		assertThat(counters.get("c").get(), equalTo(100));
 	}
 
 }

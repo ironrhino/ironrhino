@@ -1,7 +1,8 @@
 package org.ironrhino.core.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -20,49 +21,49 @@ public class ReflectionUtilsTest {
 	@Test
 	public void testGetAllFields() throws Exception {
 		List<String> fieldNames = ReflectionUtils.getAllFields(B.class);
-		assertEquals(2, fieldNames.size());
-		assertEquals("a", fieldNames.get(0));
-		assertEquals("b", fieldNames.get(1));
+		assertThat(fieldNames.size(), equalTo(2));
+		assertThat(fieldNames.get(0), equalTo("a"));
+		assertThat(fieldNames.get(1), equalTo("b"));
 	}
 
 	@Test
 	public void testGetGenericClass() throws Exception {
-		assertEquals(A.class, ReflectionUtils.getGenericClass(D.class));
-		assertEquals(A.class, ReflectionUtils.getGenericClass(D.class, 0));
-		assertEquals(A.class, ReflectionUtils.getGenericClass(F.class, C.class));
-		assertEquals(B.class, ReflectionUtils.getGenericClass(F.class, E.class));
+		assertThat(ReflectionUtils.getGenericClass(D.class), equalTo(A.class));
+		assertThat(ReflectionUtils.getGenericClass(D.class, 0), equalTo(A.class));
+		assertThat(ReflectionUtils.getGenericClass(F.class, C.class), equalTo(A.class));
+		assertThat(ReflectionUtils.getGenericClass(F.class, E.class), equalTo(B.class));
 	}
 
 	@Test
 	public void testGetField() throws Exception {
 		Field f1 = ReflectionUtils.getField(A.class, "a");
 		Field f2 = ReflectionUtils.getField(B.class, "a");
-		assertEquals(f1, f2);
+		assertThat(f2, equalTo(f1));
 		B b = new B();
 		b.setA("test");
-		assertEquals("test", ReflectionUtils.getFieldValue(b, "a"));
+		assertThat(ReflectionUtils.getFieldValue(b, "a"), equalTo("test"));
 		ReflectionUtils.setFieldValue(b, "a", "test2");
-		assertEquals("test2", ReflectionUtils.getFieldValue(b, "a"));
+		assertThat(ReflectionUtils.getFieldValue(b, "a"), equalTo("test2"));
 	}
 
 	@Test
 	public void testGetParameterNames() throws Exception {
 		Method m = Service.class.getMethod("echo", String.class, String.class);
-		assertNotNull(ReflectionUtils.getParameterNames(m));
-		assertEquals("name1", ReflectionUtils.getParameterNames(m)[0]);
-		assertEquals("test2", ReflectionUtils.getParameterNames(m)[1]);
+		assertThat(ReflectionUtils.getParameterNames(m), notNullValue());
+		assertThat(ReflectionUtils.getParameterNames(m)[0], equalTo("name1"));
+		assertThat(ReflectionUtils.getParameterNames(m)[1], equalTo("test2"));
 		m = ServiceImpl.class.getMethod("echo", String.class, String.class);
-		assertNotNull(ReflectionUtils.getParameterNames(m));
-		assertEquals("name3", ReflectionUtils.getParameterNames(m)[0]);
-		assertEquals("test4", ReflectionUtils.getParameterNames(m)[1]);
+		assertThat(ReflectionUtils.getParameterNames(m), notNullValue());
+		assertThat(ReflectionUtils.getParameterNames(m)[0], equalTo("name3"));
+		assertThat(ReflectionUtils.getParameterNames(m)[1], equalTo("test4"));
 	}
 
 	@Test
 	public void testProcessCallback() throws Exception {
 		B b = new B();
 		ReflectionUtils.processCallback(b, PostConstruct.class);
-		assertEquals("pc1", b.getA());
-		assertEquals("pc2", b.getB());
+		assertThat(b.getA(), equalTo("pc1"));
+		assertThat(b.getB(), equalTo("pc2"));
 	}
 
 	static class A {

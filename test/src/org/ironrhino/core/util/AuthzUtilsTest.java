@@ -1,7 +1,7 @@
 package org.ironrhino.core.util;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,17 +20,18 @@ public class AuthzUtilsTest {
 		Authentication auth = new TestingAuthenticationToken("admin", "password",
 				roles.toArray(new String[roles.size()]));
 		SecurityContextHolder.getContext().setAuthentication(auth);
-		assertTrue(AuthzUtils.authorize("permitAll"));
-		assertFalse(AuthzUtils.authorize("denyAll"));
-		assertTrue(AuthzUtils.authorize("hasRole('ROLE_A')"));
-		assertTrue(AuthzUtils.authorize("hasRole('ROLE_A') && hasRole('ROLE_B')"));
-		assertTrue(AuthzUtils.authorize("hasRole('ROLE_A') && hasRole('ROLE_B') && hasRole('ROLE_C')"));
-		assertFalse(AuthzUtils.authorize("hasRole('ROLE_A') && !hasRole('ROLE_B')"));
+		assertThat(AuthzUtils.authorize("permitAll"), equalTo(true));
+		assertThat(AuthzUtils.authorize("denyAll"), equalTo(false));
+		assertThat(AuthzUtils.authorize("hasRole('ROLE_A')"), equalTo(true));
+		assertThat(AuthzUtils.authorize("hasRole('ROLE_A') && hasRole('ROLE_B')"), equalTo(true));
+		assertThat(AuthzUtils.authorize("hasRole('ROLE_A') && hasRole('ROLE_B') && hasRole('ROLE_C')"), equalTo(true));
+		assertThat(AuthzUtils.authorize("hasRole('ROLE_A') && !hasRole('ROLE_B')"), equalTo(false));
 
-		assertTrue(AuthzUtils.authorizeRoles(roles, "hasRole('ROLE_A')"));
-		assertTrue(AuthzUtils.authorizeRoles(roles, "hasRole('ROLE_A') && hasRole('ROLE_B')"));
-		assertTrue(AuthzUtils.authorizeRoles(roles, "hasRole('ROLE_A') && hasRole('ROLE_B') && hasRole('ROLE_C')"));
-		assertFalse(AuthzUtils.authorizeRoles(roles, "hasRole('ROLE_A') && !hasRole('ROLE_B')"));
+		assertThat(AuthzUtils.authorizeRoles(roles, "hasRole('ROLE_A')"), equalTo(true));
+		assertThat(AuthzUtils.authorizeRoles(roles, "hasRole('ROLE_A') && hasRole('ROLE_B')"), equalTo(true));
+		assertThat(AuthzUtils.authorizeRoles(roles, "hasRole('ROLE_A') && hasRole('ROLE_B') && hasRole('ROLE_C')"),
+				equalTo(true));
+		assertThat(AuthzUtils.authorizeRoles(roles, "hasRole('ROLE_A') && !hasRole('ROLE_B')"), equalTo(false));
 	}
 
 	@Test
@@ -39,33 +40,33 @@ public class AuthzUtilsTest {
 		List<String> ifAllGranted = Arrays.asList("A,B,C".split(","));
 		List<String> ifAnyGranted = Arrays.asList("C,D".split(","));
 		List<String> ifNotGranted = Arrays.asList("D".split(","));
-		assertTrue(AuthzUtils.authorizeRoles(roles, String.join(",", ifAllGranted), null, null));
-		assertTrue(AuthzUtils.authorizeRoles(roles, null, String.join(",", ifAnyGranted), null));
-		assertTrue(AuthzUtils.authorizeRoles(roles, null, null, String.join(",", ifNotGranted)));
-		assertTrue(AuthzUtils.authorizeRoles(roles, ifAllGranted.toArray(new String[0]), null, null));
-		assertTrue(AuthzUtils.authorizeRoles(roles, null, ifAnyGranted.toArray(new String[0]), null));
-		assertTrue(AuthzUtils.authorizeRoles(roles, null, null, ifNotGranted.toArray(new String[0])));
+		assertThat(AuthzUtils.authorizeRoles(roles, String.join(",", ifAllGranted), null, null), equalTo(true));
+		assertThat(AuthzUtils.authorizeRoles(roles, null, String.join(",", ifAnyGranted), null), equalTo(true));
+		assertThat(AuthzUtils.authorizeRoles(roles, null, null, String.join(",", ifNotGranted)), equalTo(true));
+		assertThat(AuthzUtils.authorizeRoles(roles, ifAllGranted.toArray(new String[0]), null, null), equalTo(true));
+		assertThat(AuthzUtils.authorizeRoles(roles, null, ifAnyGranted.toArray(new String[0]), null), equalTo(true));
+		assertThat(AuthzUtils.authorizeRoles(roles, null, null, ifNotGranted.toArray(new String[0])), equalTo(true));
 		ifAllGranted = Arrays.asList("A,B,C,D".split(","));
 		ifAnyGranted = Arrays.asList("D,E".split(","));
 		ifNotGranted = Arrays.asList("C,D".split(","));
-		assertFalse(AuthzUtils.authorizeRoles(roles, String.join(",", ifAllGranted), null, null));
-		assertFalse(AuthzUtils.authorizeRoles(roles, null, String.join(",", ifAnyGranted), null));
-		assertFalse(AuthzUtils.authorizeRoles(roles, null, null, String.join(",", ifNotGranted)));
-		assertFalse(AuthzUtils.authorizeRoles(roles, ifAllGranted.toArray(new String[0]), null, null));
-		assertFalse(AuthzUtils.authorizeRoles(roles, null, ifAnyGranted.toArray(new String[0]), null));
-		assertFalse(AuthzUtils.authorizeRoles(roles, null, null, ifNotGranted.toArray(new String[0])));
+		assertThat(AuthzUtils.authorizeRoles(roles, String.join(",", ifAllGranted), null, null), equalTo(false));
+		assertThat(AuthzUtils.authorizeRoles(roles, null, String.join(",", ifAnyGranted), null), equalTo(false));
+		assertThat(AuthzUtils.authorizeRoles(roles, null, null, String.join(",", ifNotGranted)), equalTo(false));
+		assertThat(AuthzUtils.authorizeRoles(roles, ifAllGranted.toArray(new String[0]), null, null), equalTo(false));
+		assertThat(AuthzUtils.authorizeRoles(roles, null, ifAnyGranted.toArray(new String[0]), null), equalTo(false));
+		assertThat(AuthzUtils.authorizeRoles(roles, null, null, ifNotGranted.toArray(new String[0])), equalTo(false));
 		ifAllGranted = Arrays.asList("A,B C".split("\\s"));
 		ifAnyGranted = Arrays.asList("C,D".split("\\s"));
 		ifNotGranted = Arrays.asList("D,E".split("\\s"));
-		assertTrue(AuthzUtils.authorizeRoles(roles, ifAllGranted.toArray(new String[0]), null, null));
-		assertTrue(AuthzUtils.authorizeRoles(roles, null, ifAnyGranted.toArray(new String[0]), null));
-		assertTrue(AuthzUtils.authorizeRoles(roles, null, null, ifNotGranted.toArray(new String[0])));
+		assertThat(AuthzUtils.authorizeRoles(roles, ifAllGranted.toArray(new String[0]), null, null), equalTo(true));
+		assertThat(AuthzUtils.authorizeRoles(roles, null, ifAnyGranted.toArray(new String[0]), null), equalTo(true));
+		assertThat(AuthzUtils.authorizeRoles(roles, null, null, ifNotGranted.toArray(new String[0])), equalTo(true));
 		ifAllGranted = Arrays.asList("A,B C,D".split("\\s"));
 		ifAnyGranted = Arrays.asList("D,E".split("\\s"));
 		ifNotGranted = Arrays.asList("C,D".split("\\s"));
-		assertFalse(AuthzUtils.authorizeRoles(roles, ifAllGranted.toArray(new String[0]), null, null));
-		assertFalse(AuthzUtils.authorizeRoles(roles, null, ifAnyGranted.toArray(new String[0]), null));
-		assertFalse(AuthzUtils.authorizeRoles(roles, null, null, ifNotGranted.toArray(new String[0])));
+		assertThat(AuthzUtils.authorizeRoles(roles, ifAllGranted.toArray(new String[0]), null, null), equalTo(false));
+		assertThat(AuthzUtils.authorizeRoles(roles, null, ifAnyGranted.toArray(new String[0]), null), equalTo(false));
+		assertThat(AuthzUtils.authorizeRoles(roles, null, null, ifNotGranted.toArray(new String[0])), equalTo(false));
 	}
 
 }
