@@ -120,10 +120,10 @@ public class Customer extends BaseRecordableEntity {
 
 	@Valid
 	@UiConfig(cssClass = "nullable", description = "addresses.description")
-	@ElementCollection(fetch = FetchType.EAGER)
+	@ElementCollection
 	@CollectionTable(name = "sample_customer_address", joinColumns = @JoinColumn(name = "customer"))
 	@OrderColumn(name = "lineNumber", nullable = false)
-	@Fetch(FetchMode.SUBSELECT)
+	@Fetch(FetchMode.SELECT)
 	private List<CustomerAddress> addresses;
 
 	@Override
