@@ -1,6 +1,7 @@
 package org.ironrhino.core.util;
 
 import java.text.ParseException;
+import java.time.Year;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -104,9 +105,7 @@ public class DateUtils {
 	}
 
 	public static boolean isLeapYear(int year) {
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.YEAR, year);
-		return cal.getActualMaximum(Calendar.DAY_OF_YEAR) > 365;
+		return Year.isLeap(year);
 	}
 
 	public static Date parseDate10(String string) {
