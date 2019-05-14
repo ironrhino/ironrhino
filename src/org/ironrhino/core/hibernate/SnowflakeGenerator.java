@@ -20,14 +20,14 @@ public class SnowflakeGenerator implements IdentifierGenerator {
 	private final Snowflake snowflake;
 
 	public SnowflakeGenerator() {
-		long workerId = 0;
+		int workerId = 0;
 		String id = AppInfo.getEnv("worker.id");
 		if (id == null) {
 			String ip = AppInfo.getHostAddress();
 			id = ip.substring(ip.lastIndexOf('.') + 1);
 		}
 		if (StringUtils.isNumeric(id)) {
-			workerId = Long.valueOf(id);
+			workerId = Integer.valueOf(id);
 		}
 		log.info("Snowflake worker id is {}", workerId);
 		snowflake = new Snowflake(workerId);

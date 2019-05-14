@@ -9,11 +9,11 @@ public class Snowflake {
 	private final static long TIMESTAMP_LEFT_SHIFT = SEQUENCE_BITS + WORKER_ID_BITS;
 	private final static long SEQUENCE_MASK = -1L ^ -1L << SEQUENCE_BITS;
 
-	private final long workerId;
+	private final int workerId;
 	private long sequence = 0L;
 	private long lastTimestamp = -1L;
 
-	public Snowflake(long workerId) {
+	public Snowflake(int workerId) {
 		if (workerId > MAX_WORKER_ID || workerId < 0) {
 			throw new IllegalArgumentException(
 					String.format("Worker Id can't be greater than %d or less than 0", MAX_WORKER_ID));
