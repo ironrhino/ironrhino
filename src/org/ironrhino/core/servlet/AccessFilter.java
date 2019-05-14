@@ -190,7 +190,7 @@ public class AccessFilter implements Filter {
 			String originalChain = request.getHeader(HTTP_HEADER_REQUEST_CHAIN);
 			if (originalChain != null) {
 				requestChain = new StringBuilder(originalChain).append('.')
-						.append(requestChain != null ? requestChain : CodecUtils.nextId().substring(14)).toString();
+						.append(requestChain != null ? requestChain : CodecUtils.nextId(14)).toString();
 				sb.append(" chain:");
 				sb.append(requestChain);
 			}

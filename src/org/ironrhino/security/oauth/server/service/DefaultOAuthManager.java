@@ -58,7 +58,7 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 			auth.setAddress(RequestContext.getRequest().getRemoteAddr());
 		} catch (NullPointerException npe) {
 		}
-		auth.setRefreshToken(CodecUtils.nextId());
+		auth.setRefreshToken(CodecUtils.nextId(32));
 		authorizationManager.save(auth);
 		return auth;
 	}
@@ -72,8 +72,8 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 			dc.add(Restrictions.eq("deviceId", deviceId));
 			Authorization auth = authorizationManager.findByCriteria(dc);
 			if (auth != null) {
-				auth.setAccessToken(CodecUtils.nextId());
-				auth.setRefreshToken(CodecUtils.nextId());
+				auth.setAccessToken(CodecUtils.nextId(32));
+				auth.setRefreshToken(CodecUtils.nextId(32));
 				auth.setModifyDate(new Date());
 				authorizationManager.save(auth);
 				return auth;
@@ -124,7 +124,7 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 
 	@Override
 	public Authorization reuse(Authorization auth) {
-		auth.setCode(CodecUtils.nextId());
+		auth.setCode(CodecUtils.nextId(32));
 		auth.setModifyDate(new Date());
 		auth.setLifetime(Authorization.DEFAULT_LIFETIME);
 		authorizationManager.save(auth);
@@ -143,7 +143,7 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 		}
 		auth.setModifyDate(new Date());
 		if (!auth.isClientSide())
-			auth.setCode(CodecUtils.nextId());
+			auth.setCode(CodecUtils.nextId(32));
 		authorizationManager.save(auth);
 		return auth;
 	}
@@ -174,7 +174,7 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 		if (exclusive)
 			deleteAuthorizationsByGrantor(auth.getGrantor(), client.getId(), GrantType.authorization_code);
 		auth.setCode(null);
-		auth.setRefreshToken(CodecUtils.nextId());
+		auth.setRefreshToken(CodecUtils.nextId(32));
 		auth.setGrantType(GrantType.authorization_code);
 		auth.setModifyDate(new Date());
 		authorizationManager.save(auth);
@@ -197,8 +197,8 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 		Authorization auth = authorizationManager.findOne("refreshToken", refreshToken);
 		if (auth == null)
 			throw new OAuthError(OAuthError.INVALID_GRANT);
-		auth.setAccessToken(CodecUtils.nextId());
-		auth.setRefreshToken(CodecUtils.nextId());
+		auth.setAccessToken(CodecUtils.nextId(32));
+		auth.setRefreshToken(CodecUtils.nextId(32));
 		auth.setModifyDate(new Date());
 		authorizationManager.save(auth);
 		return auth;

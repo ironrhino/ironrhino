@@ -154,7 +154,7 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 
 	@Override
 	public Authorization reuse(Authorization auth) {
-		auth.setCode(CodecUtils.nextId());
+		auth.setCode(CodecUtils.nextId(32));
 		auth.setModifyDate(new Date());
 		auth.setLifetime(Authorization.DEFAULT_LIFETIME);
 		stringRedisTemplate.execute((SessionCallback) redisOperations -> {
@@ -199,7 +199,7 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 				return redisOperations.exec();
 			});
 		} else {
-			auth.setCode(CodecUtils.nextId());
+			auth.setCode(CodecUtils.nextId(32));
 			stringRedisTemplate.execute((SessionCallback) redisOperations -> {
 				redisOperations.multi();
 				redisOperations.delete(key);
@@ -247,7 +247,7 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 		if (exclusive)
 			deleteAuthorizationsByGrantor(auth.getGrantor(), client.getId(), GrantType.authorization_code);
 		auth.setCode(null);
-		auth.setRefreshToken(CodecUtils.nextId());
+		auth.setRefreshToken(CodecUtils.nextId(32));
 		auth.setGrantType(GrantType.authorization_code);
 		auth.setModifyDate(new Date());
 		final Authorization auth2 = auth;
@@ -306,8 +306,8 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 			redisOperations.multi();
 			redisOperations.delete(keyRefreshToken);
 			redisOperations.delete(NAMESPACE_AUTHORIZATION + auth2.getAccessToken());
-			auth2.setAccessToken(CodecUtils.nextId());
-			auth2.setRefreshToken(CodecUtils.nextId());
+			auth2.setAccessToken(CodecUtils.nextId(32));
+			auth2.setRefreshToken(CodecUtils.nextId(32));
 			auth2.setModifyDate(new Date());
 			redisOperations.opsForValue().set(NAMESPACE_AUTHORIZATION + auth2.getAccessToken(), auth2.getId(),
 					auth2.getExpiresIn(), TimeUnit.SECONDS);

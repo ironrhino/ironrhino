@@ -43,10 +43,10 @@ public class Authorization extends BaseEntity {
 
 	private static final long serialVersionUID = -559379341059695550L;
 
-	@UiConfig(width = "180px", alias = "access_token")
+	@UiConfig(width = "250px", alias = "access_token")
 	@CaseInsensitive
 	@NaturalId(mutable = true)
-	private String accessToken = CodecUtils.nextId();
+	private String accessToken = CodecUtils.nextId(32);
 
 	@Column(length = 32)
 	@UiConfig(template = "<#if value?has_content><a href=\"<@url value='/oauth/client/view/${value}'/>\" rel=\"richtable\">${beans['oauthManager'].findClientById(value)}</a></#if>")

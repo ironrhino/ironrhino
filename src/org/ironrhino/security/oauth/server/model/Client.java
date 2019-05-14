@@ -49,9 +49,9 @@ public class Client extends BaseEntity implements Enableable, Attachmentable {
 	@Column(nullable = false)
 	private String name;
 
-	@UiConfig(alias = "client_secret", cssClass = "input-xxlarge", width = "200px", excludedFromCriteria = true)
+	@UiConfig(alias = "client_secret", cssClass = "input-xxlarge", width = "250px", excludedFromCriteria = true)
 	@Column(nullable = false)
-	private String secret = CodecUtils.nextId();
+	private String secret = CodecUtils.nextId(32);
 
 	@UiConfig(cssClass = "input-xxlarge", hiddenInList = @Hidden(true))
 	private String redirectUri;

@@ -300,7 +300,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	}
 
 	protected String nextSessionId() {
-		return CodecUtils.nextId();
+		return CodecUtils.nextId(32);
 	}
 
 }
