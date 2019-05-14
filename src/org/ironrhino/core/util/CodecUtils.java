@@ -2,27 +2,24 @@ package org.ironrhino.core.util;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.SoftReference;
-import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.Base64;
-import java.util.UUID;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.lang3.StringUtils;
 
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class CodecUtils {
 
-	private static class Holder {
-		static final SecureRandom numberGenerator = new SecureRandom();
-	}
-
 	public static final String DEFAULT_ENCODING = "UTF-8";
+
+	public static final char[] CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
+
+	private static final Random random = new Random();
 
 	private static ThreadLocal<SoftReference<MessageDigest>> MD5 = new ThreadLocal<SoftReference<MessageDigest>>() {
 
@@ -283,36 +280,24 @@ public class CodecUtils {
 	}
 
 	public static String nextId() {
-		SecureRandom ng = Holder.numberGenerator;
-		byte[] bytes = new byte[16];
-		ng.nextBytes(bytes);
-		return StringUtils.leftPad(encodeBase62(new BigInteger(Hex.encodeHexString(bytes), 16)), 22, '0');
+		return nextId(22); // back compatibility
 	}
 
+	public static String nextId(int length) {
+		char[] chars = new char[length];
+		chars[0] = CHARS[random.nextInt(length == 22 ? 8 : CHARS.length)];
+		for (int i = 1; i < chars.length; i++)
+			chars[i] = CHARS[random.nextInt(CHARS.length)];
+		return new String(chars);
+	}
+
+	@Deprecated
 	public static String nextId(String salt) {
-		String id = md5Hex(salt + UUID.randomUUID().toString());
-		id = encodeBase62(id);
-		return StringUtils.leftPad(id, 22, '0');
+		return nextId(32);
 	}
 
 	public static String generateRequestId() {
 		return nextId();
-	}
-
-	public static String encodeBase62(String hex) {
-		return encodeBase62(new BigInteger(hex, 16));
-	}
-
-	private static String encodeBase62(BigInteger value) {
-		char[] buf = new char[22];
-		int charPos = 21;
-		BigInteger radix = BigInteger.valueOf(62);
-		while (value.compareTo(radix) >= 0) {
-			buf[charPos--] = NumberUtils.NUMBERS.charAt(value.mod(radix).intValue());
-			value = value.divide(radix);
-		}
-		buf[charPos] = NumberUtils.NUMBERS.charAt(value.intValue());
-		return new String(buf, charPos, (22 - charPos));
 	}
 
 }

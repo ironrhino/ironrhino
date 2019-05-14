@@ -255,7 +255,7 @@ public class SampleObjectCreator {
 		if (fieldName == null)
 			return "test";
 		if (fieldName.toLowerCase(Locale.ROOT).equals("id"))
-			return CodecUtils.encodeBase62(CodecUtils.md5Hex(sampleClass.getName()));
+			return "4zIybvEyycOxwoKLWLStsG";
 		if (fieldName.toLowerCase(Locale.ROOT).endsWith("email"))
 			return "test@test.com";
 		if (fieldName.toLowerCase(Locale.ROOT).endsWith("username"))

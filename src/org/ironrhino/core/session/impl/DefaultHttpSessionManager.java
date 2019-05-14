@@ -29,8 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DefaultHttpSessionManager implements HttpSessionManager {
 
-	private static final String SALT = "awpeqaidasdfaioiaoduifayzuxyaaokadoaifaodiaoi";
-
 	private static final String SESSION_KEY_REMOTE_ADDR = "_REMOTE_ADDR";
 
 	private static final String SESSION_TRACKER_SEPERATOR = "-";
@@ -301,8 +299,8 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 				session.getSessionTracker(), globalCookie, true);
 	}
 
-	private String nextSessionId() {
-		return CodecUtils.nextId(SALT);
+	protected String nextSessionId() {
+		return CodecUtils.nextId();
 	}
 
 }
