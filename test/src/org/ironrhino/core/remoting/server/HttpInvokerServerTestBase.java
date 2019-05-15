@@ -1,6 +1,6 @@
 package org.ironrhino.core.remoting.server;
 
-import static org.mockito.Mockito.doAnswer;
+import static org.mockito.BDDMockito.willAnswer;
 import static org.mockito.Mockito.spy;
 
 import java.io.ByteArrayInputStream;
@@ -152,10 +152,10 @@ public abstract class HttpInvokerServerTestBase {
 			mockHttpServletRequest.addHeader(AccessFilter.HTTP_HEADER_REQUEST_ID, CodecUtils.nextId());
 			mockHttpServletRequest.setContent(baos.toByteArray());
 			mockHttpServletRequest.setAsyncSupported(true);
-			doAnswer(i -> {
+			willAnswer(i -> {
 				mockHttpServletRequest.setAsyncStarted(true);
 				return mockAsyncContext;
-			}).when(mockHttpServletRequest).startAsync();
+			}).given(mockHttpServletRequest).startAsync();
 
 			httpInvokerServer.handleRequest(mockHttpServletRequest, mockHttpServletResponse);
 			byte[] content;

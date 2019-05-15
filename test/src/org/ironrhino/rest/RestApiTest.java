@@ -5,8 +5,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -98,7 +98,7 @@ public class RestApiTest {
 	@Test
 	public void testPostForm() {
 		assertEquals(EMPTY_ARTICLE, articleClient.postForm(null));
-		verify(articleController).postForm(argThat(p -> EMPTY_ARTICLE.equals(p)));
+		then(articleController).should().postForm(argThat(p -> EMPTY_ARTICLE.equals(p)));
 
 		Article article = new Article();
 		article.setId(1024);
@@ -109,7 +109,8 @@ public class RestApiTest {
 
 	@Test
 	public void testThrowException() {
-		doThrow(new RuntimeException("test")).when(articleController).postForm(argThat(p -> EMPTY_ARTICLE.equals(p)));
+		willThrow(new RuntimeException("test")).given(articleController)
+				.postForm(argThat(p -> EMPTY_ARTICLE.equals(p)));
 		RestStatus e = null;
 		try {
 			articleClient.postForm(new Article());
@@ -119,7 +120,7 @@ public class RestApiTest {
 		assertNotNull(e);
 		assertEquals(RestStatus.CODE_INTERNAL_SERVER_ERROR, e.getCode());
 		assertTrue(e.getCause() instanceof RuntimeException);
-		verify(articleController).postForm(argThat(p -> EMPTY_ARTICLE.equals(p)));
+		then(articleController).should().postForm(argThat(p -> EMPTY_ARTICLE.equals(p)));
 	}
 
 	@Test

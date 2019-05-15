@@ -2,7 +2,7 @@ package org.ironrhino.core.throttle;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,7 +25,7 @@ public class CircuitBreakingTest {
 	@Test(expected = CircuitBreakerOpenException.class)
 	public void test() throws Exception {
 		AtomicInteger count = new AtomicInteger();
-		when(echoService.echo(anyString())).thenAnswer(new Answer<String>() {
+		given(echoService.echo(anyString())).willAnswer(new Answer<String>() {
 			@Override
 			public String answer(InvocationOnMock invocation) throws IOException {
 				if (count.incrementAndGet() > 5)

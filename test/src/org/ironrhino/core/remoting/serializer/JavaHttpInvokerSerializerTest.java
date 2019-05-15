@@ -5,8 +5,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -54,8 +54,8 @@ public class JavaHttpInvokerSerializerTest {
 
 	protected MethodInvocation createMethodInvocation(Method method, Object... arguments) {
 		MethodInvocation mi = mock(MethodInvocation.class);
-		when(mi.getMethod()).thenReturn(method);
-		when(mi.getArguments()).thenReturn(arguments);
+		given(mi.getMethod()).willReturn(method);
+		given(mi.getArguments()).willReturn(arguments);
 		return mi;
 	}
 

@@ -10,8 +10,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.clearInvocations;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -109,13 +107,13 @@ public class UserRestApiTest {
 		rp.setTotalResults(1);
 		rp.setResult(Arrays.asList(admin));
 
-		when(userDetailsService.loadUserByUsername("admin")).thenReturn(admin);
-		when(userDetailsService.loadUserByUsername("builtin")).thenReturn(builtin);
-		when(userManager.loadUserByUsername("admin")).thenReturn(admin);
-		when(userManager.loadUserByUsername("builtin")).thenReturn(builtin);
-		when(userManager.loadUserByUsername("disabled")).thenReturn(disabled);
-		when(userManager.findAll()).thenReturn(Arrays.asList(admin, builtin));
-		when(userManager.findByResultPage(any())).thenReturn(rp);
+		given(userDetailsService.loadUserByUsername("admin")).willReturn(admin);
+		given(userDetailsService.loadUserByUsername("builtin")).willReturn(builtin);
+		given(userManager.loadUserByUsername("admin")).willReturn(admin);
+		given(userManager.loadUserByUsername("builtin")).willReturn(builtin);
+		given(userManager.loadUserByUsername("disabled")).willReturn(disabled);
+		given(userManager.findAll()).willReturn(Arrays.asList(admin, builtin));
+		given(userManager.findByResultPage(any())).willReturn(rp);
 		clearInvocations(userDetailsService, userManager, deferredResultProcessingInterceptor);
 	}
 
@@ -134,7 +132,7 @@ public class UserRestApiTest {
 	public void testGetSelfWithUserDetails() {
 		User self = userClient.self();
 		assertEquals("builtin", self.getUsername());
-		verify(userDetailsService).loadUserByUsername(eq("builtin"));
+		then(userDetailsService).should().loadUserByUsername(eq("builtin"));
 	}
 
 	@Test
@@ -162,7 +160,7 @@ public class UserRestApiTest {
 		assertNotNull(rs);
 		assertEquals(RestStatus.CODE_UNAUTHORIZED, rs.getCode());
 		assertTrue(rs.getCause() instanceof HttpClientErrorException);
-		verify(userDetailsService).loadUserByUsername("admin");
+		then(userDetailsService).should().loadUserByUsername("admin");
 	}
 
 	@Test
@@ -190,7 +188,7 @@ public class UserRestApiTest {
 	@WithUserDetails("admin")
 	public void testRequestParamDefaultValue() {
 		userClient.paged(null, null);
-		verify(userManager).findByResultPage(argThat(rp -> rp.getPageNo() == 1 && rp.getPageSize() == 10));
+		then(userManager).should().findByResultPage(argThat(rp -> rp.getPageNo() == 1 && rp.getPageSize() == 10));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -206,7 +204,7 @@ public class UserRestApiTest {
 		user.setUsername("builtin");
 		user.setPassword("123456");
 		userClient.patch(user);
-		verify(userManager).save(argThat(u -> passwordEncoder.matches("123456", u.getPassword())));
+		then(userManager).should().save(argThat(u -> passwordEncoder.matches("123456", u.getPassword())));
 	}
 
 	@Test
@@ -236,7 +234,7 @@ public class UserRestApiTest {
 		assertEquals(RestStatus.CODE_FORBIDDEN, rs.getCode());
 
 		userClient.delete("disabled");
-		verify(userManager)
+		then(userManager).should()
 				.delete(argThat((org.ironrhino.security.model.User u) -> u.getUsername().equals("disabled")));
 	}
 
