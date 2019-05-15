@@ -1,7 +1,6 @@
 package org.ironrhino.security.oauth.server.controller;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -221,7 +220,7 @@ public class OAuth2Controller {
 	@RequestMapping(value = "/sendVerificationCode", method = { RequestMethod.GET, RequestMethod.POST })
 	public Map<String, Object> sendVerificationCode(@RequestParam String client_id, @RequestParam String client_secret,
 			@RequestParam String username) throws IOException {
-		Map<String, Object> result = new HashMap<>();
+		Map<String, Object> result = null;
 		if (verificationManager == null) {
 			result = new LinkedHashMap<>();
 			result.put("code", "2");
@@ -234,7 +233,7 @@ public class OAuth2Controller {
 				throw new IllegalArgumentException("client_id_not_exists");
 			if (!client.getSecret().equals(client_secret))
 				throw new IllegalArgumentException("client_secret_mismatch");
-			if (verificationManager != null && StringUtils.isNotBlank(username)) {
+			if (StringUtils.isNotBlank(username)) {
 				verificationManager.send(username);
 				result = new LinkedHashMap<>();
 				result.put("code", "0");
