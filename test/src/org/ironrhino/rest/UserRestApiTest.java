@@ -1,5 +1,6 @@
 package org.ironrhino.rest;
 
+import static org.ironrhino.rest.MockMvcResultMatchers.jsonPoint;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -20,7 +21,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -52,7 +52,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.client.MockMvcClientHttpRequestFactory;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.context.request.async.DeferredResultProcessingInterceptor;
@@ -341,30 +340,5 @@ public class UserRestApiTest {
 
 		then(deferredResultProcessingInterceptor).should().afterCompletion(any(), any());
 		then(deferredResultProcessingInterceptor).shouldHaveNoMoreInteractions();
-	}
-
-	static JacksonResultMatchers jsonPoint(String expression) {
-		return new JacksonResultMatchers(expression);
-	}
-
-	static class JacksonResultMatchers {
-
-		private String expression;
-
-		protected JacksonResultMatchers(String expression) {
-			this.expression = expression;
-		}
-
-		public ResultMatcher value(String expectedValue) {
-			return result -> {
-				JsonNode jsonNode = JsonUtils.getObjectMapper().readTree(getContent(result));
-				assertEquals(expectedValue, jsonNode.at(expression).asText());
-			};
-		}
-
-		private String getContent(MvcResult result) throws UnsupportedEncodingException {
-			return result.getResponse().getContentAsString();
-		}
-
 	}
 }
