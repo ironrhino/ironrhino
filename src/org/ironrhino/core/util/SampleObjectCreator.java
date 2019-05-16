@@ -1,5 +1,9 @@
 package org.ironrhino.core.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
@@ -211,6 +215,10 @@ public class SampleObjectCreator {
 		}
 		if (GrantedAuthority.class == type)
 			return new SimpleGrantedAuthority("role");
+		if (InputStream.class == type)
+			return new ByteArrayInputStream(new byte[0]);
+		if (OutputStream.class == type)
+			return new ByteArrayOutputStream();
 		if (String.class == type)
 			return suggestStringValue(fieldName, sampleClass);
 		if ((Boolean.TYPE == type) || (Boolean.class == type))
