@@ -79,7 +79,7 @@ public class OAuth2Controller {
 			@RequestParam(required = false) String refresh_token) throws Exception {
 		Client client;
 		Authorization authorization;
-		Map<String, Object> result = new LinkedHashMap<>();
+		Map<String, Object> result = null;
 		if (grant_type == GrantType.password) {
 			client = oauthManager.findClientById(client_id);
 			try {
@@ -124,6 +124,7 @@ public class OAuth2Controller {
 					log.error(e.getMessage(), e);
 				throw new OAuthError(OAuthError.INVALID_REQUEST, e.getLocalizedMessage());
 			}
+			result = new LinkedHashMap<>();
 			result.put("access_token", authorization.getAccessToken());
 			result.put("refresh_token", authorization.getRefreshToken());
 			result.put("expires_in", authorization.getExpiresIn());
