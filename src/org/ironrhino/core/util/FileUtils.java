@@ -27,7 +27,7 @@ public class FileUtils {
 		if (StringUtils.isBlank(input))
 			return input;
 		List<String> list = new ArrayList<>();
-		for (String s : input.split("/")) {
+		for (String s : input.split("/|\\\\")) {
 			if (s.isEmpty())
 				continue;
 			switch (s) {
