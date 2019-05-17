@@ -151,13 +151,9 @@ public class RegionAction extends EntityAction<Region> {
 						return INPUT;
 					}
 			}
-			region.setName(temp.getName());
-			region.setAreacode(temp.getAreacode());
-			region.setPostcode(temp.getPostcode());
-			region.setRank(temp.getRank());
-			region.setDisplayOrder(temp.getDisplayOrder());
+			BeanUtils.copyProperties(temp, region, "id", "fullId", "fullname", "level", "parent", "children",
+					"coordinate");
 		}
-
 		entityManager.save(region);
 		notify("save.success");
 		return SUCCESS;
