@@ -23,13 +23,10 @@ package com.opensymphony.xwork2.util;
 
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ModelDriven;
-import com.opensymphony.xwork2.conversion.impl.XWorkConverter;
 import com.opensymphony.xwork2.util.logging.Logger;
 import com.opensymphony.xwork2.util.logging.LoggerFactory;
-import com.opensymphony.xwork2.util.reflection.ReflectionProviderFactory;
 import org.apache.commons.lang3.ObjectUtils;
 
-import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.*;
@@ -432,55 +429,6 @@ public class LocalizedTextUtil {
 
         if (msg != null) {
             return msg;
-        }
-
-
-        // see if it's a child property
-        int idx = aTextName.indexOf(".");
-
-        if (idx != -1) {
-            String newKey = null;
-            String prop = null;
-
-            if (aTextName.startsWith(XWorkConverter.CONVERSION_ERROR_PROPERTY_PREFIX)) {
-                idx = aTextName.indexOf(".", XWorkConverter.CONVERSION_ERROR_PROPERTY_PREFIX.length());
-
-                if (idx != -1) {
-                    prop = aTextName.substring(XWorkConverter.CONVERSION_ERROR_PROPERTY_PREFIX.length(), idx);
-                    newKey = XWorkConverter.CONVERSION_ERROR_PROPERTY_PREFIX + aTextName.substring(idx + 1);
-                }
-            } else {
-                prop = aTextName.substring(0, idx);
-                newKey = aTextName.substring(idx + 1);
-            }
-
-            if (prop != null) {
-                Object obj = valueStack.findValue(prop);
-                try {
-                    Object actionObj = ReflectionProviderFactory.getInstance().getRealTarget(prop, valueStack.getContext(), valueStack.getRoot());
-                    if (actionObj != null) {
-                        PropertyDescriptor propertyDescriptor = ReflectionProviderFactory.getInstance().getPropertyDescriptor(actionObj.getClass(), prop);
-
-                        if (propertyDescriptor != null) {
-                            Class<?> clazz = propertyDescriptor.getPropertyType();
-
-                            if (clazz != null) {
-                                if (obj != null)
-                                    valueStack.push(obj);
-                                msg = findText(clazz, newKey, locale, null, args);
-                                if (obj != null)
-                                    valueStack.pop();
-
-                                if (msg != null) {
-                                    return msg;
-                                }
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    LOG.debug("unable to find property " + prop, e);
-                }
-            }
         }
 
         // get default
