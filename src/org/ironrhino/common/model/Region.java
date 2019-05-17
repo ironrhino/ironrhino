@@ -7,6 +7,7 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 
 import org.ironrhino.common.util.LocationUtils;
 import org.ironrhino.core.aop.PublishAware;
@@ -52,7 +53,7 @@ public class Region extends BaseTreeableEntity<Region> {
 	@Column(length = 6)
 	private String postcode;
 
-	@UiConfig(cssClass = "positive", dynamicAttributes = "{\"min\":\"1\"}")
+	@Min(1)
 	private Integer rank;
 
 	public Region(String name) {
