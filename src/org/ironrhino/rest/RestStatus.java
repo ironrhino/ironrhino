@@ -20,7 +20,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = false, exclude = { "data", "fieldErrors" })
 @JsonIgnoreProperties({ "localizedMessage", "cause", "stackTrace", "suppressed" })
 public class RestStatus extends RuntimeException {
 
@@ -68,6 +68,8 @@ public class RestStatus extends RuntimeException {
 	private String message;
 
 	private Map<String, List<String>> fieldErrors;
+
+	private Object data;
 
 	@JsonIgnore
 	private Integer httpStatusCode;
@@ -118,6 +120,12 @@ public class RestStatus extends RuntimeException {
 			return valueOf(code);
 		String status = findStatus(code);
 		return new RestStatus(code, status, message, httpStatusCode);
+	}
+
+	public static RestStatus withData(Object data) {
+		RestStatus rs = new RestStatus(CODE_OK, "OK");
+		rs.setData(data);
+		return rs;
 	}
 
 	protected static String findStatus(String code) {
