@@ -62,9 +62,8 @@ public class HttpClientUtils {
 	}
 
 	public static CloseableHttpClient create(int connectTimeout, int socketTimeout) {
-		RequestConfig requestConfig = RequestConfig.custom().setCircularRedirectsAllowed(true)
-				.setConnectionRequestTimeout(connectTimeout).setConnectTimeout(connectTimeout)
-				.setSocketTimeout(socketTimeout).setExpectContinueEnabled(true).build();
+		RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(connectTimeout)
+				.setConnectTimeout(connectTimeout).setSocketTimeout(socketTimeout).build();
 		HttpClientBuilder builder = HttpClients.custom();
 		builder.disableAuthCaching().disableConnectionState().disableCookieManagement()
 				.setConnectionTimeToLive(60, TimeUnit.SECONDS).setDefaultRequestConfig(requestConfig)
