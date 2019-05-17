@@ -24,6 +24,7 @@ import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
@@ -64,10 +65,6 @@ public class PasswordAction extends BaseAction {
 	@Getter
 	@Value("${user.password.readonly:false}")
 	private boolean userPasswordReadonly;
-
-	@Getter
-	@Value("${user.password.currentPasswordNeeded:true}")
-	private boolean userCurrentPasswordNeeded;
 
 	@Value("${" + KEY_LOGIN_DEFAULT_TARGET_URL + ":" + DEFAULT_VALUE_LOGIN_DEFAULT_TARGET_URL + "}")
 	protected String defaultTargetUrl;
@@ -124,13 +121,6 @@ public class PasswordAction extends BaseAction {
 				return SUCCESS;
 			}
 		}
-		if (isUserCurrentPasswordNeeded()) {
-			boolean valid = currentPassword != null && AuthzUtils.isPasswordValid(currentPassword);
-			if (!valid) {
-				addFieldError("currentPassword", getText("currentPassword.error"));
-				return SUCCESS;
-			}
-		}
 		boolean passwordExpired = !user.isCredentialsNonExpired();
 		PasswordMutator passwordMutator = null;
 		for (PasswordMutator<?> pm : passwordMutators) {
@@ -143,7 +133,12 @@ public class PasswordAction extends BaseAction {
 			addActionError(getText("access.denied"));
 			return ACCESSDENIED;
 		}
-		passwordMutator.changePassword(user, password);
+		try {
+			passwordMutator.changePassword(user, currentPassword, password);
+		} catch (BadCredentialsException e) {
+			addFieldError("currentPassword", getText("currentPassword.error"));
+			return SUCCESS;
+		}
 		notify("save.success");
 		eventPublisher.publish(
 				new PasswordChangedEvent(user.getUsername(), ServletActionContext.getRequest().getRemoteAddr()),

@@ -14,6 +14,7 @@ import org.ironrhino.core.spring.security.password.PasswordNotifier;
 import org.ironrhino.security.model.BaseUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -74,6 +75,25 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 	@Override
 	public void changePassword(T user, String password) {
 		T u = get(user.getId());
+		u.setPassword(passwordEncoder.encode(password));
+		u.setPasswordModifyDate(new Date());
+		// copy state to origin object to avoid re-login
+		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+			@Override
+			public void afterCommit() {
+				user.setPassword(u.getPassword());
+				user.setPasswordModifyDate(u.getPasswordModifyDate());
+			}
+		});
+		super.save(u);
+	}
+
+	@Transactional
+	@Override
+	public void changePassword(T user, String currentPassword, String password) {
+		T u = get(user.getId());
+		if (!passwordEncoder.matches(currentPassword, u.getPassword()))
+			throw new BadCredentialsException("Bad credentials");
 		u.setPassword(passwordEncoder.encode(password));
 		u.setPasswordModifyDate(new Date());
 		// copy state to origin object to avoid re-login

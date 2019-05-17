@@ -10,4 +10,6 @@ public interface PasswordMutator<T extends UserDetails> {
 
 	void changePassword(T user, String password);
 
+	void changePassword(T user, String currentPassword, String password);
+
 }

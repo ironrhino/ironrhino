@@ -68,6 +68,13 @@ public class UserManagerImpl extends BaseUserManagerImpl<User> implements UserMa
 	}
 
 	@Override
+	@Transactional
+	@EvictCache(namespace = CACHE_NAMESPACE, key = "${[user.username,user.email]}")
+	public void changePassword(User user, String currentPassword, String password) {
+		super.changePassword(user, currentPassword, password);
+	}
+
+	@Override
 	@Transactional(readOnly = true)
 	@CheckCache(namespace = CACHE_NAMESPACE, key = "${username}", cacheNull = true)
 	public User loadUserByUsername(String username) {
