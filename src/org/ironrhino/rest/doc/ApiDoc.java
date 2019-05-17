@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.core.util.ReflectionUtils;
+import org.ironrhino.rest.RestResult;
 import org.ironrhino.rest.doc.annotation.Api;
 import org.ironrhino.rest.doc.annotation.Field;
 import org.ironrhino.rest.doc.annotation.Fields;
@@ -181,6 +182,11 @@ public class ApiDoc implements Serializable {
 
 		Class<?> responseBodyClass = method.getReturnType();
 		Type responseBodyGenericType = method.getGenericReturnType();
+		boolean isRestResult = false;
+		if (responseBodyClass == RestResult.class) {
+			isRestResult = true;
+			responseBodyGenericType = ((ParameterizedType) responseBodyGenericType).getActualTypeArguments()[0];
+		}
 		if (Iterable.class.isAssignableFrom(responseBodyClass)) {
 			responseBodyType = "collection";
 		} else if (ResultPage.class.isAssignableFrom(responseBodyClass)) {
@@ -223,7 +229,7 @@ public class ApiDoc implements Serializable {
 		Object responseSample = ApiDocHelper.generateSample(apiDocClazz, apiDocMethod, responseFields);
 		if (responseSample == null)
 			responseSample = ApiDocHelper.createSample(responseBodyGenericType);
-		if (responseSample instanceof String) {
+		if (responseSample instanceof String && !isRestResult) {
 			responseBodySample = (String) responseSample;
 		} else if (responseSample != null) {
 			if (responseSample instanceof Flux) {
@@ -242,6 +248,9 @@ public class ApiDoc implements Serializable {
 				view = ((MappingJacksonValue) responseSample).getSerializationView();
 				responseSample = ((MappingJacksonValue) responseSample).getValue();
 			}
+
+			if (isRestResult)
+				responseSample = RestResult.of(responseSample);
 
 			JsonView jsonView = AnnotationUtils.findAnnotation(method, JsonView.class);
 			if (view == null && jsonView != null)
