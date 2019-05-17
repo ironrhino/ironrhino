@@ -180,6 +180,10 @@ public class UserRestApiTest {
 		assertEquals(1, resultPage.getPageNo());
 		assertEquals(1, resultPage.getPageSize());
 		assertEquals(1, resultPage.getResult().size());
+		resultPage = userClient.pagedRestResult(1, 1);
+		assertEquals(1, resultPage.getPageNo());
+		assertEquals(1, resultPage.getPageSize());
+		assertEquals(1, resultPage.getResult().size());
 	}
 
 	@Test

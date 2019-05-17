@@ -28,6 +28,11 @@ public interface UserClient {
 	public ResultPage<User> paged(@RequestParam(defaultValue = "1") Integer pageNo,
 			@RequestParam(defaultValue = "10") Integer pageSize);
 
+	@RequestMapping(value = "/@pagedRestResult", method = RequestMethod.GET)
+	@JsonPointer("/data")
+	public ResultPage<User> pagedRestResult(@RequestParam(defaultValue = "1") Integer pageNo,
+			@RequestParam(defaultValue = "10") Integer pageSize);
+
 	@JsonPointer("/result")
 	@RequestMapping(value = "/@paged", method = RequestMethod.GET)
 	public List<User> pagedResult(@RequestParam(defaultValue = "1") Integer pageNo,

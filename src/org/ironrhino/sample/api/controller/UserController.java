@@ -13,6 +13,7 @@ import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.BeanUtils;
 import org.ironrhino.rest.Asserts;
+import org.ironrhino.rest.RestResult;
 import org.ironrhino.rest.RestStatus;
 import org.ironrhino.rest.doc.annotation.Api;
 import org.ironrhino.rest.doc.annotation.Status;
@@ -74,6 +75,19 @@ public class UserController {
 		if (pageSize != null && pageSize > 0)
 			rp.setPageSize(pageSize);
 		return userManager.findByResultPage(rp);
+	}
+
+	@Order(3)
+	@Api("包一层code和status的分页获取所有用户信息")
+	@RequestMapping(value = "/@pagedRestResult", method = RequestMethod.GET)
+	public RestResult<ResultPage<User>> pagedRestResult(@RequestParam(defaultValue = "1") Integer pageNo,
+			@RequestParam(defaultValue = "10") Integer pageSize) {
+		ResultPage<User> rp = new ResultPage<>();
+		if (pageNo != null && pageNo > 0)
+			rp.setPageNo(pageNo);
+		if (pageSize != null && pageSize > 0)
+			rp.setPageSize(pageSize);
+		return RestResult.of(userManager.findByResultPage(rp));
 	}
 
 	@RequestMapping(value = "/@self", method = RequestMethod.PATCH)
