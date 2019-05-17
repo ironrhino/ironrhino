@@ -186,6 +186,10 @@ public class ApiDoc implements Serializable {
 		if (responseBodyClass == RestResult.class) {
 			isRestResult = true;
 			responseBodyGenericType = ((ParameterizedType) responseBodyGenericType).getActualTypeArguments()[0];
+			if (responseBodyGenericType instanceof Class)
+				responseBodyClass = (Class<?>) responseBodyGenericType;
+			else if (responseBodyGenericType instanceof ParameterizedType)
+				responseBodyClass = (Class<?>) ((ParameterizedType) responseBodyGenericType).getRawType();
 		}
 		if (Iterable.class.isAssignableFrom(responseBodyClass)) {
 			responseBodyType = "collection";
