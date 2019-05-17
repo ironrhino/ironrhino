@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.willThrow;
+import static org.mockito.Mockito.spy;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -21,10 +22,12 @@ import javax.annotation.PostConstruct;
 
 import org.ironrhino.core.spring.http.client.RestTemplate;
 import org.ironrhino.core.util.JsonUtils;
+import org.ironrhino.rest.RestApiTest.RestApiConfiguration;
 import org.ironrhino.rest.client.ArticleClient;
 import org.ironrhino.rest.client.RestApiFactoryBean;
 import org.ironrhino.rest.client.UploadClient;
 import org.ironrhino.sample.api.controller.ArticleController;
+import org.ironrhino.sample.api.controller.UploadController;
 import org.ironrhino.sample.api.model.Article;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -32,6 +35,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
@@ -40,9 +44,8 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.client.MockMvcClientHttpRequestFactory;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -54,17 +57,15 @@ public class RestApiTest {
 	private static final Article EMPTY_ARTICLE = new Article();
 
 	@Autowired
-	private WebApplicationContext wac;
-	@Autowired
 	private ArticleController articleController;
-
+	@Autowired
 	private MockMvc mockMvc;
+
 	private ArticleClient articleClient;
 	private UploadClient uploadClient;
 
 	@PostConstruct
 	public void afterPropertiesSet() throws Exception {
-		mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 		RestTemplate restTemplate = new RestTemplate(new MockMvcClientHttpRequestFactory(mockMvc));
 		articleClient = RestApiFactoryBean.create(ArticleClient.class, restTemplate);
 		uploadClient = RestApiFactoryBean.create(UploadClient.class, restTemplate);
@@ -166,4 +167,20 @@ public class RestApiTest {
 		assertEquals("file", jn.get("filename").asText());
 		assertEquals("build.xml", jn.get("originalFilename").asText());
 	}
+
+	@EnableWebMvc
+	static class RestApiConfiguration extends AbstractMockMvcConfigurer {
+
+		@Bean
+		public ArticleController articleController() {
+			return spy(new ArticleController());
+		}
+
+		@Bean
+		public UploadController uploadController() {
+			return new UploadController();
+		}
+
+	}
+
 }

@@ -7,84 +7,40 @@ import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import org.ironrhino.core.spring.ExecutorServiceFactoryBean;
-import org.ironrhino.core.spring.security.password.MixedPasswordEncoder;
+import org.ironrhino.core.servlet.MainAppInitializer;
+import org.ironrhino.core.spring.converter.DateConverter;
+import org.ironrhino.core.spring.converter.LocalDateConverter;
+import org.ironrhino.core.spring.converter.LocalDateTimeConverter;
+import org.ironrhino.core.spring.converter.LocalTimeConverter;
+import org.ironrhino.core.spring.converter.YearMonthConverter;
 import org.ironrhino.core.util.JsonUtils;
-import org.ironrhino.rest.client.RestClientConfiguration.MyJsonValidator;
-import org.ironrhino.rest.component.AuthorizeAspect;
 import org.ironrhino.rest.component.RestExceptionHandler;
-import org.ironrhino.sample.api.controller.UserController;
-import org.ironrhino.security.service.UserManager;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpResponse;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.async.DeferredResultProcessingInterceptor;
 import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@Configuration
-@EnableWebMvc
-@EnableWebSecurity
-@EnableAspectJAutoProxy(proxyTargetClass = true)
-public class UserRestApiConfig implements WebMvcConfigurer {
+public abstract class AbstractMockMvcConfigurer implements WebMvcConfigurer {
 
 	@Bean
 	public MockMvc mockMvc(WebApplicationContext wac) {
-		return MockMvcBuilders.webAppContextSetup(wac).build();
-	}
-
-	@Bean
-	public UserDetailsService userDetailsService() {
-		return mock(UserDetailsService.class);
-	}
-
-	@Bean
-	public UserManager userManager() {
-		return mock(UserManager.class);
-	}
-
-	@Bean
-	public ExecutorServiceFactoryBean executorService() {
-		return new ExecutorServiceFactoryBean();
-	}
-
-	@Bean
-	public UserController userController() {
-		return new UserController();
-	}
-
-	@Bean
-	public MixedPasswordEncoder passwordEncoder() {
-		return new MixedPasswordEncoder();
-	}
-
-	@Bean
-	public AuthorizeAspect authorizeAspect() {
-		return new AuthorizeAspect();
-	}
-
-	@Bean
-	public RestExceptionHandler restExceptionHandler() {
-		return new RestExceptionHandler();
-	}
-
-	@Bean
-	public MyJsonValidator myJsonValidator() {
-		return new MyJsonValidator();
+		MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+		MainAppInitializer.SERVLET_CONTEXT = mockMvc.getDispatcherServlet().getServletContext();
+		return mockMvc;
 	}
 
 	@Bean
@@ -95,6 +51,20 @@ public class UserRestApiConfig implements WebMvcConfigurer {
 	@Override
 	public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
 		configurer.registerDeferredResultInterceptors(deferredResultProcessingInterceptor());
+	}
+
+	@Bean
+	public RestExceptionHandler restExceptionHandler() {
+		return new RestExceptionHandler();
+	}
+
+	@Override
+	public void addFormatters(FormatterRegistry formatterRegistry) {
+		formatterRegistry.addConverter(new DateConverter());
+		formatterRegistry.addConverter(new LocalDateConverter());
+		formatterRegistry.addConverter(new LocalDateTimeConverter());
+		formatterRegistry.addConverter(new LocalTimeConverter());
+		formatterRegistry.addConverter(new YearMonthConverter());
 	}
 
 	@Override
@@ -140,6 +110,7 @@ public class UserRestApiConfig implements WebMvcConfigurer {
 		};
 		string.setWriteAcceptCharset(false);
 		converters.add(string);
+		converters.add(new ByteArrayHttpMessageConverter());
+		converters.add(new ResourceHttpMessageConverter());
 	}
-
 }

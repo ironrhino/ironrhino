@@ -14,16 +14,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Locale;
 
 import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.security.verfication.VerificationManager;
 import org.ironrhino.core.struts.I18N;
-import org.ironrhino.core.util.JsonUtils;
+import org.ironrhino.rest.AbstractMockMvcConfigurer;
 import org.ironrhino.security.oauth.server.controller.OAuth2ControllerTest.OAuth2Configuration;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
@@ -32,16 +28,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpInputMessage;
-import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.HttpMessageNotWritableException;
-import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.http.server.ServerHttpResponse;
-import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -58,7 +45,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
@@ -303,11 +289,11 @@ public class OAuth2ControllerTest {
 		then(verificationManager).should().send("username");
 	}
 
-	@Configuration
 	@EnableWebMvc
-	static class OAuth2Configuration implements WebMvcConfigurer {
+	static class OAuth2Configuration extends AbstractMockMvcConfigurer {
 
 		@Bean
+		@Override
 		public MockMvc mockMvc(WebApplicationContext wac) {
 			return MockMvcBuilders.webAppContextSetup(wac)
 					.alwaysExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON)).build();
@@ -362,51 +348,5 @@ public class OAuth2ControllerTest {
 		public WebAuthenticationDetailsSource authenticationDetailsSource() {
 			return mock(WebAuthenticationDetailsSource.class);
 		}
-
-		@Override
-		public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-			MappingJackson2HttpMessageConverter jackson2 = new MappingJackson2HttpMessageConverter() {
-
-				@Override
-				protected void writeInternal(Object object, Type type, HttpOutputMessage outputMessage)
-						throws IOException, HttpMessageNotWritableException {
-					super.writeInternal(object, type, outputMessage);
-					if (!(outputMessage instanceof ServerHttpResponse)
-							|| outputMessage instanceof ServletServerHttpResponse) {
-						// don't close MediaType.TEXT_EVENT_STREAM
-						outputMessage.getBody().close();
-					}
-				}
-
-			};
-			jackson2.setObjectMapper(JsonUtils.createNewObjectMapper());
-			converters.add(jackson2);
-			StringHttpMessageConverter string = new StringHttpMessageConverter(StandardCharsets.UTF_8) {
-
-				@Override
-				protected String readInternal(Class<? extends String> clazz, HttpInputMessage inputMessage)
-						throws IOException {
-					try {
-						return super.readInternal(clazz, inputMessage);
-					} finally {
-						inputMessage.getBody().close();
-					}
-				}
-
-				@Override
-				protected void writeInternal(String str, HttpOutputMessage outputMessage) throws IOException {
-					super.writeInternal(str, outputMessage);
-					if (!(outputMessage instanceof ServerHttpResponse)
-							|| outputMessage instanceof ServletServerHttpResponse) {
-						// don't close MediaType.TEXT_EVENT_STREAM
-						outputMessage.getBody().close();
-					}
-				}
-
-			};
-			string.setWriteAcceptCharset(false);
-			converters.add(string);
-		}
 	}
-
 }

@@ -10,6 +10,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -26,18 +27,26 @@ import javax.annotation.PostConstruct;
 
 import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.core.security.role.UserRole;
-import org.ironrhino.core.servlet.MainAppInitializer;
+import org.ironrhino.core.spring.ExecutorServiceFactoryBean;
 import org.ironrhino.core.spring.http.client.RestTemplate;
+import org.ironrhino.core.spring.security.password.MixedPasswordEncoder;
 import org.ironrhino.core.util.JsonUtils;
+import org.ironrhino.rest.UserRestApiTest.UserRestApiConfiguration;
 import org.ironrhino.rest.client.RestApiFactoryBean;
+import org.ironrhino.rest.client.RestClientConfiguration.MyJsonValidator;
 import org.ironrhino.rest.client.UserClient;
+import org.ironrhino.rest.component.AuthorizeAspect;
+import org.ironrhino.sample.api.controller.UserController;
 import org.ironrhino.security.domain.User;
 import org.ironrhino.security.service.UserManager;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -53,12 +62,13 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.context.request.async.DeferredResultProcessingInterceptor;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
-@ContextConfiguration(classes = UserRestApiConfig.class)
+@ContextConfiguration(classes = UserRestApiConfiguration.class)
 public class UserRestApiTest {
 
 	@Autowired
@@ -93,11 +103,8 @@ public class UserRestApiTest {
 
 	@PostConstruct
 	public void afterPropertiesSet() throws Exception {
-		MainAppInitializer.SERVLET_CONTEXT = mockMvc.getDispatcherServlet().getServletContext();
-
 		RestTemplate restTemplate = new RestTemplate(new MockMvcClientHttpRequestFactory(mockMvc));
 		userClient = RestApiFactoryBean.create(UserClient.class, restTemplate);
-
 		admin = createUser("admin", "admin", true, UserRole.ROLE_ADMINISTRATOR);
 		builtin = createUser("builtin", "builtin", true, UserRole.ROLE_BUILTIN_USER);
 		disabled = createUser("disabled", "disabled", false);
@@ -342,5 +349,46 @@ public class UserRestApiTest {
 
 		then(deferredResultProcessingInterceptor).should().afterCompletion(any(), any());
 		then(deferredResultProcessingInterceptor).shouldHaveNoMoreInteractions();
+	}
+
+	@EnableWebMvc
+	@EnableWebSecurity
+	@EnableAspectJAutoProxy(proxyTargetClass = true)
+	static class UserRestApiConfiguration extends AbstractMockMvcConfigurer {
+
+		@Bean
+		public UserDetailsService userDetailsService() {
+			return mock(UserDetailsService.class);
+		}
+
+		@Bean
+		public UserManager userManager() {
+			return mock(UserManager.class);
+		}
+
+		@Bean
+		public ExecutorServiceFactoryBean executorService() {
+			return new ExecutorServiceFactoryBean();
+		}
+
+		@Bean
+		public UserController userController() {
+			return new UserController();
+		}
+
+		@Bean
+		public MixedPasswordEncoder passwordEncoder() {
+			return new MixedPasswordEncoder();
+		}
+
+		@Bean
+		public AuthorizeAspect authorizeAspect() {
+			return new AuthorizeAspect();
+		}
+
+		@Bean
+		public MyJsonValidator myJsonValidator() {
+			return new MyJsonValidator();
+		}
 	}
 }
