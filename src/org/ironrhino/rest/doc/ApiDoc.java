@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.Authorize;
@@ -43,8 +44,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 import lombok.Data;
 import reactor.core.publisher.Flux;
@@ -340,7 +345,14 @@ public class ApiDoc implements Serializable {
 								if (requestSample instanceof String) {
 									requestBodySample = (String) requestSample;
 								} else if (requestSample != null) {
-									requestBodySample = objectMapper.writeValueAsString(requestSample);
+									SimpleFilterProvider filters = new SimpleFilterProvider();
+									filters.addFilter("desensitizer",
+											SimpleBeanPropertyFilter.filterOutAllExcept(requestBody.stream()
+													.map(FieldObject::getName).collect(Collectors.toSet())));
+									ObjectWriter objectWriter = objectMapper.copy()
+											.addMixIn(requestBodyClass, JsonFilterMixIn.class)
+											.setFilterProvider(filters).writer();
+									requestBodySample = objectWriter.writeValueAsString(requestSample);
 								}
 							}
 						}
@@ -423,6 +435,11 @@ public class ApiDoc implements Serializable {
 			}
 
 		}
+	}
+
+	@JsonFilter("desensitizer")
+	static class JsonFilterMixIn {
+
 	}
 
 }
