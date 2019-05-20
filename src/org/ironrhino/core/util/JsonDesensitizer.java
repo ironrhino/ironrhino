@@ -48,15 +48,15 @@ public class JsonDesensitizer {
 		});
 	}
 
-	public JsonDesensitizer(Map<BiPredicate<String, Object>, Function<String, String>> mapper) {
-		this.mapping = mapper;
+	public JsonDesensitizer(Map<BiPredicate<String, Object>, Function<String, String>> mapping) {
+		this.mapping = mapping;
 		FilterProvider filters = new SimpleFilterProvider().setDefaultFilter(new SimpleBeanPropertyFilter() {
 			@Override
 			public void serializeAsField(Object obj, JsonGenerator jgen, SerializerProvider provider,
 					PropertyWriter writer) throws Exception {
 				if (include(writer)) {
 					String name = writer.getName();
-					Optional<Function<String, String>> func = mapper.entrySet().stream()
+					Optional<Function<String, String>> func = mapping.entrySet().stream()
 							.filter(entry -> entry.getKey().test(name, obj)).findFirst().map(entry -> entry.getValue());
 					if (func.isPresent()) {
 						BeanWrapperImpl bw = new BeanWrapperImpl(obj);
