@@ -31,7 +31,7 @@
 			枚举值:
 			<ul class="unstyled">
 				<#list field.values as key,value>
-				<li>${key} <span class="label">${value}</span></li>
+				<li>${key}<#if value!=key> <span class="label">${value}</span></#if></li>
 				</#list>
 			</ul>
 			</#if>
