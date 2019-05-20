@@ -4,10 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Proxy;
+import java.net.ConnectException;
 
-import org.ironrhino.core.remoting.RemotingSerivceFallbackTest.RemotingFallbackConfiguration;
+import org.aopalliance.intercept.MethodInvocation;
+import org.ironrhino.core.remoting.RemotingServiceFallbackTest.RemotingFallbackConfiguration;
 import org.ironrhino.core.remoting.client.HttpInvokerClient;
+import org.ironrhino.core.remoting.client.HttpInvokerRequestExecutor;
 import org.ironrhino.core.remoting.client.RemotingServiceRegistryPostProcessor;
 import org.ironrhino.core.remoting.impl.StandaloneServiceRegistry;
 import org.ironrhino.core.spring.configuration.Fallback;
@@ -19,12 +23,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.remoting.RemoteAccessException;
+import org.springframework.remoting.support.RemoteInvocationResult;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = RemotingFallbackConfiguration.class)
-public class RemotingSerivceFallbackTest {
+public class RemotingServiceFallbackTest {
 
 	@Autowired
 	private TestService testService;
@@ -99,6 +104,17 @@ public class RemotingSerivceFallbackTest {
 		@Bean
 		public FallbackEchoService fallbackEchoService() {
 			return new FallbackEchoService();
+		}
+
+		@Bean
+		public HttpInvokerRequestExecutor httpInvokerRequestExecutor() {
+			return new HttpInvokerRequestExecutor() {
+				@Override
+				protected RemoteInvocationResult doExecuteRequest(String serviceUrl, MethodInvocation methodInvocation,
+						ByteArrayOutputStream baos) throws Exception {
+					throw new ConnectException("Connection refused");
+				}
+			};
 		}
 
 	}
