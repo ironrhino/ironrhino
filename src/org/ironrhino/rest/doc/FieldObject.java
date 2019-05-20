@@ -245,8 +245,14 @@ public class FieldObject implements Serializable {
 						continue;
 					fd = f.getAnnotation(Field.class);
 					if (Persistable.class.isAssignableFrom(domainClass)) {
+						UiConfig uic = null;
+						if (pd.getReadMethod() != null) {
+							uic = pd.getReadMethod().getAnnotation(UiConfig.class);
+						}
+						if (uic == null)
+							uic = f.getAnnotation(UiConfig.class);
 						if (forRequest) {
-							if ("id".equals(name))
+							if ("id".equals(name) || uic != null && uic.hidden())
 								continue;
 						} else {
 							if ("id".equals(name))
@@ -257,17 +263,10 @@ public class FieldObject implements Serializable {
 						Column column = f.getAnnotation(Column.class);
 						if (column != null && !column.nullable())
 							required = true;
-					}
-
-					if (!required) {
-						UiConfig uic = null;
-						if (pd.getReadMethod() != null) {
-							uic = pd.getReadMethod().getAnnotation(UiConfig.class);
+						if (!required) {
+							if (uic != null && uic.required())
+								required = true;
 						}
-						if (uic == null)
-							uic = f.getAnnotation(UiConfig.class);
-						if (uic != null && uic.required())
-							required = true;
 					}
 
 					if (!required) {
