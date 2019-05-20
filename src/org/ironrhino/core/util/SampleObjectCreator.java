@@ -26,6 +26,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.function.BiFunction;
 
+import org.ironrhino.common.model.Coordinate;
 import org.ironrhino.core.model.ResultPage;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
@@ -215,6 +216,8 @@ public class SampleObjectCreator {
 		}
 		if (GrantedAuthority.class == type)
 			return new SimpleGrantedAuthority("role");
+		if (Coordinate.class == type)
+			return new Coordinate("26.7011948,113.5207633");
 		if (InputStream.class == type)
 			return new ByteArrayInputStream(new byte[0]);
 		if (OutputStream.class == type)
