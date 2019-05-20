@@ -1,12 +1,12 @@
 package org.ironrhino.rest;
 
+import static org.ironrhino.rest.MockMvcResultMatchers.jsonPoint;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.spy;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -21,7 +21,6 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.ironrhino.core.spring.http.client.RestTemplate;
-import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.rest.RestApiTest.RestApiConfiguration;
 import org.ironrhino.rest.client.ArticleClient;
 import org.ironrhino.rest.client.RestApiFactoryBean;
@@ -29,11 +28,9 @@ import org.ironrhino.rest.client.UploadClient;
 import org.ironrhino.sample.api.controller.ArticleController;
 import org.ironrhino.sample.api.controller.UploadController;
 import org.ironrhino.sample.api.model.Article;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
@@ -43,18 +40,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.client.MockMvcClientHttpRequestFactory;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
 @ContextConfiguration(classes = RestApiConfiguration.class)
 public class RestApiTest {
-
-	private static final Article EMPTY_ARTICLE = new Article();
 
 	@Autowired
 	private ArticleController articleController;
@@ -69,11 +61,6 @@ public class RestApiTest {
 		RestTemplate restTemplate = new RestTemplate(new MockMvcClientHttpRequestFactory(mockMvc));
 		articleClient = RestApiFactoryBean.create(ArticleClient.class, restTemplate);
 		uploadClient = RestApiFactoryBean.create(UploadClient.class, restTemplate);
-	}
-
-	@Before
-	public void reset() {
-		Mockito.reset(articleController);
 	}
 
 	@Test
@@ -98,8 +85,8 @@ public class RestApiTest {
 
 	@Test
 	public void testPostForm() {
-		assertEquals(EMPTY_ARTICLE, articleClient.postForm(null));
-		then(articleController).should().postForm(argThat(p -> EMPTY_ARTICLE.equals(p)));
+		assertEquals(new Article(), articleClient.postForm(null));
+		then(articleController).should().postForm(new Article());
 
 		Article article = new Article();
 		article.setId(1024);
@@ -110,18 +97,19 @@ public class RestApiTest {
 
 	@Test
 	public void testThrowException() {
-		willThrow(new RuntimeException("test")).given(articleController)
-				.postForm(argThat(p -> EMPTY_ARTICLE.equals(p)));
+		Article article = new Article();
+		article.setTitle("exception");
+		given(articleController.postForm(article)).willThrow(new RuntimeException("exception"));
 		RestStatus e = null;
 		try {
-			articleClient.postForm(new Article());
+			articleClient.postForm(article);
 		} catch (RestStatus restStatus) {
 			e = restStatus;
 		}
 		assertNotNull(e);
 		assertEquals(RestStatus.CODE_INTERNAL_SERVER_ERROR, e.getCode());
 		assertTrue(e.getCause() instanceof RuntimeException);
-		then(articleController).should().postForm(argThat(p -> EMPTY_ARTICLE.equals(p)));
+		then(articleController).should().postForm(article);
 	}
 
 	@Test
@@ -160,12 +148,9 @@ public class RestApiTest {
 	public void testMultipart() throws Exception {
 		MockMultipartFile file = new MockMultipartFile("file", "build.xml", MediaType.TEXT_PLAIN_VALUE,
 				new FileInputStream("build.xml"));
-		MvcResult mvcResult = mockMvc.perform(multipart("/upload").file(file).param("name", "build"))
-				.andExpect(status().isOk()).andReturn();
-		JsonNode jn = JsonUtils.fromJson(mvcResult.getResponse().getContentAsString(), JsonNode.class);
-		assertEquals("build", jn.get("name").asText());
-		assertEquals("file", jn.get("filename").asText());
-		assertEquals("build.xml", jn.get("originalFilename").asText());
+		mockMvc.perform(multipart("/upload").file(file).param("name", "build")).andExpect(status().isOk())
+				.andExpect(jsonPoint("/name").value("build")).andExpect(jsonPoint("/filename").value("file"))
+				.andExpect(jsonPoint("/originalFilename").value("build.xml"));
 	}
 
 	@EnableWebMvc
