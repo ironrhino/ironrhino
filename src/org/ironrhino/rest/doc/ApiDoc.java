@@ -258,7 +258,7 @@ public class ApiDoc implements Serializable {
 				responseSample = ((MappingJacksonValue) responseSample).getValue();
 			}
 
-			if (isRestResult)
+			if (isRestResult && !(responseSample instanceof RestResult))
 				responseSample = RestResult.of(responseSample);
 
 			JsonView jsonView = AnnotationUtils.findAnnotation(method, JsonView.class);
