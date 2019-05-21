@@ -332,7 +332,8 @@ public class ApiDoc implements Serializable {
 						}
 						if (requestBodyClass == String.class) {
 							String sample = (String) ApiDocHelper.createSample(String.class);
-							if (consumes != null && MediaType.parseMediaType(consumes[0]).getType().equals("text"))
+							if (consumes != null && consumes.length > 0
+									&& MediaType.parseMediaType(consumes[0]).getType().equals("text"))
 								requestBodySample = sample;
 							else
 								requestBodySample = objectMapper.writeValueAsString(sample);
