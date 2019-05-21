@@ -26,6 +26,7 @@ import org.ironrhino.rest.doc.annotation.Api;
 import org.ironrhino.rest.doc.annotation.Field;
 import org.ironrhino.rest.doc.annotation.Fields;
 import org.ironrhino.rest.doc.annotation.Status;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -315,16 +316,30 @@ public class ApiDoc implements Serializable {
 						Class<?> requestBodyClass = parameterType;
 						if (Iterable.class.isAssignableFrom(requestBodyClass)) {
 							requestBodyType = "collection";
+						} else if (Map.class.isAssignableFrom(requestBodyClass)) {
+							requestBodyType = "map";
 						} else if (ResultPage.class.isAssignableFrom(requestBodyClass)) {
 							requestBodyType = "resultPage";
 						}
 						if (genericParameterType instanceof ParameterizedType) {
 							ParameterizedType pt = (ParameterizedType) genericParameterType;
+							Type[] actualTypeArguments = pt.getActualTypeArguments();
 							if (pt.getRawType() == Optional.class) {
 								requestBodyRequired = false;
-								genericParameterType = pt.getActualTypeArguments()[0];
+								genericParameterType = actualTypeArguments[0];
+								if (genericParameterType instanceof ParameterizedType) {
+									pt = (ParameterizedType) genericParameterType;
+									actualTypeArguments = pt.getActualTypeArguments();
+								}
 							}
-							requestBodyClass = (Class<?>) pt.getActualTypeArguments()[0];
+							if (actualTypeArguments.length == 1) {
+								Type type = actualTypeArguments[0];
+								if (type instanceof Class) {
+									Class<?> cls = (Class<?>) type;
+									if (!BeanUtils.isSimpleValueType(cls))
+										requestBodyClass = cls;
+								}
+							}
 						}
 						if (requestBodyClass.getGenericSuperclass() instanceof ParameterizedType) {
 							ParameterizedType pt = (ParameterizedType) requestBodyClass.getGenericSuperclass();
@@ -345,6 +360,8 @@ public class ApiDoc implements Serializable {
 									requestSample = ApiDocHelper.createSample(genericParameterType);
 								if (requestSample instanceof String) {
 									requestBodySample = (String) requestSample;
+								} else if (requestSample instanceof Map) {
+									requestBodySample = objectMapper.writeValueAsString(requestSample);
 								} else if (requestSample != null) {
 									SimpleFilterProvider filters = new SimpleFilterProvider();
 									filters.addFilter("desensitizer",

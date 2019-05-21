@@ -49,18 +49,22 @@ public class ApiDocHelper {
 			}
 		}
 		if (apiDocMethod != null) {
-			Class<?>[] argTypes = apiDocMethod.getParameterTypes();
+			Type[] argTypes = apiDocMethod.getGenericParameterTypes();
 			Object[] args = new Object[argTypes.length];
 			for (int i = 0; i < argTypes.length; i++) {
-				Class<?> type = argTypes[i];
-				if (type.isPrimitive()) {
-					if (Number.class.isAssignableFrom(type))
-						args[i] = 0;
-					else if (type == Boolean.TYPE)
-						args[i] = false;
-					else if (type == Byte.TYPE)
-						args[i] = (byte) 0;
-				} else {
+				Type type = argTypes[i];
+				if (type instanceof Class) {
+					Class<?> cls = (Class<?>) type;
+					if (cls.isPrimitive()) {
+						if (Number.class.isAssignableFrom(cls))
+							args[i] = 0;
+						else if (type == Boolean.TYPE)
+							args[i] = false;
+						else if (type == Byte.TYPE)
+							args[i] = (byte) 0;
+					}
+				}
+				if (args[i] == null) {
 					args[i] = createSample(type);
 				}
 			}

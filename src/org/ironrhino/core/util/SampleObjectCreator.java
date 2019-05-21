@@ -18,9 +18,11 @@ import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -59,11 +61,13 @@ public class SampleObjectCreator {
 	public Object createSample(Type returnType) {
 		if (returnType instanceof ParameterizedType) {
 			ParameterizedType pt = (ParameterizedType) returnType;
-			if (!(pt.getRawType() instanceof Class) || pt.getActualTypeArguments().length != 1
-					|| !(pt.getActualTypeArguments()[0] instanceof Class))
+			Type[] actualTypeArguments = pt.getActualTypeArguments();
+			if (!(pt.getRawType() instanceof Class)
+					|| (actualTypeArguments.length != 1 && actualTypeArguments.length != 2)
+					|| !(actualTypeArguments[0] instanceof Class))
 				return null;
 			Class<?> raw = (Class<?>) pt.getRawType();
-			Class<?> clazz = (Class<?>) pt.getActualTypeArguments()[0];
+			Class<?> clazz = (Class<?>) actualTypeArguments[0];
 			if (Flux.class.isAssignableFrom(raw)) {
 				return Flux.just(createSample(clazz));
 			} else if (Mono.class.isAssignableFrom(raw)) {
@@ -75,6 +79,10 @@ public class SampleObjectCreator {
 				Set<Object> set = new HashSet<>();
 				set.add(createSample(clazz));
 				return set;
+			} else if (Map.class.isAssignableFrom(raw)) {
+				Map<Object, Object> map = new HashMap<>();
+				map.put(createSample(clazz), createSample((Class<?>) actualTypeArguments[1]));
+				return map;
 			} else if (Iterable.class.isAssignableFrom(raw)) {
 				List<Object> list = new ArrayList<>();
 				list.add(createSample(clazz));
