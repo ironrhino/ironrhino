@@ -1,8 +1,7 @@
 package org.ironrhino.batch.job;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -17,20 +16,20 @@ public class JobParameterHelperTest {
 	@Test
 	public void testParseString() {
 		List<SimpleJobParameter> parameters = JobParameterHelper.parse("");
-		assertTrue(parameters.isEmpty());
+		assertThat(parameters.isEmpty(), is(true));
 		parameters = JobParameterHelper.parse("key=value\n\n-key2(long)=12345");
-		assertEquals(2, parameters.size());
-		assertEquals(ParameterType.STRING, parameters.get(0).getType());
-		assertTrue(parameters.get(0).isRequired());
-		assertEquals(ParameterType.LONG, parameters.get(1).getType());
-		assertFalse(parameters.get(1).isRequired());
+		assertThat(parameters.size(), is(2));
+		assertThat(parameters.get(0).getType(), is(ParameterType.STRING));
+		assertThat(parameters.get(0).isRequired(), is(true));
+		assertThat(parameters.get(1).getType(), is(ParameterType.LONG));
+		assertThat(parameters.get(1).isRequired(), is(false));
 	}
 
 	@Test
 	public void testJobParametersValidator() {
 		List<SimpleJobParameter> parameters = JobParameterHelper.parse(paramJobParameters -> {
 		});
-		assertTrue(parameters.isEmpty());
+		assertThat(parameters.isEmpty(), is(true));
 		SimpleJobParametersValidator sjpv = new SimpleJobParametersValidator();
 		Map<String, ParameterType> requiredKeys = new LinkedHashMap<>();
 		requiredKeys.put("key", ParameterType.STRING);
@@ -39,20 +38,20 @@ public class JobParameterHelperTest {
 		sjpv.setRequiredKeys(requiredKeys);
 		sjpv.setOptionalKeys(optionalKeys);
 		parameters = JobParameterHelper.parse(sjpv);
-		assertEquals(2, parameters.size());
-		assertEquals(ParameterType.STRING, parameters.get(0).getType());
-		assertTrue(parameters.get(0).isRequired());
-		assertEquals(ParameterType.LONG, parameters.get(1).getType());
-		assertFalse(parameters.get(1).isRequired());
+		assertThat(parameters.size(), is(2));
+		assertThat(parameters.get(0).getType(), is(ParameterType.STRING));
+		assertThat(parameters.get(0).isRequired(), is(true));
+		assertThat(parameters.get(1).getType(), is(ParameterType.LONG));
+		assertThat(parameters.get(1).isRequired(), is(false));
 		DefaultJobParametersValidator djpv = new DefaultJobParametersValidator();
 		djpv.setRequiredKeys(new String[] { "key" });
 		djpv.setOptionalKeys(new String[] { "key2" });
 		parameters = JobParameterHelper.parse(sjpv);
-		assertEquals(2, parameters.size());
-		assertEquals(ParameterType.STRING, parameters.get(0).getType());
-		assertTrue(parameters.get(0).isRequired());
-		assertEquals(ParameterType.LONG, parameters.get(1).getType());
-		assertFalse(parameters.get(1).isRequired());
+		assertThat(parameters.size(), is(2));
+		assertThat(parameters.get(0).getType(), is(ParameterType.STRING));
+		assertThat(parameters.get(0).isRequired(), is(true));
+		assertThat(parameters.get(1).getType(), is(ParameterType.LONG));
+		assertThat(parameters.get(1).isRequired(), is(false));
 	}
 
 }

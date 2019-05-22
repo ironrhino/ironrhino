@@ -1,7 +1,7 @@
 package org.ironrhino.core.coordination.impl;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -50,7 +50,7 @@ public class RedisLockServiceTest {
 	public void testTryLockSuccessful() {
 		given(opsForValue.setIfAbsent("lock:key", holder(), lockService.getMaxHoldTime(), TimeUnit.SECONDS))
 				.willReturn(true);
-		assertTrue(lockService.tryLock("key"));
+		assertThat(lockService.tryLock("key"), is(true));
 	}
 
 	@Test
@@ -58,7 +58,7 @@ public class RedisLockServiceTest {
 		AppInfo.setContextPath(null);
 		given(opsForValue.setIfAbsent("lock:key", holder(), lockService.getMaxHoldTime(), TimeUnit.SECONDS))
 				.willReturn(false);
-		assertFalse(lockService.tryLock("key"));
+		assertThat(lockService.tryLock("key"), is(false));
 	}
 
 	@Test
@@ -67,7 +67,7 @@ public class RedisLockServiceTest {
 				.willReturn(false);
 		given(stringRedisTemplate.getExpire("lock:key", TimeUnit.SECONDS))
 				.willReturn(lockService.getMaxHoldTime() - lockService.getSuspiciousHoldTime() + 10L);
-		assertFalse(lockService.tryLock("key"));
+		assertThat(lockService.tryLock("key"), is(false));
 	}
 
 	@Test
@@ -84,7 +84,7 @@ public class RedisLockServiceTest {
 							.willReturn(true);
 					return 1L;
 				});
-		assertTrue(lockService.tryLock("key"));
+		assertThat(lockService.tryLock("key"), is(true));
 	}
 
 	@Test

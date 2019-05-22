@@ -1,8 +1,8 @@
 package org.ironrhino.rest.client;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -43,18 +43,18 @@ public class RestApiTests {
 
 	@Test
 	public void testGetAndPatch() {
-		assertEquals("admin", userClient.self().getUsername());
-		assertTrue(userClient.all().size() > 0);
+		assertThat(userClient.self().getUsername(), is("admin"));
+		assertThat(userClient.all().size() > 0, is(true));
 		ResultPage<User> page = userClient.paged(1, 1);
-		assertEquals(1, page.getPageNo());
-		assertEquals(1, page.getPageSize());
-		assertEquals(1, page.getResult().size());
-		assertEquals("admin", userClient.get("admin").getUsername());
+		assertThat(page.getPageNo(), is(1));
+		assertThat(page.getPageSize(), is(1));
+		assertThat(page.getResult().size(), is(1));
+		assertThat(userClient.get("admin").getUsername(), is("admin"));
 		User u = new User();
 		String newName = "admin" + new Random().nextInt(1000);
 		u.setName(newName);
 		userClient.patch(u);
-		assertEquals(newName, userClient.self().getName());
+		assertThat(userClient.self().getName(), is(newName));
 	}
 
 	@Test
@@ -63,7 +63,7 @@ public class RestApiTests {
 		article.setId(100);
 		article.setAuthor("测试");
 		article.setPublishDate(LocalDate.of(2000, 10, 12));
-		assertEquals(article, articleClient.postForm(article));
+		assertThat(articleClient.postForm(article), is(article));
 	}
 
 	@Test(expected = RestStatus.class)
@@ -73,7 +73,7 @@ public class RestApiTests {
 
 	@Test
 	public void testJsonPointer() {
-		assertEquals(1, userClient.pagedResult(1, 1).size());
+		assertThat(userClient.pagedResult(1, 1).size(), is(1));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -85,9 +85,9 @@ public class RestApiTests {
 	public void testValidatePassword() {
 		User u = new User();
 		u.setPassword("password");
-		assertEquals(RestStatus.OK, userClient.validatePassword(u));
+		assertThat(userClient.validatePassword(u), is(RestStatus.OK));
 		u.setPassword("password2");
-		assertEquals(RestStatus.CODE_FIELD_INVALID, userClient.validatePassword(u).getCode());
+		assertThat(userClient.validatePassword(u).getCode(), is(RestStatus.CODE_FIELD_INVALID));
 	}
 
 	@Test
@@ -98,9 +98,9 @@ public class RestApiTests {
 		} catch (RestStatus e) {
 			rs = e;
 		}
-		assertNotNull(rs);
-		assertEquals(rs.getCode(), RestStatus.CODE_NOT_FOUND);
-		assertTrue(rs.getCause() instanceof HttpClientErrorException);
+		assertThat(rs, is(notNullValue()));
+		assertThat(RestStatus.CODE_NOT_FOUND, is(rs.getCode()));
+		assertThat(rs.getCause() instanceof HttpClientErrorException, is(true));
 	}
 
 	@Test
@@ -108,25 +108,25 @@ public class RestApiTests {
 		InputStream is = userClient.getStream();
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
 			List<String> lines = br.lines().collect(Collectors.toList());
-			assertEquals(false, lines.isEmpty());
+			assertThat(lines.isEmpty(), is(false));
 		}
 	}
 
 	@Test
 	public void testPostStream() {
-		assertEquals("test", uploadClient.upload(new ByteArrayInputStream("test".getBytes())));
+		assertThat(uploadClient.upload(new ByteArrayInputStream("test".getBytes())), is("test"));
 	}
 
 	@Test
 	public void testPostByteArray() {
-		assertEquals("test", uploadClient.upload("test".getBytes()));
+		assertThat(uploadClient.upload("test".getBytes()), is("test"));
 	}
 
 	@Test
 	public void testUpload() throws IOException {
 		Map<String, String> result = uploadClient.upload("test", new File("build.xml"));
-		assertEquals("test", result.get("name"));
-		assertEquals("build.xml", result.get("originalFilename"));
+		assertThat(result.get("name"), is("test"));
+		assertThat(result.get("originalFilename"), is("build.xml"));
 	}
 
 }

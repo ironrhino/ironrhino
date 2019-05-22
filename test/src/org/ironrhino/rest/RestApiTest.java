@@ -1,10 +1,9 @@
 package org.ironrhino.rest;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.ironrhino.rest.MockMvcResultMatchers.jsonPoint;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.spy;
@@ -66,33 +65,33 @@ public class RestApiTest {
 	@Test
 	public void testGet() {
 		Article article = articleClient.view(1);
-		assertSame(1, article.getId());
-		assertEquals("Author1", article.getAuthor());
-		assertNotNull(article.getPublishDate());
+		assertThat(article.getId(), is(1));
+		assertThat(article.getAuthor(), is("Author1"));
+		assertThat(article.getPublishDate(), is(notNullValue()));
 	}
 
 	@Test
 	public void testReturnCollection() {
 		Collection<Article> articles = articleClient.list();
-		assertEquals(10, articles.size());
+		assertThat(articles.size(), is(10));
 		int i = 1;
 		for (Article article : articles) {
-			assertSame(i, article.getId());
-			assertEquals("Title" + i, article.getTitle());
-			assertEquals("Author" + (i++), article.getAuthor());
+			assertThat(article.getId(), is(i));
+			assertThat(article.getTitle(), is("Title" + i));
+			assertThat(article.getAuthor(), is("Author" + (i++)));
 		}
 	}
 
 	@Test
 	public void testPostForm() {
-		assertEquals(new Article(), articleClient.postForm(null));
+		assertThat(articleClient.postForm(null), is(new Article()));
 		then(articleController).should().postForm(new Article());
 
 		Article article = new Article();
 		article.setId(1024);
 		article.setTitle("RestApi");
 		article.setPublishDate(LocalDate.of(2019, 2, 26));
-		assertEquals(article, articleClient.postForm(article));
+		assertThat(articleClient.postForm(article), is(article));
 	}
 
 	@Test
@@ -106,9 +105,9 @@ public class RestApiTest {
 		} catch (RestStatus restStatus) {
 			e = restStatus;
 		}
-		assertNotNull(e);
-		assertEquals(RestStatus.CODE_INTERNAL_SERVER_ERROR, e.getCode());
-		assertTrue(e.getCause() instanceof RuntimeException);
+		assertThat(e, is(notNullValue()));
+		assertThat(e.getCode(), is(RestStatus.CODE_INTERNAL_SERVER_ERROR));
+		assertThat(e.getCause() instanceof RuntimeException, is(true));
 		then(articleController).should().postForm(article);
 	}
 
@@ -120,28 +119,28 @@ public class RestApiTest {
 		} catch (RestStatus restStatus) {
 			e = restStatus;
 		}
-		assertNotNull(e);
-		assertEquals(RestStatus.CODE_NOT_FOUND, e.getCode());
-		assertTrue(e.getCause() instanceof HttpClientErrorException);
+		assertThat(e, is(notNullValue()));
+		assertThat(e.getCode(), is(RestStatus.CODE_NOT_FOUND));
+		assertThat(e.getCause() instanceof HttpClientErrorException, is(true));
 	}
 
 	@Test
 	public void testPostStream() {
-		assertEquals("test", uploadClient.upload(new ByteArrayInputStream("test".getBytes())));
+		assertThat(uploadClient.upload(new ByteArrayInputStream("test".getBytes())), is("test"));
 	}
 
 	@Test
 	public void testPostByteArray() {
-		assertEquals("test", uploadClient.upload("test".getBytes()));
+		assertThat(uploadClient.upload("test".getBytes()), is("test"));
 	}
 
 	@Test
 	@Ignore
 	public void testUpload() {
 		Map<String, String> result = uploadClient.upload("test", new File("build.xml"));
-		assertEquals("build", result.get("name"));
-		assertEquals("file", result.get("filename"));
-		assertEquals("build.xml", result.get("originalFileName"));
+		assertThat(result.get("name"), is("build"));
+		assertThat(result.get("filename"), is("file"));
+		assertThat(result.get("originalFileName"), is("build.xml"));
 	}
 
 	@Test

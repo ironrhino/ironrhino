@@ -1,9 +1,8 @@
 package org.ironrhino.core.jdbc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
@@ -64,29 +63,29 @@ public class JdbcRepositoryTest {
 		p.getRoles().add("test2");
 		personRepository.save(p);
 		Person p2 = personRepository.get(p.getName());
-		assertEquals(p, p2);
+		assertThat(p2, is(p));
 		List<Person> all = personRepository.list();
-		assertEquals(1, all.size());
-		assertEquals(p, all.get(0));
+		assertThat(all.size(), is(1));
+		assertThat(all.get(0), is(p));
 		List<Person> females = personRepository.listByGender(Gender.FEMALE);
-		assertEquals(1, females.size());
-		assertEquals(p, females.get(0));
+		assertThat(females.size(), is(1));
+		assertThat(females.get(0), is(p));
 		List<Person> result = personRepository.search("te");
-		assertEquals(1, result.size());
-		assertEquals(p, result.get(0));
-		assertEquals(1, personRepository.count());
-		assertEquals(1, personRepository.countByNamePrefix("te"));
-		assertEquals(1, personRepository.listNames().size());
-		assertEquals(1, personRepository.listGenders().size());
-		assertEquals(1, personRepository.listAges().size());
-		assertFalse(personRepository.updateAmount("test", new BigDecimal("11.00"), new BigDecimal("120.00")));
-		assertTrue(personRepository.updateAmount("test", new BigDecimal("12.00"), new BigDecimal("120.00")));
+		assertThat(result.size(), is(1));
+		assertThat(result.get(0), is(p));
+		assertThat(personRepository.count(), is(1L));
+		assertThat(personRepository.countByNamePrefix("te"), is(1));
+		assertThat(personRepository.listNames().size(), is(1));
+		assertThat(personRepository.listGenders().size(), is(1));
+		assertThat(personRepository.listAges().size(), is(1));
+		assertThat(personRepository.updateAmount("test", new BigDecimal("11.00"), new BigDecimal("120.00")), is(false));
+		assertThat(personRepository.updateAmount("test", new BigDecimal("12.00"), new BigDecimal("120.00")), is(true));
 		Person p3 = personRepository.get("test");
-		assertEquals(new BigDecimal("120.00"), p3.getAmount());
+		assertThat(p3.getAmount(), is(new BigDecimal("120.00")));
 		int rows = personRepository.delete("test");
-		assertEquals(1, rows);
+		assertThat(rows, is(1));
 		all = personRepository.list();
-		assertTrue(all.isEmpty());
+		assertThat(all.isEmpty(), is(true));
 	}
 
 	@Test
@@ -100,11 +99,11 @@ public class JdbcRepositoryTest {
 		p.setAmount(new BigDecimal("12.00"));
 		personRepository.save(p);
 		p = personRepository.getAndChangeAge(p.getName(), 0);
-		assertEquals("test", p.getName());
-		assertEquals(0, p.getAge());
+		assertThat(p.getName(), is("test"));
+		assertThat(p.getAge(), is(0));
 		p = personRepository.getAndChangeGender(p.getName(), Gender.MALE);
-		assertEquals("test", p.getName());
-		assertEquals(Gender.MALE, p.getGender());
+		assertThat(p.getName(), is("test"));
+		assertThat(p.getGender(), is(Gender.MALE));
 	}
 
 	@Test
@@ -122,14 +121,14 @@ public class JdbcRepositoryTest {
 		personRepository.save(p);
 		p.setName("test3");
 		personRepository.save(p);
-		assertEquals(0, personRepository.getByNames(new String[] { "test" }).size());
-		assertEquals(1, personRepository.getByNames(new String[] { "test1" }).size());
-		assertEquals(2, personRepository.getByNames(new String[] { "test1", "test2" }).size());
-		assertEquals(2, personRepository.getByNames(new String[] { "test1", "test2", "test" }).size());
-		assertEquals(3, personRepository.getByNames(new String[] { "test1", "test2", "test3" }).size());
-		assertEquals(1, personRepository.getByGenders(EnumSet.of(Gender.FEMALE)).size());
-		assertEquals(2, personRepository.getByGenders(EnumSet.of(Gender.MALE)).size());
-		assertEquals(3, personRepository.getByGenders(EnumSet.of(Gender.FEMALE, Gender.MALE)).size());
+		assertThat(personRepository.getByNames(new String[] { "test" }).size(), is(0));
+		assertThat(personRepository.getByNames(new String[] { "test1" }).size(), is(1));
+		assertThat(personRepository.getByNames(new String[] { "test1", "test2" }).size(), is(2));
+		assertThat(personRepository.getByNames(new String[] { "test1", "test2", "test" }).size(), is(2));
+		assertThat(personRepository.getByNames(new String[] { "test1", "test2", "test3" }).size(), is(3));
+		assertThat(personRepository.getByGenders(EnumSet.of(Gender.FEMALE)).size(), is(1));
+		assertThat(personRepository.getByGenders(EnumSet.of(Gender.MALE)).size(), is(2));
+		assertThat(personRepository.getByGenders(EnumSet.of(Gender.FEMALE, Gender.MALE)).size(), is(3));
 	}
 
 	@Test
@@ -147,11 +146,11 @@ public class JdbcRepositoryTest {
 		personRepository.save(p);
 		p.setName("test3");
 		personRepository.save(p);
-		assertEquals(3, personRepository.searchByNameOrGender(null, null).size());
-		assertEquals(1, personRepository.searchByNameOrGender("test1", null).size());
-		assertEquals(1, personRepository.searchByNameOrGender("test1", Gender.FEMALE).size());
-		assertEquals(0, personRepository.searchByNameOrGender("test1", Gender.MALE).size());
-		assertEquals(2, personRepository.searchByNameOrGender(null, Gender.MALE).size());
+		assertThat(personRepository.searchByNameOrGender(null, null).size(), is(3));
+		assertThat(personRepository.searchByNameOrGender("test1", null).size(), is(1));
+		assertThat(personRepository.searchByNameOrGender("test1", Gender.FEMALE).size(), is(1));
+		assertThat(personRepository.searchByNameOrGender("test1", Gender.MALE).size(), is(0));
+		assertThat(personRepository.searchByNameOrGender(null, Gender.MALE).size(), is(2));
 	}
 
 	@Test
@@ -165,12 +164,12 @@ public class JdbcRepositoryTest {
 		p.setAmount(new BigDecimal("12.00"));
 		personRepository.save(p);
 		Person p2 = personRepository.getWithShadow(p.getName());
-		assertNotNull(p2.getShadow());
-		assertEquals(p2.getName(), p2.getShadow().getName());
-		assertEquals(p2.getGender(), p2.getShadow().getGender());
-		assertEquals(p2.getDob(), p2.getShadow().getDob());
-		assertEquals(p2.getAge(), p2.getShadow().getAge());
-		assertEquals(p2.getAmount(), p2.getShadow().getAmount());
+		assertThat(p2.getShadow(), is(notNullValue()));
+		assertThat(p2.getShadow().getName(), is(p2.getName()));
+		assertThat(p2.getShadow().getGender(), is(p2.getGender()));
+		assertThat(p2.getShadow().getDob(), is(p2.getDob()));
+		assertThat(p2.getShadow().getAge(), is(p2.getAge()));
+		assertThat(p2.getShadow().getAmount(), is(p2.getAmount()));
 	}
 
 	@Test
@@ -188,17 +187,17 @@ public class JdbcRepositoryTest {
 		personRepository.save(p);
 		p.setName("test3");
 		personRepository.save(p);
-		assertEquals(3, personRepository.searchWithLimiting("test", Limiting.of(10)).size());
-		assertEquals(3, personRepository.searchWithLimiting("test", Limiting.of(3)).size());
-		assertEquals(2, personRepository.searchWithLimiting("test", Limiting.of(2)).size());
-		assertEquals(1, personRepository.searchWithLimiting("test", Limiting.of(1)).size());
-		assertEquals(0, personRepository.searchWithLimiting("test", Limiting.of(0)).size());
+		assertThat(personRepository.searchWithLimiting("test", Limiting.of(10)).size(), is(3));
+		assertThat(personRepository.searchWithLimiting("test", Limiting.of(3)).size(), is(3));
+		assertThat(personRepository.searchWithLimiting("test", Limiting.of(2)).size(), is(2));
+		assertThat(personRepository.searchWithLimiting("test", Limiting.of(1)).size(), is(1));
+		assertThat(personRepository.searchWithLimiting("test", Limiting.of(0)).size(), is(0));
 		List<Person> list = personRepository.searchWithLimiting("test", Limiting.of(1, 2));
-		assertEquals(2, list.size());
-		assertEquals("test2", list.get(0).getName());
+		assertThat(list.size(), is(2));
+		assertThat(list.get(0).getName(), is("test2"));
 		list = personRepository.searchWithLimiting("test", Limiting.of(2, 2));
-		assertEquals(1, list.size());
-		assertEquals("test3", list.get(0).getName());
+		assertThat(list.size(), is(1));
+		assertThat(list.get(0).getName(), is("test3"));
 	}
 
 	@Test
@@ -209,7 +208,7 @@ public class JdbcRepositoryTest {
 			Dog dog = new Dog();
 			dog.setName("dog" + i);
 			dogRepository.save(dog);
-			assertEquals(Integer.valueOf(i + 1), dog.getId());
+			assertThat(dog.getId(), is(Integer.valueOf(i + 1)));
 		}
 		for (int i = 0; i < size; i++) {
 			Dog dog = new Dog();
@@ -217,10 +216,10 @@ public class JdbcRepositoryTest {
 			dogRepository.insert(dog.getName(), id -> {
 				dog.setId(id);
 			});
-			assertEquals(Integer.valueOf(size + i + 1), dog.getId());
+			assertThat(dog.getId(), is(Integer.valueOf(size + i + 1)));
 		}
 		for (int i = 0; i < size * 2; i++) {
-			assertTrue(dogRepository.delete(i + 1));
+			assertThat(dogRepository.delete(i + 1), is(true));
 		}
 		dogRepository.dropTable();
 	}
@@ -242,9 +241,9 @@ public class JdbcRepositoryTest {
 		p.getRoles().add("test2");
 		personRepository.save(p);
 		Optional<Person> optional = personRepository.getOptional(p.getName());
-		assertTrue(optional.isPresent());
-		assertEquals(p, optional.get());
-		assertFalse(personRepository.getOptional("notexists").isPresent());
+		assertThat(optional.isPresent(), is(true));
+		assertThat(optional.get(), is(p));
+		assertThat(personRepository.getOptional("notexists").isPresent(), is(false));
 	}
 
 	@Test
@@ -269,7 +268,7 @@ public class JdbcRepositoryTest {
 				count.incrementAndGet();
 			}
 		});
-		assertEquals(2, count.get());
+		assertThat(count.get(), is(2));
 	}
 
 }

@@ -1,7 +1,7 @@
 package org.ironrhino.core.dataroute;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -38,7 +38,7 @@ public class RoutingDataSourceTest {
 			Pet p = new Pet();
 			p.setName(name);
 			petRepository.save(p);
-			assertEquals(p, petRepository.get(name));
+			assertThat(petRepository.get(name), is(p));
 			verify(name);
 		}
 	}
@@ -49,7 +49,7 @@ public class RoutingDataSourceTest {
 		for (int i = 0; i < 10; i++) {
 			petRepository.saveOwnership(name, "owner");
 		}
-		assertEquals(10, petRepository.findOwnership("owner").size());
+		assertThat(petRepository.findOwnership("owner").size(), is(10));
 		verifyOwnership("owner");
 	}
 
@@ -60,13 +60,13 @@ public class RoutingDataSourceTest {
 				PreparedStatement stmt = conn.prepareStatement("select * from pet where name = ?")) {
 			stmt.setString(1, name);
 			try (ResultSet rs = stmt.executeQuery()) {
-				assertTrue(name + " doesn't exists in " + ds, rs.next());
+				assertThat(name + " doesn't exists in " + ds, rs.next(), is(true));
 			}
 		}
 		Long count = shardingsTemplateHolder.route(name).jdbc.queryForObject("select count(*) from pet where name = ?",
 				Long.class, name);
 		boolean exists = count != null && count > 0;
-		assertTrue(name + " doesn't exists", exists);
+		assertThat(name + " doesn't exists", exists, is(true));
 	}
 
 	private void verifyOwnership(String owner) throws SQLException {
@@ -75,8 +75,8 @@ public class RoutingDataSourceTest {
 				PreparedStatement stmt = conn.prepareStatement("select count(*) from ownership where owner = ?")) {
 			stmt.setString(1, owner);
 			try (ResultSet rs = stmt.executeQuery()) {
-				assertTrue("owner doesn't exists in " + ds, rs.next());
-				assertEquals("owner doesn't exists in " + ds, 10, rs.getLong(1));
+				assertThat("owner doesn't exists in " + ds, rs.next(), is(true));
+				assertThat("owner doesn't exists in " + ds, rs.getLong(1), is(10L));
 			}
 		}
 	}

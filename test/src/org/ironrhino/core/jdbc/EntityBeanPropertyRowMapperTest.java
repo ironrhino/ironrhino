@@ -1,6 +1,7 @@
 package org.ironrhino.core.jdbc;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Date;
 
@@ -32,8 +33,8 @@ public class EntityBeanPropertyRowMapperTest {
 	@Test
 	public void test() {
 		EntityBeanPropertyRowMapper<Person> mapper = new EntityBeanPropertyRowMapper<>(Person.class);
-		assertEquals("date_of_birth", mapper.underscoreName("dateOfBirth"));
-		assertEquals("g2", mapper.underscoreName("grade2"));
+		assertThat(mapper.underscoreName("dateOfBirth"), is("date_of_birth"));
+		assertThat(mapper.underscoreName("grade2"), is("g2"));
 	}
 
 }

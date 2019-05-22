@@ -1,6 +1,7 @@
 package org.ironrhino.core.freemarker;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -29,12 +30,12 @@ public class FreemarkerTemplateTest {
 		Map<String, String> map = new HashMap<>();
 		map.put("size", "size");
 		Map<String, Object> dataModel = Collections.singletonMap("map", map);
-		assertEquals("false false", render(template0, dataModel));
-		assertEquals("size", render(template1, dataModel));
-		assertEquals("size", render(template2, dataModel));
-		assertEquals("size", render(template3, dataModel));
-		assertEquals("size", render(template4, dataModel));
-		assertEquals("String String", render(template5, dataModel));
+		assertThat(render(template0, dataModel), is("false false"));
+		assertThat(render(template1, dataModel), is("size"));
+		assertThat(render(template2, dataModel), is("size"));
+		assertThat(render(template3, dataModel), is("size"));
+		assertThat(render(template4, dataModel), is("size"));
+		assertThat(render(template5, dataModel), is("String String"));
 	}
 
 	@Test
@@ -43,15 +44,15 @@ public class FreemarkerTemplateTest {
 		String template2 = "${statics['org.ironrhino.core.metadata.Scope'].LOCAL.name()}";
 		Date today = new Date();
 		Map<String, Object> dataModel = Collections.singletonMap("today", today);
-		assertEquals(DateUtils.formatDate8(today), render(template1, dataModel));
-		assertEquals(Scope.LOCAL.name(), render(template2, dataModel));
+		assertThat(render(template1, dataModel), is(DateUtils.formatDate8(today)));
+		assertThat(render(template2, dataModel), is(Scope.LOCAL.name()));
 	}
 
 	@Test
 	public void testConstants() throws Exception {
 		String template = "${constants['org.ironrhino.core.metadata.Scope.LOCAL'].name()}";
 		Map<String, Object> dataModel = Collections.emptyMap();
-		assertEquals(Scope.LOCAL.name(), render(template, dataModel));
+		assertThat(render(template, dataModel), is(Scope.LOCAL.name()));
 	}
 
 	static String render(String template, Object dataModel) throws Exception {
