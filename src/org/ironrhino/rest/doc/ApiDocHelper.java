@@ -71,7 +71,8 @@ public class ApiDocHelper {
 			Object obj;
 			try {
 				obj = apiDocMethod.invoke(apiDocClazz.getConstructor().newInstance(), args);
-			} catch (InvocationTargetException | IllegalArgumentException | NoSuchMethodException e) {
+			} catch (InvocationTargetException | NoSuchMethodException | IllegalArgumentException
+					| NullPointerException e) {
 				obj = null;
 			}
 			if (obj == null) {
