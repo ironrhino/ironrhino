@@ -4,6 +4,7 @@ import java.beans.PropertyDescriptor;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
+import java.lang.reflect.ParameterizedType;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.sql.Time;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -676,6 +678,34 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 					}
 					bw.setPropertyValue(propertyName, value);
+				} else if (Collection.class.isAssignableFrom(type)) {
+					Collection oldValue = (Collection) bw.getPropertyValue(propertyName);
+					Collection newValue = List.class.isAssignableFrom(type) ? new ArrayList() : new LinkedHashSet();
+					Class subtype = (Class<?>) ((ParameterizedType) bw.getPropertyDescriptor(propertyName)
+							.getReadMethod().getGenericReturnType()).getActualTypeArguments()[0];
+					if (Persistable.class.isAssignableFrom(subtype)) {
+						BaseManager em = getEntityManager(subtype);
+						try {
+							for (String id : parameterValue.split(",")) {
+								BeanWrapperImpl bwt = new BeanWrapperImpl(subtype.getConstructor().newInstance());
+								bwt.setPropertyValue("id", id);
+								Object item = em.get((Serializable) bwt.getPropertyValue("id"));
+								if (item == null)
+									item = em.findOne(parameterValue);
+								if (item != null)
+									newValue.add(item);
+							}
+						} catch (Exception e) {
+						}
+						if (oldValue == null) {
+							bw.setPropertyValue(propertyName, newValue);
+						} else {
+							oldValue.clear();
+							oldValue.addAll(newValue);
+						}
+					} else {
+						bw.setPropertyValue(propertyName, parameterValue);
+					}
 				} else {
 					bw.setPropertyValue(propertyName, parameterValue);
 				}
