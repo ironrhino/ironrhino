@@ -39148,20 +39148,34 @@ Observation._richtable = function(container) {
 					$(':input', td).clone().appendTo(td).css('margin-left',
 							'10px');
 				_observe(td);
-			} else if (size < 0 && 'select' == option.data('type')) {
-				var map = option.data('map');
-				if (map.indexOf('{') == 0)
-					map = map.substring(1, map.length - 1);
-				map = map.split(/,\s*/);
-				for (var i = 0; i < map.length; i++) {
-					var arr = map[i].split('=', 2);
-					var cbid = '-filter-' + property.val() + '-' + i;
-					$('<label for="'
-							+ cbid
-							+ '" class="checkbox inline"><input type="checkbox" name="'
-							+ property.val() + '" value="' + arr[0] + '" id="'
-							+ cbid + '">' + (arr[1] || arr[0]) + '</label>')
-							.appendTo(td);
+			} else {
+				if ('select' == option.data('type')) {
+					var map = option.data('map');
+					if (map.indexOf('{') == 0)
+						map = map.substring(1, map.length - 1);
+					map = map.split(/,\s*/);
+					for (var i = 0; i < map.length; i++) {
+						var arr = map[i].split('=', 2);
+						var cbid = '-filter-' + property.val() + '-' + i;
+						$('<label for="'
+								+ cbid
+								+ '" class="checkbox inline"><input type="checkbox" name="'
+								+ property.val() + '" value="' + arr[0]
+								+ '" id="' + cbid + '">' + (arr[1] || arr[0])
+								+ '</label>').appendTo(td);
+					}
+				} else if ('listpick' == option.data('type')
+						|| 'treeselect' == option.data('type')) {
+					var type = option.data('type');
+					$('<div class="' + type
+							+ ' removeonadd" data-options="{\'url\':\''
+							+ option.data('pickurl')
+							+ '\',\'multiple\':true}"><input class="' + type
+							+ '-id required" type="hidden" name="'
+							+ property.val()
+							+ '" class="required"/><div class="' + type
+							+ '-name input-pseudo"></div></div>').appendTo(td);
+					_observe(td);
 				}
 			}
 		});
