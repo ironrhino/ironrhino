@@ -237,7 +237,8 @@ public class CriterionUtils {
 					else
 						operator = CriterionOperator.EQ;
 				}
-				if (operator == CriterionOperator.IN && parameterValues.length == 1) {
+				if ((operator == CriterionOperator.IN || operator == CriterionOperator.NOTIN)
+						&& parameterValues.length == 1) {
 					parameterValues = parameterValues[0].split(",");
 				}
 				if (parameterValues.length < operator.getParametersSize())
