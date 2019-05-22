@@ -3,7 +3,6 @@ package org.ironrhino.rest.doc;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
@@ -71,8 +70,7 @@ public class ApiDocHelper {
 			Object obj;
 			try {
 				obj = apiDocMethod.invoke(apiDocClazz.getConstructor().newInstance(), args);
-			} catch (InvocationTargetException | NoSuchMethodException | IllegalArgumentException
-					| NullPointerException e) {
+			} catch (Exception e) {
 				obj = null;
 			}
 			if (obj == null) {
