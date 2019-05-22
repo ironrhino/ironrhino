@@ -237,7 +237,9 @@ public class CriterionUtils {
 					else
 						operator = CriterionOperator.EQ;
 				}
-
+				if (operator == CriterionOperator.IN && parameterValues.length == 1) {
+					parameterValues = parameterValues[0].split(",");
+				}
 				if (parameterValues.length < operator.getParametersSize())
 					continue;
 				Type type = config.getGenericPropertyType();
@@ -334,20 +336,21 @@ public class CriterionUtils {
 							if (parameterValues.length > 0)
 								subBeanWrapper.setPropertyValue("id", parameterValues[0]);
 							if (collectionType == null) {
-								Persistable<?> p = null;
-								if (parameterValues.length > 0) {
-									p = em.get((Serializable) subBeanWrapper.getPropertyValue("id"));
-									if (p == null) {
+								Object[] ps = new Persistable<?>[parameterValues.length];
+								for (int i = 0; i < ps.length; i++) {
+									subBeanWrapper.setPropertyValue("id", parameterValues[i]);
+									ps[i] = em.get((Serializable) subBeanWrapper.getPropertyValue("id"));
+									if (ps[i] == null) {
 										Map<String, NaturalId> naturalIds = AnnotationUtils
 												.getAnnotatedPropertyNameAndAnnotations(enClass, NaturalId.class);
 										if (naturalIds.size() == 1) {
 											String name = naturalIds.entrySet().iterator().next().getKey();
 											if (parameterValues.length > 0)
-												subBeanWrapper.setPropertyValue(name, parameterValues[0]);
-											p = em.findOne((Serializable) subBeanWrapper.getPropertyValue(name));
+												subBeanWrapper.setPropertyValue(name, parameterValues[i]);
+											ps[i] = em.findOne((Serializable) subBeanWrapper.getPropertyValue(name));
 										}
 									}
-									if (p == null) {
+									if (ps[i] == null) {
 										dc.add(Restrictions.isNull("id"));
 										// return empty result set
 										break;
@@ -378,7 +381,7 @@ public class CriterionUtils {
 									}
 									continue;
 								}
-								Criterion criterion = operator.operator(propertyName, type, p);
+								Criterion criterion = operator.operator(propertyName, type, ps);
 								if (criterion != null) {
 									dc.add(criterion);
 									state.getCriteria().add(propertyName);

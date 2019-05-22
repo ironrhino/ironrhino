@@ -87,6 +87,7 @@ public class AnnotationShadows {
 		private boolean showSum;
 		private MatchMode queryMatchMode = MatchMode.ANYWHERE;
 		private boolean queryWithRange;
+		private boolean queryWithMultiplePick;
 
 		public UiConfigImpl(String propertyName, Type genericPropertyType, UiConfig config) {
 			this.genericPropertyType = genericPropertyType;
@@ -173,6 +174,8 @@ public class AnnotationShadows {
 					|| Number.class.isAssignableFrom(ClassUtils.primitiveToWrapper(propertyType))
 					|| Date.class.isAssignableFrom(propertyType) || Temporal.class.isAssignableFrom(propertyType))
 				this.queryWithRange = config.queryWithRange();
+			if (Persistable.class.isAssignableFrom(propertyType))
+				this.queryWithMultiplePick = config.queryWithMultiplePick();
 		}
 
 		public void setRequired(boolean required) {

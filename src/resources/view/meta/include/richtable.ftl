@@ -486,6 +486,9 @@ ${formFooter!}
 		<#if config.multiple>
 			<@s.hidden name=key+'-op' value="CONTAINS"/>
 		</#if>
+		<#if config.queryWithMultiplePick>
+			<@s.hidden name=key+'-op' value="IN"/>
+		</#if>
 		<#if config.type=='checkbox'>
 			<@s.select disabled=disabled id=id label=label name=key value=value! class=cssClass list={'true':getText('true'),'false':getText('false')} headerKey="" headerValue="" dynamicAttributes=dynamicAttributes/>
 		<#elseif config.type=='enum'>
@@ -499,7 +502,7 @@ ${formFooter!}
 		<#elseif (config.type=='listpick' || config.type=='treeselect') && !disabled>
 			<div id="control-group-${id}" class="control-group"<#if group?has_content> data-group="${group}"</#if>>
 				<@controlLabel label=label description=description for=id/>
-				<div class="controls ${config.type}" data-options="{'url':'<@url value=pickUrl/>'}">
+				<div class="controls ${config.type}" data-options="{'url':'<@url value=pickUrl/>'<#if config.queryWithMultiplePick>,'multiple':true</#if>}">
 				<@s.hidden id=id name=key class=config.type+"-id ${cssClass}" dynamicAttributes=dynamicAttributes/>
 				<div class="${config.type}-name input-pseudo"></div>
 				</div>

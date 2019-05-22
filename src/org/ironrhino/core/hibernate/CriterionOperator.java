@@ -399,7 +399,8 @@ public enum CriterionOperator implements Displayable {
 	IN(-1) {
 		@Override
 		boolean supports(Type type) {
-			return type instanceof Class && ((Class<?>) type).isEnum();
+			return type instanceof Class && Persistable.class.isAssignableFrom((Class<?>) type)
+					|| type instanceof Class && ((Class<?>) type).isEnum();
 		}
 
 		@Override

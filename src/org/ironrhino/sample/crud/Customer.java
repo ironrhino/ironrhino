@@ -108,7 +108,7 @@ public class Customer extends BaseRecordableEntity {
 	private Long[] activeRegions;
 
 	@SearchableComponent(nestSearchableProperties = "name")
-	@UiConfig(width = "120px", pickUrl = "/sample/company/pick?columns=name,type&creatable=true&editable=true", description = "company.description")
+	@UiConfig(width = "120px", pickUrl = "/sample/company/pick?columns=name,type&creatable=true&editable=true", description = "company.description", queryWithMultiplePick = true)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "company")
 	private Company company;

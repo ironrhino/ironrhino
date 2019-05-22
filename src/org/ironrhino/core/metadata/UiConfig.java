@@ -105,4 +105,6 @@ public @interface UiConfig {
 
 	boolean queryWithRange() default false;
 
+	boolean queryWithMultiplePick() default false;
+
 }
