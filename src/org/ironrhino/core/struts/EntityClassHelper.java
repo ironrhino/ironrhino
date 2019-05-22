@@ -465,22 +465,6 @@ public class EntityClassHelper {
 						if (TypeUtils.isIntegralNumeric(returnType)) {
 							uci.setInputType("number");
 							uci.addCssClass((returnType == Long.TYPE || returnType == Long.class) ? "long" : "integer");
-							Min min = findAnnotation(readMethod, declaredField, Min.class);
-							if (min != null)
-								uci.getInternalDynamicAttributes().put("min", String.valueOf(min.value()));
-							Max max = findAnnotation(readMethod, declaredField, Max.class);
-							if (max != null)
-								uci.getInternalDynamicAttributes().put("max", String.valueOf(max.value()));
-							if (HIBERNATE_VALIDATOR_PRESENT) {
-								org.hibernate.validator.constraints.Range range = findAnnotation(readMethod,
-										declaredField, org.hibernate.validator.constraints.Range.class);
-								if (range != null) {
-									if (range.min() != 0)
-										uci.getInternalDynamicAttributes().put("min", String.valueOf(range.min()));
-									if (range.max() != Integer.MAX_VALUE)
-										uci.getInternalDynamicAttributes().put("max", String.valueOf(range.max()));
-								}
-							}
 						} else if (TypeUtils.isDecimalNumeric(returnType)) {
 							uci.setInputType("number");
 							uci.addCssClass("double");
@@ -494,12 +478,6 @@ public class EntityClassHelper {
 							step.append("1");
 							uci.getInternalDynamicAttributes().put("step", step.toString());
 							uci.getInternalDynamicAttributes().put("data-scale", String.valueOf(scale));
-							DecimalMin min = findAnnotation(readMethod, declaredField, DecimalMin.class);
-							if (min != null)
-								uci.getInternalDynamicAttributes().put("min", min.value());
-							DecimalMax max = findAnnotation(readMethod, declaredField, DecimalMax.class);
-							if (max != null)
-								uci.getInternalDynamicAttributes().put("max", max.value());
 							if (StringUtils.isBlank(uci.getTemplate())) {
 								StringBuilder template = new StringBuilder(scale + 40);
 								template.append("<#if value?is_number>${value?string('");
@@ -531,6 +509,28 @@ public class EntityClassHelper {
 								uci.getInternalDynamicAttributes().put("min", "0.01");
 							if (cssClasses.contains("zero"))
 								uci.getInternalDynamicAttributes().put("min", "0");
+						}
+						Min min = findAnnotation(readMethod, declaredField, Min.class);
+						if (min != null)
+							uci.getInternalDynamicAttributes().put("min", String.valueOf(min.value()));
+						Max max = findAnnotation(readMethod, declaredField, Max.class);
+						if (max != null)
+							uci.getInternalDynamicAttributes().put("max", String.valueOf(max.value()));
+						DecimalMin decimalMin = findAnnotation(readMethod, declaredField, DecimalMin.class);
+						if (decimalMin != null)
+							uci.getInternalDynamicAttributes().put("min", decimalMin.value());
+						DecimalMax decimalMax = findAnnotation(readMethod, declaredField, DecimalMax.class);
+						if (decimalMax != null)
+							uci.getInternalDynamicAttributes().put("max", decimalMax.value());
+						if (HIBERNATE_VALIDATOR_PRESENT) {
+							org.hibernate.validator.constraints.Range range = findAnnotation(readMethod, declaredField,
+									org.hibernate.validator.constraints.Range.class);
+							if (range != null) {
+								if (range.min() != 0)
+									uci.getInternalDynamicAttributes().put("min", String.valueOf(range.min()));
+								if (range.max() != Integer.MAX_VALUE)
+									uci.getInternalDynamicAttributes().put("max", String.valueOf(range.max()));
+							}
 						}
 					} else if (Date.class.isAssignableFrom(returnType)
 							|| java.time.temporal.Temporal.class.isAssignableFrom(returnType)) {
