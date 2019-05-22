@@ -1,9 +1,8 @@
 package org.ironrhino.core.cache;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,35 +23,35 @@ public abstract class CacheManagerTestBase {
 		String key = "key";
 		Object value = "value";
 		cacheManager.put(key, value, 2, TimeUnit.SECONDS, NAMESPACE);
-		assertTrue(cacheManager.exists(key, NAMESPACE));
-		assertEquals(value, cacheManager.get(key, NAMESPACE));
+		assertThat(cacheManager.exists(key, NAMESPACE), is(true));
+		assertThat(cacheManager.get(key, NAMESPACE), is(value));
 		try {
 			TimeUnit.MILLISECONDS.sleep(2100);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		assertNull(cacheManager.get(key, NAMESPACE));
-		assertFalse(cacheManager.exists(key, NAMESPACE));
+		assertThat(cacheManager.get(key, NAMESPACE), is(nullValue()));
+		assertThat(cacheManager.exists(key, NAMESPACE), is(false));
 		cacheManager.put(key, value, 2, TimeUnit.SECONDS, NAMESPACE);
-		assertTrue(cacheManager.exists(key, NAMESPACE));
-		assertEquals(value, cacheManager.get(key, NAMESPACE));
+		assertThat(cacheManager.exists(key, NAMESPACE), is(true));
+		assertThat(cacheManager.get(key, NAMESPACE), is(value));
 		cacheManager.put(key, value, 3, TimeUnit.SECONDS, NAMESPACE);
 		try {
 			TimeUnit.SECONDS.sleep(2);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		assertEquals(value, cacheManager.get(key, NAMESPACE));
+		assertThat(cacheManager.get(key, NAMESPACE), is(value));
 		try {
 			TimeUnit.SECONDS.sleep(2);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		assertFalse(cacheManager.exists(key, NAMESPACE));
+		assertThat(cacheManager.exists(key, NAMESPACE), is(false));
 		cacheManager.put(key, value, 2, TimeUnit.SECONDS, NAMESPACE);
-		assertTrue(cacheManager.exists(key, NAMESPACE));
+		assertThat(cacheManager.exists(key, NAMESPACE), is(true));
 		cacheManager.delete(key, NAMESPACE);
-		assertFalse(cacheManager.exists(key, NAMESPACE));
+		assertThat(cacheManager.exists(key, NAMESPACE), is(false));
 	}
 
 	@Test
@@ -61,16 +60,17 @@ public abstract class CacheManagerTestBase {
 		for (int i = 0; i < 10; i++)
 			map.put("test" + i, "value" + i);
 		cacheManager.mput(map, 2, TimeUnit.SECONDS, NAMESPACE);
-		assertEquals(map, cacheManager.mget(map.keySet(), NAMESPACE));
+		for (int i = 0; i < 10; i++)
+			assertThat(cacheManager.mget(map.keySet(), NAMESPACE).get("test" + i), is(map.get("test" + i)));
 		try {
 			TimeUnit.MILLISECONDS.sleep(2100);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		assertNull(cacheManager.mget(map.keySet(), NAMESPACE).get("test1"));
+		assertThat(cacheManager.mget(map.keySet(), NAMESPACE).get("test1"), is(nullValue()));
 		cacheManager.mput(map, 2, TimeUnit.SECONDS, NAMESPACE);
 		cacheManager.mdelete(map.keySet(), NAMESPACE);
-		assertNull(cacheManager.mget(map.keySet(), NAMESPACE).get("test2"));
+		assertThat(cacheManager.mget(map.keySet(), NAMESPACE).get("test2"), is(nullValue()));
 	}
 
 	@Test
@@ -78,13 +78,13 @@ public abstract class CacheManagerTestBase {
 		String key = "key";
 		Object value = "value";
 		try {
-			assertEquals(0, cacheManager.ttl(key, NAMESPACE));
+			assertThat(cacheManager.ttl(key, NAMESPACE), is(0L));
 		} catch (UnsupportedOperationException e) {
 
 		}
 		cacheManager.put(key, value, 2, TimeUnit.SECONDS, NAMESPACE);
 		if (cacheManager.supportsGetTtl())
-			assertTrue(cacheManager.ttl(key, NAMESPACE) > 1000);
+			assertThat(cacheManager.ttl(key, NAMESPACE) > 1000, is(true));
 		try {
 			TimeUnit.SECONDS.sleep(1);
 		} catch (InterruptedException e) {
@@ -93,40 +93,40 @@ public abstract class CacheManagerTestBase {
 		cacheManager.setTtl(key, NAMESPACE, 2, TimeUnit.SECONDS);
 		if (cacheManager.supportsTti()) {
 			cacheManager.putWithTti(key, value, 2, TimeUnit.SECONDS, NAMESPACE);
-			assertEquals(value, cacheManager.get(key, NAMESPACE));
+			assertThat(cacheManager.get(key, NAMESPACE), is(value));
 			for (int i = 0; i < 3; i++) {
 				try {
 					TimeUnit.SECONDS.sleep(1);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				assertEquals(value, cacheManager.get(key, NAMESPACE));
+				assertThat(cacheManager.get(key, NAMESPACE), is(value));
 			}
 			try {
 				TimeUnit.SECONDS.sleep(2);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			assertFalse(cacheManager.exists(key, NAMESPACE));
+			assertThat(cacheManager.exists(key, NAMESPACE), is(false));
 		} else if (cacheManager.supportsUpdateTtl()) {
 			try {
 				TimeUnit.SECONDS.sleep(1);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			assertEquals(value, cacheManager.getWithTti(key, NAMESPACE, 2, TimeUnit.SECONDS));
+			assertThat(cacheManager.getWithTti(key, NAMESPACE, 2, TimeUnit.SECONDS), is(value));
 			try {
 				TimeUnit.SECONDS.sleep(1);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			assertTrue(cacheManager.exists(key, NAMESPACE));
+			assertThat(cacheManager.exists(key, NAMESPACE), is(true));
 			try {
 				TimeUnit.MILLISECONDS.sleep(2100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			assertFalse(cacheManager.exists(key, NAMESPACE));
+			assertThat(cacheManager.exists(key, NAMESPACE), is(false));
 		}
 		cacheManager.delete(key, NAMESPACE);
 	}
@@ -135,44 +135,44 @@ public abstract class CacheManagerTestBase {
 	public void testAtomic() {
 		String key = "key";
 		Object value = "value";
-		assertTrue(cacheManager.putIfAbsent(key, value, 2, TimeUnit.SECONDS, NAMESPACE));
-		assertFalse(cacheManager.putIfAbsent(key, value, 2, TimeUnit.SECONDS, NAMESPACE));
+		assertThat(cacheManager.putIfAbsent(key, value, 2, TimeUnit.SECONDS, NAMESPACE), is(true));
+		assertThat(cacheManager.putIfAbsent(key, value, 2, TimeUnit.SECONDS, NAMESPACE), is(false));
 		try {
 			TimeUnit.MILLISECONDS.sleep(2100);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		assertTrue(cacheManager.putIfAbsent(key, value, 2, TimeUnit.SECONDS, NAMESPACE));
+		assertThat(cacheManager.putIfAbsent(key, value, 2, TimeUnit.SECONDS, NAMESPACE), is(true));
 		cacheManager.delete(key, NAMESPACE);
-		assertEquals(0, cacheManager.increment(key, 0, 2, TimeUnit.SECONDS, NAMESPACE));
-		assertEquals(2, cacheManager.increment(key, 2, 2, TimeUnit.SECONDS, NAMESPACE));
-		assertEquals(5, cacheManager.increment(key, 3, 2, TimeUnit.SECONDS, NAMESPACE));
-		assertEquals(4, cacheManager.decrement(key, 1, 2, TimeUnit.SECONDS, NAMESPACE));
+		assertThat(cacheManager.increment(key, 0, 2, TimeUnit.SECONDS, NAMESPACE), is(0L));
+		assertThat(cacheManager.increment(key, 2, 2, TimeUnit.SECONDS, NAMESPACE), is(2L));
+		assertThat(cacheManager.increment(key, 3, 2, TimeUnit.SECONDS, NAMESPACE), is(5L));
+		assertThat(cacheManager.decrement(key, 1, 2, TimeUnit.SECONDS, NAMESPACE), is(4L));
 		try {
 			TimeUnit.MILLISECONDS.sleep(2100);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		assertFalse(cacheManager.exists(key, NAMESPACE));
+		assertThat(cacheManager.exists(key, NAMESPACE), is(false));
 		cacheManager.delete(key, NAMESPACE);
 
-		assertTrue(cacheManager.putIfAbsent(key, value, -1, TimeUnit.SECONDS, NAMESPACE));
-		assertFalse(cacheManager.putIfAbsent(key, value, -1, TimeUnit.SECONDS, NAMESPACE));
+		assertThat(cacheManager.putIfAbsent(key, value, -1, TimeUnit.SECONDS, NAMESPACE), is(true));
+		assertThat(cacheManager.putIfAbsent(key, value, -1, TimeUnit.SECONDS, NAMESPACE), is(false));
 		try {
 			TimeUnit.MILLISECONDS.sleep(1000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		assertFalse(cacheManager.putIfAbsent(key, value, 2, TimeUnit.SECONDS, NAMESPACE));
+		assertThat(cacheManager.putIfAbsent(key, value, 2, TimeUnit.SECONDS, NAMESPACE), is(false));
 		cacheManager.delete(key, NAMESPACE);
-		assertEquals(2, cacheManager.increment(key, 2, -1, TimeUnit.SECONDS, NAMESPACE));
-		assertEquals(5, cacheManager.increment(key, 3, -1, TimeUnit.SECONDS, NAMESPACE));
+		assertThat(cacheManager.increment(key, 2, -1, TimeUnit.SECONDS, NAMESPACE), is(2L));
+		assertThat(cacheManager.increment(key, 3, -1, TimeUnit.SECONDS, NAMESPACE), is(5L));
 		try {
 			TimeUnit.MILLISECONDS.sleep(1000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		assertTrue(cacheManager.exists(key, NAMESPACE));
+		assertThat(cacheManager.exists(key, NAMESPACE), is(true));
 		cacheManager.delete(key, NAMESPACE);
 	}
 
@@ -185,23 +185,23 @@ public abstract class CacheManagerTestBase {
 		} catch (IllegalArgumentException e) {
 			error = true;
 		}
-		assertTrue(error);
+		assertThat(error, is(true));
 		error = false;
 		try {
 			cacheManager.decrementAndReturnNonnegative(key, 2, -1, TimeUnit.SECONDS, NAMESPACE);
 		} catch (IllegalStateException e) {
 			error = true;
 		}
-		assertTrue(error);
-		assertEquals(2, cacheManager.increment(key, 2, -1, TimeUnit.SECONDS, NAMESPACE));
-		assertEquals(1, cacheManager.decrementAndReturnNonnegative(key, 1, -1, TimeUnit.SECONDS, NAMESPACE));
+		assertThat(error, is(true));
+		assertThat(cacheManager.increment(key, 2, -1, TimeUnit.SECONDS, NAMESPACE), is(2L));
+		assertThat(cacheManager.decrementAndReturnNonnegative(key, 1, -1, TimeUnit.SECONDS, NAMESPACE), is(1L));
 		error = false;
 		try {
 			cacheManager.decrementAndReturnNonnegative(key, 2, -1, TimeUnit.SECONDS, NAMESPACE);
 		} catch (IllegalStateException e) {
 			error = true;
 		}
-		assertEquals(0, cacheManager.decrementAndReturnNonnegative(key, 1, -1, TimeUnit.SECONDS, NAMESPACE));
+		assertThat(cacheManager.decrementAndReturnNonnegative(key, 1, -1, TimeUnit.SECONDS, NAMESPACE), is(0L));
 		cacheManager.delete(key, NAMESPACE);
 	}
 

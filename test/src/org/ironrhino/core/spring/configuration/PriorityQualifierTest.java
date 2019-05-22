@@ -1,6 +1,7 @@
 package org.ironrhino.core.spring.configuration;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.ironrhino.core.spring.configuration.PriorityQualifierTest.TestConfiguration;
 import org.junit.Test;
@@ -45,22 +46,22 @@ public class PriorityQualifierTest {
 
 	@Test
 	public void testExplicitFieldInjection() {
-		assertEquals("prioritizedTestBean", testBean.getName());
+		assertThat(testBean.getName(), is("prioritizedTestBean"));
 	}
 
 	@Test
 	public void testImplicitFieldInjection() {
-		assertEquals("prioritizedTestBean", prioritizedTestBean.getName());
+		assertThat(prioritizedTestBean.getName(), is("prioritizedTestBean"));
 	}
 
 	@Test
 	public void testExplicitSetterInjection() {
-		assertEquals("prioritizedTestBean", testBean2.getName());
+		assertThat(testBean2.getName(), is("prioritizedTestBean"));
 	}
 
 	@Test
 	public void testImplicitSetterInjection() {
-		assertEquals("prioritizedTestBean", testBean3.getName());
+		assertThat(testBean3.getName(), is("prioritizedTestBean"));
 	}
 
 	@Configuration

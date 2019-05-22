@@ -1,8 +1,7 @@
 package org.ironrhino.core.session;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
@@ -53,18 +52,18 @@ public class CacheBasedHttpSessionTest extends BaseHttpSessionTest {
 		// initialize httpSession
 		request.setCookies(new Cookie[0]);
 		WrappedHttpSession session = new WrappedHttpSession(request, response, servletContext, httpSessionManager);
-		assertTrue(session.isNew());
-		assertTrue(session.isCacheBased());
-		assertEquals(session.getId(), session.getSessionTracker());
-		assertEquals(session.getNow(), session.getCreationTime());
-		assertEquals(session.getNow(), session.getLastAccessedTime());
+		assertThat(session.isNew(), is(true));
+		assertThat(session.isCacheBased(), is(true));
+		assertThat(session.getSessionTracker(), is(session.getId()));
+		assertThat(session.getCreationTime(), is(session.getNow()));
+		assertThat(session.getLastAccessedTime(), is(session.getNow()));
 		then(httpSessionManager).should().initialize(session);
 		then(cacheBased).should().initialize(session);
 
 		// save httpSession
 		String sessionTracker = session.getSessionTracker();
 		httpSessionManager.save(session);
-		assertEquals(sessionTracker, session.getSessionTracker());
+		assertThat(session.getSessionTracker(), is(sessionTracker));
 		then(response).should().addCookie(argThat(c -> sessionTrackerName.equals(c.getName()) && 0 != c.getMaxAge()));
 		then(cacheBased).should().save(session);
 	}
@@ -91,18 +90,18 @@ public class CacheBasedHttpSessionTest extends BaseHttpSessionTest {
 		// initialize httpSession
 		WrappedHttpSession session = new WrappedHttpSession(request, response, servletContext, httpSessionManager);
 		SecurityContext sc = (SecurityContext) session.getAttribute(SPRING_SECURITY_CONTEXT_KEY);
-		assertFalse(session.isNew());
-		assertTrue(session.isCacheBased());
-		assertEquals(session.getNow(), session.getCreationTime());
-		assertEquals(session.getNow(), session.getLastAccessedTime());
-		assertTrue(sc.getAuthentication().isAuthenticated());
-		assertEquals("test", sc.getAuthentication().getName());
+		assertThat(session.isNew(), is(false));
+		assertThat(session.isCacheBased(), is(true));
+		assertThat(session.getCreationTime(), is(session.getNow()));
+		assertThat(session.getLastAccessedTime(), is(session.getNow()));
+		assertThat(sc.getAuthentication().isAuthenticated(), is(true));
+		assertThat(sc.getAuthentication().getName(), is("test"));
 		then(httpSessionManager).should().initialize(session);
 		then(cacheBased).should().initialize(session);
 
 		// save httpSession
 		httpSessionManager.save(session);
-		assertEquals(sessionId, session.getSessionTracker());
+		assertThat(session.getSessionTracker(), is(sessionId));
 		then(response).should(never()).addCookie(any(Cookie.class));
 	}
 }

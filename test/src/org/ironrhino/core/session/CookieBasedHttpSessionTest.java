@@ -1,10 +1,9 @@
 package org.ironrhino.core.session;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -87,15 +86,15 @@ public class CookieBasedHttpSessionTest extends BaseHttpSessionTest {
 
 		// initialize httpSession
 		WrappedHttpSession session = new WrappedHttpSession(request, response, servletContext, httpSessionManager);
-		assertFalse(session.isNew());
-		assertEquals(creationTime, session.getCreationTime());
-		assertEquals(lastAccessedTime, session.getLastAccessedTime());
+		assertThat(session.isNew(), is(false));
+		assertThat(session.getCreationTime(), is(creationTime));
+		assertThat(session.getLastAccessedTime(), is(lastAccessedTime));
 		then(httpSessionManager).should().initialize(session);
 		then(cookieBased).should().initialize(session);
 
 		// save httpSession
 		httpSessionManager.save(session);
-		assertEquals(sessionTracker, session.getSessionTracker());
+		assertThat(session.getSessionTracker(), is(sessionTracker));
 		then(response).should(never()).addCookie(any(Cookie.class));
 	}
 
@@ -105,16 +104,16 @@ public class CookieBasedHttpSessionTest extends BaseHttpSessionTest {
 
 		// initialize httpSession
 		WrappedHttpSession session = new WrappedHttpSession(request, response, servletContext, httpSessionManager);
-		assertTrue(session.isNew());
-		assertEquals(session.getNow(), session.getCreationTime());
-		assertEquals(session.getNow(), session.getLastAccessedTime());
+		assertThat(session.isNew(), is(true));
+		assertThat(session.getCreationTime(), is(session.getNow()));
+		assertThat(session.getLastAccessedTime(), is(session.getNow()));
 		then(httpSessionManager).should().initialize(session);
 		then(cookieBased).should().initialize(session);
 
 		// save httpSession
 		String sessionTracker = session.getSessionTracker();
 		httpSessionManager.save(session);
-		assertEquals(sessionTracker, session.getSessionTracker());
+		assertThat(session.getSessionTracker(), is(sessionTracker));
 		then(response).should().addCookie(argThat(this::isValidSessionTracker));
 	}
 
@@ -125,16 +124,16 @@ public class CookieBasedHttpSessionTest extends BaseHttpSessionTest {
 
 		// initialize httpSession
 		WrappedHttpSession session = new WrappedHttpSession(request, response, servletContext, httpSessionManager);
-		assertTrue(session.isNew());
-		assertEquals(session.getNow(), session.getCreationTime());
-		assertEquals(session.getNow(), session.getLastAccessedTime());
-		assertEquals(unseparatedSessionTracker, session.getSessionTracker());
+		assertThat(session.isNew(), is(true));
+		assertThat(session.getCreationTime(), is(session.getNow()));
+		assertThat(session.getLastAccessedTime(), is(session.getNow()));
+		assertThat(session.getSessionTracker(), is(unseparatedSessionTracker));
 		then(httpSessionManager).should().initialize(session);
 		then(cookieBased).should().initialize(session);
 
 		// save httpSession
 		httpSessionManager.save(session);
-		assertNotEquals(unseparatedSessionTracker, session.getSessionTracker());
+		assertThat(session.getSessionTracker(), is(not(unseparatedSessionTracker)));
 		then(response).should().addCookie(argThat(this::isValidSessionTracker));
 	}
 
@@ -148,10 +147,10 @@ public class CookieBasedHttpSessionTest extends BaseHttpSessionTest {
 
 		// initialize httpSession
 		WrappedHttpSession session = new WrappedHttpSession(request, response, servletContext, httpSessionManager);
-		assertFalse(session.isNew());
-		assertEquals(creationTime, session.getCreationTime());
-		assertEquals(lastAccessedTime, session.getLastAccessedTime());
-		assertEquals(sessionTracker, session.getSessionTracker());
+		assertThat(session.isNew(), is(false));
+		assertThat(session.getCreationTime(), is(creationTime));
+		assertThat(session.getLastAccessedTime(), is(lastAccessedTime));
+		assertThat(session.getSessionTracker(), is(sessionTracker));
 		then(httpSessionManager).should().initialize(session);
 		then(cookieBased).should().initialize(session);
 		then(cookieBased).should().invalidate(session);
@@ -171,12 +170,12 @@ public class CookieBasedHttpSessionTest extends BaseHttpSessionTest {
 		// initialize httpSession
 		WrappedHttpSession session = new WrappedHttpSession(request, response, servletContext, httpSessionManager);
 		SecurityContext sc = (SecurityContext) session.getAttribute(SPRING_SECURITY_CONTEXT_KEY);
-		assertFalse(session.isNew());
-		assertEquals(creationTime, session.getCreationTime());
-		assertEquals(lastAccessedTime, session.getLastAccessedTime());
-		assertEquals(sessionTracker, session.getSessionTracker());
-		assertTrue(sc.getAuthentication().isAuthenticated());
-		assertEquals("test", sc.getAuthentication().getName());
+		assertThat(session.isNew(), is(false));
+		assertThat(session.getCreationTime(), is(creationTime));
+		assertThat(session.getLastAccessedTime(), is(lastAccessedTime));
+		assertThat(session.getSessionTracker(), is(sessionTracker));
+		assertThat(sc.getAuthentication().isAuthenticated(), is(true));
+		assertThat(sc.getAuthentication().getName(), is("test"));
 		then(httpSessionManager).should().initialize(session);
 		then(cookieBased).should().initialize(session);
 		then(securityContextSessionCompressor).should().uncompress(eq(CodecUtils.md5Hex("password") + ",test"));
@@ -228,8 +227,8 @@ public class CookieBasedHttpSessionTest extends BaseHttpSessionTest {
 		// initialize httpSession
 		WrappedHttpSession session = new WrappedHttpSession(request, response, servletContext, httpSessionManager);
 		SecurityContext sc = (SecurityContext) session.getAttribute(SPRING_SECURITY_CONTEXT_KEY);
-		assertTrue(sc.getAuthentication().isAuthenticated());
-		assertEquals(10240, sc.getAuthentication().getName().length());
+		assertThat(sc.getAuthentication().isAuthenticated(), is(true));
+		assertThat(sc.getAuthentication().getName().length(), is(10240));
 	}
 
 	@Test
@@ -244,9 +243,9 @@ public class CookieBasedHttpSessionTest extends BaseHttpSessionTest {
 
 		// initialize httpSession
 		WrappedHttpSession session = new WrappedHttpSession(request, response, servletContext, httpSessionManager);
-		assertEquals(creationTime, session.getCreationTime());
-		assertEquals(lastAccessedTime, session.getLastAccessedTime());
-		assertEquals(expiredSessionTracker, session.getSessionTracker());
+		assertThat(session.getCreationTime(), is(creationTime));
+		assertThat(session.getLastAccessedTime(), is(lastAccessedTime));
+		assertThat(session.getSessionTracker(), is(expiredSessionTracker));
 		then(httpSessionManager).should().initialize(session);
 		then(cookieBased).should().initialize(session);
 		then(response).should(never()).addCookie(any(Cookie.class));
@@ -254,9 +253,9 @@ public class CookieBasedHttpSessionTest extends BaseHttpSessionTest {
 		// save httpSession
 		String sessionTracker = session.getSessionTracker();
 		httpSessionManager.save(session);
-		assertEquals(creationTime, session.getCreationTime());
-		assertNotEquals(lastAccessedTime, session.getLastAccessedTime());
-		assertNotEquals(sessionTracker, session.getSessionTracker());
+		assertThat(session.getCreationTime(), is(creationTime));
+		assertThat(session.getLastAccessedTime(), is(not(lastAccessedTime)));
+		assertThat(session.getSessionTracker(), is(not(sessionTracker)));
 		then(response).should().addCookie(argThat(this::isValidSessionTracker));
 		then(sessionCompressorManager).should(never()).compress(session);
 	}
@@ -273,11 +272,11 @@ public class CookieBasedHttpSessionTest extends BaseHttpSessionTest {
 
 		// initialize httpSession
 		WrappedHttpSession session = new WrappedHttpSession(request, response, servletContext, httpSessionManager);
-		assertFalse(session.isNew());
-		assertTrue(session.isInvalid());
-		assertNotEquals(creationTime, session.getCreationTime());
-		assertNotEquals(lastAccessedTime, session.getLastAccessedTime());
-		assertNotEquals(expiredSessionTracker, session.getSessionTracker());
+		assertThat(session.isNew(), is(false));
+		assertThat(session.isInvalid(), is(true));
+		assertThat(session.getCreationTime(), is(not(creationTime)));
+		assertThat(session.getLastAccessedTime(), is(not(lastAccessedTime)));
+		assertThat(session.getSessionTracker(), is(not(expiredSessionTracker)));
 		then(httpSessionManager).should().invalidate(session);
 		then(cookieBased).should().invalidate(session);
 		then(response).should().addCookie(argThat(this::isInvalidSessionCookie));
@@ -285,7 +284,7 @@ public class CookieBasedHttpSessionTest extends BaseHttpSessionTest {
 		// save httpSession
 		String sessionTracker = session.getSessionTracker();
 		httpSessionManager.save(session);
-		assertNotEquals(sessionTracker, session.getSessionTracker());
+		assertThat(session.getSessionTracker(), is(not(sessionTracker)));
 		then(response).should().addCookie(argThat(this::isValidSessionTracker));
 		then(sessionCompressorManager).should(never()).compress(session);
 	}
@@ -301,16 +300,16 @@ public class CookieBasedHttpSessionTest extends BaseHttpSessionTest {
 		// initialize httpSession
 		WrappedHttpSession session = new WrappedHttpSession(request, response, servletContext, httpSessionManager);
 		sc = (SecurityContext) session.getAttribute(SPRING_SECURITY_CONTEXT_KEY);
-		assertFalse(session.isNew());
-		assertEquals(0, session.getCreationTime());
-		assertEquals(0, session.getLastAccessedTime());
-		assertEquals("test", sc.getAuthentication().getName());
+		assertThat(session.isNew(), is(false));
+		assertThat(session.getCreationTime(), is(0L));
+		assertThat(session.getLastAccessedTime(), is(0L));
+		assertThat(sc.getAuthentication().getName(), is("test"));
 		then(httpSessionManager).should().initialize(session);
 		then(cookieBased).should(never()).initialize(session);
 
 		// save httpSession
 		httpSessionManager.save(session);
-		assertNull(request.getAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API));
+		assertThat(request.getAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API), is(nullValue()));
 		request.clearAttributes();
 	}
 

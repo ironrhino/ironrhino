@@ -1,10 +1,9 @@
 package org.ironrhino.core.remoting.serializer;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -65,9 +64,9 @@ public class JavaHttpInvokerSerializerTest {
 		MethodInvocation mi = createMethodInvocation(method, "test");
 		RemoteInvocation ri = serializer.createRemoteInvocation(mi);
 		ri = readRemoteInvocation(TestService.class, writeRemoteInvocation(ri));
-		assertEquals("echo", ri.getMethodName());
-		assertArrayEquals(new Object[] { "test" }, ri.getArguments());
-		assertArrayEquals(new Class<?>[] { String.class }, ri.getParameterTypes());
+		assertThat(ri.getMethodName(), is("echo"));
+		assertThat(ri.getArguments(), is(new Object[] { "test" }));
+		assertThat(ri.getParameterTypes(), is(new Class<?>[] { String.class }));
 	}
 
 	@Test
@@ -78,7 +77,7 @@ public class JavaHttpInvokerSerializerTest {
 		RemoteInvocationResult rir = new RemoteInvocationResult("result");
 		byte[] data = writeRemoteInvocationResult(ri, rir);
 		rir = readRemoteInvocationResult(mi, data);
-		assertEquals("result", rir.getValue());
+		assertThat(rir.getValue(), is("result"));
 	}
 
 	@Test
@@ -90,10 +89,11 @@ public class JavaHttpInvokerSerializerTest {
 		RemoteInvocationResult rir = new RemoteInvocationResult(
 				new InvocationTargetException(new RuntimeException("error")));
 		rir = readRemoteInvocationResult(mi, writeRemoteInvocationResult(ri, rir));
-		assertNull(rir.getValue());
-		assertTrue(rir.hasInvocationTargetException());
-		assertEquals("error", ((InvocationTargetException) rir.getException()).getTargetException().getMessage());
-		assertTrue(((InvocationTargetException) rir.getException()).getTargetException() instanceof RuntimeException);
+		assertThat(rir.getValue(), is(nullValue()));
+		assertThat(rir.hasInvocationTargetException(), is(true));
+		assertThat(((InvocationTargetException) rir.getException()).getTargetException().getMessage(), is("error"));
+		assertThat(((InvocationTargetException) rir.getException()).getTargetException() instanceof RuntimeException,
+				is(true));
 	}
 
 	@Test
@@ -104,7 +104,7 @@ public class JavaHttpInvokerSerializerTest {
 		RemoteInvocation ri = serializer.createRemoteInvocation(mi);
 		RemoteInvocationResult rir = new RemoteInvocationResult();
 		rir = readRemoteInvocationResult(mi, writeRemoteInvocationResult(ri, rir));
-		assertNull(rir.getValue());
+		assertThat(rir.getValue(), is(nullValue()));
 	}
 
 	@Test
@@ -115,22 +115,22 @@ public class JavaHttpInvokerSerializerTest {
 			MethodInvocation mi = createMethodInvocation(method, new Echo("test"));
 			RemoteInvocation ri = serializer.createRemoteInvocation(mi);
 			ri = readRemoteInvocation(EchoService.class, writeRemoteInvocation(ri));
-			assertEquals("echo", ri.getMethodName());
-			assertArrayEquals(new Class<?>[] { Echo.class }, ri.getParameterTypes());
-			assertEquals("test", ((Echo) ri.getArguments()[0]).getEcho());
+			assertThat(ri.getMethodName(), is("echo"));
+			assertThat(ri.getParameterTypes(), is(new Class<?>[] { Echo.class }));
+			assertThat(((Echo) ri.getArguments()[0]).getEcho(), is("test"));
 		} catch (SerializationFailedException error) {
 			e = error;
 		} catch (RuntimeException error) {
 			e = error;
 		}
 		if (JavaHttpInvokerSerializer.INSTANCE == serializer) {
-			assertNotNull(e);
-			assertTrue(e instanceof SerializationFailedException);
+			assertThat(e, is(notNullValue()));
+			assertThat(e instanceof SerializationFailedException, is(true));
 		} else if (FstHttpInvokerSerializer.INSTANCE == serializer) {
-			assertNotNull(e);
-			assertTrue(e instanceof RuntimeException);
+			assertThat(e, is(notNullValue()));
+			assertThat(e instanceof RuntimeException, is(true));
 		} else {
-			assertNull(e);
+			assertThat(e, is(nullValue()));
 		}
 	}
 

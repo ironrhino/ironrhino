@@ -1,6 +1,7 @@
 package org.ironrhino.core.throttle;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -51,8 +52,8 @@ public class BulkheadAspectTest {
 		}
 		es.shutdown();
 		es.awaitTermination(100, TimeUnit.MILLISECONDS);
-		assertEquals(TestService.MAX_CONCURRENT_CALLS, success.get());
-		assertEquals(overflow, error.get());
+		assertThat(success.get(), is(TestService.MAX_CONCURRENT_CALLS));
+		assertThat(error.get(), is(overflow));
 	}
 
 	public static class TestService {

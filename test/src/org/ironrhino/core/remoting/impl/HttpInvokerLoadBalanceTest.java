@@ -1,9 +1,9 @@
 package org.ironrhino.core.remoting.impl;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.ironrhino.core.remoting.impl.RedisServiceRegistry.NAMESPACE_HOSTS;
 import static org.ironrhino.core.remoting.impl.RedisServiceRegistry.NAMESPACE_SERVICES;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -108,13 +108,14 @@ public class HttpInvokerLoadBalanceTest extends RedisServiceRegistryAdapter {
 		given(event.getExportServices()).willReturn(Arrays.asList(serviceName));
 		eventPublisher.publish(event, Scope.GLOBAL);
 
-		assertTrue(importedServiceCandidates.get(serviceName).containsAll(Arrays.asList(provider1, provider2)));
-		assertEquals(provider2, importedServices.get(serviceName));
+		assertThat(importedServiceCandidates.get(serviceName).containsAll(Arrays.asList(provider1, provider2)),
+				is(true));
+		assertThat(importedServices.get(serviceName), is(provider2));
 		then(serviceRegistry).should().publishServiceHostsChangedEvent(serviceName);
 		then(serviceRegistry).should().discover(serviceName, false);
 		then(opsForHash).should().putAll(eq(NAMESPACE_HOSTS + serviceRegistry.getLocalHost()),
 				argThat(s -> s.containsKey(serviceName) && s.get(serviceName).equals(provider2)));
-		assertEquals(serviceUrl(normalizeHost(provider2), BarService.class), getServiceUrl(barServiceClient));
+		assertThat(getServiceUrl(barServiceClient), is(serviceUrl(normalizeHost(provider2), BarService.class)));
 	}
 
 	@Test
@@ -140,7 +141,7 @@ public class HttpInvokerLoadBalanceTest extends RedisServiceRegistryAdapter {
 		then(serviceRegistry).should().discover(serviceName, false);
 		then(opsForHash).should().putAll(eq(NAMESPACE_HOSTS + serviceRegistry.getLocalHost()),
 				argThat(s -> s.containsKey(serviceName) && s.get(serviceName).equals(provider2)));
-		assertEquals(serviceUrl(normalizeHost(provider2), BarService.class), getServiceUrl(barServiceClient));
+		assertThat(getServiceUrl(barServiceClient), is(serviceUrl(normalizeHost(provider2), BarService.class)));
 	}
 
 	@Test
@@ -169,14 +170,14 @@ public class HttpInvokerLoadBalanceTest extends RedisServiceRegistryAdapter {
 				any(RemoteInvocation.class), any(MethodInvocation.class)))
 						.willReturn(new RemoteInvocationResult("test"));
 
-		assertEquals("test", barService.test(""));
+		assertThat(barService.test(""), is("test"));
 		then(serviceRegistry).should().evict(normalizeHost(provider1));
 		then(serviceRegistry).should().onServiceHostsChanged(serviceName);
 		then(serviceRegistry).should().publishServiceHostsChangedEvent(serviceName);
 		then(serviceRegistry).should().discover(serviceName, false);
 		then(opsForHash).should().putAll(eq(NAMESPACE_HOSTS + serviceRegistry.getLocalHost()),
 				argThat(s -> s.containsKey(serviceName) && s.get(serviceName).equals(provider2)));
-		assertEquals(serviceUrl(normalizeHost(provider2), BarService.class), getServiceUrl(barServiceClient));
+		assertThat(getServiceUrl(barServiceClient), is(serviceUrl(normalizeHost(provider2), BarService.class)));
 	}
 
 	static class HttpInvokerConfiguration {

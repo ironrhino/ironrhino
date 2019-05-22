@@ -1,9 +1,8 @@
 package org.ironrhino.core.security.verfication.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -40,12 +39,12 @@ public class DefaultVerificationManagerTest {
 		given(userDetailsManager.loadUserByUsername("test")).willReturn(verificationAware);
 
 		given(verificationAware.isVerificationRequired()).willReturn(true);
-		assertTrue(verificationManager.isVerificationRequired("test"));
-		assertTrue(verificationManager.isVerificationRequired(verificationAware));
+		assertThat(verificationManager.isVerificationRequired("test"), is(true));
+		assertThat(verificationManager.isVerificationRequired(verificationAware), is(true));
 
 		given(verificationAware.isVerificationRequired()).willReturn(false);
-		assertFalse(verificationManager.isVerificationRequired("test"));
-		assertFalse(verificationManager.isVerificationRequired(verificationAware));
+		assertThat(verificationManager.isVerificationRequired("test"), is(false));
+		assertThat(verificationManager.isVerificationRequired(verificationAware), is(false));
 	}
 
 	@Test
@@ -54,12 +53,12 @@ public class DefaultVerificationManagerTest {
 		given(userDetailsManager.loadUserByUsername("test")).willReturn(verificationAware);
 
 		given(verificationAware.isPasswordRequired()).willReturn(true);
-		assertTrue(verificationManager.isPasswordRequired("test"));
-		assertTrue(verificationManager.isPasswordRequired(verificationAware));
+		assertThat(verificationManager.isPasswordRequired("test"), is(true));
+		assertThat(verificationManager.isPasswordRequired(verificationAware), is(true));
 
 		given(verificationAware.isPasswordRequired()).willReturn(false);
-		assertFalse(verificationManager.isPasswordRequired("test"));
-		assertFalse(verificationManager.isPasswordRequired(verificationAware));
+		assertThat(verificationManager.isPasswordRequired("test"), is(false));
+		assertThat(verificationManager.isPasswordRequired(verificationAware), is(false));
 	}
 
 	@Test
@@ -68,12 +67,12 @@ public class DefaultVerificationManagerTest {
 		given(userDetailsManager.loadUserByUsername("test")).willReturn(userDetails);
 
 		given(userDetails.getPassword()).willReturn("password");
-		assertTrue(verificationManager.isPasswordRequired("test"));
-		assertTrue(verificationManager.isPasswordRequired(userDetails));
+		assertThat(verificationManager.isPasswordRequired("test"), is(true));
+		assertThat(verificationManager.isPasswordRequired(userDetails), is(true));
 
 		given(userDetails.getPassword()).willReturn("");
-		assertFalse(verificationManager.isPasswordRequired("test"));
-		assertFalse(verificationManager.isPasswordRequired(userDetails));
+		assertThat(verificationManager.isPasswordRequired("test"), is(false));
+		assertThat(verificationManager.isPasswordRequired(userDetails), is(false));
 	}
 
 	@Test
@@ -88,10 +87,10 @@ public class DefaultVerificationManagerTest {
 		} catch (ReceiverNotFoundException error) {
 			e = error;
 		}
-		assertNotNull(e);
+		assertThat(e, is(notNullValue()));
 
 		given(verificationAware.getReceiver()).willReturn("test");
-		assertEquals("test", verificationManager.getReceiver(verificationAware));
+		assertThat(verificationManager.getReceiver(verificationAware), is("test"));
 	}
 
 	@Test

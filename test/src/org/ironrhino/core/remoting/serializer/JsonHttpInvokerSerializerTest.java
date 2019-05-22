@@ -1,8 +1,8 @@
 package org.ironrhino.core.remoting.serializer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
 
@@ -46,9 +46,9 @@ public class JsonHttpInvokerSerializerTest extends SmileHttpInvokerSerializerTes
 			} catch (Exception error) {
 				e = error;
 			}
-			assertNotNull(e);
-			assertTrue(e instanceof JsonRpcException);
-			assertEquals(CODE_PARSE_ERROR, ((JsonRpcException) e).getCode());
+			assertThat(e, is(notNullValue()));
+			assertThat(e instanceof JsonRpcException, is(true));
+			assertThat(((JsonRpcException) e).getCode(), is(CODE_PARSE_ERROR));
 		}
 	}
 
@@ -70,9 +70,9 @@ public class JsonHttpInvokerSerializerTest extends SmileHttpInvokerSerializerTes
 			} catch (Exception error) {
 				e = error;
 			}
-			assertNotNull(e);
-			assertTrue(e instanceof JsonRpcException);
-			assertEquals(CODE_INVALID_REQUEST, ((JsonRpcException) e).getCode());
+			assertThat(e, is(notNullValue()));
+			assertThat(e instanceof JsonRpcException, is(true));
+			assertThat(((JsonRpcException) e).getCode(), is(CODE_INVALID_REQUEST));
 		}
 	}
 
@@ -87,9 +87,9 @@ public class JsonHttpInvokerSerializerTest extends SmileHttpInvokerSerializerTes
 			} catch (Exception error) {
 				e = error;
 			}
-			assertNotNull(e);
-			assertTrue(e instanceof JsonRpcException);
-			assertEquals(CODE_INVALID_PARAMS, ((JsonRpcException) e).getCode());
+			assertThat(e, is(notNullValue()));
+			assertThat(e instanceof JsonRpcException, is(true));
+			assertThat(((JsonRpcException) e).getCode(), is(CODE_INVALID_PARAMS));
 		}
 	}
 
@@ -104,9 +104,9 @@ public class JsonHttpInvokerSerializerTest extends SmileHttpInvokerSerializerTes
 			} catch (Exception error) {
 				e = error;
 			}
-			assertNotNull(e);
-			assertTrue(e instanceof JsonRpcException);
-			assertEquals(CODE_METHOD_NOT_FOUND, ((JsonRpcException) e).getCode());
+			assertThat(e, is(notNullValue()));
+			assertThat(e instanceof JsonRpcException, is(true));
+			assertThat(((JsonRpcException) e).getCode(), is(CODE_METHOD_NOT_FOUND));
 		}
 	}
 }

@@ -1,8 +1,9 @@
 package org.ironrhino.core.security.action;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -76,8 +77,8 @@ public class LoginActionTest extends StrutsSpringJUnit4TestCase<LoginAction> {
 	@Test
 	public void testInput() {
 		executeAction("/login/input");
-		assertEquals(HttpStatus.FOUND.value(), response.getStatus());
-		assertEquals("/login", response.getHeader("Location"));
+		assertThat(response.getStatus(), is(HttpStatus.FOUND.value()));
+		assertThat(response.getHeader("Location"), is("/login"));
 	}
 
 	@Test
@@ -107,46 +108,46 @@ public class LoginActionTest extends StrutsSpringJUnit4TestCase<LoginAction> {
 
 		String output = executeAction("/login");
 		Document doc = Jsoup.parse(output);
-		assertNotNull(doc);
+		assertThat(doc, is(notNullValue()));
 
 		Element loginForm = doc.getElementById("login");
-		assertNotNull(loginForm);
-		assertEquals("login", loginForm.attr("name"));
-		assertEquals("/login", loginForm.attr("action"));
-		assertEquals("post", loginForm.attr("method"));
+		assertThat(loginForm, is(notNullValue()));
+		assertThat(loginForm.attr("name"), is("login"));
+		assertThat(loginForm.attr("action"), is("/login"));
+		assertThat(loginForm.attr("method"), is("post"));
 
 		Element usernameInput = loginForm.getElementById("login-username");
-		assertNotNull(usernameInput);
-		assertEquals("username", usernameInput.attr("name"));
-		assertEquals("input", usernameInput.tagName());
-		assertEquals("test", usernameInput.attr("value"));
+		assertThat(usernameInput, is(notNullValue()));
+		assertThat(usernameInput.attr("name"), is("username"));
+		assertThat(usernameInput.tagName(), is("input"));
+		assertThat(usernameInput.attr("value"), is("test"));
 
 		if (!verificationCodeEnabled || passwordRequired) {
 			Element passwordInput = loginForm.getElementById("login-password");
-			assertNotNull(passwordInput);
-			assertEquals("password", passwordInput.attr("name"));
-			assertEquals("input", passwordInput.tagName());
+			assertThat(passwordInput, is(notNullValue()));
+			assertThat(passwordInput.attr("name"), is("password"));
+			assertThat(passwordInput.tagName(), is("input"));
 		} else {
-			assertNull(loginForm.getElementById("login-password"));
+			assertThat(loginForm.getElementById("login-password"), is(nullValue()));
 		}
 
 		if (verificationCodeEnabled && verificationCodeRequired) {
 			Element verificationCodeInput = loginForm.getElementById("login-verificationCode");
-			assertNotNull(verificationCodeInput);
-			assertEquals("verificationCode", verificationCodeInput.attr("name"));
-			assertEquals("input", verificationCodeInput.tagName());
+			assertThat(verificationCodeInput, is(notNullValue()));
+			assertThat(verificationCodeInput.attr("name"), is("verificationCode"));
+			assertThat(verificationCodeInput.tagName(), is("input"));
 		} else {
-			assertNull(loginForm.getElementById("login-verificationCode"));
+			assertThat(loginForm.getElementById("login-verificationCode"), is(nullValue()));
 			Element remembermeInput = loginForm.getElementById("login-rememberme");
-			assertNotNull(remembermeInput);
-			assertEquals("rememberme", remembermeInput.attr("name"));
-			assertEquals("input", remembermeInput.tagName());
+			assertThat(remembermeInput, is(notNullValue()));
+			assertThat(remembermeInput.attr("name"), is("rememberme"));
+			assertThat(remembermeInput.tagName(), is("input"));
 		}
 
 		Elements submits = loginForm.getElementsByAttributeValue("type", "submit");
-		assertNotNull(submits);
-		assertEquals(1, submits.size());
-		assertEquals("button", submits.get(0).tagName());
+		assertThat(submits, is(notNullValue()));
+		assertThat(submits.size(), is(1));
+		assertThat(submits.get(0).tagName(), is("button"));
 	}
 
 	@Test
@@ -155,8 +156,8 @@ public class LoginActionTest extends StrutsSpringJUnit4TestCase<LoginAction> {
 		String output = executeAction("/login/sendVerificationCode");
 		JsonNode jsonNode = JsonUtils.getObjectMapper().readTree(output);
 		JsonNode errorMessage = jsonNode.at("/actionErrors/0");
-		assertNotNull(errorMessage);
-		assertEquals(getText("validation.error"), errorMessage.asText());
+		assertThat(errorMessage, is(notNullValue()));
+		assertThat(errorMessage.asText(), is(getText("validation.error")));
 	}
 
 	@Test
@@ -166,8 +167,8 @@ public class LoginActionTest extends StrutsSpringJUnit4TestCase<LoginAction> {
 		willThrow(new LockedException("locked")).given(verificationManager).send("locked");
 		String output = executeAction("/login/sendVerificationCode");
 		JsonNode errorMessage = JsonUtils.getObjectMapper().readTree(output).at("/fieldErrors/username/0");
-		assertNotNull(errorMessage);
-		assertEquals(getText(LockedException.class.getName()), errorMessage.asText());
+		assertThat(errorMessage, is(notNullValue()));
+		assertThat(errorMessage.asText(), is(getText(LockedException.class.getName())));
 	}
 
 	@Test
@@ -177,8 +178,8 @@ public class LoginActionTest extends StrutsSpringJUnit4TestCase<LoginAction> {
 		willThrow(new AccountExpiredException("expired")).given(verificationManager).send("expired");
 		String output = executeAction("/login/sendVerificationCode");
 		JsonNode errorMessage = JsonUtils.getObjectMapper().readTree(output).at("/fieldErrors/username/0");
-		assertNotNull(errorMessage);
-		assertEquals(getText(AccountExpiredException.class.getName()), errorMessage.asText());
+		assertThat(errorMessage, is(notNullValue()));
+		assertThat(errorMessage.asText(), is(getText(AccountExpiredException.class.getName())));
 	}
 
 	@Test
@@ -188,8 +189,8 @@ public class LoginActionTest extends StrutsSpringJUnit4TestCase<LoginAction> {
 		String output = executeAction("/login/sendVerificationCode");
 		then(verificationManager).should().send("test");
 		JsonNode message = JsonUtils.getObjectMapper().readTree(output).at("/actionSuccessMessage");
-		assertNotNull(message);
-		assertEquals(getText("send.success"), message.asText());
+		assertThat(message, is(notNullValue()));
+		assertThat(message.asText(), is(getText("send.success")));
 	}
 
 	@Test
@@ -208,8 +209,8 @@ public class LoginActionTest extends StrutsSpringJUnit4TestCase<LoginAction> {
 		executeAction("/login");
 
 		then(usernamePasswordAuthenticationFilter).should().success(request, response, auth);
-		assertEquals(HttpStatus.FOUND.value(), response.getStatus());
-		assertEquals("/", response.getHeader("Location"));
+		assertThat(response.getStatus(), is(HttpStatus.FOUND.value()));
+		assertThat(response.getHeader("Location"), is("/"));
 	}
 
 	@Test
@@ -237,8 +238,8 @@ public class LoginActionTest extends StrutsSpringJUnit4TestCase<LoginAction> {
 		String output = executeAction("/login");
 		then(usernamePasswordAuthenticationFilter).should().unsuccess(eq(request), eq(response), any(expected));
 		JsonNode errorMessage = JsonUtils.getObjectMapper().readTree(output).at("/fieldErrors/" + errorField + "/0");
-		assertEquals(getText(expected.getName()), errorMessage.asText());
-		assertEquals(HttpStatus.OK.value(), response.getStatus());
+		assertThat(errorMessage.asText(), is(getText(expected.getName())));
+		assertThat(response.getStatus(), is(HttpStatus.OK.value()));
 
 		initServletMockObjects();
 	}

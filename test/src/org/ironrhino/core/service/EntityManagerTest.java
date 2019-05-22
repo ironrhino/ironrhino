@@ -1,10 +1,9 @@
 package org.ironrhino.core.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.Serializable;
 import java.time.YearMonth;
@@ -56,9 +55,9 @@ public class EntityManagerTest {
 	@Test
 	public void testCrud() {
 		entityManager.setEntityClass(Person.class);
-		assertNull(entityManager.get("notexistsid"));
-		assertNull(entityManager.findByNaturalId("notexistsid"));
-		assertNull(entityManager.findOne("notexistsid"));
+		assertThat(entityManager.get("notexistsid"), is(nullValue()));
+		assertThat(entityManager.findByNaturalId("notexistsid"), is(nullValue()));
+		assertThat(entityManager.findOne("notexistsid"), is(nullValue()));
 		Person person = new Person();
 		person.setName("test");
 		person.setCode("9527");
@@ -67,51 +66,51 @@ public class EntityManagerTest {
 		entityManager.save(person);
 
 		Person person2 = entityManager.get(person.getId());
-		assertEquals(Gender.MALE, person2.getGender());
-		assertNotNull(person2.getCreateDate());
+		assertThat(person2.getGender(), is(Gender.MALE));
+		assertThat(person2.getCreateDate(), is(notNullValue()));
 		person.setGender(Gender.FEMALE);
 		entityManager.update(person);
 
-		assertTrue(entityManager.existsNaturalId("test"));
+		assertThat(entityManager.existsNaturalId("test"), is(true));
 		person2 = entityManager.findByNaturalId("test");
-		assertEquals(Gender.FEMALE, person2.getGender());
-		assertTrue(entityManager.existsNaturalId("name", "test"));
+		assertThat(person2.getGender(), is(Gender.FEMALE));
+		assertThat(entityManager.existsNaturalId("name", "test"), is(true));
 		person2 = entityManager.findByNaturalId("name", "test");
-		assertEquals(Gender.FEMALE, person2.getGender());
+		assertThat(person2.getGender(), is(Gender.FEMALE));
 
 		try {
 			entityManager.existsNaturalId("code", "9527");
 		} catch (Exception e) {
-			assertTrue(e instanceof IllegalArgumentException);
+			assertThat(e instanceof IllegalArgumentException, is(true));
 		}
 
 		try {
 			entityManager.findByNaturalId("code", "9527");
 		} catch (Exception e) {
-			assertTrue(e instanceof IllegalArgumentException);
+			assertThat(e instanceof IllegalArgumentException, is(true));
 		}
 
 		person2 = entityManager.findOne("test");
-		assertEquals(Gender.FEMALE, person2.getGender());
+		assertThat(person2.getGender(), is(Gender.FEMALE));
 		person2 = entityManager.findOne(true, new Serializable[] { "name", "test" });
-		assertEquals(Gender.FEMALE, person2.getGender());
-		assertTrue(entityManager.existsOne("name", "test"));
-		assertTrue(entityManager.existsOne(true, new Serializable[] { "name", "Test" }));
-		assertFalse(entityManager.existsOne(true, new Serializable[] { "name", null }));
+		assertThat(person2.getGender(), is(Gender.FEMALE));
+		assertThat(entityManager.existsOne("name", "test"), is(true));
+		assertThat(entityManager.existsOne(true, new Serializable[] { "name", "Test" }), is(true));
+		assertThat(entityManager.existsOne(true, new Serializable[] { "name", null }), is(false));
 		person2 = entityManager.findOne("name", "test");
-		assertEquals(Gender.FEMALE, person2.getGender());
+		assertThat(person2.getGender(), is(Gender.FEMALE));
 
 		person2 = entityManager.findOne(true, new Serializable[] { "code", "9527" });
-		assertEquals(Gender.FEMALE, person2.getGender());
-		assertTrue(entityManager.existsOne("code", "9527"));
-		assertTrue(entityManager.existsOne(true, new Serializable[] { "code", "9527" }));
+		assertThat(person2.getGender(), is(Gender.FEMALE));
+		assertThat(entityManager.existsOne("code", "9527"), is(true));
+		assertThat(entityManager.existsOne(true, new Serializable[] { "code", "9527" }), is(true));
 		person2 = entityManager.findOne("code", "9527");
-		assertEquals(Gender.FEMALE, person2.getGender());
+		assertThat(person2.getGender(), is(Gender.FEMALE));
 
-		assertTrue(entityManager.exists(person.getId()));
+		assertThat(entityManager.exists(person.getId()), is(true));
 		entityManager.delete(person2);
-		assertFalse(entityManager.exists(person.getId()));
-		assertNull(entityManager.findByNaturalId("test"));
+		assertThat(entityManager.exists(person.getId()), is(false));
+		assertThat(entityManager.findByNaturalId("test"), is(nullValue()));
 
 	}
 
@@ -123,17 +122,17 @@ public class EntityManagerTest {
 		person.setCode("9527");
 		person.setGender(Gender.MALE);
 		person.setDateOfBirth(new Date());
-		assertEquals(-1, person.getVersion());
+		assertThat(person.getVersion(), is(-1));
 		entityManager.save(person);
-		assertEquals(0, person.getVersion());
+		assertThat(person.getVersion(), is(0));
 		person.setCreateDate(new Date());
 		entityManager.save(person);
-		assertEquals(1, person.getVersion());
+		assertThat(person.getVersion(), is(1));
 		entityManager.save(person);
-		assertEquals(2, person.getVersion());
+		assertThat(person.getVersion(), is(2));
 		entityManager.execute(session -> {
 			Person p = session.get(Person.class, person.getId());
-			assertEquals(2, p.getVersion());
+			assertThat(p.getVersion(), is(2));
 			p.setVersion(p.getVersion() - 1);
 			session.update(p);
 			return null;
@@ -148,21 +147,21 @@ public class EntityManagerTest {
 		person.setGender(Gender.MALE);
 		person.setDateOfBirth(new Date());
 		entityManager.save(person);
-		assertEquals(2, person.lifyCycleEvents.size());
-		assertEquals(PrePersist.class.getSimpleName(), person.lifyCycleEvents.get(0));
-		assertEquals(PostPersist.class.getSimpleName(), person.lifyCycleEvents.get(1));
+		assertThat(person.lifyCycleEvents.size(), is(2));
+		assertThat(person.lifyCycleEvents.get(0), is(PrePersist.class.getSimpleName()));
+		assertThat(person.lifyCycleEvents.get(1), is(PostPersist.class.getSimpleName()));
 		Person person2 = entityManager.get(person.getId());
-		assertEquals(1, person2.lifyCycleEvents.size());
-		assertEquals(PostLoad.class.getSimpleName(), person2.lifyCycleEvents.get(0));
+		assertThat(person2.lifyCycleEvents.size(), is(1));
+		assertThat(person2.lifyCycleEvents.get(0), is(PostLoad.class.getSimpleName()));
 		person2.setDateOfBirth(new Date());
 		entityManager.save(person2);
-		assertEquals(3, person2.lifyCycleEvents.size());
-		assertEquals(PreUpdate.class.getSimpleName(), person2.lifyCycleEvents.get(1));
-		assertEquals(PostUpdate.class.getSimpleName(), person2.lifyCycleEvents.get(2));
+		assertThat(person2.lifyCycleEvents.size(), is(3));
+		assertThat(person2.lifyCycleEvents.get(1), is(PreUpdate.class.getSimpleName()));
+		assertThat(person2.lifyCycleEvents.get(2), is(PostUpdate.class.getSimpleName()));
 		entityManager.delete(person2);
-		assertEquals(5, person2.lifyCycleEvents.size());
-		assertEquals(PreRemove.class.getSimpleName(), person2.lifyCycleEvents.get(3));
-		assertEquals(PostRemove.class.getSimpleName(), person2.lifyCycleEvents.get(4));
+		assertThat(person2.lifyCycleEvents.size(), is(5));
+		assertThat(person2.lifyCycleEvents.get(3), is(PreRemove.class.getSimpleName()));
+		assertThat(person2.lifyCycleEvents.get(4), is(PostRemove.class.getSimpleName()));
 	}
 
 	@Test
@@ -173,14 +172,14 @@ public class EntityManagerTest {
 		person.setGender(Gender.MALE);
 		person.setDateOfBirth(new Date());
 		entityManager.save(person);
-		assertEquals(1, entityManager.countAll());
+		assertThat(entityManager.countAll(), is(1L));
 		DetachedCriteria dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("gender", Gender.MALE));
-		assertEquals(1, entityManager.countByCriteria(dc));
+		assertThat(entityManager.countByCriteria(dc), is(1L));
 		dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("name", "test"));
 		Person person2 = entityManager.findByCriteria(dc);
-		assertEquals("test", person2.getName());
+		assertThat(person2.getName(), is("test"));
 		entityManager.delete(person);
 	}
 
@@ -189,29 +188,29 @@ public class EntityManagerTest {
 		prepareData();
 
 		List<Person> males = entityManager.findAll(Order.asc("name"));
-		assertEquals(9, males.size());
+		assertThat(males.size(), is(9));
 
 		DetachedCriteria dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("gender", Gender.MALE));
 		dc.addOrder(Order.asc("name"));
 		males = entityManager.findListByCriteria(dc);
-		assertEquals(5, males.size());
+		assertThat(males.size(), is(5));
 
 		dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("gender", Gender.MALE));
 		dc.addOrder(Order.asc("name"));
 		males = entityManager.findBetweenListByCriteria(dc, 2, 4);
-		assertEquals(2, males.size());
-		assertEquals("test4", males.get(0).getName());
-		assertEquals("test6", males.get(1).getName());
+		assertThat(males.size(), is(2));
+		assertThat(males.get(0).getName(), is("test4"));
+		assertThat(males.get(1).getName(), is("test6"));
 
 		dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("gender", Gender.MALE));
 		dc.addOrder(Order.asc("name"));
 		males = entityManager.findListByCriteria(dc, 2, 3);
-		assertEquals(2, males.size());
-		assertEquals("test6", males.get(0).getName());
-		assertEquals("test8", males.get(1).getName());
+		assertThat(males.size(), is(2));
+		assertThat(males.get(0).getName(), is("test6"));
+		assertThat(males.get(1).getName(), is("test8"));
 
 		dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("gender", Gender.MALE));
@@ -222,14 +221,14 @@ public class EntityManagerTest {
 		rp.setCriteria(dc);
 		rp = entityManager.findByResultPage(rp);
 		males = (List<Person>) rp.getResult();
-		assertEquals(2, rp.getTotalPage());
-		assertEquals(5, rp.getTotalResults());
-		assertEquals(2, males.size());
-		assertEquals("test6", males.get(0).getName());
-		assertEquals("test8", males.get(1).getName());
+		assertThat(rp.getTotalPage(), is(2));
+		assertThat(rp.getTotalResults(), is(5L));
+		assertThat(males.size(), is(2));
+		assertThat(males.get(0).getName(), is("test6"));
+		assertThat(males.get(1).getName(), is("test8"));
 
 		clearData();
-		assertEquals(0, entityManager.countAll());
+		assertThat(entityManager.countAll(), is(0L));
 	}
 
 	@Test
@@ -237,25 +236,25 @@ public class EntityManagerTest {
 		prepareData();
 
 		List<Person> males = entityManager.find("from Person p where p.gender=?1", Gender.MALE);
-		assertEquals(5, males.size());
+		assertThat(males.size(), is(5));
 		entityManager.executeUpdate("delete from Person p where p.gender=?1", Gender.MALE);
 		males = entityManager.find("from Person p where p.gender=?1", Gender.MALE);
-		assertEquals(0, males.size());
+		assertThat(males.size(), is(0));
 		List<Person> females = entityManager.find("from Person p where p.gender=?1", Gender.FEMALE);
-		assertEquals(4, females.size());
+		assertThat(females.size(), is(4));
 
 		clearData();
-		assertEquals(0, entityManager.countAll());
+		assertThat(entityManager.countAll(), is(0L));
 
 		prepareData();
 
 		Map<String, Object> args = new HashMap<>();
 		args.put("gender", Gender.MALE);
 		males = entityManager.find("from Person p where p.gender=:gender", args);
-		assertEquals(5, males.size());
+		assertThat(males.size(), is(5));
 		entityManager.executeUpdate("delete from Person p where p.gender=:gender", args);
 		males = entityManager.find("from Person p where p.gender=:gender", args);
-		assertEquals(0, males.size());
+		assertThat(males.size(), is(0));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -267,7 +266,7 @@ public class EntityManagerTest {
 			query.setParameter("gender", 0);
 			return query.getResultList();
 		});
-		assertEquals(5, list.size());
+		assertThat(list.size(), is(5));
 	}
 
 	@SuppressWarnings({ "unchecked", "deprecation" })
@@ -279,25 +278,25 @@ public class EntityManagerTest {
 			return session.createQuery(hql).setResultTransformer(Transformers.aliasToBean(PersonDTO.class))
 					.setParameter("gender", Gender.MALE).list();
 		});
-		assertEquals(5, males.size());
-		assertEquals("test0", males.get(0).getName());
-		assertEquals("code0", males.get(0).getCode());
-		assertEquals(Gender.MALE, males.get(0).getGender());
+		assertThat(males.size(), is(5));
+		assertThat(males.get(0).getName(), is("test0"));
+		assertThat(males.get(0).getCode(), is("code0"));
+		assertThat(males.get(0).getGender(), is(Gender.MALE));
 		List<Map<String, Object>> males2 = entityManager.executeFind(session -> {
 			return session.createQuery(hql).setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE)
 					.setParameter("gender", Gender.MALE).list();
 		});
-		assertEquals(5, males2.size());
-		assertEquals("test0", males2.get(0).get("name"));
-		assertEquals("code0", males2.get(0).get("code"));
-		assertEquals(Gender.MALE, males2.get(0).get("gender"));
+		assertThat(males2.size(), is(5));
+		assertThat(males2.get(0).get("name"), is("test0"));
+		assertThat(males2.get(0).get("code"), is("code0"));
+		assertThat(males2.get(0).get("gender"), is(Gender.MALE));
 		List<Object[]> males3 = entityManager.executeFind(session -> {
 			return session.createQuery(hql).setParameter("gender", Gender.MALE).list();
 		});
-		assertEquals(5, males3.size());
-		assertEquals("test0", males3.get(0)[0]);
-		assertEquals("code0", males3.get(0)[1]);
-		assertEquals(Gender.MALE, males3.get(0)[2]);
+		assertThat(males3.size(), is(5));
+		assertThat(males3.get(0)[0], is("test0"));
+		assertThat(males3.get(0)[1], is("code0"));
+		assertThat(males3.get(0)[2], is(Gender.MALE));
 		List<PersonDTO> males4 = entityManager.executeFind(session -> {
 			DetachedCriteria dc = DetachedCriteria.forClass(Person.class);
 			dc.setProjection(Projections.projectionList().add(Projections.property("name"), "name")
@@ -306,10 +305,10 @@ public class EntityManagerTest {
 			dc.add(Restrictions.eq("gender", Gender.MALE));
 			return dc.getExecutableCriteria(session).list();
 		});
-		assertEquals(5, males4.size());
-		assertEquals("test0", males4.get(0).getName());
-		assertEquals("code0", males4.get(0).getCode());
-		assertEquals(Gender.MALE, males4.get(0).getGender());
+		assertThat(males4.size(), is(5));
+		assertThat(males4.get(0).getName(), is("test0"));
+		assertThat(males4.get(0).getCode(), is("code0"));
+		assertThat(males4.get(0).getGender(), is(Gender.MALE));
 	}
 
 	@Test
@@ -321,7 +320,7 @@ public class EntityManagerTest {
 			q.setMaxResults(1);
 			return q.uniqueResult();
 		});
-		assertEquals("test0", person.getName());
+		assertThat(person.getName(), is("test0"));
 	}
 
 	@Test
@@ -340,8 +339,8 @@ public class EntityManagerTest {
 				}
 			}
 		}, people -> ai.getAndAdd(people.length), dc);
-		assertEquals(5, count);
-		assertEquals(5, ai.get());
+		assertThat(count, is(5L));
+		assertThat(ai.get(), is(5));
 
 		dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("gender", Gender.FEMALE));
@@ -354,7 +353,7 @@ public class EntityManagerTest {
 				}
 			}
 		}, dc, true);
-		assertEquals(9, count);
+		assertThat(count, is(9L));
 
 		dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("gender", Gender.MALE));
@@ -373,7 +372,7 @@ public class EntityManagerTest {
 		}
 		dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("gender", Gender.FEMALE));
-		assertEquals(2 * 2, entityManager.countByCriteria(dc)); // first 2 batch
+		assertThat(entityManager.countByCriteria(dc), is(2 * 2L));
 
 		entityManager.executeUpdate("update Person set gender=?1", Gender.FEMALE);
 
@@ -390,15 +389,15 @@ public class EntityManagerTest {
 				}
 			}
 		}, dc, true);
-		assertEquals(9, count);
-		assertEquals(9, males.size());
+		assertThat(count, is(9L));
+		assertThat(males.size(), is(9));
 
 		dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("gender", Gender.MALE));
 		dc.addOrder(Order.asc("name"));
 		count = entityManager.iterate(2, (entities, session) -> {
 		}, dc, true);
-		assertEquals(9, count);
+		assertThat(count, is(9L));
 
 	}
 

@@ -1,9 +1,9 @@
 package org.ironrhino.core.remoting.impl;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.ironrhino.core.remoting.impl.RedisServiceRegistry.NAMESPACE_APPS;
 import static org.ironrhino.core.remoting.impl.RedisServiceRegistry.NAMESPACE_SERVICES;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -52,21 +52,21 @@ public class RedisServiceRegistryInitializationTest extends RedisServiceRegistry
 	}
 
 	private void testImportedServiceCandidates() {
-		assertTrue(importedServiceCandidates.get(BarService.class.getName())
-				.containsAll(Arrays.asList("barService@0.0.0.0:8080", "barService@0.0.0.1:8080")));
+		assertThat(importedServiceCandidates.get(BarService.class.getName())
+				.containsAll(Arrays.asList("barService@0.0.0.0:8080", "barService@0.0.0.1:8080")), is(true));
 	}
 
 	private void testExportedServices() {
-		assertTrue(exportedServices.containsKey(exportedServiceName));
-		assertEquals(fooService, exportedServices.get(exportedServiceName));
+		assertThat(exportedServices.containsKey(exportedServiceName), is(true));
+		assertThat(exportedServices.get(exportedServiceName), is(fooService));
 		then(opsForList).should().remove(NAMESPACE_SERVICES + exportedServiceName, 0, serviceRegistry.getLocalHost());
 		then(opsForList).should().rightPush(NAMESPACE_SERVICES + exportedServiceName, serviceRegistry.getLocalHost());
 	}
 
 	private void testExportedServiceDescriptions() {
 		String exportedServiceName = FooService.class.getName();
-		assertTrue(exportedServiceDescriptions.containsKey(exportedServiceName));
-		assertEquals("FooService Test", exportedServiceDescriptions.get(exportedServiceName));
+		assertThat(exportedServiceDescriptions.containsKey(exportedServiceName), is(true));
+		assertThat(exportedServiceDescriptions.get(exportedServiceName), is("FooService Test"));
 		then(opsForHash).should().putAll(NAMESPACE_APPS + AppInfo.getAppName(), exportedServiceDescriptions);
 	}
 
