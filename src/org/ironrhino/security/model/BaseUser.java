@@ -18,13 +18,17 @@ import javax.validation.constraints.Email;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.hibernate.annotations.NaturalId;
+import org.ironrhino.core.aop.PublishAware;
+import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.CaseInsensitive;
 import org.ironrhino.core.metadata.NotInCopy;
+import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.BaseRecordableEntity;
 import org.ironrhino.core.model.Enableable;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.search.elasticsearch.annotations.Index;
+import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 import org.ironrhino.core.security.role.RoledUserDetails;
 import org.ironrhino.core.service.BaseManager;
@@ -45,6 +49,10 @@ import lombok.Setter;
 @MappedSuperclass
 @Getter
 @Setter
+@PublishAware
+@AutoConfig
+@Searchable
+@Richtable(order = "username asc", celleditable = false, actionColumnButtons = "<@btn view='input' label='edit'/> <@btn action='resetPassword' confirm=true/>")
 public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, Enableable {
 
 	private static final long serialVersionUID = -6135434863820342822L;
