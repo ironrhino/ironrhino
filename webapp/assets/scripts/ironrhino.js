@@ -39102,13 +39102,16 @@ Observation._richtable = function(container) {
 			var t = $(this);
 			var property = $('select.property', t.closest('tr'));
 			var option = $('option:selected', property);
-			var size = parseInt($('option:selected', t).data('parameters'));
+			var type = option.data('type');
+			var parameters = $('option:selected', t).data('parameters');
 			var td = $('td:eq(2)', t.closest('tr'));
-			if (size == $(':input', td).length)
+			if (parameters == td.data('parameters'))
 				return;
+			td.data('parameters', parameters);
 			$(':input,.input-pseudo,.removeonadd,label', td).remove();
+			var size = parseInt(parameters);
 			if (size > 0) {
-				if ('select' == option.data('type')) {
+				if ('select' == type) {
 					var select = $('<select name="' + property.val()
 							+ '" class="removeonadd ' + option.data('class')
 							+ '"></select>').appendTo(td);
@@ -39124,13 +39127,11 @@ Observation._richtable = function(container) {
 								+ (arr[1] || arr[0]) + '</option>')
 								.appendTo(select);
 					}
-				} else if ('treeselect' == option.data('type')) {
+				} else if ('treeselect' == type) {
 					$('<input name="' + property.val()
 							+ '" class="treeselect-inline required" data-url="'
 							+ option.data('pickurl') + '"/>').appendTo(td);
-				} else if ('listpick' == option.data('type')
-						|| 'treeselect' == option.data('type')) {
-					var type = option.data('type');
+				} else if ('listpick' == type || 'treeselect' == type) {
 					$('<div class="' + type
 							+ ' removeonadd" data-options="{\'url\':\''
 							+ option.data('pickurl') + '\'}"><input class="'
@@ -39148,8 +39149,8 @@ Observation._richtable = function(container) {
 					$(':input', td).clone().appendTo(td).css('margin-left',
 							'10px');
 				_observe(td);
-			} else {
-				if ('select' == option.data('type')) {
+			} else if (size < 0) {
+				if ('select' == type) {
 					var map = option.data('map');
 					if (map.indexOf('{') == 0)
 						map = map.substring(1, map.length - 1);
@@ -39164,9 +39165,7 @@ Observation._richtable = function(container) {
 								+ '" id="' + cbid + '">' + (arr[1] || arr[0])
 								+ '</label>').appendTo(td);
 					}
-				} else if ('listpick' == option.data('type')
-						|| 'treeselect' == option.data('type')) {
-					var type = option.data('type');
+				} else if ('listpick' == type || 'treeselect' == type) {
 					$('<div class="' + type
 							+ ' removeonadd" data-options="{\'url\':\''
 							+ option.data('pickurl')
