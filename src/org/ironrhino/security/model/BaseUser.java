@@ -57,8 +57,8 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 	@NotInCopy
 	@CaseInsensitive
 	@NaturalId
-	@Column(nullable = false)
-	@UiConfig(width = "120px")
+	@Column(nullable = false, updatable = false)
+	@UiConfig(width = "120px", cssClass = "conjunct", regex = USERNAME_REGEX, dynamicAttributes = "{'data-replacement':'control-group-user-roles'}")
 	private String username;
 
 	@NotInCopy
@@ -67,7 +67,7 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 	private String password;
 
 	@SearchableProperty(boost = 3)
-	@UiConfig(width = "120px")
+	@UiConfig(width = "120px", required = true)
 	private String name;
 
 	@Email
@@ -82,7 +82,7 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 	private String phone;
 
 	@JsonIgnore
-	@UiConfig(width = "80px", displayOrder = 100)
+	@UiConfig(width = "80px", displayOrder = 99)
 	private boolean enabled = true;
 
 	@NotInCopy
@@ -110,7 +110,7 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 
 	@SearchableProperty
 	@Column(length = 4000)
-	@UiConfig(displayOrder = 99, type = "multiselect", cssClass = "input-xxlarge chosen", listOptions = "beans['userRoleManager'].getAllRoles(true)", listKey = "key", listValue = "value", template = "<#list beans['userRoleManager'].displayRoles(value) as r><span class=\"label\">${action.getText(r)}</span><#sep> </#list>", csvTemplate = "<#list value as r>${beans['userRoleManager'].displayRole(r)}<#sep>,</#list>")
+	@UiConfig(displayOrder = 100, type = "multiselect", cssClass = "input-xxlarge chosen", listOptions = "beans['userRoleManager'].getAllRoles(true)", listKey = "key", listValue = "value", template = "<#list beans['userRoleManager'].displayRoles(value) as r><span class=\"label\">${action.getText(r)}</span><#sep> </#list>", csvTemplate = "<#list value as r>${beans['userRoleManager'].displayRole(r)}<#sep>,</#list>", inputTemplate = "<#--<div class=\"control-group\">--><@s.checkboxlist id='user-roles' name='user.roles' list='roles' listKey='value' listValue='label'><#if hiddenRoles?has_content><@s.param name='after'><#list hiddenRoles as role><input type=\"hidden\" name=\"user.roles\" value=\"${role}\"/></#list></@s.param></#if></@s.checkboxlist><#--</div>-->")
 	private Set<String> roles = new LinkedHashSet<>(0);
 
 	@NotInCopy
