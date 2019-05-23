@@ -16,7 +16,7 @@ import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 @Searchable
 @Entity
 @Table(name = "user")
-@Richtable(order = "username asc")
+@Richtable(order = "username asc", celleditable = false, actionColumnButtons = "<@btn view='input' label='edit'/> <@btn action='resetPassword' confirm=true/>")
 @ClassPresentConditional("org.ironrhino.security.service.UserManagerImpl")
 public class User extends BaseUser {
 

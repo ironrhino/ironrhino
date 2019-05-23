@@ -110,7 +110,7 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 
 	@SearchableProperty
 	@Column(length = 4000)
-	@UiConfig(displayOrder = 99, type = "multiselect", cssClass = "input-xxlarge chosen", listOptions = "beans['userRoleManager'].getAllRoles(true)", listKey = "key", listValue = "value", template = "<#list beans['userRoleManager'].displayRoles(value) as role>${action.getText(role)}&nbsp;&nbsp;</#list>", csvTemplate = "<#list value as r>${beans['userRoleManager'].displayRole(r)}<#sep>,</#list>")
+	@UiConfig(displayOrder = 99, type = "multiselect", cssClass = "input-xxlarge chosen", listOptions = "beans['userRoleManager'].getAllRoles(true)", listKey = "key", listValue = "value", template = "<#list beans['userRoleManager'].displayRoles(value) as r><span class=\"label\">${action.getText(r)}</span><#sep> </#list>", csvTemplate = "<#list value as r>${beans['userRoleManager'].displayRole(r)}<#sep>,</#list>")
 	private Set<String> roles = new LinkedHashSet<>(0);
 
 	@NotInCopy
