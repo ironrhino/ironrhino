@@ -1,6 +1,7 @@
 package org.ironrhino.core.coordination;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -75,7 +76,7 @@ public abstract class LockServiceTestBase {
 		time = System.currentTimeMillis() - time;
 		System.out.println("completed " + count.get() + " requests with concurrency(" + THREADS + ") in " + time
 				+ "ms (tps = " + (count.get() * 1000 / time) + ") with tryLock()");
-		assertEquals(0, error.get());
+		assertThat(error.get(), is(0));
 	}
 
 	@Test
@@ -119,7 +120,7 @@ public abstract class LockServiceTestBase {
 		time = System.currentTimeMillis() - time;
 		System.out.println("completed " + count.get() + " requests with concurrency(" + THREADS + ") in " + time
 				+ "ms (tps = " + (count.get() * 1000 / time) + ") with lock()");
-		assertEquals(0, error.get());
+		assertThat(error.get(), is(0));
 	}
 
 }

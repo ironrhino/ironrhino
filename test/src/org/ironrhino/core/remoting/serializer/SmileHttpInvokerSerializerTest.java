@@ -1,10 +1,9 @@
 package org.ironrhino.core.remoting.serializer;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -75,15 +74,15 @@ public class SmileHttpInvokerSerializerTest extends JavaHttpInvokerSerializerTes
 		byte[] data = writeRemoteInvocation(ri);
 
 		JsonNode jsonNode = objectMapper.readTree(data);
-		assertEquals(VERSION, jsonNode.get(JSONRPC).asText());
-		assertEquals("echo", jsonNode.get(METHOD).asText());
-		assertEquals("test", jsonNode.get(PARAMS).get(0).asText());
-		assertNotNull(jsonNode.get(ID));
+		assertThat(jsonNode.get(JSONRPC).asText(), is(VERSION));
+		assertThat(jsonNode.get(METHOD).asText(), is("echo"));
+		assertThat(jsonNode.get(PARAMS).get(0).asText(), is("test"));
+		assertThat(jsonNode.get(ID), is(notNullValue()));
 
 		ri = readRemoteInvocation(TestService.class, data);
-		assertEquals("echo", ri.getMethodName());
-		assertArrayEquals(new Object[] { "test" }, ri.getArguments());
-		assertArrayEquals(new Class<?>[] { String.class }, ri.getParameterTypes());
+		assertThat(ri.getMethodName(), is("echo"));
+		assertThat(ri.getArguments(), is(new Object[] { "test" }));
+		assertThat(ri.getParameterTypes(), is(new Class<?>[] { String.class }));
 	}
 
 	@Test
@@ -96,11 +95,11 @@ public class SmileHttpInvokerSerializerTest extends JavaHttpInvokerSerializerTes
 		byte[] data = writeRemoteInvocationResult(ri, rir);
 
 		JsonNode jsonNode = objectMapper.readTree(data);
-		assertNotNull(jsonNode.get(ID).asText());
-		assertEquals("result", jsonNode.get(RESULT).asText());
+		assertThat(jsonNode.get(ID).asText(), is(notNullValue()));
+		assertThat(jsonNode.get(RESULT).asText(), is("result"));
 
 		rir = readRemoteInvocationResult(mi, data);
-		assertEquals("result", rir.getValue());
+		assertThat(rir.getValue(), is("result"));
 	}
 
 	@Test
@@ -115,16 +114,17 @@ public class SmileHttpInvokerSerializerTest extends JavaHttpInvokerSerializerTes
 		byte[] data = writeRemoteInvocationResult(ri, rir);
 
 		JsonNode jsonNode = objectMapper.readTree(data);
-		assertNotNull(jsonNode.get(ID).asText());
-		assertEquals(CODE_INTERNAL_ERROR, jsonNode.get(ERROR).get(CODE).asInt());
-		assertEquals("error", jsonNode.get(ERROR).get(MESSAGE).asText());
-		assertEquals(RuntimeException.class.getName(), jsonNode.get(ERROR).get(DATA).asText());
+		assertThat(jsonNode.get(ID).asText(), is(notNullValue()));
+		assertThat(jsonNode.get(ERROR).get(CODE).asInt(), is(CODE_INTERNAL_ERROR));
+		assertThat(jsonNode.get(ERROR).get(MESSAGE).asText(), is("error"));
+		assertThat(jsonNode.get(ERROR).get(DATA).asText(), is(RuntimeException.class.getName()));
 
 		rir = readRemoteInvocationResult(mi, data);
-		assertNull(rir.getValue());
-		assertTrue(rir.hasInvocationTargetException());
-		assertEquals("error", ((InvocationTargetException) rir.getException()).getTargetException().getMessage());
-		assertTrue(((InvocationTargetException) rir.getException()).getTargetException() instanceof RuntimeException);
+		assertThat(rir.getValue(), is(nullValue()));
+		assertThat(rir.hasInvocationTargetException(), is(true));
+		assertThat(((InvocationTargetException) rir.getException()).getTargetException().getMessage(), is("error"));
+		assertThat(((InvocationTargetException) rir.getException()).getTargetException() instanceof RuntimeException,
+				is(true));
 	}
 
 	@Test
@@ -138,11 +138,11 @@ public class SmileHttpInvokerSerializerTest extends JavaHttpInvokerSerializerTes
 
 		byte[] data = writeRemoteInvocationResult(ri, rir);
 		JsonNode jsonNode = objectMapper.readTree(data);
-		assertNotNull(jsonNode.get(ID).asText());
-		assertTrue(jsonNode.get(RESULT).isNull());
+		assertThat(jsonNode.get(ID).asText(), is(notNullValue()));
+		assertThat(jsonNode.get(RESULT).isNull(), is(true));
 
 		rir = readRemoteInvocationResult(mi, data);
-		assertNull(rir.getValue());
+		assertThat(rir.getValue(), is(nullValue()));
 	}
 
 	@Test
@@ -157,11 +157,11 @@ public class SmileHttpInvokerSerializerTest extends JavaHttpInvokerSerializerTes
 
 		byte[] data = writeRemoteInvocationResult(ri, rir);
 		JsonNode jsonNode = objectMapper.readTree(data);
-		assertNotNull(jsonNode.get(ID).asText());
-		assertEquals("username", jsonNode.get(RESULT).get("username").asText());
+		assertThat(jsonNode.get(ID).asText(), is(notNullValue()));
+		assertThat(jsonNode.get(RESULT).get("username").asText(), is("username"));
 
 		rir = readRemoteInvocationResult(mi, data);
-		assertEquals(user.getUsername(), ((User) rir.getValue()).getUsername());
+		assertThat(((User) rir.getValue()).getUsername(), is(user.getUsername()));
 	}
 
 	@Test
@@ -176,11 +176,11 @@ public class SmileHttpInvokerSerializerTest extends JavaHttpInvokerSerializerTes
 
 		byte[] data = writeRemoteInvocationResult(ri, rir);
 		JsonNode jsonNode = objectMapper.readTree(data);
-		assertNotNull(jsonNode.get(ID).asText());
-		assertEquals("username", jsonNode.get(RESULT).get("username").asText());
+		assertThat(jsonNode.get(ID).asText(), is(notNullValue()));
+		assertThat(jsonNode.get(RESULT).get("username").asText(), is("username"));
 
 		rir = readRemoteInvocationResult(mi, data);
-		assertEquals(user.getUsername(), ((User) rir.getValue()).getUsername());
+		assertThat(((User) rir.getValue()).getUsername(), is(user.getUsername()));
 	}
 
 	@Test
@@ -195,10 +195,10 @@ public class SmileHttpInvokerSerializerTest extends JavaHttpInvokerSerializerTes
 
 		byte[] data = writeRemoteInvocationResult(ri, rir);
 		JsonNode jsonNode = objectMapper.readTree(data);
-		assertNotNull(jsonNode.get(ID).asText());
-		assertEquals("username", jsonNode.get(RESULT).get("username").asText());
+		assertThat(jsonNode.get(ID).asText(), is(notNullValue()));
+		assertThat(jsonNode.get(RESULT).get("username").asText(), is("username"));
 
 		rir = readRemoteInvocationResult(mi, data);
-		assertEquals(user.getUsername(), ((User) rir.getValue()).getUsername());
+		assertThat(((User) rir.getValue()).getUsername(), is(user.getUsername()));
 	}
 }

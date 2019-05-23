@@ -1,9 +1,8 @@
 package org.ironrhino.security.component;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -66,9 +65,9 @@ public class SsoHandlerTest {
 	public void testStrictAccess() throws IOException {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		given(request.getRequestURL()).willReturn(new StringBuffer("http://127.0.0.0.1:8080"));
-		assertEquals(ssoHandler.strictAccess, ssoHandler.handle(request, mock(HttpServletResponse.class)));
+		assertThat(ssoHandler.handle(request, mock(HttpServletResponse.class)), is(ssoHandler.strictAccess));
 		given(request.getRequestURL()).willReturn(new StringBuffer("http://www.baidu.com"));
-		assertEquals(ssoHandler.strictAccess, ssoHandler.handle(request, mock(HttpServletResponse.class)));
+		assertThat(ssoHandler.handle(request, mock(HttpServletResponse.class)), is(ssoHandler.strictAccess));
 	}
 
 	@Test
@@ -81,7 +80,7 @@ public class SsoHandlerTest {
 
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		given(request.getRequestURL()).willReturn(new StringBuffer("http://app.cywb.com"));
-		assertFalse(ssoHandler.handle(request, mock(HttpServletResponse.class)));
+		assertThat(ssoHandler.handle(request, mock(HttpServletResponse.class)), is(false));
 		SecurityContextHolder.clearContext();
 	}
 
@@ -91,7 +90,7 @@ public class SsoHandlerTest {
 		HttpServletResponse response = mock(HttpServletResponse.class);
 		given(request.getRequestURL()).willReturn(new StringBuffer("http://app.cywb.com"));
 		given(request.getQueryString()).willReturn("v=123456");
-		assertTrue(ssoHandler.handle(request, response));
+		assertThat(ssoHandler.handle(request, response), is(true));
 		then(response).should().sendRedirect(eq("http://portal.cywb.com/login?targetUrl="
 				+ URLEncoder.encode("http://app.cywb.com?v=123456", "UTF-8")));
 	}
@@ -107,7 +106,7 @@ public class SsoHandlerTest {
 		URI apiUri = new URI("http://portal.cywb.com/api/user/@self");
 		willThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND)).given(restTemplate)
 				.exchange(argThat(entity -> entity.getUrl().equals(apiUri)), eq(SsoHandler.User.class));
-		assertTrue(ssoHandler.handle(request, response));
+		assertThat(ssoHandler.handle(request, response), is(true));
 		then(response).should().sendRedirect(
 				eq("http://portal.cywb.com/login?targetUrl=" + URLEncoder.encode("http://app.cywb.com", "UTF-8")));
 	}
@@ -133,15 +132,13 @@ public class SsoHandlerTest {
 		given(user.getAuthorities()).willReturn(AuthorityUtils.createAuthorityList("ROLE_APP_1", "ROLE_APP_2"));
 		given(userDetailsService.loadUserByUsername("admin")).willReturn(user);
 
-		assertFalse(ssoHandler.handle(request, response));
+		assertThat(ssoHandler.handle(request, response), is(false));
 		SecurityContext sc = SecurityContextHolder.getContext();
 		Authentication authentication = sc.getAuthentication();
-		assertNotNull(authentication);
-		assertEquals("admin", authentication.getName());
-		assertNotNull(authentication.getAuthorities());
-		assertTrue(authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
-				.collect(Collectors.toList())
-				.containsAll(Arrays.asList("ROLE_PORTAL_1", "ROLE_PORTAL_2", "ROLE_APP_1", "ROLE_APP_2")));
+		assertThat(authentication, is(notNullValue()));
+		assertThat(authentication.getName(), is("admin"));
+		assertThat(authentication.getAuthorities(), is(notNullValue()));
+		assertThat(authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()).containsAll(Arrays.asList("ROLE_PORTAL_1", "ROLE_PORTAL_2", "ROLE_APP_1", "ROLE_APP_2")), is(true));
 		SecurityContextHolder.clearContext();
 	}
 
@@ -158,11 +155,11 @@ public class SsoHandlerTest {
 		given(userDetailsService.loadUserByUsername("admin")).willReturn(user);
 
 		UserDetails userDetails = ssoHandler.map(userFromApi);
-		assertNotNull(userDetails.getAuthorities());
+		assertThat(userDetails.getAuthorities(), is(notNullValue()));
 		Collection<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority)
 				.collect(Collectors.toList());
-		assertFalse(roles.contains("ROLE_PORTAL_1"));
-		assertTrue(roles.contains("ROLE_APP_1"));
+		assertThat(roles.contains("ROLE_PORTAL_1"), is(false));
+		assertThat(roles.contains("ROLE_APP_1"), is(true));
 	}
 
 	static class SsoHandlerConfig {

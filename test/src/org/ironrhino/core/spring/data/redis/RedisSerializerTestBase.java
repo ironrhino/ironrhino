@@ -1,7 +1,7 @@
 package org.ironrhino.core.spring.data.redis;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -78,12 +78,13 @@ public abstract class RedisSerializerTestBase {
 		byte[] bytes = serializer.serialize(obj);
 		Object obj2 = serializer.deserialize(bytes);
 		if (obj instanceof NullObject || obj instanceof Enum)
-			assertTrue(obj == obj2);
+			assertThat(obj == obj2, is(true));
 		if (obj instanceof Number) // AtomicInteger not override equals
-			assertTrue(
-					obj.getClass() == obj2.getClass() && ((Number) obj).doubleValue() == ((Number) obj2).doubleValue());
+			assertThat(
+					obj.getClass() == obj2.getClass() && ((Number) obj).doubleValue() == ((Number) obj2).doubleValue(),
+					is(true));
 		else
-			assertEquals(obj, obj2);
+			assertThat(obj2, is(obj));
 	}
 
 	static enum Status {

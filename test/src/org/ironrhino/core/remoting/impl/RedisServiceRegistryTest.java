@@ -1,11 +1,10 @@
 package org.ironrhino.core.remoting.impl;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.ironrhino.core.remoting.impl.RedisServiceRegistry.NAMESPACE_HOSTS;
 import static org.ironrhino.core.remoting.impl.RedisServiceRegistry.NAMESPACE_SERVICES;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -60,7 +59,7 @@ public class RedisServiceRegistryTest extends RedisServiceRegistryAdapter {
 		InOrder order = inOrder(opsForList);
 		String serviceName = TestService.class.getName();
 		serviceRegistry.register(serviceName, new TestServiceImpl());
-		assertTrue(exportedServices.containsKey(serviceName));
+		assertThat(exportedServices.containsKey(serviceName), is(true));
 		then(opsForList).should(order).remove(NAMESPACE_SERVICES + serviceName, 0, serviceRegistry.getLocalHost());
 		then(opsForList).should(order).rightPush(NAMESPACE_SERVICES + serviceName, serviceRegistry.getLocalHost());
 	}
@@ -70,7 +69,7 @@ public class RedisServiceRegistryTest extends RedisServiceRegistryAdapter {
 		String serviceName = TestService.class.getName();
 		exportedServices.put(serviceName, new TestServiceImpl());
 		serviceRegistry.unregister(serviceName);
-		assertFalse(exportedServices.containsKey(serviceName));
+		assertThat(exportedServices.containsKey(serviceName), is(false));
 		then(opsForList).should().remove(NAMESPACE_SERVICES + serviceName, 0, serviceRegistry.getLocalHost());
 	}
 
@@ -83,16 +82,16 @@ public class RedisServiceRegistryTest extends RedisServiceRegistryAdapter {
 		String host1 = serviceRegistry.discover(serviceName, true);
 		String host2 = serviceRegistry.discover(serviceName, true);
 		String host3 = serviceRegistry.discover(serviceName, true);
-		assertNotEquals(host1, host2);
-		assertNotEquals(host1, host3);
-		assertNotEquals(host2, host3);
+		assertThat(host2, is(not(host1)));
+		assertThat(host3, is(not(host1)));
+		assertThat(host3, is(not(host2)));
 
 		String host4 = serviceRegistry.discover(serviceName, true);
 		String host5 = serviceRegistry.discover(serviceName, true);
 		String host6 = serviceRegistry.discover(serviceName, true);
-		assertEquals(host1, host4);
-		assertEquals(host2, host5);
-		assertEquals(host3, host6);
+		assertThat(host4, is(host1));
+		assertThat(host5, is(host2));
+		assertThat(host6, is(host3));
 	}
 
 	@Test
@@ -105,12 +104,12 @@ public class RedisServiceRegistryTest extends RedisServiceRegistryAdapter {
 
 		String host1 = serviceRegistry.discover(serviceName, true);
 		String host2 = serviceRegistry.discover(serviceName, true);
-		assertNotEquals(host1, host2);
+		assertThat(host2, is(not(host1)));
 
 		String host3 = serviceRegistry.discover(serviceName, true);
 		String host4 = serviceRegistry.discover(serviceName, true);
-		assertEquals(host1, host3);
-		assertEquals(host2, host4);
+		assertThat(host3, is(host1));
+		assertThat(host4, is(host2));
 	}
 
 	@Test
@@ -142,8 +141,8 @@ public class RedisServiceRegistryTest extends RedisServiceRegistryAdapter {
 
 		String discoveredHost = serviceRegistry.discover(serviceName, false);
 		List<String> serviceCandidates = importedServiceCandidates.get(serviceName);
-		assertTrue(serviceCandidates.containsAll(Arrays.asList(provider1, provider2, provider3)));
-		assertEquals(normalizeHost(provider3), discoveredHost);
+		assertThat(serviceCandidates.containsAll(Arrays.asList(provider1, provider2, provider3)), is(true));
+		assertThat(discoveredHost, is(normalizeHost(provider3)));
 		then(opsForHash).should().putAll(eq(NAMESPACE_HOSTS + serviceRegistry.getLocalHost()),
 				argThat(importedServices -> importedServices.containsKey(serviceName)
 						&& provider3.equals(importedServices.get(serviceName))));
@@ -156,7 +155,7 @@ public class RedisServiceRegistryTest extends RedisServiceRegistryAdapter {
 				.willReturn(Collections.singletonMap(serviceName, provider3));
 
 		discoveredHost = serviceRegistry.discover(serviceName, false);
-		assertEquals(normalizeHost(provider2), discoveredHost);
+		assertThat(discoveredHost, is(normalizeHost(provider2)));
 	}
 
 	@Test
@@ -186,7 +185,7 @@ public class RedisServiceRegistryTest extends RedisServiceRegistryAdapter {
 				.willReturn(Collections.singletonMap(serviceName, provider3));
 
 		String discoveredHost = serviceRegistry.discover(serviceName, false);
-		assertEquals(normalizeHost(provider2), discoveredHost);
+		assertThat(discoveredHost, is(normalizeHost(provider2)));
 		then(opsForHash).should().putAll(eq(NAMESPACE_HOSTS + serviceRegistry.getLocalHost()),
 				argThat(importedServices -> importedServices.containsKey(serviceName)
 						&& importedServices.get(serviceName).equals(provider2)));

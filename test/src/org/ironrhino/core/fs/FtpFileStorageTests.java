@@ -1,6 +1,7 @@
 package org.ironrhino.core.fs;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -62,7 +63,7 @@ public class FtpFileStorageTests extends FileStorageTestBase {
 		cdl.await();
 		es.shutdown();
 
-		assertEquals(0, errors.intValue());
+		assertThat(errors.intValue(), is(0));
 	}
 
 	@Configuration

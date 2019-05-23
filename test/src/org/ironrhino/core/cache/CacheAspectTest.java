@@ -1,9 +1,9 @@
 package org.ironrhino.core.cache;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -63,28 +63,28 @@ public class CacheAspectTest {
 		personRepository.save(person);
 		for (int i = 0; i < 10; i++) {
 			if (i == 0) {
-				assertNull(cacheManager.get(person.getName(), PersonRepository.CACHE_NAMESPACE));
+				assertThat(cacheManager.get(person.getName(), PersonRepository.CACHE_NAMESPACE), is(nullValue()));
 			} else {
-				assertEquals(person, cacheManager.get(person.getName(), PersonRepository.CACHE_NAMESPACE));
+				assertThat(cacheManager.get(person.getName(), PersonRepository.CACHE_NAMESPACE), is(person));
 			}
 			Person person2 = personRepository.get(person.getName());
-			assertEquals(person, person2);
-			assertEquals(1, personRepository.count());
+			assertThat(person2, is(person));
+			assertThat(personRepository.count(), is(1));
 		}
 		personRepository.remove(person.getName());
-		assertNull(cacheManager.get(person.getName(), PersonRepository.CACHE_NAMESPACE));
+		assertThat(cacheManager.get(person.getName(), PersonRepository.CACHE_NAMESPACE), is(nullValue()));
 	}
 
 	@Test
 	public void testCacheNull() {
 		for (int i = 0; i < 10; i++) {
-			assertNull(personRepository.get("notexists"));
-			assertEquals(i + 1, personRepository.count());
+			assertThat(personRepository.get("notexists"), is(nullValue()));
+			assertThat(personRepository.count(), is(i + 1));
 		}
 		int current = personRepository.count();
 		for (int i = 0; i < 10; i++) {
-			assertNull(personRepository.getWithCacheNull("notexists"));
-			assertEquals(current + 1, personRepository.count());
+			assertThat(personRepository.getWithCacheNull("notexists"), is(nullValue()));
+			assertThat(personRepository.count(), is(current + 1));
 		}
 	}
 
@@ -105,7 +105,7 @@ public class CacheAspectTest {
 			});
 		}
 		cdl.await();
-		assertTrue(personRepository.count() <= PersonRepository.THROUGH_PERMITS);
+		assertThat(personRepository.count() <= PersonRepository.THROUGH_PERMITS, is(true));
 		es.shutdown();
 	}
 
@@ -114,14 +114,14 @@ public class CacheAspectTest {
 		long nanoTime = timeService.nanoTime();
 		for (int i = 0; i < 5; i++) {
 			Thread.sleep(10);
-			assertEquals(nanoTime, timeService.nanoTime());
+			assertThat(timeService.nanoTime(), is(nanoTime));
 		}
 		cacheManager.delete(TimeService.CACHE_KEY, TimeService.CACHE_NAMESPACE);
-		assertNotEquals(nanoTime, timeService.nanoTime());
+		assertThat(timeService.nanoTime(), is(not(nanoTime)));
 		nanoTime = timeService.nanoTime();
 		for (int i = 0; i < 5; i++) {
 			Thread.sleep(10);
-			assertEquals(nanoTime, timeService.nanoTime());
+			assertThat(timeService.nanoTime(), is(nanoTime));
 		}
 	}
 

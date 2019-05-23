@@ -1,9 +1,9 @@
 package org.ironrhino.rest;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.ironrhino.rest.MockMvcResultMatchers.jsonPoint;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -130,7 +130,7 @@ public class UserRestApiTest {
 				builtin.getAuthorities());
 		SecurityContextHolder.getContext().setAuthentication(auth);
 		User self = userClient.self();
-		assertEquals("builtin", self.getUsername());
+		assertThat(self.getUsername(), is("builtin"));
 		SecurityContextHolder.getContext().setAuthentication(null);
 	}
 
@@ -138,7 +138,7 @@ public class UserRestApiTest {
 	@WithUserDetails("builtin")
 	public void testGetSelfWithUserDetails() {
 		User self = userClient.self();
-		assertEquals("builtin", self.getUsername());
+		assertThat(self.getUsername(), is("builtin"));
 		then(userDetailsService).should().loadUserByUsername(eq("builtin"));
 	}
 
@@ -150,9 +150,9 @@ public class UserRestApiTest {
 		} catch (RestStatus restStatus) {
 			rs = restStatus;
 		}
-		assertNotNull(rs);
-		assertEquals(RestStatus.CODE_NOT_FOUND, rs.getCode());
-		assertTrue(rs.getCause() instanceof HttpClientErrorException);
+		assertThat(rs, is(notNullValue()));
+		assertThat(rs.getCode(), is(RestStatus.CODE_NOT_FOUND));
+		assertThat(rs.getCause() instanceof HttpClientErrorException, is(true));
 	}
 
 	@Test
@@ -164,9 +164,9 @@ public class UserRestApiTest {
 		} catch (RestStatus restStatus) {
 			rs = restStatus;
 		}
-		assertNotNull(rs);
-		assertEquals(RestStatus.CODE_UNAUTHORIZED, rs.getCode());
-		assertTrue(rs.getCause() instanceof HttpClientErrorException);
+		assertThat(rs, is(notNullValue()));
+		assertThat(rs.getCode(), is(RestStatus.CODE_UNAUTHORIZED));
+		assertThat(rs.getCause() instanceof HttpClientErrorException, is(true));
 		then(userDetailsService).should().loadUserByUsername("admin");
 	}
 
@@ -174,21 +174,21 @@ public class UserRestApiTest {
 	@WithUserDetails("admin")
 	public void testGetAll() {
 		List<User> userList = userClient.all();
-		assertNotNull(userList);
-		assertEquals(2, userList.size());
+		assertThat(userList, is(notNullValue()));
+		assertThat(userList.size(), is(2));
 	}
 
 	@Test
 	@WithUserDetails("admin")
 	public void testPaged() {
 		ResultPage<User> resultPage = userClient.paged(1, 1);
-		assertEquals(1, resultPage.getPageNo());
-		assertEquals(1, resultPage.getPageSize());
-		assertEquals(1, resultPage.getResult().size());
+		assertThat(resultPage.getPageNo(), is(1));
+		assertThat(resultPage.getPageSize(), is(1));
+		assertThat(resultPage.getResult().size(), is(1));
 		resultPage = userClient.pagedRestResult(1, 1);
-		assertEquals(1, resultPage.getPageNo());
-		assertEquals(1, resultPage.getPageSize());
-		assertEquals(1, resultPage.getResult().size());
+		assertThat(resultPage.getPageNo(), is(1));
+		assertThat(resultPage.getPageSize(), is(1));
+		assertThat(resultPage.getResult().size(), is(1));
 	}
 
 	@Test
@@ -221,11 +221,11 @@ public class UserRestApiTest {
 		user.setUsername("builtin");
 		user.setPassword("builtin");
 		RestStatus rs = userClient.validatePassword(user);
-		assertEquals(RestStatus.CODE_OK, rs.getCode());
+		assertThat(rs.getCode(), is(RestStatus.CODE_OK));
 
 		user.setPassword("123456");
 		rs = userClient.validatePassword(user);
-		assertEquals(RestStatus.CODE_FIELD_INVALID, rs.getCode());
+		assertThat(rs.getCode(), is(RestStatus.CODE_FIELD_INVALID));
 	}
 
 	@Test
@@ -237,8 +237,8 @@ public class UserRestApiTest {
 		} catch (RestStatus e) {
 			rs = e;
 		}
-		assertNotNull(rs);
-		assertEquals(RestStatus.CODE_FORBIDDEN, rs.getCode());
+		assertThat(rs, is(notNullValue()));
+		assertThat(rs.getCode(), is(RestStatus.CODE_FORBIDDEN));
 
 		userClient.delete("disabled");
 		then(userManager).should()
@@ -250,8 +250,8 @@ public class UserRestApiTest {
 	public void testGetStream() throws IOException {
 		InputStream in = userClient.getStream();
 		JsonNode jsonNode = JsonUtils.createNewObjectMapper().readTree(in);
-		assertEquals("builtin", jsonNode.get("username").asText());
-		assertEquals("builtin", jsonNode.get("name").asText());
+		assertThat(jsonNode.get("username").asText(), is("builtin"));
+		assertThat(jsonNode.get("name").asText(), is("builtin"));
 	}
 
 	@Test
@@ -264,9 +264,9 @@ public class UserRestApiTest {
 		} catch (RestStatus e) {
 			rs = e;
 		}
-		assertNotNull(rs);
-		assertEquals(rs.getCode(), RestStatus.CODE_INTERNAL_SERVER_ERROR);
-		assertTrue(rs.getCause() instanceof HttpServerErrorException);
+		assertThat(rs, is(notNullValue()));
+		assertThat(RestStatus.CODE_INTERNAL_SERVER_ERROR, is(rs.getCode()));
+		assertThat(rs.getCause() instanceof HttpServerErrorException, is(true));
 	}
 
 	@Test

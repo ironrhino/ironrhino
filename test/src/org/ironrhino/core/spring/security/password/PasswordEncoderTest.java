@@ -1,6 +1,7 @@
 package org.ironrhino.core.spring.security.password;
 
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.ironrhino.core.util.CodecUtils;
 import org.junit.Test;
@@ -12,14 +13,14 @@ public class PasswordEncoderTest {
 		MixedPasswordEncoder pe = new MixedPasswordEncoder();
 		String shaPassword = CodecUtils.shaHex("password");
 		String value1 = pe.encode("password");
-		assertTrue(pe.matches("password", value1));
-		assertTrue(pe.matches(shaPassword, value1));
+		assertThat(pe.matches("password", value1), is(true));
+		assertThat(pe.matches(shaPassword, value1), is(true));
 		String value2 = pe.encode("password");
-		assertTrue(pe.matches("password", value2));
-		assertTrue(pe.matches(shaPassword, value2));
-		assertTrue(!value1.equals(value2));
-		assertTrue(pe.matches("password", "fb6603c6be5733bef5d208a1d6721b84")); // legacy password
-		assertTrue(pe.matches(CodecUtils.shaHex("password"), "fb6603c6be5733bef5d208a1d6721b84")); // legacy password
+		assertThat(pe.matches("password", value2), is(true));
+		assertThat(pe.matches(shaPassword, value2), is(true));
+		assertThat(!value1.equals(value2), is(true));
+		assertThat(pe.matches("password", "fb6603c6be5733bef5d208a1d6721b84"), is(true));
+		assertThat(pe.matches(CodecUtils.shaHex("password"), "fb6603c6be5733bef5d208a1d6721b84"), is(true));
 	}
 
 }

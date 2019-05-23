@@ -1,7 +1,7 @@
 package org.ironrhino.core.throttle;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -43,16 +43,16 @@ public class CircuitBreakerAspectTest {
 		} catch (CircuitBreakerOpenException ex) {
 			opened = true;
 		}
-		assertEquals(EchoService.SIZE_IN_CLOSED_STATE / 2, success.get());
-		assertEquals(EchoService.SIZE_IN_CLOSED_STATE / 2, fail.get());
-		assertTrue(opened);
+		assertThat(success.get(), is(EchoService.SIZE_IN_CLOSED_STATE / 2));
+		assertThat(fail.get(), is(EchoService.SIZE_IN_CLOSED_STATE / 2));
+		assertThat(opened, is(true));
 		echoService.recover();
-		assertTrue(isOpen());
+		assertThat(isOpen(), is(true));
 		Thread.sleep(TimeUnit.SECONDS.toMillis(EchoService.WAIT_DURATION_IN_OPEN_STATE) / 2);
-		assertTrue(isOpen());
+		assertThat(isOpen(), is(true));
 		Thread.sleep(TimeUnit.SECONDS.toMillis(EchoService.WAIT_DURATION_IN_OPEN_STATE) / 2);
 		for (int i = 0; i < 100; i++) {
-			assertEquals("test", echoService.echo("test"));
+			assertThat(echoService.echo("test"), is("test"));
 		}
 	}
 

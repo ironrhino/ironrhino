@@ -1,8 +1,7 @@
 package org.ironrhino.core.remoting;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Proxy;
@@ -39,15 +38,15 @@ public class RemotingServiceFallbackTest {
 
 	@Test
 	public void testServiceNotFoundException() {
-		assertFalse(testService instanceof FallbackTestService);
-		assertTrue(Proxy.isProxyClass(testService.getClass()));
-		assertEquals("echo:test", testService.echo("test"));
+		assertThat(testService instanceof FallbackTestService, is(false));
+		assertThat(Proxy.isProxyClass(testService.getClass()), is(true));
+		assertThat(testService.echo("test"), is("echo:test"));
 	}
 
 	@Test
 	public void testCircuitBreakerOpenException() {
-		assertFalse(echoService instanceof FallbackEchoService);
-		assertTrue(Proxy.isProxyClass(echoService.getClass()));
+		assertThat(echoService instanceof FallbackEchoService, is(false));
+		assertThat(Proxy.isProxyClass(echoService.getClass()), is(true));
 		int errorCount = 0;
 		for (int i = 0; i < 50; i++)
 			try {
@@ -55,16 +54,16 @@ public class RemotingServiceFallbackTest {
 			} catch (RemoteAccessException e) {
 				errorCount++;
 			}
-		assertEquals(50, errorCount);
+		assertThat(errorCount, is(50));
 		for (int i = 0; i < 50; i++)
 			try {
 				echoService.echo("test");
 			} catch (RemoteAccessException e) {
 				errorCount++;
 			}
-		assertEquals(100, errorCount);
+		assertThat(errorCount, is(100));
 		// CircuitBreaker is open and fallback will active
-		assertEquals("echo:test", echoService.echo("test"));
+		assertThat(echoService.echo("test"), is("echo:test"));
 	}
 
 	@Configuration

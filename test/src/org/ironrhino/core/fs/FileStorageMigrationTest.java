@@ -1,8 +1,7 @@
 package org.ironrhino.core.fs;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -52,21 +51,21 @@ public class FileStorageMigrationTest {
 		verify(source);
 		verify(target);
 		cleanup(target, "/");
-		assertTrue(target.listFilesAndDirectory("/").isEmpty());
+		assertThat(target.listFilesAndDirectory("/").isEmpty(), is(true));
 		source.migrateTo(target, "/", true);
-		assertTrue(source.listFilesAndDirectory("/").isEmpty());
+		assertThat(source.listFilesAndDirectory("/").isEmpty(), is(true));
 		verify(target);
 	}
 
 	protected static void verify(FileStorage fs) throws IOException {
 		List<FileInfo> list = fs.listFilesAndDirectory("/");
-		assertEquals(10, list.size());
+		assertThat(list.size(), is(10));
 		for (FileInfo file : list) {
-			assertFalse(file.isFile());
+			assertThat(file.isFile(), is(false));
 			List<FileInfo> list2 = fs.listFilesAndDirectory("/" + file.getName());
-			assertEquals(10, list2.size());
+			assertThat(list2.size(), is(10));
 			for (FileInfo file2 : list2) {
-				assertTrue(file2.isFile());
+				assertThat(file2.isFile(), is(true));
 			}
 		}
 	}

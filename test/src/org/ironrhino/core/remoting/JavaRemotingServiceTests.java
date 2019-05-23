@@ -1,10 +1,9 @@
 package org.ironrhino.core.remoting;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -75,64 +74,64 @@ public class JavaRemotingServiceTests {
 
 	@Test
 	public void testJdbcRepository() {
-		assertNotNull(personRepository.findAll());
+		assertThat(personRepository.findAll(), is(notNullValue()));
 	}
 
 	@Test
 	public void testServiceImplementedByFactoryBean() {
-		assertEquals("test", fooService.test("test"));
+		assertThat(fooService.test("test"), is("test"));
 	}
 
 	@Test
 	public void testServiceRegistriedInConfigurationClass() {
-		assertEquals("test", barService.test("test"));
+		assertThat(barService.test("test"), is("test"));
 	}
 
 	@Test
 	public void testEcho() {
 		testService.ping();
-		assertEquals("test", testService.defaultEcho("test"));
-		assertEquals("", testService.echo());
-		assertNull(testService.echo((String) null));
-		assertEquals("test", testService.echo("test"));
-		assertEquals(Collections.singletonList("list"), testService.echoList(Collections.singletonList("list")));
-		assertTrue(Arrays.equals(new String[] { "echoWithArrayList" },
-				testService.echoArray(new String[] { "echoWithArrayList" })));
-		assertEquals(3, testService.countAndAdd(Collections.singletonList("test"), 2));
+		assertThat(testService.defaultEcho("test"), is("test"));
+		assertThat(testService.echo(), is(""));
+		assertThat(testService.echo((String) null), is(nullValue()));
+		assertThat(testService.echo("test"), is("test"));
+		assertThat(testService.echoList(Collections.singletonList("list")), is(Collections.singletonList("list")));
+		assertThat(Arrays.equals(new String[] { "echoWithArrayList" },
+				testService.echoArray(new String[] { "echoWithArrayList" })), is(true));
+		assertThat(testService.countAndAdd(Collections.singletonList("test"), 2), is(3));
 		TestService.Immutable value = new TestService.Immutable(12, "test");
-		assertEquals(value, testService.echoImmutable(value));
+		assertThat(testService.echoImmutable(value), is(value));
 	}
 
 	@Test
 	public void testEchoListWithArray() {
-		assertEquals("test",
-				testService.echoListWithArray(Collections.singletonList(new String[] { "test" })).get(0)[0]);
+		assertThat(testService.echoListWithArray(Collections.singletonList(new String[] { "test" })).get(0)[0],
+				is("test"));
 	}
 
 	@Test
 	public void testConcreteType() {
-		assertNull(testService.loadUserByUsername(null));
-		assertEquals("username", testService.loadUserByUsername("username").getUsername());
-		assertNull(testService.searchUser(null));
-		assertEquals(Collections.EMPTY_LIST, testService.searchUser(""));
-		assertEquals("username", testService.searchUser("username").get(0).getUsername());
+		assertThat(testService.loadUserByUsername(null), is(nullValue()));
+		assertThat(testService.loadUserByUsername("username").getUsername(), is("username"));
+		assertThat(testService.searchUser(null), is(nullValue()));
+		assertThat(testService.searchUser(""), is(Collections.EMPTY_LIST));
+		assertThat(testService.searchUser("username").get(0).getUsername(), is("username"));
 	}
 
 	@Test
 	public void testNonConcreteType() {
 		User user = new User();
 		user.setUsername("test");
-		assertEquals(user.getUsername(), testService.echoUserDetails(user).getUsername());
-		assertNull(testService.loadUserDetailsByUsername(null));
-		assertEquals("username", testService.loadUserDetailsByUsername("username").getUsername());
-		assertNull(testService.searchUserDetails(null));
-		assertEquals(Collections.EMPTY_LIST, testService.searchUserDetails(""));
-		assertEquals("username", testService.searchUserDetails("username").get(0).getUsername());
+		assertThat(testService.echoUserDetails(user).getUsername(), is(user.getUsername()));
+		assertThat(testService.loadUserDetailsByUsername(null), is(nullValue()));
+		assertThat(testService.loadUserDetailsByUsername("username").getUsername(), is("username"));
+		assertThat(testService.searchUserDetails(null), is(nullValue()));
+		assertThat(testService.searchUserDetails(""), is(Collections.EMPTY_LIST));
+		assertThat(testService.searchUserDetails("username").get(0).getUsername(), is("username"));
 	}
 
 	@Test(expected = ConstraintViolationException.class)
 	public void testBeanValidation() throws Exception {
-		assertEquals(Scope.LOCAL, testService.echoScope(Scope.LOCAL));
+		assertThat(testService.echoScope(Scope.LOCAL), is(Scope.LOCAL));
 		testService.echoScope((Scope) null);
 	}
 
@@ -140,7 +139,7 @@ public class JavaRemotingServiceTests {
 	public void testBeanValidationWithValid() throws Exception {
 		User user = new User();
 		user.setEmail("test@test.com");
-		assertEquals(user, testService.echoUser(user));
+		assertThat(testService.echoUser(user), is(user));
 		user.setEmail("iamnotemail");
 		testService.echoUser(user);
 	}
@@ -152,14 +151,14 @@ public class JavaRemotingServiceTests {
 
 	@Test
 	public void testConcreteOptional() {
-		assertFalse(testService.loadOptionalUserByUsername("").isPresent());
-		assertEquals("username", testService.loadOptionalUserByUsername("username").get().getUsername());
+		assertThat(testService.loadOptionalUserByUsername("").isPresent(), is(false));
+		assertThat(testService.loadOptionalUserByUsername("username").get().getUsername(), is("username"));
 	}
 
 	@Test
 	public void testNonConcreteOptional() {
-		assertFalse(testService.loadOptionalUserDetailsByUsername("").isPresent());
-		assertEquals("username", testService.loadOptionalUserDetailsByUsername("username").get().getUsername());
+		assertThat(testService.loadOptionalUserDetailsByUsername("").isPresent(), is(false));
+		assertThat(testService.loadOptionalUserDetailsByUsername("username").get().getUsername(), is("username"));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -175,15 +174,16 @@ public class JavaRemotingServiceTests {
 	@Test
 	public void testConcreteFuture() throws Exception {
 		for (FutureType futureType : FutureType.values()) {
-			assertEquals("username", testService.loadFutureUserByUsername("username", futureType).get().getUsername());
+			assertThat(testService.loadFutureUserByUsername("username", futureType).get().getUsername(),
+					is("username"));
 		}
 	}
 
 	@Test
 	public void testNonConcreteFuture() throws Exception {
 		for (FutureType futureType : FutureType.values()) {
-			assertEquals("username",
-					testService.loadFutureUserDetailsByUsername("username", futureType).get().getUsername());
+			assertThat(testService.loadFutureUserDetailsByUsername("username", futureType).get().getUsername(),
+					is("username"));
 		}
 	}
 
@@ -194,10 +194,10 @@ public class JavaRemotingServiceTests {
 			try {
 				testService.loadFutureUserByUsername(null, futureType).get();
 			} catch (ExecutionException e) {
-				assertTrue(e.getCause() instanceof IllegalArgumentException);
+				assertThat(e.getCause() instanceof IllegalArgumentException, is(true));
 				error = true;
 			}
-			assertTrue(error);
+			assertThat(error, is(true));
 		}
 	}
 
@@ -208,10 +208,10 @@ public class JavaRemotingServiceTests {
 			try {
 				testService.loadFutureUserByUsername("", futureType).get();
 			} catch (ExecutionException e) {
-				assertTrue(e.getCause() instanceof IllegalArgumentException);
+				assertThat(e.getCause() instanceof IllegalArgumentException, is(true));
 				error = true;
 			}
-			assertTrue(error);
+			assertThat(error, is(true));
 		}
 	}
 
@@ -226,9 +226,9 @@ public class JavaRemotingServiceTests {
 			b2.set(true);
 		});
 		Thread.sleep(1000);
-		assertTrue(b1.get());
-		assertFalse(b2.get());
-		assertEquals("username", future.get().getUsername());
+		assertThat(b1.get(), is(true));
+		assertThat(b2.get(), is(false));
+		assertThat(future.get().getUsername(), is("username"));
 	}
 
 	@Test
@@ -243,19 +243,19 @@ public class JavaRemotingServiceTests {
 			b2.set(true);
 		});
 		Thread.sleep(1000);
-		assertTrue(b1.get());
-		assertFalse(b2.get());
-		assertEquals("username", future.get().getUsername());
+		assertThat(b1.get(), is(true));
+		assertThat(b2.get(), is(false));
+		assertThat(future.get().getUsername(), is("username"));
 	}
 
 	@Test
 	public void testConcreteCallable() throws Exception {
-		assertEquals("username", testService.loadCallableUserByUsername("username").call().getUsername());
+		assertThat(testService.loadCallableUserByUsername("username").call().getUsername(), is("username"));
 	}
 
 	@Test
 	public void testNonConcreteCallable() throws Exception {
-		assertEquals("username", testService.loadCallableUserDetailsByUsername("username").call().getUsername());
+		assertThat(testService.loadCallableUserDetailsByUsername("username").call().getUsername(), is("username"));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -277,7 +277,7 @@ public class JavaRemotingServiceTests {
 
 			executorService.execute(() -> {
 				for (int j = 0; j < LOOP; j++) {
-					assertEquals("test" + j, testService.echo("test" + j));
+					assertThat(testService.echo("test" + j), is("test" + j));
 					count.incrementAndGet();
 				}
 				cdl.countDown();
@@ -287,7 +287,7 @@ public class JavaRemotingServiceTests {
 		time = System.currentTimeMillis() - time;
 		System.out.println(getClass().getSimpleName() + " completed " + count.get() + " requests with concurrency("
 				+ THREADS + ") in " + time + "ms (tps = " + (count.get() * 1000 / time) + ")");
-		assertEquals(count.get(), THREADS * LOOP);
+		assertThat(THREADS * LOOP, is(count.get()));
 	}
 
 	@Configuration

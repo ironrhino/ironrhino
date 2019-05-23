@@ -1,7 +1,8 @@
 package org.ironrhino.rest.client;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
 
@@ -32,21 +33,21 @@ public class RestClientTests {
 	@Test
 	public void testFetchAccessToken() {
 		String accessToken = restClient.fetchAccessToken();
-		assertNotNull(accessToken);
+		assertThat(accessToken, is(notNullValue()));
 		String accessToken2 = restClient.fetchAccessToken();
-		assertNotNull(accessToken2);
-		assertEquals(accessToken, accessToken2);
+		assertThat(accessToken2, is(notNullValue()));
+		assertThat(accessToken2, is(accessToken));
 	}
 
 	@Test
 	public void testRestTemplate() {
 		RestTemplate rt = restClient.getRestTemplate();
 		User u = rt.getForObject("/user/@self", User.class);
-		assertNotNull(u);
-		assertNotNull(u.getUsername());
+		assertThat(u, is(notNullValue()));
+		assertThat(u.getUsername(), is(notNullValue()));
 		u = rt.getForObject("/user/admin", User.class);
-		assertNotNull(u);
-		assertEquals("admin", u.getUsername());
+		assertThat(u, is(notNullValue()));
+		assertThat(u.getUsername(), is("admin"));
 	}
 
 	@Test
@@ -60,9 +61,9 @@ public class RestClientTests {
 		HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(params, headers);
 		String response = rt.postForEntity("/upload", request, String.class).getBody();
 		JsonNode jn = JsonUtils.fromJson(response, JsonNode.class);
-		assertEquals("build", jn.get("name").asText());
-		assertEquals("file", jn.get("filename").asText());
-		assertEquals("build.xml", jn.get("originalFilename").asText());
+		assertThat(jn.get("name").asText(), is("build"));
+		assertThat(jn.get("filename").asText(), is("file"));
+		assertThat(jn.get("originalFilename").asText(), is("build.xml"));
 	}
 
 }

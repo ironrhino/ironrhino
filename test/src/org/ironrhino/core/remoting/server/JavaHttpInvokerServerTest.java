@@ -1,11 +1,9 @@
 package org.ironrhino.core.remoting.server;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.contains;
@@ -104,10 +102,10 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 	@Test
 	public void testServiceRegistry() {
 		Map<String, Object> exportedServices = serviceRegistry.getExportedServices();
-		assertTrue(exportedServices.containsKey(TestService.class.getName()));
-		assertTrue(exportedServices.containsKey(FooService.class.getName()));
-		assertSame(mockTestService, exportedServices.get(TestService.class.getName()));
-		assertSame(mockFooService, exportedServices.get(FooService.class.getName()));
+		assertThat(exportedServices.containsKey(TestService.class.getName()), is(true));
+		assertThat(exportedServices.containsKey(FooService.class.getName()), is(true));
+		assertThat(exportedServices.get(TestService.class.getName()), is(mockTestService));
+		assertThat(exportedServices.get(FooService.class.getName()), is(mockFooService));
 	}
 
 	@Test
@@ -122,7 +120,7 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 		request.addHeader(AccessFilter.HTTP_HEADER_REQUEST_ID, CodecUtils.nextId());
 		MockHttpServletResponse response = new MockHttpServletResponse();
 		httpInvokerServer.handleRequest(request, response);
-		assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatus());
+		assertThat(response.getStatus(), is(HttpServletResponse.SC_NOT_FOUND));
 	}
 
 	@Test
@@ -138,9 +136,9 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 		MockHttpServletResponse response = new MockHttpServletResponse();
 		httpInvokerServer.handleRequest(request, response);
 		if (HttpInvokerSerializers.DEFAULT_SERIALIZER.getSerializationType().equals(serializationType)) {
-			assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, response.getStatus());
+			assertThat(response.getStatus(), is(HttpServletResponse.SC_INTERNAL_SERVER_ERROR));
 		} else {
-			assertEquals(RemotingContext.SC_SERIALIZATION_FAILED, response.getStatus());
+			assertThat(response.getStatus(), is(RemotingContext.SC_SERIALIZATION_FAILED));
 		}
 	}
 
@@ -149,112 +147,112 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 		testService.ping();
 		then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(TestService.class)),
 				argThat(ri -> "ping".equals(ri.getMethodName())), any(MethodInvocation.class));
-		assertEquals(HttpServletResponse.SC_OK, mockHttpServletResponse.getStatus());
+		assertThat(mockHttpServletResponse.getStatus(), is(HttpServletResponse.SC_OK));
 		then(mockTestService).should().ping();
 	}
 
 	@Test
 	public void testEcho() throws Exception {
-		assertEquals("", testService.echo());
+		assertThat(testService.echo(), is(""));
 		then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(TestService.class)),
 				argThat(ri -> "echo".equals(ri.getMethodName())), any(MethodInvocation.class));
-		assertEquals(HttpServletResponse.SC_OK, mockHttpServletResponse.getStatus());
+		assertThat(mockHttpServletResponse.getStatus(), is(HttpServletResponse.SC_OK));
 		then(mockTestService).should().echo();
 		TestService.Immutable value = new TestService.Immutable(12, "test");
-		assertEquals(value, testService.echoImmutable(value));
+		assertThat(testService.echoImmutable(value), is(value));
 		then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(TestService.class)),
 				argThat(ri -> "echoImmutable".equals(ri.getMethodName())), any(MethodInvocation.class));
-		assertEquals(HttpServletResponse.SC_OK, mockHttpServletResponse.getStatus());
+		assertThat(mockHttpServletResponse.getStatus(), is(HttpServletResponse.SC_OK));
 		then(mockTestService).should().echoImmutable(value);
 	}
 
 	@Test
 	public void testDefaultEcho() throws Exception {
-		assertEquals("", testService.defaultEcho(""));
+		assertThat(testService.defaultEcho(""), is(""));
 		then(mockTestService).should(never()).defaultEcho("");
 		then(mockHttpInvokerRequestExecutor).should(never()).executeRequest(eq(serviceUrl(TestService.class)),
 				argThat(ri -> "defaultEcho".equals(ri.getMethodName())), any(MethodInvocation.class));
 		then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(TestService.class)),
 				argThat(ri -> "echo".equals(ri.getMethodName())), any(MethodInvocation.class));
-		assertEquals(HttpServletResponse.SC_OK, mockHttpServletResponse.getStatus());
+		assertThat(mockHttpServletResponse.getStatus(), is(HttpServletResponse.SC_OK));
 		then(mockTestService).should().echo("");
 	}
 
 	@Test
 	public void testEchoList() throws Exception {
-		assertEquals("test", testService.echoList(Arrays.asList("test")).get(0));
+		assertThat(testService.echoList(Arrays.asList("test")).get(0), is("test"));
 		then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(TestService.class)),
 				argThat(ri -> "echoList".equals(ri.getMethodName())), any(MethodInvocation.class));
-		assertEquals(HttpServletResponse.SC_OK, mockHttpServletResponse.getStatus());
+		assertThat(mockHttpServletResponse.getStatus(), is(HttpServletResponse.SC_OK));
 		then(mockTestService).should().echoList(argThat(list -> list.get(0).equals("test")));
 	}
 
 	@Test
 	public void testEchoListWithArray() throws Exception {
-		assertEquals("test",
-				testService.echoListWithArray(Collections.singletonList(new String[] { "test" })).get(0)[0]);
+		assertThat(testService.echoListWithArray(Collections.singletonList(new String[] { "test" })).get(0)[0],
+				is("test"));
 		then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(TestService.class)),
 				argThat(ri -> "echoListWithArray".equals(ri.getMethodName())), any(MethodInvocation.class));
-		assertEquals(HttpServletResponse.SC_OK, mockHttpServletResponse.getStatus());
+		assertThat(mockHttpServletResponse.getStatus(), is(HttpServletResponse.SC_OK));
 		then(mockTestService).should().echoListWithArray(argThat(list -> list.get(0)[0].equals("test")));
 	}
 
 	@Test
 	public void testEchoArray() throws Exception {
-		assertEquals("test", testService.echoArray(new String[] { "test" })[0]);
+		assertThat(testService.echoArray(new String[] { "test" })[0], is("test"));
 		then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(TestService.class)),
 				argThat(ri -> "echoArray".equals(ri.getMethodName())), any(MethodInvocation.class));
-		assertEquals(HttpServletResponse.SC_OK, mockHttpServletResponse.getStatus());
+		assertThat(mockHttpServletResponse.getStatus(), is(HttpServletResponse.SC_OK));
 		then(mockTestService).should().echoArray(argThat(array -> array[0].equals("test")));
 	}
 
 	@Test
 	public void testContcreteType() throws Exception {
-		assertNull(testService.loadUserByUsername(null));
+		assertThat(testService.loadUserByUsername(null), is(nullValue()));
 		then(mockTestService).should().loadUserByUsername(isNull());
 
-		assertEquals("username", testService.loadUserByUsername("username").getUsername());
+		assertThat(testService.loadUserByUsername("username").getUsername(), is("username"));
 		then(mockTestService).should().loadUserByUsername(eq("username"));
 
-		assertNull(testService.searchUser(null));
+		assertThat(testService.searchUser(null), is(nullValue()));
 		then(mockTestService).should().searchUser(isNull());
-		assertEquals(Collections.EMPTY_LIST, testService.searchUser(""));
+		assertThat(testService.searchUser(""), is(Collections.EMPTY_LIST));
 		then(mockTestService).should().searchUser(eq(""));
-		assertEquals("username", testService.searchUser("username").get(0).getUsername());
+		assertThat(testService.searchUser("username").get(0).getUsername(), is("username"));
 		then(mockTestService).should().searchUser(eq("username"));
 	}
 
 	@Test
 	public void testNonContcreteType() throws Exception {
-		assertNull(testService.echoUserDetails(null));
+		assertThat(testService.echoUserDetails(null), is(nullValue()));
 		then(mockTestService).should().echoUserDetails(isNull());
 		User user = new User();
 		user.setUsername("test");
 		UserDetails userDetails = testService.echoUserDetails(user);
 		verifyUserDetails(userDetails);
-		assertEquals("test", userDetails.getUsername());
+		assertThat(userDetails.getUsername(), is("test"));
 		then(mockTestService).should().echoUserDetails(argThat(u -> u != null && u.getUsername().equals("test")));
 
-		assertNull(testService.loadUserDetailsByUsername(null));
+		assertThat(testService.loadUserDetailsByUsername(null), is(nullValue()));
 		then(mockTestService).should().loadUserDetailsByUsername(isNull());
 		userDetails = testService.loadUserDetailsByUsername("test");
 		verifyUserDetails(userDetails);
-		assertEquals("test", userDetails.getUsername());
+		assertThat(userDetails.getUsername(), is("test"));
 		then(mockTestService).should().loadUserDetailsByUsername(eq("test"));
 
-		assertNull(testService.searchUserDetails(null));
+		assertThat(testService.searchUserDetails(null), is(nullValue()));
 		then(mockTestService).should().searchUserDetails(isNull());
-		assertEquals(Collections.EMPTY_LIST, testService.searchUserDetails(""));
+		assertThat(testService.searchUserDetails(""), is(Collections.EMPTY_LIST));
 		then(mockTestService).should().searchUserDetails(eq(""));
 		List<? extends UserDetails> list = testService.searchUserDetails("test");
 		verifyUserDetails(list.get(0));
-		assertEquals("test", list.get(0).getUsername());
+		assertThat(list.get(0).getUsername(), is("test"));
 		then(mockTestService).should().searchUserDetails(eq("test"));
 	}
 
 	@Test
 	public void testBeanValidation() {
-		assertEquals(Scope.LOCAL, testService.echoScope(Scope.LOCAL));
+		assertThat(testService.echoScope(Scope.LOCAL), is(Scope.LOCAL));
 		then(mockTestService).should().echoScope(Scope.LOCAL);
 
 		Exception e = null;
@@ -263,8 +261,8 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 		} catch (ConstraintViolationException error) {
 			e = error;
 		}
-		assertNotNull(e);
-		assertTrue(e instanceof ConstraintViolationException);
+		assertThat(e, is(notNullValue()));
+		assertThat(e instanceof ConstraintViolationException, is(true));
 		then(mockTestService).should(never()).echoScope(isNull());
 	}
 
@@ -272,7 +270,7 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 	public void testBeanValidationWithValid() {
 		User user = new User();
 		user.setEmail("test@test.com");
-		assertEquals(user, testService.echoUser(user));
+		assertThat(testService.echoUser(user), is(user));
 		then(mockTestService).should().echoUser(user);
 
 		user.setEmail("iamnotemail");
@@ -282,8 +280,8 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 		} catch (ConstraintViolationException error) {
 			e = error;
 		}
-		assertNotNull(e);
-		assertTrue(e instanceof ConstraintViolationException);
+		assertThat(e, is(notNullValue()));
+		assertThat(e instanceof ConstraintViolationException, is(true));
 		then(mockTestService).should(never()).echoUser(user);
 	}
 
@@ -295,44 +293,44 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 		} catch (Exception e) {
 			error = true;
 		}
-		assertTrue(error);
+		assertThat(error, is(true));
 		then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(TestService.class)),
 				argThat(ri -> "throwException".equals(ri.getMethodName())), any(MethodInvocation.class));
-		assertEquals(HttpServletResponse.SC_OK, mockHttpServletResponse.getStatus());
+		assertThat(mockHttpServletResponse.getStatus(), is(HttpServletResponse.SC_OK));
 		then(mockTestService).should().throwException("");
 	}
 
 	@Test
 	public void testOptional() {
-		assertFalse(testService.loadOptionalUserByUsername("").isPresent());
-		assertEquals(HttpServletResponse.SC_OK, mockHttpServletResponse.getStatus());
+		assertThat(testService.loadOptionalUserByUsername("").isPresent(), is(false));
+		assertThat(mockHttpServletResponse.getStatus(), is(HttpServletResponse.SC_OK));
 		then(mockTestService).should().loadOptionalUserByUsername("");
 
-		assertTrue(testService.loadOptionalUserByUsername("test").isPresent());
-		assertEquals(HttpServletResponse.SC_OK, mockHttpServletResponse.getStatus());
+		assertThat(testService.loadOptionalUserByUsername("test").isPresent(), is(true));
+		assertThat(mockHttpServletResponse.getStatus(), is(HttpServletResponse.SC_OK));
 		then(mockTestService).should().loadOptionalUserByUsername("test");
 
 		willReturn(null).given(mockTestService).loadOptionalUserByUsername(null);
-		assertNull(mockTestService.loadOptionalUserByUsername(null));
-		assertNotNull(testService.loadOptionalUserByUsername(null));
+		assertThat(mockTestService.loadOptionalUserByUsername(null), is(nullValue()));
+		assertThat(testService.loadOptionalUserByUsername(null), is(notNullValue()));
 		then(mockTestService).should(atLeast(2)).loadOptionalUserByUsername(null);
 	}
 
 	@Test
 	public void testNonConcreteOptional() {
-		assertFalse(testService.loadOptionalUserDetailsByUsername("").isPresent());
-		assertEquals(HttpServletResponse.SC_OK, mockHttpServletResponse.getStatus());
+		assertThat(testService.loadOptionalUserDetailsByUsername("").isPresent(), is(false));
+		assertThat(mockHttpServletResponse.getStatus(), is(HttpServletResponse.SC_OK));
 		then(mockTestService).should().loadOptionalUserDetailsByUsername("");
 
 		Optional<? extends UserDetails> userDetailsOptional = testService.loadOptionalUserDetailsByUsername("test");
-		assertTrue(userDetailsOptional.isPresent());
+		assertThat(userDetailsOptional.isPresent(), is(true));
 		verifyUserDetails(userDetailsOptional.get());
-		assertEquals(HttpServletResponse.SC_OK, mockHttpServletResponse.getStatus());
+		assertThat(mockHttpServletResponse.getStatus(), is(HttpServletResponse.SC_OK));
 		then(mockTestService).should().loadOptionalUserDetailsByUsername("test");
 
 		willReturn(null).given(mockTestService).loadOptionalUserDetailsByUsername(null);
-		assertNull(mockTestService.loadOptionalUserDetailsByUsername(null));
-		assertNotNull(testService.loadOptionalUserDetailsByUsername(null));
+		assertThat(mockTestService.loadOptionalUserDetailsByUsername(null), is(nullValue()));
+		assertThat(testService.loadOptionalUserDetailsByUsername(null), is(notNullValue()));
 		then(mockTestService).should(atLeast(2)).loadOptionalUserDetailsByUsername(null);
 	}
 
@@ -342,7 +340,7 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 		then(mockHttpInvokerRequestExecutor).shouldHaveZeroInteractions();
 		then(mockTestService).shouldHaveZeroInteractions();
 
-		assertEquals("username", callable.call().getUsername());
+		assertThat(callable.call().getUsername(), is("username"));
 		then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(TestService.class)),
 				argThat(ri -> "loadCallableUserByUsername".equals(ri.getMethodName())), any(MethodInvocation.class));
 		then(mockHttpServletRequest).should().startAsync();
@@ -358,7 +356,7 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 		then(mockTestService).shouldHaveZeroInteractions();
 
 		UserDetails userDetails = callable.call();
-		assertEquals("username", userDetails.getUsername());
+		assertThat(userDetails.getUsername(), is("username"));
 		verifyUserDetails(userDetails);
 		then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(TestService.class)),
 				argThat(ri -> "loadCallableUserDetailsByUsername".equals(ri.getMethodName())),
@@ -373,7 +371,7 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 	public void testFuture() throws Exception {
 		for (FutureType futureType : FutureType.values()) {
 			Future<User> future = testService.loadFutureUserByUsername("username", futureType);
-			assertEquals("username", future.get().getUsername());
+			assertThat(future.get().getUsername(), is("username"));
 			then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(TestService.class)),
 					argThat(ri -> "loadFutureUserByUsername".equals(ri.getMethodName())), any(MethodInvocation.class));
 			then(mockHttpServletRequest).should().startAsync();
@@ -390,7 +388,7 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 		for (FutureType futureType : FutureType.values()) {
 			Future<? extends UserDetails> future = testService.loadFutureUserDetailsByUsername("username", futureType);
 			UserDetails userDetails = future.get();
-			assertEquals("username", userDetails.getUsername());
+			assertThat(userDetails.getUsername(), is("username"));
 			verifyUserDetails(userDetails);
 			then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(TestService.class)),
 					argThat(ri -> "loadFutureUserDetailsByUsername".equals(ri.getMethodName())),
@@ -411,10 +409,10 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 			try {
 				testService.loadFutureUserByUsername(null, futureType).get();
 			} catch (ExecutionException e) {
-				assertTrue(e.getCause() instanceof IllegalArgumentException);
+				assertThat(e.getCause() instanceof IllegalArgumentException, is(true));
 				error = true;
 			}
-			assertTrue(error);
+			assertThat(error, is(true));
 			then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(TestService.class)),
 					argThat(ri -> "loadFutureUserByUsername".equals(ri.getMethodName())), any(MethodInvocation.class));
 			then(mockTestService).should().loadFutureUserByUsername(null, futureType);
@@ -431,10 +429,10 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 			try {
 				testService.loadFutureUserByUsername("", futureType).get();
 			} catch (ExecutionException e) {
-				assertTrue(e.getCause() instanceof IllegalArgumentException);
+				assertThat(e.getCause() instanceof IllegalArgumentException, is(true));
 				error = true;
 			}
-			assertTrue(error);
+			assertThat(error, is(true));
 			then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(TestService.class)),
 					argThat(ri -> "loadFutureUserByUsername".equals(ri.getMethodName())), any(MethodInvocation.class));
 			then(mockHttpServletRequest).should().startAsync();
@@ -453,9 +451,9 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 		AtomicBoolean b2 = new AtomicBoolean();
 		listenableFuture.addCallback(u -> b1.set(u != null && "username".equals(u.getUsername())), e -> b2.set(true));
 		Thread.sleep(1000);
-		assertTrue(b1.get());
-		assertFalse(b2.get());
-		assertEquals("username", listenableFuture.get().getUsername());
+		assertThat(b1.get(), is(true));
+		assertThat(b2.get(), is(false));
+		assertThat(listenableFuture.get().getUsername(), is("username"));
 		then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(TestService.class)),
 				argThat(ri -> "loadListenableFutureUserByUsername".equals(ri.getMethodName())),
 				any(MethodInvocation.class));
@@ -472,10 +470,10 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 		AtomicBoolean b2 = new AtomicBoolean();
 		listenableFuture.addCallback(u -> b1.set(u != null && "username".equals(u.getUsername())), e -> b2.set(true));
 		Thread.sleep(1000);
-		assertTrue(b1.get());
-		assertFalse(b2.get());
+		assertThat(b1.get(), is(true));
+		assertThat(b2.get(), is(false));
 		UserDetails userDetails = listenableFuture.get();
-		assertEquals("username", userDetails.getUsername());
+		assertThat(userDetails.getUsername(), is("username"));
 		verifyUserDetails(userDetails);
 		then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(TestService.class)),
 				argThat(ri -> "loadListenableFutureUserDetailsByUsername".equals(ri.getMethodName())),
@@ -498,7 +496,7 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 		} catch (Throwable e) {
 			error = true;
 		}
-		assertTrue(error);
+		assertThat(error, is(true));
 		then(mockHttpInvokerRequestExecutor).should(times(maxAttempts)).executeRequest(
 				contains(BarService.class.getName()), argThat(ri -> "test".equals(ri.getMethodName())),
 				any(MethodInvocation.class));
@@ -520,8 +518,8 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 			} catch (Throwable e) {
 				error = true;
 			}
-			assertTrue(error);
-			assertEquals(defaultSerizliazer, mockHttpInvokerRequestExecutor.getSerializer().getSerializationType());
+			assertThat(error, is(true));
+			assertThat(mockHttpInvokerRequestExecutor.getSerializer().getSerializationType(), is(defaultSerizliazer));
 			then(mockHttpInvokerRequestExecutor).should().setSerializer(HttpInvokerSerializers.DEFAULT_SERIALIZER);
 			then(mockHttpInvokerRequestExecutor).should(times(maxAttempts)).executeRequest(
 					contains(BarService.class.getName()), argThat(ri -> "test".contentEquals(ri.getMethodName())),
@@ -538,7 +536,7 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 		willThrow(new ServiceNotFoundException(BarService.class.getName())).given(mockHttpInvokerRequestExecutor)
 				.executeRequest(contains(BarService.class.getName()),
 						argThat(ri -> "test".contentEquals(ri.getMethodName())), any(MethodInvocation.class));
-		assertEquals("fallback:", ((BarService) (barServiceClient.getObject())).test(""));
+		assertThat(((BarService) (barServiceClient.getObject())).test(""), is("fallback:"));
 		then(mockBarService).should(never()).test(eq(""));
 		then(fallbackBarService).should().test(eq(""));
 	}
@@ -550,7 +548,7 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 		willThrow(new CircuitBreakerOpenException("CircuitBreakerOpen")).given(mockHttpInvokerRequestExecutor)
 				.executeRequest(contains(BarService.class.getName()),
 						argThat(ri -> "test".contentEquals(ri.getMethodName())), any(MethodInvocation.class));
-		assertEquals("fallback:", ((BarService) (barServiceClient.getObject())).test(""));
+		assertThat(((BarService) (barServiceClient.getObject())).test(""), is("fallback:"));
 		then(mockBarService).should(never()).test(eq(""));
 		then(fallbackBarService).should().test(eq(""));
 	}
@@ -560,16 +558,16 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 		fooService.test("test");
 		then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(FooService.class)),
 				argThat(ri -> "test".equals(ri.getMethodName())), any(MethodInvocation.class));
-		assertEquals(HttpServletResponse.SC_OK, mockHttpServletResponse.getStatus());
+		assertThat(mockHttpServletResponse.getStatus(), is(HttpServletResponse.SC_OK));
 		then(mockFooService).should().test("test");
 	}
 
 	protected void verifyUserDetails(UserDetails userDetails) {
 		if (FstHttpInvokerSerializer.INSTANCE.getSerializationType().equals(serializationType)
 				|| JavaHttpInvokerSerializer.INSTANCE.getSerializationType().equals(serializationType)) {
-			assertTrue(userDetails instanceof User);
+			assertThat(userDetails instanceof User, is(true));
 		} else {
-			assertFalse(userDetails instanceof User);
+			assertThat(userDetails instanceof User, is(false));
 		}
 	}
 

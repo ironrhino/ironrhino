@@ -1,7 +1,7 @@
 package org.ironrhino.core.security.verfication.impl;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.then;
@@ -63,7 +63,7 @@ public class DefaultVerificationServiceTest {
 	public void testVerify() {
 		verificationService.send("testVerify");
 		then(verificationCodeNotifier).should().send(eq("testVerify"), eq("testVerify"));
-		assertTrue(verificationService.verify("testVerify", "testVerify"));
+		assertThat(verificationService.verify("testVerify", "testVerify"), is(true));
 		then(cacheManager).should().mdelete(
 				argThat(collection -> collection != null
 						&& collection.containsAll(Arrays.asList("testVerify", "testVerify$$threshold"))),
@@ -75,13 +75,13 @@ public class DefaultVerificationServiceTest {
 		verificationService.send("testVerifyWithErrorCode");
 		then(verificationCodeNotifier).should().send(eq("testVerifyWithErrorCode"), eq("testVerifyWithErrorCode"));
 		for (int i = 0; i < verificationService.getMaxAttempts(); i++) {
-			assertFalse(verificationService.verify("testVerifyWithErrorCode", "test"));
+			assertThat(verificationService.verify("testVerifyWithErrorCode", "test"), is(false));
 		}
 		then(cacheManager).should().mdelete(
 				argThat(collection -> collection != null && collection
 						.containsAll(Arrays.asList("testVerifyWithErrorCode", "testVerifyWithErrorCode$$threshold"))),
 				eq("verification"));
-		assertFalse(verificationService.verify("testVerifyWithErrorCode", "testVerifyWithErrorCode"));
+		assertThat(verificationService.verify("testVerifyWithErrorCode", "testVerifyWithErrorCode"), is(false));
 	}
 
 	static class VerificationConfig {

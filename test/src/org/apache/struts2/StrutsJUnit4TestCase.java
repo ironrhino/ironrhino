@@ -18,7 +18,9 @@
  */
 package org.apache.struts2;
 
-import static org.junit.Assert.assertNotNull;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
@@ -102,7 +104,7 @@ public abstract class StrutsJUnit4TestCase<T> extends XWorkJUnit4TestCase implem
 		request.setRequestURI(uri);
 		ActionMapping mapping = getActionMapping(request);
 
-		assertNotNull(mapping);
+		assertThat(mapping, is(notNullValue()));
 		try {
 			Dispatcher.getInstance().serviceAction(request, response, servletContext, mapping);
 			return response.getContentAsString();

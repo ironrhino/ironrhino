@@ -1,7 +1,8 @@
 package org.ironrhino.core.dataroute;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -37,10 +38,10 @@ public class GroupedDataSourceTest {
 		p.setName("test");
 		petRepository.save(p);
 		Pet p2 = petRepository.get(p.getName());
-		assertNull(p2);
+		assertThat(p2, is(nullValue()));
 		sync(masterDataSource, slaveDataSource);
 		p2 = petRepository.get(p.getName());
-		assertEquals(p, p2);
+		assertThat(p2, is(p));
 	}
 
 	private static void sync(DataSource from, DataSource to) throws SQLException {

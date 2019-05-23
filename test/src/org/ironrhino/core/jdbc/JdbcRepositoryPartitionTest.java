@@ -1,7 +1,8 @@
 package org.ironrhino.core.jdbc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
 
@@ -53,15 +54,15 @@ public class JdbcRepositoryPartitionTest {
 		customer.setName("test" + identifyNo);
 		customerRepository.save(customer);
 		Customer customer2 = customerRepository.get(customer.getIdentifyNo());
-		assertEquals(customer.getIdentifyNo(), customer2.getIdentifyNo());
-		assertEquals(customer.getName(), customer2.getName());
+		assertThat(customer2.getIdentifyNo(), is(customer.getIdentifyNo()));
+		assertThat(customer2.getName(), is(customer.getName()));
 		List<Customer> customers = customerRepository.list(customerPartitioner.partition(identifyNo));
-		assertEquals(1, customers.size());
-		assertEquals(customer.getIdentifyNo(), customers.get(0).getIdentifyNo());
-		assertEquals(customer.getName(), customers.get(0).getName());
+		assertThat(customers.size(), is(1));
+		assertThat(customers.get(0).getIdentifyNo(), is(customer.getIdentifyNo()));
+		assertThat(customers.get(0).getName(), is(customer.getName()));
 		customerRepository.delete(customer.getIdentifyNo());
 		Customer customer3 = customerRepository.get(customer.getIdentifyNo());
-		assertNull(customer3);
+		assertThat(customer3, is(nullValue()));
 	}
 
 }

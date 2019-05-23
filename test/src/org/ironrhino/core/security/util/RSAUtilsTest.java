@@ -1,8 +1,8 @@
 package org.ironrhino.core.security.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.junit.Test;
 
@@ -37,15 +37,15 @@ public class RSAUtilsTest {
 	public void testEncrypt() throws Exception {
 		String data = "I am test";
 		String encryptedData = RSAUtils.encrypt(data, PUBLIC_KEY);
-		assertNotEquals(data, encryptedData);
+		assertThat(encryptedData, is(not(data)));
 		String decryptedData = RSAUtils.decrypt(encryptedData, PRIVATE_KEY);
-		assertEquals(data, decryptedData);
+		assertThat(decryptedData, is(data));
 	}
 
 	@Test
 	public void testSign() throws Exception {
 		String data = "I am test";
 		String sign = RSAUtils.sign(data, PRIVATE_KEY);
-		assertTrue(RSAUtils.verify(data, PUBLIC_KEY, sign));
+		assertThat(RSAUtils.verify(data, PUBLIC_KEY, sign), is(true));
 	}
 }

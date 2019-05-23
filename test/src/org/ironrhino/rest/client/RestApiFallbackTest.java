@@ -1,8 +1,7 @@
 package org.ironrhino.rest.client;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -36,8 +35,8 @@ public class RestApiFallbackTest {
 
 	@Test
 	public void test() {
-		assertFalse(testClient instanceof FallbackTestClient);
-		assertTrue(Proxy.isProxyClass(testClient.getClass()));
+		assertThat(testClient instanceof FallbackTestClient, is(false));
+		assertThat(Proxy.isProxyClass(testClient.getClass()), is(true));
 		int errorCount = 0;
 		for (int i = 0; i < 50; i++)
 			try {
@@ -45,16 +44,16 @@ public class RestApiFallbackTest {
 			} catch (ResourceAccessException e) {
 				errorCount++;
 			}
-		assertEquals(50, errorCount);
+		assertThat(errorCount, is(50));
 		for (int i = 0; i < 50; i++)
 			try {
 				testClient.echo("test");
 			} catch (ResourceAccessException e) {
 				errorCount++;
 			}
-		assertEquals(100, errorCount);
+		assertThat(errorCount, is(100));
 		// CircuitBreaker is open and fallback will active
-		assertEquals("echo:test", testClient.echo("test"));
+		assertThat(testClient.echo("test"), is("echo:test"));
 	}
 
 	@Configuration

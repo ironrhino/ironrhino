@@ -1,10 +1,10 @@
 package org.ironrhino.core.remoting.impl;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.ironrhino.core.remoting.impl.RedisServiceRegistry.NAMESPACE_HOSTS;
 import static org.ironrhino.core.remoting.impl.RedisServiceRegistry.NAMESPACE_SERVICES;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -61,9 +61,10 @@ public class HttpInvokerPollingTest extends HttpInvokerLoadBalanceTest {
 		then(serviceRegistry).should().publishServiceHostsChangedEvent(serviceName);
 		then(opsForHash).should().delete(NAMESPACE_HOSTS + serviceRegistry.getLocalHost(), serviceName);
 
-		assertNull(importedServices.get(serviceName));
-		assertTrue(importedServiceCandidates.get(serviceName).containsAll(Arrays.asList(provider1, provider2)));
-		assertEquals(serviceUrl(normalizeHost(provider1), BarService.class), getServiceUrl(barServiceClient));
+		assertThat(importedServices.get(serviceName), is(nullValue()));
+		assertThat(importedServiceCandidates.get(serviceName).containsAll(Arrays.asList(provider1, provider2)),
+				is(true));
+		assertThat(getServiceUrl(barServiceClient), is(serviceUrl(normalizeHost(provider1), BarService.class)));
 	}
 
 	@Test
@@ -90,9 +91,9 @@ public class HttpInvokerPollingTest extends HttpInvokerLoadBalanceTest {
 		then(serviceRegistry).should().publishServiceHostsChangedEvent(serviceName);
 		then(opsForHash).should().delete(NAMESPACE_HOSTS + serviceRegistry.getLocalHost(), serviceName);
 
-		assertNull(importedServices.get(serviceName));
-		assertTrue(importedServiceCandidates.get(serviceName).isEmpty());
-		assertEquals(serviceUrl(normalizeHost(provider1), BarService.class), getServiceUrl(barServiceClient));
+		assertThat(importedServices.get(serviceName), is(nullValue()));
+		assertThat(importedServiceCandidates.get(serviceName).isEmpty(), is(true));
+		assertThat(getServiceUrl(barServiceClient), is(serviceUrl(normalizeHost(provider1), BarService.class)));
 	}
 
 	@Test
@@ -122,12 +123,12 @@ public class HttpInvokerPollingTest extends HttpInvokerLoadBalanceTest {
 				any(RemoteInvocation.class), any(MethodInvocation.class)))
 						.willReturn(new RemoteInvocationResult("test"));
 
-		assertEquals("test", barService.test(""));
+		assertThat(barService.test(""), is("test"));
 		int discoverTimes = 2;
 		try {
 			then(serviceRegistry).should().evict(normalizeHost(provider1));
 		} catch (Throwable e) {
-			assertEquals("test", barService.test(""));
+			assertThat(barService.test(""), is("test"));
 			then(serviceRegistry).should().evict(normalizeHost(provider1));
 			discoverTimes = 3;
 		}
@@ -135,6 +136,6 @@ public class HttpInvokerPollingTest extends HttpInvokerLoadBalanceTest {
 		then(serviceRegistry).should().publishServiceHostsChangedEvent(serviceName);
 		then(opsForHash).should().delete(NAMESPACE_HOSTS + serviceRegistry.getLocalHost(), serviceName);
 		then(serviceRegistry).should(times(discoverTimes)).discover(serviceName, true);
-		assertEquals(serviceUrl(normalizeHost(provider2), BarService.class), getServiceUrl(barServiceClient));
+		assertThat(getServiceUrl(barServiceClient), is(serviceUrl(normalizeHost(provider2), BarService.class)));
 	}
 }

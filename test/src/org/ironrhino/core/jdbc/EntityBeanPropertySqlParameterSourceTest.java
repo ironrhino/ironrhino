@@ -1,7 +1,7 @@
 package org.ironrhino.core.jdbc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import javax.persistence.Column;
 import javax.persistence.EnumType;
@@ -36,16 +36,16 @@ public class EntityBeanPropertySqlParameterSourceTest {
 		p.setGrade1(Grade.A);
 		p.setGrade2(Grade.B);
 		EntityBeanPropertySqlParameterSource ebpsps = new EntityBeanPropertySqlParameterSource(p);
-		assertTrue(ebpsps.hasValue("name"));
-		assertTrue(ebpsps.hasValue("age"));
-		assertTrue(ebpsps.hasValue("grade1"));
-		assertTrue(ebpsps.hasValue("grade2"));
-		assertTrue(ebpsps.hasValue("g2"));
-		assertEquals("name", ebpsps.getValue("name"));
-		assertEquals(12, ebpsps.getValue("age"));
-		assertEquals(0, ebpsps.getValue("grade1"));
-		assertEquals("B", ebpsps.getValue("grade2"));
-		assertEquals("B", ebpsps.getValue("g2"));
+		assertThat(ebpsps.hasValue("name"), is(true));
+		assertThat(ebpsps.hasValue("age"), is(true));
+		assertThat(ebpsps.hasValue("grade1"), is(true));
+		assertThat(ebpsps.hasValue("grade2"), is(true));
+		assertThat(ebpsps.hasValue("g2"), is(true));
+		assertThat(ebpsps.getValue("name"), is("name"));
+		assertThat(ebpsps.getValue("age"), is(12));
+		assertThat(ebpsps.getValue("grade1"), is(0));
+		assertThat(ebpsps.getValue("grade2"), is("B"));
+		assertThat(ebpsps.getValue("g2"), is("B"));
 	}
 
 }

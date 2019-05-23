@@ -1,6 +1,7 @@
 package org.ironrhino.core.throttle;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
@@ -45,8 +46,8 @@ public class CircuitBreakingTest {
 				error.incrementAndGet();
 			}
 		}
-		assertEquals(5, success.get());
-		assertEquals(95, error.get());
+		assertThat(success.get(), is(5));
+		assertThat(error.get(), is(95));
 		CircuitBreaking.executeThrowableCallable(this.getClass().getName(), ex -> ex instanceof IOException,
 				() -> echoService.echo("test"));
 	}

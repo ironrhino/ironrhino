@@ -1,6 +1,7 @@
 package org.ironrhino.core.seq;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
@@ -82,7 +83,7 @@ public abstract class SequenceTestBase {
 		System.out.println(
 				"completed " + count.get() + " requests with concurrency(" + THREADS + ") in " + time + "ms (tps = "
 						+ (int) (((double) count.get() / time) * 1000) + ") using " + seq.getClass().getSimpleName());
-		assertEquals(LOOP * THREADS, map.size());
+		assertThat(map.size(), is(LOOP * THREADS));
 	}
 
 }
