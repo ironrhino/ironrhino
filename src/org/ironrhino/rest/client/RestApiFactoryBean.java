@@ -33,6 +33,7 @@ import org.ironrhino.core.util.MaxAttemptsExceededException;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.rest.RestStatus;
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
@@ -484,7 +485,7 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 				}
 			}
 			if (validator == null)
-				validator = validatorClass.getConstructor().newInstance();
+				validator = BeanUtils.instantiateClass(validatorClass);
 			validator.validate(tree);
 		}
 		if (!pointer.value().isEmpty())

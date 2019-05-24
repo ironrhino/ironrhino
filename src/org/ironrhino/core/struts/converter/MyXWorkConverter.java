@@ -2,7 +2,6 @@ package org.ironrhino.core.struts.converter;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -34,11 +33,10 @@ public class MyXWorkConverter extends XWorkConverter {
 				return null;
 			Object entity;
 			try {
-				entity = toClass.getConstructor().newInstance();
+				entity = org.springframework.beans.BeanUtils.instantiateClass(toClass);
 				BeanUtils.setPropertyValue(entity, "id", id);
 				return entity;
-			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+			} catch (Exception e) {
 			}
 		} else if ((Collection.class.isAssignableFrom(toClass) || toClass.isArray()) && value instanceof String[]
 				&& target != null) {

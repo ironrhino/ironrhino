@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.struts2.util.StrutsTypeConverter;
 import org.ironrhino.core.model.Persistable;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapperImpl;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -15,7 +16,7 @@ public class PersistableConverter extends StrutsTypeConverter {
 		if (values[0] == null || values[0].trim().equals(""))
 			return null;
 		try {
-			Persistable<?> persistable = (Persistable<?>) toClass.getConstructor().newInstance();
+			Persistable<?> persistable = (Persistable<?>) BeanUtils.instantiateClass(toClass);
 			BeanWrapperImpl bw = new BeanWrapperImpl(persistable);
 			bw.setPropertyValue("id", values[0].trim());
 			return persistable;

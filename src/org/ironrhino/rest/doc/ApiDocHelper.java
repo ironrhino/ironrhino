@@ -13,6 +13,7 @@ import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.SampleObjectCreator;
 import org.ironrhino.rest.RestStatus;
 import org.ironrhino.rest.doc.annotation.Fields;
+import org.springframework.beans.BeanUtils;
 
 import lombok.experimental.UtilityClass;
 
@@ -44,7 +45,7 @@ public class ApiDocHelper {
 			if (StringUtils.isNotBlank(sampleMethodName)) {
 				Method m = apiDocClazz.getDeclaredMethod(sampleMethodName, new Class[0]);
 				m.setAccessible(true);
-				return m.invoke(apiDocClazz.getConstructor().newInstance(), new Object[0]);
+				return m.invoke(BeanUtils.instantiateClass(apiDocClazz), new Object[0]);
 			}
 		}
 		if (apiDocMethod != null) {
@@ -69,7 +70,7 @@ public class ApiDocHelper {
 			}
 			Object obj;
 			try {
-				obj = apiDocMethod.invoke(apiDocClazz.getConstructor().newInstance(), args);
+				obj = apiDocMethod.invoke(BeanUtils.instantiateClass(apiDocClazz), args);
 			} catch (Exception e) {
 				obj = null;
 			}

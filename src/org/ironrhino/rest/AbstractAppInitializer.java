@@ -14,6 +14,7 @@ import javax.servlet.ServletRegistration;
 import org.ironrhino.core.servlet.DelegatingFilter;
 import org.ironrhino.core.spring.NameGenerator;
 import org.ironrhino.core.spring.servlet.InheritedDispatcherServlet;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoader;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -47,7 +48,7 @@ public abstract class AbstractAppInitializer<T extends ApiConfigBase> implements
 		dynamic.setLoadOnStartup(1);
 		try {
 			// glassfish5 disallow add mapping after servlet context initialized
-			T ac = apiConfigClass.getConstructor().newInstance();
+			T ac = BeanUtils.instantiateClass(apiConfigClass);
 			dynamic.addMapping(ac.getServletMapping());
 		} catch (Exception e) {
 			e.printStackTrace();

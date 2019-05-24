@@ -437,8 +437,8 @@ public class EntityClassHelper {
 							}
 							if (!uci.getInternalDynamicAttributes().containsKey("data-separator")) {
 								try {
-									BaseTreeableEntity<?> te = (BaseTreeableEntity<?>) returnType.getConstructor()
-											.newInstance();
+									BaseTreeableEntity<?> te = (BaseTreeableEntity<?>) BeanUtils
+											.instantiateClass(returnType);
 									String separator = te.getFullnameSeperator();
 									if (StringUtils.isNotBlank(separator))
 										uci.getInternalDynamicAttributes().put("data-separator", separator);

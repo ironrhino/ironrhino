@@ -43,7 +43,7 @@ public class JsonJavaTypeDescriptor extends AbstractTypeDescriptor<Object> imple
 			protected Object deepCopyNotNull(Object value) {
 				Object obj;
 				try {
-					obj = value.getClass().getConstructor().newInstance();
+					obj = BeanUtils.instantiateClass(value.getClass());
 					BeanUtils.copyProperties(value, obj);
 					return obj;
 				} catch (Exception e) {

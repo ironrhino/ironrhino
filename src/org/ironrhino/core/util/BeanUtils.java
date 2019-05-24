@@ -3,7 +3,6 @@ package org.ironrhino.core.util;
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -107,7 +106,7 @@ public class BeanUtils {
 	public static <S extends Treeable<S>> S copyTree(S source, String... ignoreProperties) {
 		return (S) copyTree(source, () -> {
 			try {
-				return source.getClass().getConstructor().newInstance();
+				return org.springframework.beans.BeanUtils.instantiateClass(source.getClass());
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -139,7 +138,7 @@ public class BeanUtils {
 
 	public static Object convert(Class<?> beanClass, String propertyName, String value) {
 		try {
-			return convert(beanClass.getConstructor().newInstance(), propertyName, value);
+			return convert(org.springframework.beans.BeanUtils.instantiateClass(beanClass), propertyName, value);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -278,11 +277,10 @@ public class BeanUtils {
 			if (t == null)
 				return null;
 			try {
-				T target = targetClass.getConstructor().newInstance();
+				T target = org.springframework.beans.BeanUtils.instantiateClass(targetClass);
 				copyProperties(t, target, false);
 				return target;
-			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 		};
@@ -296,11 +294,10 @@ public class BeanUtils {
 			List<T> list = new ArrayList<>(t.size());
 			t.forEach(e -> {
 				try {
-					T target = targetClass.getConstructor().newInstance();
+					T target = org.springframework.beans.BeanUtils.instantiateClass(targetClass);
 					copyProperties(e, target, false);
 					list.add(target);
-				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-						| InvocationTargetException | NoSuchMethodException | SecurityException ex) {
+				} catch (Exception ex) {
 					throw new RuntimeException(ex);
 				}
 			});

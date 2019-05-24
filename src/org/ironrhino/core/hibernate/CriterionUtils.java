@@ -132,7 +132,8 @@ public class CriterionUtils {
 		CriteriaState state = new CriteriaState();
 		try {
 			ConversionService conversionService = ApplicationContextUtils.getBean(ConversionService.class);
-			BeanWrapperImpl entityBeanWrapper = new BeanWrapperImpl(entityClass.getConstructor().newInstance());
+			BeanWrapperImpl entityBeanWrapper = new BeanWrapperImpl(
+					org.springframework.beans.BeanUtils.instantiateClass(entityClass));
 			entityBeanWrapper.setConversionService(conversionService);
 			for (String parameterName : parameterMap.keySet()) {
 				String propertyName;
@@ -260,7 +261,8 @@ public class CriterionUtils {
 						PropertyDescriptor pd = BeanUtils.getPropertyDescriptor(enClass, subPropertyName);
 						if (!operator.isEffective(pd.getReadMethod().getGenericReturnType(), parameterValues))
 							continue;
-						BeanWrapperImpl subBeanWrapper = new BeanWrapperImpl(enClass.getConstructor().newInstance());
+						BeanWrapperImpl subBeanWrapper = new BeanWrapperImpl(
+								org.springframework.beans.BeanUtils.instantiateClass(enClass));
 						subBeanWrapper.setConversionService(conversionService);
 						values = new Object[parameterValues.length];
 						for (int n = 0; n < values.length; n++) {
@@ -450,7 +452,8 @@ public class CriterionUtils {
 		Predicate<EN> predicate = en -> true;
 		try {
 			ConversionService conversionService = ApplicationContextUtils.getBean(ConversionService.class);
-			BeanWrapperImpl entityBeanWrapper = new BeanWrapperImpl(entityClass.getConstructor().newInstance());
+			BeanWrapperImpl entityBeanWrapper = new BeanWrapperImpl(
+					org.springframework.beans.BeanUtils.instantiateClass(entityClass));
 			entityBeanWrapper.setConversionService(conversionService);
 			for (String parameterName : parameterMap.keySet()) {
 				String propertyName;

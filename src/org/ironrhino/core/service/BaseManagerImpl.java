@@ -185,7 +185,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 		Class idtype = String.class;
 		BeanWrapperImpl bw = null;
 		try {
-			bw = new BeanWrapperImpl(getEntityClass().getConstructor().newInstance());
+			bw = new BeanWrapperImpl(org.springframework.beans.BeanUtils.instantiateClass(getEntityClass()));
 			idtype = getEntityClass().getMethod("getId", new Class[0]).getReturnType();
 		} catch (Exception e) {
 		}
@@ -565,7 +565,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			throw new IllegalArgumentException(
 					"entityClass mustn't be null,and must extends class 'BaseTreeableEntity'");
 		try {
-			TE root = (TE) getEntityClass().getConstructor().newInstance();
+			TE root = (TE) org.springframework.beans.BeanUtils.instantiateClass(getEntityClass());
 			root.setId(0L);
 			root.setName("");
 			assemble(root, (List<TE>) findAll(Order.asc("level")));
@@ -606,7 +606,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			}
 			if (isChild) {
 				it.remove();
-				TE rr = (TE) te.getClass().getConstructor().newInstance();
+				TE rr = (TE) org.springframework.beans.BeanUtils.instantiateClass(te.getClass());
 				BeanUtils.copyProperties(r, rr);
 				children.add(rr);
 				rr.setParent(te);

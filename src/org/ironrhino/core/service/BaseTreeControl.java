@@ -150,7 +150,7 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 			parent = tree.getDescendantOrSelfById(Long.valueOf(parentId));
 		}
 		try {
-			T t = entityClass.getConstructor().newInstance();
+			T t = org.springframework.beans.BeanUtils.instantiateClass(entityClass);
 			t.setChildren(new ArrayList<>());
 			BeanUtils.copyProperties(treeNode, t, new String[] { "parent", "children" });
 			parent.addChild(t);
