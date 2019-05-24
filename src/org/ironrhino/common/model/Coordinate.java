@@ -102,7 +102,7 @@ public class Coordinate implements Serializable {
 	public Coordinate moveHorizontal(int distance) {
 		if (Math.abs(this.latitude) == 90)
 			return new Coordinate(this.latitude, this.longitude);
-		double radius = EARTH_RADIUS * Math.sin((90 - Math.abs(this.latitude)) / 180 * Math.PI);
+		double radius = EARTH_RADIUS * Math.cos(Math.abs(this.latitude) / 180 * Math.PI);
 		double delta = (distance / (2 * Math.PI * radius)) * 360;
 		double newLongitude = this.longitude + delta;
 		while (newLongitude > 180)
