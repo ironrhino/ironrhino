@@ -298,8 +298,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	protected void tryFindEntity() {
 		BaseManager<EN> entityManager = getEntityManager(getEntityClass());
 		try {
-			BeanWrapperImpl bw = new BeanWrapperImpl(
-					org.springframework.beans.BeanUtils.instantiateClass(getEntityClass()));
+			BeanWrapperImpl bw = new BeanWrapperImpl(newEntityInstance());
 			bw.setConversionService(conversionService);
 			Set<String> naturalIds = getNaturalIds().keySet();
 			if (StringUtils.isNotBlank(getUid())) {
@@ -353,8 +352,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	@Override
 	public String execute() throws Exception {
-		BeanWrapperImpl bw = new BeanWrapperImpl(
-				org.springframework.beans.BeanUtils.instantiateClass(getEntityClass()));
+		BeanWrapperImpl bw = new BeanWrapperImpl(newEntityInstance());
 		bw.setConversionService(conversionService);
 		Richtable richtableConfig = getClass().getAnnotation(Richtable.class);
 		if (richtableConfig == null)
@@ -427,8 +425,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	protected DetachedCriteria detachedCriteria() throws Exception {
 		BaseManager entityManager = getEntityManager(getEntityClass());
-		BeanWrapperImpl bw = new BeanWrapperImpl(
-				org.springframework.beans.BeanUtils.instantiateClass(getEntityClass()));
+		BeanWrapperImpl bw = new BeanWrapperImpl(newEntityInstance());
 		Richtable richtableConfig = getClass().getAnnotation(Richtable.class);
 		if (richtableConfig == null)
 			richtableConfig = getEntityClass().getAnnotation(Richtable.class);
@@ -615,7 +612,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		}
 		BeanWrapperImpl bw;
 		if (_entity == null) {
-			_entity = org.springframework.beans.BeanUtils.instantiateClass(getEntityClass());
+			_entity = newEntityInstance();
 			bw = new BeanWrapperImpl(_entity);
 			String versionPropertyName = getVersionPropertyName();
 			if (versionPropertyName != null) {
@@ -959,7 +956,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					if (isAttachmentable())
 						editedPropertyNames.add("attachments");
 				}
-				_entity = org.springframework.beans.BeanUtils.instantiateClass(getEntityClass());
+				_entity = newEntityInstance();
 				BeanWrapperImpl bwp = new BeanWrapperImpl(_entity);
 				bwp.setConversionService(conversionService);
 				String versionPropertyName = getVersionPropertyName();
@@ -1328,8 +1325,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		String[] arr = getId();
 		Serializable[] id = (arr != null) ? new Serializable[arr.length] : new Serializable[0];
 		try {
-			BeanWrapperImpl bw = new BeanWrapperImpl(
-					org.springframework.beans.BeanUtils.instantiateClass(getEntityClass()));
+			BeanWrapperImpl bw = new BeanWrapperImpl(newEntityInstance());
 			bw.setConversionService(conversionService);
 			for (int i = 0; i < id.length; i++) {
 				bw.setPropertyValue("id", arr[i]);
@@ -1587,8 +1583,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		String[] arr = getId();
 		Serializable[] id = (arr != null) ? new Serializable[arr.length] : new Serializable[0];
 		try {
-			BeanWrapperImpl bw = new BeanWrapperImpl(
-					org.springframework.beans.BeanUtils.instantiateClass(getEntityClass()));
+			BeanWrapperImpl bw = new BeanWrapperImpl(newEntityInstance());
 			bw.setConversionService(conversionService);
 			for (int i = 0; i < id.length; i++) {
 				bw.setPropertyValue("id", arr[i]);
@@ -1816,7 +1811,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	protected EN constructEntity() {
 		Persistable entity = null;
 		try {
-			entity = org.springframework.beans.BeanUtils.instantiateClass(getEntityClass());
+			entity = newEntityInstance();
 			ValueStack temp = valueStackFactory.createValueStack();
 			temp.set(getEntityName(), entity);
 			Map<String, Object> context = temp.getContext();
@@ -1848,6 +1843,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			logger.error(e.getMessage(), e);
 		}
 		return (EN) entity;
+	}
+
+	protected EN newEntityInstance() {
+		return org.springframework.beans.BeanUtils.instantiateClass(getEntityClass());
 	}
 
 	private boolean hasOwnership(Persistable<?> entity) {
