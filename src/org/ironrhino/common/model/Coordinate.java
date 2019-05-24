@@ -20,7 +20,7 @@ public class Coordinate implements Serializable {
 
 	private static final long serialVersionUID = 5828814302557010566L;
 
-	private static double EARTH_RADIUS = 6371000;
+	private static double EARTH_RADIUS = 6371393;
 
 	@Min(-90)
 	@Max(90)
@@ -81,12 +81,35 @@ public class Coordinate implements Serializable {
 
 	public int distanceFrom(Coordinate c2) {
 		Coordinate c1 = this;
-		Double latitude = (c1.getLatitude() - c2.getLatitude()) * Math.PI / 180;
-		Double longitude = (c1.getLongitude() - c2.getLongitude()) * Math.PI / 180;
-		Double aDouble = Math.sin(latitude / 2) * Math.sin(latitude / 2) + Math.cos(c1.getLatitude() * Math.PI / 180)
+		double latitude = Math.abs((c1.getLatitude() - c2.getLatitude())) * Math.PI / 180;
+		double longitude = Math.abs((c1.getLongitude() - c2.getLongitude())) * Math.PI / 180;
+		double value = Math.sin(latitude / 2) * Math.sin(latitude / 2) + Math.cos(c1.getLatitude() * Math.PI / 180)
 				* Math.cos(c2.getLatitude() * Math.PI / 180) * Math.sin(longitude / 2) * Math.sin(longitude / 2);
-		Double distance = 2 * Math.atan2(Math.sqrt(aDouble), Math.sqrt(1 - aDouble));
+		double distance = 2 * Math.atan2(Math.sqrt(value), Math.sqrt(1 - value));
 		return (int) Math.round((EARTH_RADIUS * distance) * 1000) / 1000;
+	}
+
+	public Coordinate moveVertical(int distance) {
+		double delta = (distance / (2 * Math.PI * EARTH_RADIUS)) * 360;
+		double newLatitude = this.latitude + delta;
+		while (newLatitude > 90)
+			newLatitude = 180 - newLatitude;
+		while (newLatitude < -90)
+			newLatitude = 180 + newLatitude;
+		return new Coordinate(newLatitude, this.longitude);
+	}
+
+	public Coordinate moveHorizontal(int distance) {
+		if (Math.abs(this.latitude) == 90)
+			return new Coordinate(this.latitude, this.longitude);
+		double radius = EARTH_RADIUS * Math.sin((90 - Math.abs(this.latitude)) / 180 * Math.PI);
+		double delta = (distance / (2 * Math.PI * radius)) * 360;
+		double newLongitude = this.longitude + delta;
+		while (newLongitude > 180)
+			newLongitude = newLongitude - 360;
+		while (newLongitude < -180)
+			newLongitude = newLongitude + 360;
+		return new Coordinate(this.latitude, newLongitude);
 	}
 
 }
