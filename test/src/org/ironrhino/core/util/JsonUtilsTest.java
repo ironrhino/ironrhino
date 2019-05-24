@@ -62,7 +62,18 @@ public class JsonUtilsTest {
 
 		@JsonSerialize(using = ToIdJsonSerializer.class)
 		@JsonDeserialize(using = FromIdJsonDeserializer.class)
+		@JsonView(View.Detail.class)
 		private Department department;
+
+		@JsonSerialize(using = ToIdJsonSerializer.class)
+		@JsonDeserialize(using = FromIdJsonDeserializer.class)
+		@JsonView(View.Detail.class)
+		private List<Department> departments = new ArrayList<>();
+
+		@JsonSerialize(using = ToIdJsonSerializer.class)
+		@JsonDeserialize(using = FromIdJsonDeserializer.class)
+		@JsonView(View.Detail.class)
+		private Department[] depts;
 
 		@JsonView(View.Detail.class)
 		private Date date = DateUtils.beginOfDay(new Date());
@@ -215,12 +226,31 @@ public class JsonUtilsTest {
 		u.setContent("this is a lob");
 		Department department = new Department();
 		department.setId(12L);
+		Department department2 = new Department();
+		department2.setId(13L);
 		u.setDepartment(department);
+		u.getDepartments().add(department);
+		u.getDepartments().add(department2);
+		u.setDepts(u.getDepartments().toArray(new Department[0]));
 		String json = JsonUtils.toJson(u);
-		JsonNode jsonNode = JsonUtils.fromJson(json, JsonNode.class).get("department");
-		assertThat(jsonNode.asLong(), equalTo(department.getId()));
+		JsonNode root = JsonUtils.fromJson(json, JsonNode.class);
+		JsonNode node = root.get("department");
+		assertThat(node.isNumber(), equalTo(true));
+		assertThat(node.asLong(), equalTo(department.getId()));
+		node = root.get("departments");
+		assertThat(node.isArray(), equalTo(true));
+		assertThat(node.get(0).asLong(), equalTo(department.getId()));
+		assertThat(node.get(1).asLong(), equalTo(department2.getId()));
+		node = root.get("depts");
+		assertThat(node.isArray(), equalTo(true));
+		assertThat(node.get(0).asLong(), equalTo(department.getId()));
+		assertThat(node.get(1).asLong(), equalTo(department2.getId()));
 		User user = JsonUtils.fromJson(json, User.class);
 		assertThat(user.getDepartment().getId(), equalTo(department.getId()));
+		assertThat(user.getDepartments().get(0).getId(), equalTo(department.getId()));
+		assertThat(user.getDepartments().get(1).getId(), equalTo(department2.getId()));
+		assertThat(user.getDepts()[0].getId(), equalTo(department.getId()));
+		assertThat(user.getDepts()[1].getId(), equalTo(department2.getId()));
 	}
 
 }
