@@ -20,6 +20,7 @@ import java.util.Locale;
 import javax.persistence.Lob;
 
 import org.ironrhino.core.metadata.View;
+import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.model.ResultPage;
 import org.junit.Test;
 
@@ -28,6 +29,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import lombok.Data;
 import lombok.Getter;
@@ -57,6 +60,10 @@ public class JsonUtilsTest {
 		@Lob
 		private String content;
 
+		@JsonSerialize(using = ToIdJsonSerializer.class)
+		@JsonDeserialize(using = FromIdJsonDeserializer.class)
+		private Department department;
+
 		@JsonView(View.Detail.class)
 		private Date date = DateUtils.beginOfDay(new Date());
 
@@ -69,6 +76,12 @@ public class JsonUtilsTest {
 		public void setPassword(String password) {
 			this.password = password;
 		}
+
+	}
+
+	static class Department extends BaseTreeableEntity<Department> {
+
+		private static final long serialVersionUID = 1L;
 
 	}
 
@@ -190,6 +203,24 @@ public class JsonUtilsTest {
 	public void testImmutable() throws IOException {
 		assertThat(JsonUtils.fromJson("{\"id\":12,\"name\":\"test\"}", ImmutableObject.class),
 				equalTo(new ImmutableObject(12, "test")));
+	}
+
+	@Test
+	public void testToIdSerializer() throws IOException {
+		User u = new User();
+		u.setUsername("username");
+		u.setPassword("password");
+		u.setStatus(Status.ACTIVE);
+		u.setAge(12);
+		u.setContent("this is a lob");
+		Department department = new Department();
+		department.setId(12L);
+		u.setDepartment(department);
+		String json = JsonUtils.toJson(u);
+		JsonNode jsonNode = JsonUtils.fromJson(json, JsonNode.class).get("department");
+		assertThat(jsonNode.asLong(), equalTo(department.getId()));
+		User user = JsonUtils.fromJson(json, User.class);
+		assertThat(user.getDepartment().getId(), equalTo(department.getId()));
 	}
 
 }
