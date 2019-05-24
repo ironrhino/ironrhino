@@ -217,7 +217,7 @@ public class JsonUtilsTest {
 	}
 
 	@Test
-	public void testToIdSerializer() throws IOException {
+	public void testToIdJsonSerializer() throws IOException {
 		User u = new User();
 		u.setUsername("username");
 		u.setPassword("password");
@@ -245,6 +245,13 @@ public class JsonUtilsTest {
 		assertThat(node.isArray(), equalTo(true));
 		assertThat(node.get(0).asLong(), equalTo(department.getId()));
 		assertThat(node.get(1).asLong(), equalTo(department2.getId()));
+		testFromIdJsonSerializer(json, department, department2);
+		json = "{\"username\":\"username\",\"age\":12,\"status\":\"ACTIVE\",\"department\":{\"id\":12},\"departments\":[{\"id\":12},{\"id\":13}],\"depts\":[{\"id\":12},{\"id\":13}],\"date\":\"2019-05-24 00:00:00\"}";
+		testFromIdJsonSerializer(json, department, department2);
+	}
+
+	private void testFromIdJsonSerializer(String json, Department department, Department department2)
+			throws IOException {
 		User user = JsonUtils.fromJson(json, User.class);
 		assertThat(user.getDepartment().getId(), equalTo(department.getId()));
 		assertThat(user.getDepartments().get(0).getId(), equalTo(department.getId()));
