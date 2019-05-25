@@ -218,21 +218,6 @@ public class ApiDoc implements Serializable {
 				}
 			}
 		}
-		if (responseBodyClass.getGenericSuperclass() instanceof ParameterizedType) {
-			ParameterizedType pt = (ParameterizedType) responseBodyClass.getGenericSuperclass();
-			Type type = pt.getActualTypeArguments()[0];
-			if (type instanceof Class) {
-				responseBodyClass = (Class<?>) type;
-				responseBodyGenericType = pt;
-			} else if (type instanceof ParameterizedType) {
-				responseBodyGenericType = pt;
-				pt = (ParameterizedType) type;
-				if (Iterable.class.isAssignableFrom((Class<?>) pt.getRawType())) {
-					responseBodyType = "collection";
-					responseBodyClass = (Class<?>) pt.getActualTypeArguments()[0];
-				}
-			}
-		}
 
 		Fields responseFields = AnnotationUtils.findAnnotation(apiDocMethod, Fields.class);
 		Class<?> view = null;
