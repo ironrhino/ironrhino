@@ -12,6 +12,7 @@ import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,6 +28,7 @@ import org.hibernate.annotations.NaturalId;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.util.ReflectionUtils;
+import org.ironrhino.core.util.ToIdJsonSerializer;
 import org.ironrhino.rest.doc.annotation.Field;
 import org.ironrhino.rest.doc.annotation.Fields;
 import org.springframework.beans.BeanUtils;
@@ -36,6 +38,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import lombok.Data;
 
@@ -207,6 +210,7 @@ public class FieldObject implements Serializable {
 			PropertyDescriptor[] pds = BeanUtils.getPropertyDescriptors(domainClass);
 			for (PropertyDescriptor pd : pds) {
 				String name = pd.getName();
+				Class<?> type = pd.getPropertyType();
 				if (name.equals("class") || ignoreList.contains(name))
 					continue;
 				if (forRequest && (pd.getReadMethod() == null || pd.getWriteMethod() == null
@@ -243,6 +247,11 @@ public class FieldObject implements Serializable {
 					java.lang.reflect.Field f = pd.getReadMethod().getDeclaringClass().getDeclaredField(name);
 					if (f.getAnnotation(JsonIgnore.class) != null)
 						continue;
+					JsonSerialize jsonSerialize = f.getAnnotation(JsonSerialize.class);
+					if (jsonSerialize != null && jsonSerialize.using() == ToIdJsonSerializer.class) {
+						if (!(type.isArray() || Collection.class.isAssignableFrom(type)))
+							type = BeanUtils.getPropertyDescriptor(type, "id").getPropertyType();
+					}
 					fd = f.getAnnotation(Field.class);
 					if (Persistable.class.isAssignableFrom(domainClass)) {
 						UiConfig uic = null;
@@ -282,7 +291,7 @@ public class FieldObject implements Serializable {
 				} catch (Throwable e) {
 					e.printStackTrace();
 				}
-				list.add(create(name, pd.getPropertyType(), required, null, fd));
+				list.add(create(name, type, required, null, fd));
 			}
 			list.sort((o1, o2) -> {
 				return fieldNames.indexOf(o1.getName()) - fieldNames.indexOf(o2.getName());
