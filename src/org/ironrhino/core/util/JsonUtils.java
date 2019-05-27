@@ -12,6 +12,7 @@ import java.util.TimeZone;
 
 import javax.persistence.Lob;
 
+import org.ironrhino.common.model.Coordinate;
 import org.ironrhino.core.model.Displayable;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -54,13 +56,13 @@ public class JsonUtils {
 	public static final TypeReference<Map<String, String>> STRING_MAP_TYPE = new TypeReference<Map<String, String>>() {
 	};
 
-	public static final Module MODULE_TEMPORAL = new SimpleModule().addDeserializer(Date.class,
-			new JsonDeserializer<Date>() {
+	public static final Module MODULE_COMMON = new SimpleModule()
+			.addDeserializer(Date.class, new JsonDeserializer<Date>() {
 				@Override
-				public Date deserialize(JsonParser jsonparser, DeserializationContext deserializationcontext)
+				public Date deserialize(JsonParser parser, DeserializationContext ctx)
 						throws IOException, JsonProcessingException {
-					String date = jsonparser.getText();
-					DateFormat df = deserializationcontext.getConfig().getDateFormat();
+					String date = parser.getText();
+					DateFormat df = ctx.getConfig().getDateFormat();
 					if (df != null) {
 						DateFormat clone = (DateFormat) df.clone();
 						try {
@@ -72,6 +74,22 @@ public class JsonUtils {
 					if (d == null)
 						throw new RuntimeException(date + " is not valid date");
 					return d;
+				}
+			}).addDeserializer(Coordinate.class, new JsonDeserializer<Coordinate>() {
+				@Override
+				public Coordinate deserialize(JsonParser parser, DeserializationContext ctx)
+						throws IOException, JsonProcessingException {
+					if (parser.currentToken() == JsonToken.START_ARRAY) {
+						Double[] array = parser.readValueAs(new TypeReference<Double[]>() {
+						});
+						return new Coordinate(array[0], array[1]);
+					} else if (parser.currentToken() == JsonToken.VALUE_STRING) {
+						return new Coordinate(parser.getText());
+					} else {
+						Map<String, Double> map = parser.readValueAs(new TypeReference<Map<String, Double>>() {
+						});
+						return new Coordinate(map.get("latitude"), map.get("longitude"));
+					}
 				}
 			});
 
@@ -106,7 +124,7 @@ public class JsonUtils {
 		objectMapper.setTimeZone(TimeZone.getDefault());
 		objectMapper.addMixIn(GrantedAuthority.class, SimpleGrantedAuthorityMixin.class)
 				.addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityMixin.class);
-		objectMapper.registerModule(MODULE_TEMPORAL);
+		objectMapper.registerModule(MODULE_COMMON);
 		objectMapper.findAndRegisterModules();
 		if (AppInfo.getStage() == Stage.DEVELOPMENT)
 			objectMapper.enable(SerializationFeature.INDENT_OUTPUT);

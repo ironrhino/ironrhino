@@ -13,12 +13,14 @@ import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 import javax.persistence.Lob;
 
+import org.ironrhino.common.model.Coordinate;
 import org.ironrhino.core.metadata.View;
 import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.model.ResultPage;
@@ -109,6 +111,12 @@ public class JsonUtilsTest {
 	static class ImmutableObject {
 		private long id;
 		private String name;
+	}
+
+	@Data
+	static class CoordinateObject {
+		private Coordinate coordinate;
+		private List<Coordinate> coordinates;
 	}
 
 	@Test
@@ -260,4 +268,19 @@ public class JsonUtilsTest {
 		assertThat(user.getDepts()[1].getId(), equalTo(department2.getId()));
 	}
 
+	@Test
+	public void testDeserializeCoordinate() throws IOException {
+		Coordinate coordinate = new Coordinate(23.0, 113.0);
+		CoordinateObject co = new CoordinateObject();
+		co.setCoordinate(coordinate);
+		co.setCoordinates(Collections.singletonList(coordinate));
+		String json = JsonUtils.toJson(co);
+		assertThat(JsonUtils.fromJson(json, CoordinateObject.class), equalTo(co));
+		json = "{\"coordinate\":\"23.0,113.0\",\"coordinates\":[\"23.0,113.0\"]}";
+		assertThat(JsonUtils.fromJson(json, CoordinateObject.class), equalTo(co));
+		json = "{\"coordinate\":\"23.0 113.0\",\"coordinates\":[\"23.0 113.0\"]}";
+		assertThat(JsonUtils.fromJson(json, CoordinateObject.class), equalTo(co));
+		json = "{\"coordinate\":[23.0,113.0],\"coordinates\":[[23.0,113.0]]}";
+		assertThat(JsonUtils.fromJson(json, CoordinateObject.class), equalTo(co));
+	}
 }

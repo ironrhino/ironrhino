@@ -37,7 +37,10 @@ public class Coordinate implements Serializable {
 			this.latitude = null;
 			this.longitude = null;
 		} else {
+			latLng = latLng.trim();
 			String[] arr = latLng.split("\\s*,\\s*");
+			if (arr.length == 1)
+				arr = latLng.split("\\s+");
 			this.latitude = parseLatOrLong(arr[0]);
 			this.longitude = parseLatOrLong(arr[1]);
 		}
