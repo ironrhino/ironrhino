@@ -55,6 +55,8 @@ public class FieldObject implements Serializable {
 
 	private boolean multiple;
 
+	private boolean reference;
+
 	private String label;
 
 	private String description;
@@ -243,12 +245,14 @@ public class FieldObject implements Serializable {
 				}
 				Field fd = null;
 				boolean required = false;
+				boolean reference = false;
 				try {
 					java.lang.reflect.Field f = pd.getReadMethod().getDeclaringClass().getDeclaredField(name);
 					if (f.getAnnotation(JsonIgnore.class) != null)
 						continue;
 					JsonSerialize jsonSerialize = f.getAnnotation(JsonSerialize.class);
 					if (jsonSerialize != null && jsonSerialize.using() == ToIdJsonSerializer.class) {
+						reference = true;
 						if (!(type.isArray() || Collection.class.isAssignableFrom(type)))
 							type = BeanUtils.getPropertyDescriptor(type, "id").getPropertyType();
 					}
@@ -291,7 +295,9 @@ public class FieldObject implements Serializable {
 				} catch (Throwable e) {
 					e.printStackTrace();
 				}
-				list.add(create(name, type, required, null, fd));
+				FieldObject fo = create(name, type, required, null, fd);
+				fo.setReference(reference);
+				list.add(fo);
 			}
 			list.sort((o1, o2) -> {
 				return fieldNames.indexOf(o1.getName()) - fieldNames.indexOf(o2.getName());

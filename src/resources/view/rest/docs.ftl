@@ -13,7 +13,7 @@
 <tbody>
 	<#list fields as field>
 	<tr>
-		<td>${field.name} 
+		<td>${field.name} <#if field.reference><span class="badge">ID</span></#if>
 		<#assign label=field.label!/>
 		<#if !label?has_content>
 		<#assign label=''/>
