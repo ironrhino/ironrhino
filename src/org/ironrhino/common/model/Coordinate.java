@@ -20,27 +20,30 @@ public class Coordinate implements Serializable {
 
 	private static final long serialVersionUID = 5828814302557010566L;
 
-	private static double EARTH_RADIUS = 6371393;
+	private static final int SCALE = 6;
+
+	private static final double EARTH_RADIUS = 6371393;
 
 	@Min(-90)
 	@Max(90)
-	@Column(precision = 8, scale = 6)
+	@Column(precision = 8, scale = SCALE)
 	private Double latitude;
 
 	@Min(-180)
 	@Max(180)
-	@Column(precision = 9, scale = 6)
+	@Column(precision = 9, scale = SCALE)
 	private Double longitude;
 
 	public Coordinate(String latLng) {
-		if (latLng == null || latLng.trim().length() == 0) {
-			this.latitude = null;
-			this.longitude = null;
+		latLng = latLng.trim();
+		if (latLng.toLowerCase(Locale.ROOT).startsWith("point")) {
+			// WKT https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry
+			latLng = latLng.substring(latLng.indexOf('(') + 1, latLng.indexOf(')')).trim();
+			String[] arr = latLng.split("\\s+");
+			this.latitude = parseLatOrLong(arr[1]);
+			this.longitude = parseLatOrLong(arr[0]);
 		} else {
-			latLng = latLng.trim();
 			String[] arr = latLng.split("\\s*,\\s*");
-			if (arr.length == 1)
-				arr = latLng.split("\\s+");
 			this.latitude = parseLatOrLong(arr[0]);
 			this.longitude = parseLatOrLong(arr[1]);
 		}
@@ -57,6 +60,10 @@ public class Coordinate implements Serializable {
 			return latitude + "," + longitude;
 		else
 			return "";
+	}
+
+	public String toWktString() {
+		return String.format("POINT (%." + SCALE + "f %." + SCALE + "f)", longitude, latitude);
 	}
 
 	public static Double parseLatOrLong(String input) {

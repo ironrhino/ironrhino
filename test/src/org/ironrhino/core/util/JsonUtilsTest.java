@@ -278,9 +278,9 @@ public class JsonUtilsTest {
 		assertThat(JsonUtils.fromJson(json, CoordinateObject.class), equalTo(co));
 		json = "{\"coordinate\":\"23.0,113.0\",\"coordinates\":[\"23.0,113.0\"]}";
 		assertThat(JsonUtils.fromJson(json, CoordinateObject.class), equalTo(co));
-		json = "{\"coordinate\":\"23.0 113.0\",\"coordinates\":[\"23.0 113.0\"]}";
-		assertThat(JsonUtils.fromJson(json, CoordinateObject.class), equalTo(co));
 		json = "{\"coordinate\":[23.0,113.0],\"coordinates\":[[23.0,113.0]]}";
+		assertThat(JsonUtils.fromJson(json, CoordinateObject.class), equalTo(co));
+		json = "{\"coordinate\":\"POINT (113.0 23.0)\",\"coordinates\":[\"POINT (113.0 23.0)\"]}";
 		assertThat(JsonUtils.fromJson(json, CoordinateObject.class), equalTo(co));
 	}
 }
