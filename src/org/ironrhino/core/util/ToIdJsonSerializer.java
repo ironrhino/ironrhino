@@ -53,8 +53,4 @@ public class ToIdJsonSerializer extends StdSerializer<Object> {
 		}
 	}
 
-	public static void main(String[] args) {
-		System.out.println();
-	}
-
 }
