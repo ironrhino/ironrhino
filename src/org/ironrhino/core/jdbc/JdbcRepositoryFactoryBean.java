@@ -38,6 +38,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -276,7 +277,13 @@ public class JdbcRepositoryFactoryBean extends MethodInterceptorFactoryBean
 				}
 				Class<?> clz = (Class<?>) returnType;
 				if (BeanUtils.isSimpleValueType(clz)) {
-					return namedParameterJdbcTemplate.queryForObject(sql, sqlParameterSource, clz);
+					try {
+						return namedParameterJdbcTemplate.queryForObject(sql, sqlParameterSource, clz);
+					} catch (EmptyResultDataAccessException e) {
+						if (!clz.isPrimitive())
+							return null;
+						throw e;
+					}
 				} else {
 					List<?> result = namedParameterJdbcTemplate.query(sql, sqlParameterSource,
 							new EntityBeanPropertyRowMapper<>(clz));
