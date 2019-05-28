@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
+import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.util.AuthzUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,21 +76,26 @@ public abstract class AuthorizedWebSocketHandler extends AbstractWebSocketHandle
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 		Principal principal = session.getPrincipal();
 		String username = principal != null ? principal.getName() : null;
-		if (username == null || !authorize(userDetailsService.loadUserByUsername(username))) {
+		if (username == null) {
 			String message = "anonymous user denied";
 			logger.warn(message);
 			session.sendMessage(new TextMessage(message));
 			session.close(CloseStatus.NORMAL);
 			return;
-		} else if (!authorize(userDetailsService.loadUserByUsername(username))) {
+		}
+		Authorize auth = getClass().getAnnotation(Authorize.class);
+		UserDetails ud = userDetailsService.loadUserByUsername(username);
+		boolean authorized = (auth == null
+				|| AuthzUtils.authorizeUserDetails(ud, auth.ifAllGranted(), auth.ifAnyGranted(), auth.ifNotGranted()))
+				&& authorize(ud);
+		if (!authorized) {
 			String message = username + " denied";
 			logger.warn(message);
 			session.sendMessage(new TextMessage(message));
 			session.close(CloseStatus.NORMAL);
 			return;
-		} else {
-			logger.info("connected with {}", username);
 		}
+		logger.info("connected with {}", username);
 		sessions.add(session);
 		super.afterConnectionEstablished(session);
 	}
@@ -102,6 +108,7 @@ public abstract class AuthorizedWebSocketHandler extends AbstractWebSocketHandle
 					session.close(CloseStatus.NORMAL);
 				} catch (IOException e) {
 				}
+		sessions.clear();
 	}
 
 }
