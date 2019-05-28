@@ -243,11 +243,12 @@ public class RedisCacheManager implements CacheManager {
 	public long increment(String key, long delta, int timeToLive, TimeUnit timeUnit, String namespace) {
 		String actualkey = generateKey(key, namespace);
 		RedisTemplate redisTemplate = findRedisTemplate(namespace);
-		List<Object> list = redisTemplate.executePipelined((SessionCallback) redisOperations -> {
-			redisOperations.boundValueOps(actualkey).increment(delta);
+		List<Object> list = (List<Object>) redisTemplate.execute((SessionCallback) redisOperations -> {
+			redisOperations.multi();
+			redisOperations.opsForValue().increment(actualkey, delta);
 			if (timeToLive > 0)
 				redisOperations.expire(actualkey, timeToLive, timeUnit);
-			return null;
+			return redisOperations.exec();
 		});
 		return (Long) list.get(0);
 	}
