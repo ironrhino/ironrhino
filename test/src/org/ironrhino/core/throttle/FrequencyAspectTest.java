@@ -12,10 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.cache.impl.Cache2kCacheManager;
-import org.ironrhino.core.coordination.LockService;
-import org.ironrhino.core.coordination.impl.StandaloneLockService;
 import org.ironrhino.core.throttle.FrequencyAspectTest.FrequencyConfiguration;
-import org.ironrhino.core.throttle.impl.DefaultFrequencyService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,16 +89,6 @@ public class FrequencyAspectTest {
 		@Bean
 		public CacheManager cacheManager() {
 			return new Cache2kCacheManager();
-		}
-
-		@Bean
-		public LockService lockService() {
-			return new StandaloneLockService();
-		}
-
-		@Bean
-		public FrequencyService frequencyService() {
-			return new DefaultFrequencyService();
 		}
 
 		@Bean

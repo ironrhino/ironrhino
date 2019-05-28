@@ -6,6 +6,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.ironrhino.core.aop.BaseAspect;
+import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.util.ExpressionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,8 +15,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class FrequencyAspect extends BaseAspect {
 
+	private static final String NAMESPACE = "frequency";
+
 	@Autowired
-	private FrequencyService frequencyService;
+	private CacheManager cacheManager;
 
 	public FrequencyAspect() {
 		order = -1000;
@@ -30,14 +33,16 @@ public class FrequencyAspect extends BaseAspect {
 		} else {
 			key = jp.getSignature().toLongString();
 		}
+		long timestamp = System.currentTimeMillis();
+		long duration = frequency.timeUnit().toMillis(frequency.duration());
+		String actualKey = key + ":" + (timestamp - timestamp % duration);
 		int limits = ExpressionUtils.evalInt(frequency.limits(), context, 0);
-		if (frequencyService.available(key, limits) > 0) {
-			frequencyService.increment(key, 1, frequency.duration(), frequency.timeUnit());
+		int used = (int) cacheManager.increment(actualKey, 1, frequency.duration(), frequency.timeUnit(), NAMESPACE);
+		if (limits >= used) {
 			return jp.proceed();
 		} else {
 			throw new FrequencyLimitExceededException(key);
 		}
-
 	}
 
 }
