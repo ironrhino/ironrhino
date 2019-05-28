@@ -155,9 +155,9 @@ public class RedisCacheManager implements CacheManager {
 		String actualKey = generateKey(key, namespace);
 		Long value = findRedisTemplate(namespace).getExpire(actualKey, TimeUnit.MILLISECONDS);
 		if (value == null)
-			value = 0L;
+			value = -1L;
 		if (value == -2)
-			value = 0L; // not exists
+			value = -2L; // not exists
 		return value;
 	}
 

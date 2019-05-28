@@ -78,7 +78,9 @@ public abstract class CacheManagerTestBase {
 		String key = "key";
 		Object value = "value";
 		try {
-			assertThat(cacheManager.ttl(key, NAMESPACE), is(0L));
+			assertThat(cacheManager.ttl(key, NAMESPACE), is(-2L));
+			cacheManager.put(key, value, -1, TimeUnit.SECONDS, NAMESPACE);
+			assertThat(cacheManager.ttl(key, NAMESPACE), is(-1L));
 		} catch (UnsupportedOperationException e) {
 
 		}
