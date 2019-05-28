@@ -22,18 +22,18 @@ public class Coordinate implements Serializable {
 
 	private static final int SCALE = 6;
 
-	public static final double EARTH_RADIUS = 6371393;
+	public static final double EARTH_RADIUS = 6370986;
 
 	public static final double EARTH_PERIMETER = EARTH_RADIUS * Math.PI * 2;
 
 	@Min(-90)
 	@Max(90)
-	@Column(precision = 8, scale = SCALE)
+	@Column(precision = SCALE + 2, scale = SCALE)
 	private Double latitude;
 
 	@Min(-180)
 	@Max(180)
-	@Column(precision = 9, scale = SCALE)
+	@Column(precision = SCALE + 3, scale = SCALE)
 	private Double longitude;
 
 	public Coordinate(String latLng) {
