@@ -23,7 +23,7 @@ import org.ironrhino.core.spring.data.redis.FallbackToStringSerializer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.env.Environment;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -42,9 +42,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RedisCacheManager implements CacheManager {
 
-	public static final String DEFAULT_SERIALIZER = "cacheManager.redis.defaultSerializer";
+	public static final String DEFAULT_SERIALIZER = "redisCacheManager.defaultSerializer";
 
-	public static final String SERIALIZERS_PREFIX = "cacheManager.redis.serializers.";
+	public static final String SERIALIZERS_PREFIX = "redisCacheManager.serializers.";
+
+	public static final String TEMPLATES_PREFIX = "redisCacheManager.templates.";
 
 	@Autowired
 	@PriorityQualifier
@@ -56,7 +58,7 @@ public class RedisCacheManager implements CacheManager {
 	private StringRedisTemplate cacheStringRedisTemplate;
 
 	@Autowired
-	private Environment env;
+	private ApplicationContext ctx;
 
 	private Map<String, RedisTemplate> cache = new ConcurrentHashMap<>();
 
@@ -66,7 +68,7 @@ public class RedisCacheManager implements CacheManager {
 
 	@PostConstruct
 	public void init() {
-		String defaultSerializerClass = env.getProperty(DEFAULT_SERIALIZER);
+		String defaultSerializerClass = ctx.getEnvironment().getProperty(DEFAULT_SERIALIZER);
 		if (StringUtils.isNotBlank(defaultSerializerClass)) {
 			try {
 				cacheRedisTemplate.setValueSerializer((RedisSerializer) BeanUtils.instantiateClass(
@@ -309,7 +311,10 @@ public class RedisCacheManager implements CacheManager {
 	protected RedisTemplate findRedisTemplate(String namespace) {
 		if (StringUtils.isBlank(namespace))
 			return cacheRedisTemplate;
-		String serializerClass = env.getProperty(SERIALIZERS_PREFIX + namespace);
+		String templateBeanName = ctx.getEnvironment().getProperty(TEMPLATES_PREFIX + namespace);
+		if (StringUtils.isNotBlank(templateBeanName))
+			return ctx.getBean(templateBeanName, RedisTemplate.class);
+		String serializerClass = ctx.getEnvironment().getProperty(SERIALIZERS_PREFIX + namespace);
 		if (StringUtils.isBlank(serializerClass))
 			return cacheRedisTemplate;
 		return cache.computeIfAbsent(namespace, key -> {
