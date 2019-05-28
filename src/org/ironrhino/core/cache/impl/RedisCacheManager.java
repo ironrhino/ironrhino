@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
@@ -240,12 +241,13 @@ public class RedisCacheManager implements CacheManager {
 	public long increment(String key, long delta, int timeToLive, TimeUnit timeUnit, String namespace) {
 		String actualkey = generateKey(key, namespace);
 		RedisTemplate redisTemplate = findRedisTemplate(namespace);
-		Long result = redisTemplate.opsForValue().increment(actualkey, delta);
-		if (result == null)
-			throw new RuntimeException("Unexpected null");
-		if (timeToLive > 0)
-			redisTemplate.expire(actualkey, timeToLive, timeUnit);
-		return result;
+		List<Object> list = redisTemplate.executePipelined((SessionCallback) redisOperations -> {
+			redisOperations.boundValueOps(actualkey).increment(delta);
+			if (timeToLive > 0)
+				redisOperations.expire(actualkey, timeToLive, timeUnit);
+			return null;
+		});
+		return (Long) list.get(0);
 	}
 
 	@Override
