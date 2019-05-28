@@ -26,7 +26,7 @@ public class BulkheadAspect extends BaseAspect {
 
 	@Around("execution(public * *(..)) and @annotation(bulkhead)")
 	public Object control(ProceedingJoinPoint jp, Bulkhead bulkhead) throws Throwable {
-		String key = jp.getSignature().toLongString();
+		String key = buildKey(jp);
 		io.github.resilience4j.bulkhead.Bulkhead bh = bulkheads.computeIfAbsent(key, k -> {
 			BulkheadConfig config = BulkheadConfig.custom().maxConcurrentCalls(bulkhead.maxConcurrentCalls())
 					.maxWaitTime(bulkhead.maxWaitTime()).build();

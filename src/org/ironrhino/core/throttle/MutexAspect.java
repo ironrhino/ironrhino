@@ -8,12 +8,10 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.ironrhino.core.aop.BaseAspect;
 import org.ironrhino.core.coordination.LockService;
-import org.ironrhino.core.spring.NameGenerator;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.ExpressionUtils;
 import org.ironrhino.core.util.LockFailedException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.stereotype.Component;
 
 @Aspect
@@ -32,21 +30,7 @@ public class MutexAspect extends BaseAspect {
 		String key = mutex.key();
 		StringBuilder sb = new StringBuilder();
 		if (StringUtils.isBlank(key)) {
-			Class<?> beanClass = jp.getTarget().getClass();
-			String beanName = NameGenerator.buildDefaultBeanName(beanClass.getName());
-			Component comp = AnnotatedElementUtils.getMergedAnnotation(beanClass, Component.class);
-			if (comp != null && StringUtils.isNotBlank(comp.value()))
-				beanName = comp.value();
-			sb.append(beanName).append('.').append(jp.getSignature().getName()).append('(');
-			Object[] args = jp.getArgs();
-			if (args.length > 0) {
-				for (int i = 0; i < args.length; i++) {
-					sb.append(args[i]);
-					if (i != args.length - 1)
-						sb.append(',');
-				}
-			}
-			sb.append(')');
+			sb.append(buildKey(jp));
 		} else {
 			Map<String, Object> context = buildContext(jp);
 			sb.append(ExpressionUtils.evalString(key, context));
@@ -71,7 +55,7 @@ public class MutexAspect extends BaseAspect {
 				lockService.unlock(lockName);
 			}
 		} else {
-			throw new LockFailedException(jp.getSignature().toLongString());
+			throw new LockFailedException(buildKey(jp));
 		}
 	}
 

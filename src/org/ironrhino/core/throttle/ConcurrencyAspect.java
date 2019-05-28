@@ -29,7 +29,7 @@ public class ConcurrencyAspect extends BaseAspect {
 		if (!key.isEmpty()) {
 			key = ExpressionUtils.evalString(key, context);
 		} else {
-			key = jp.getSignature().toLongString();
+			key = buildKey(jp);
 		}
 		int permits = ExpressionUtils.evalInt(concurrency.permits(), context, 0);
 		if (!concurrency.block()) {

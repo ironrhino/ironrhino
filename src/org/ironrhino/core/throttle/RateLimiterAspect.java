@@ -27,7 +27,7 @@ public class RateLimiterAspect extends BaseAspect {
 
 	@Around("execution(public * *(..)) and @annotation(rateLimiter)")
 	public Object control(ProceedingJoinPoint jp, RateLimiter rateLimiter) throws Throwable {
-		String key = jp.getSignature().toLongString();
+		String key = buildKey(jp);
 		io.github.resilience4j.ratelimiter.RateLimiter limiter = rateLimiters.computeIfAbsent(key, k -> {
 			RateLimiterConfig config = RateLimiterConfig.custom()
 					.timeoutDuration(Duration.ofMillis(rateLimiter.timeoutDuration()))

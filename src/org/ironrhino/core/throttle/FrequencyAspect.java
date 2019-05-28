@@ -31,7 +31,7 @@ public class FrequencyAspect extends BaseAspect {
 		if (!key.isEmpty()) {
 			key = ExpressionUtils.evalString(key, context);
 		} else {
-			key = jp.getSignature().toLongString();
+			key = buildKey(jp);
 		}
 		long timestamp = System.currentTimeMillis();
 		long duration = frequency.timeUnit().toMillis(frequency.duration());

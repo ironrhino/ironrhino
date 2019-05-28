@@ -27,7 +27,7 @@ public class CircuitBreakerAspect extends BaseAspect {
 
 	@Around("execution(public * *(..)) and @annotation(circuitBreaker)")
 	public Object control(ProceedingJoinPoint jp, CircuitBreaker circuitBreaker) throws Throwable {
-		String key = jp.getSignature().toLongString();
+		String key = buildKey(jp);
 		io.github.resilience4j.circuitbreaker.CircuitBreaker cb = circuitBreakers.computeIfAbsent(key, k -> {
 			CircuitBreakerConfig config = CircuitBreakerConfig.custom()
 					.failureRateThreshold(circuitBreaker.failureRateThreshold())

@@ -3,13 +3,19 @@ package org.ironrhino.core.aop;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.ironrhino.core.servlet.RequestContext;
+import org.ironrhino.core.spring.NameGenerator;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
+import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.stereotype.Component;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -49,6 +55,27 @@ public class BaseAspect implements Ordered {
 		if (!context.containsKey(oldName))
 			context.put(oldName, value);
 		context.put(AopContext.CONTEXT_KEY_RETVAL, value);
+	}
+
+	protected String buildKey(ProceedingJoinPoint jp) {
+		StringBuilder sb = new StringBuilder();
+		Class<?> beanClass = jp.getTarget().getClass();
+		String beanName = NameGenerator.buildDefaultBeanName(beanClass.getName());
+		Component comp = AnnotatedElementUtils.getMergedAnnotation(beanClass, Component.class);
+		if (comp != null && StringUtils.isNotBlank(comp.value()))
+			beanName = comp.value();
+		MethodSignature signature = (MethodSignature) jp.getSignature();
+		sb.append(beanName).append('.').append(signature.getName()).append('(');
+		Class<?>[] parameterTypes = signature.getParameterTypes();
+		if (parameterTypes.length > 0) {
+			for (int i = 0; i < parameterTypes.length; i++) {
+				sb.append(parameterTypes[i].getSimpleName());
+				if (i != parameterTypes.length - 1)
+					sb.append(',');
+			}
+		}
+		sb.append(')');
+		return sb.toString();
 	}
 
 }
