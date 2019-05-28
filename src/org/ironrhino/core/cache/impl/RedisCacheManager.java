@@ -243,6 +243,12 @@ public class RedisCacheManager implements CacheManager {
 	public long increment(String key, long delta, int timeToLive, TimeUnit timeUnit, String namespace) {
 		String actualkey = generateKey(key, namespace);
 		RedisTemplate redisTemplate = findRedisTemplate(namespace);
+		if (timeToLive <= 0) {
+			Long result = redisTemplate.opsForValue().increment(actualkey, delta);
+			if (result == null)
+				throw new RuntimeException("Unexpected null");
+			return result;
+		}
 		List<Object> list = (List<Object>) redisTemplate.execute((SessionCallback) redisOperations -> {
 			redisOperations.multi();
 			redisOperations.opsForValue().increment(actualkey, delta);
@@ -250,6 +256,8 @@ public class RedisCacheManager implements CacheManager {
 				redisOperations.expire(actualkey, timeToLive, timeUnit);
 			return redisOperations.exec();
 		});
+		if (list == null)
+			throw new RuntimeException("Unexpected null");
 		return (Long) list.get(0);
 	}
 
