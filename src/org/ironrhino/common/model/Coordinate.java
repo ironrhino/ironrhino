@@ -22,7 +22,9 @@ public class Coordinate implements Serializable {
 
 	private static final int SCALE = 6;
 
-	private static final double EARTH_RADIUS = 6371393;
+	public static final double EARTH_RADIUS = 6371393;
+
+	public static final double EARTH_PERIMETER = EARTH_RADIUS * Math.PI * 2;
 
 	@Min(-90)
 	@Max(90)
@@ -91,35 +93,43 @@ public class Coordinate implements Serializable {
 
 	public int distanceFrom(Coordinate c2) {
 		Coordinate c1 = this;
-		double latitude = Math.abs((c1.getLatitude() - c2.getLatitude())) * Math.PI / 180;
-		double longitude = Math.abs((c1.getLongitude() - c2.getLongitude())) * Math.PI / 180;
-		double value = Math.sin(latitude / 2) * Math.sin(latitude / 2) + Math.cos(c1.getLatitude() * Math.PI / 180)
-				* Math.cos(c2.getLatitude() * Math.PI / 180) * Math.sin(longitude / 2) * Math.sin(longitude / 2);
-		double distance = 2 * Math.atan2(Math.sqrt(value), Math.sqrt(1 - value));
-		return (int) Math.round((EARTH_RADIUS * distance) * 1000) / 1000;
+		double x1 = radian(c1.latitude), y1 = radian(c1.longitude);
+		double x2 = radian(c2.latitude), y2 = radian(c2.longitude);
+		double radian = Math.acos(Math.cos(x1) * Math.cos(x2) * Math.cos(y2 - y1) + Math.sin(x1) * Math.sin(x2));
+		return (int) (EARTH_RADIUS * radian);
 	}
 
 	public Coordinate moveVertical(int distance) {
-		double delta = (distance / (2 * Math.PI * EARTH_RADIUS)) * 360;
-		double newLatitude = this.latitude + delta;
-		while (newLatitude > 90)
-			newLatitude = 180 - newLatitude;
-		while (newLatitude < -90)
-			newLatitude = 180 + newLatitude;
-		return new Coordinate(newLatitude, this.longitude);
+		double delta = (distance / EARTH_PERIMETER) % 1 * 360; // (-360, 360)
+		double newLatitude = this.latitude + delta; // (-450, 450)
+		double absoluteNewLatitude = Math.abs(newLatitude);
+		boolean needInverse = false;
+		if (absoluteNewLatitude <= 90) {
+		} else if (absoluteNewLatitude <= 270) {
+			needInverse = true;
+			newLatitude = (newLatitude > 0 ? 180 : -180) - newLatitude;
+		} else {
+			newLatitude = (newLatitude < 0 ? 360 : -360) + newLatitude;
+		}
+		return new Coordinate(newLatitude,
+				needInverse ? (this.longitude > 0 ? -180 : 180) + this.longitude : this.longitude);
 	}
 
 	public Coordinate moveHorizontal(int distance) {
 		if (Math.abs(this.latitude) == 90)
 			return new Coordinate(this.latitude, this.longitude);
-		double radius = EARTH_RADIUS * Math.cos(Math.abs(this.latitude) / 180 * Math.PI);
-		double delta = (distance / (2 * Math.PI * radius)) * 360;
-		double newLongitude = this.longitude + delta;
-		while (newLongitude > 180)
-			newLongitude = newLongitude - 360;
-		while (newLongitude < -180)
-			newLongitude = newLongitude + 360;
+		double delta = (distance / (EARTH_PERIMETER * Math.cos(radian(this.latitude)))) % 1 * 360; // (-360, 360)
+		double newLongitude = this.longitude + delta; // (-540, 540)
+		if (newLongitude > 180) {
+			newLongitude -= 360;
+		} else if (newLongitude < -180) {
+			newLongitude += 360;
+		}
 		return new Coordinate(this.latitude, newLongitude);
+	}
+
+	public static double radian(double degree) {
+		return degree * Math.PI / 180;
 	}
 
 }
