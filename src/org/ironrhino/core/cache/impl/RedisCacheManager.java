@@ -252,8 +252,7 @@ public class RedisCacheManager implements CacheManager {
 		List<Object> list = (List<Object>) redisTemplate.execute((SessionCallback) redisOperations -> {
 			redisOperations.multi();
 			redisOperations.opsForValue().increment(actualkey, delta);
-			if (timeToLive > 0)
-				redisOperations.expire(actualkey, timeToLive, timeUnit);
+			redisOperations.expire(actualkey, timeToLive, timeUnit);
 			return redisOperations.exec();
 		});
 		if (list == null)
