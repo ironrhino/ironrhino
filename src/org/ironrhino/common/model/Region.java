@@ -13,7 +13,9 @@ import org.ironrhino.common.util.LocationUtils;
 import org.ironrhino.core.aop.PublishAware;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.FullnameSeperator;
+import org.ironrhino.core.metadata.Hidden;
 import org.ironrhino.core.metadata.NotInCopy;
+import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.search.elasticsearch.annotations.Index;
@@ -36,24 +38,28 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@Richtable(actionColumnButtons = "<@btn view='input' label='edit'/><#if 'treeview'!=Parameters.view!><a class=\"btn ajax view\" href=\"${actionBaseUrl+\"?parent=\"+entity.id}<#if tree??>&tree=${tree}</#if>\">${getText(\"enter\")}</a></#if>", bottomButtons = "<#if !(tree?? && tree gt 0 && (!parent??||parent lt 1))><@btn view='input' label='create'/> </#if><@btn action='save' confirm=true/> <@btn action='delete' confirm=true/> <#if 'treeview'!=Parameters.view! && region?? && parent??><#if region.parent?? && (!tree??||parent!=tree)><a class=\"btn ajax view\" href=\"${actionBaseUrl+\"?parent=\"+region.parent.id}<#if tree??>&tree=${tree}</#if>\" rel=\"up\">${getText(\"upward\")}</a><#else><a class=\"btn ajax view\" href=\"${actionBaseUrl}<#if tree??>?tree=${tree}</#if>\" rel=\"up\">${getText(\"upward\")}</a></#if></#if>")
 public class Region extends BaseTreeableEntity<Region> {
 
 	private static final long serialVersionUID = 8878381261391688086L;
 
 	@Embedded
-	@UiConfig(cssClass = "latlng", embeddedAsSingle = true, dynamicAttributes = "{\"data-address\":\"${region.fullname!}\"}")
+	@UiConfig(hiddenInList = @Hidden(true), cssClass = "latlng", embeddedAsSingle = true, dynamicAttributes = "{\"data-address\":\"${region.fullname!}\"}")
 	private @Valid Coordinate coordinate;
 
 	@UiConfig(hidden = true)
 	private String fullname;
 
 	@Column(length = 6)
+	@UiConfig(width = "100px")
 	private String areacode;
 
 	@Column(length = 6)
+	@UiConfig(width = "100px")
 	private String postcode;
 
 	@Min(1)
+	@UiConfig(width = "100px")
 	private Integer rank;
 
 	public Region(String name) {
