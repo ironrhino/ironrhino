@@ -1,5 +1,6 @@
 package org.ironrhino.rest.client;
 
+import org.ironrhino.core.spring.http.client.RestTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.ClassUtils;
@@ -26,6 +27,12 @@ public class RestClientConfiguration {
 	public MyJsonValidator myJsonValidator() {
 		return new MyJsonValidator();
 	}
+	
+	@Bean
+	public RestTemplate restTemplate() {
+		return new RestTemplate();
+	}
+
 
 	public static class MyJsonValidator implements JsonValidator {
 
