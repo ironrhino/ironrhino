@@ -79,7 +79,7 @@
 		-->
 		<#if !hidden>
 			<#assign columns+=[key]>
-			<#if resultPage.result?size gt 0 && config['showSum']>
+			<#if ((resultPage.result)!list)?size gt 0 && config['showSum']>
 				<#assign sumColumns+={key:{"value":0,"template":config['listTemplate']!}}>
 			</#if>
 			<#assign label=key>
@@ -110,7 +110,7 @@
 </#list>
 <#assign showActionColumn=richtableConfig.showActionColumn && (richtableConfig.actionColumnButtons?has_content||!readonly.value&&!appendOnly||viewable)>
 <@rtmiddle showActionColumn=showActionColumn/>
-<#list resultPage.result as entity>
+<#list ((resultPage.result)!list) as entity>
 <#assign entityReadonly = readonly.value/>
 <#if !entityReadonly && readonly.expression?has_content><#assign entityReadonly=readonly.expression?eval></#if>
 <#assign rowDynamicAttributes={}>
