@@ -37,6 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -291,7 +292,11 @@ public class FieldObject implements Serializable {
 						required = f.getType().isPrimitive();
 					}
 				} catch (NoSuchFieldException e) {
-					continue;
+					if (forRequest)
+						continue;
+					JsonProperty jp = pd.getReadMethod().getAnnotation(JsonProperty.class);
+					if (jp != null)
+						name = jp.value();
 				} catch (Throwable e) {
 					e.printStackTrace();
 				}
@@ -300,7 +305,13 @@ public class FieldObject implements Serializable {
 				list.add(fo);
 			}
 			list.sort((o1, o2) -> {
-				return fieldNames.indexOf(o1.getName()) - fieldNames.indexOf(o2.getName());
+				int index1 = fieldNames.indexOf(o1.getName());
+				int index2 = fieldNames.indexOf(o2.getName());
+				if (index1 == -1)
+					index1 = Integer.MAX_VALUE;
+				if (index2 == -1)
+					index2 = Integer.MAX_VALUE;
+				return index1 - index2;
 			});
 			return list;
 		}
