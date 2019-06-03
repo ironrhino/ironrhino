@@ -61,8 +61,11 @@ public class RedisCacheManager implements CacheManager {
 
 	private Map<String, RedisTemplate> cache = new ConcurrentHashMap<>();
 
+	private RedisScript<Long> incrementAndExpireScript = new DefaultRedisScript<>(
+			"local v=redis.call('incrby',KEYS[1],ARGV[1]) redis.call('pexpire',KEYS[1],ARGV[2]) return v", Long.class);
+
 	private RedisScript<Long> decrementPositiveScript = new DefaultRedisScript<>(
-			"if redis.call('exists',KEYS[1])==1 then local v=redis.call('decrby',KEYS[1],ARGV[1]) if v >= 0 then return v else redis.call('incrby',KEYS[1],ARGV[1]) return -2 end else return -1 end",
+			"if redis.call('exists',KEYS[1])==1 then local v=redis.call('decrby',KEYS[1],ARGV[1]) if v >= 0 then if tonumber(ARGV[2]) > 0 then redis.call('pexpire',KEYS[1],ARGV[2]) end return v else redis.call('incrby',KEYS[1],ARGV[1]) return -2 end else return -1 end",
 			Long.class);
 
 	@PostConstruct
@@ -242,11 +245,16 @@ public class RedisCacheManager implements CacheManager {
 	public long increment(String key, long delta, int timeToLive, TimeUnit timeUnit, String namespace) {
 		String actualkey = generateKey(key, namespace);
 		RedisTemplate redisTemplate = findRedisTemplate(namespace);
-		Long result = redisTemplate.opsForValue().increment(actualkey, delta);
+		Long result;
+		if (timeToLive > 0) {
+			result = (Long) redisTemplate.execute(incrementAndExpireScript, redisTemplate.getStringSerializer(),
+					redisTemplate.getValueSerializer(), Collections.singletonList(actualkey), String.valueOf(delta),
+					String.valueOf(timeUnit.toMillis(timeToLive)));
+		} else {
+			result = redisTemplate.opsForValue().increment(actualkey, delta);
+		}
 		if (result == null)
 			throw new RuntimeException("Unexpected null");
-		if (timeToLive > 0)
-			redisTemplate.expire(actualkey, timeToLive, timeUnit);
 		return result;
 	}
 
@@ -258,15 +266,14 @@ public class RedisCacheManager implements CacheManager {
 		RedisTemplate redisTemplate = findRedisTemplate(namespace);
 		String actualkey = generateKey(key, namespace);
 		Long result = (Long) redisTemplate.execute(decrementPositiveScript, redisTemplate.getStringSerializer(),
-				redisTemplate.getValueSerializer(), Collections.singletonList(actualkey), String.valueOf(delta));
+				redisTemplate.getValueSerializer(), Collections.singletonList(actualkey), String.valueOf(delta),
+				String.valueOf(timeUnit.toMillis(timeToLive)));
 		if (result == null)
 			throw new RuntimeException("Unexpected null");
 		if (result == -1)
 			throw new IllegalStateException("namespace:" + namespace + ", key:" + key + " does not exist");
 		if (result == -2)
 			throw new IllegalStateException("namespace:" + namespace + ", key:" + key + " is less than " + delta);
-		if (timeToLive > 0)
-			redisTemplate.expire(actualkey, timeToLive, timeUnit);
 		return result;
 	}
 
