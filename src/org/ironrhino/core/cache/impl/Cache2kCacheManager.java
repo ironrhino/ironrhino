@@ -3,6 +3,7 @@ package org.ironrhino.core.cache.impl;
 import static org.ironrhino.core.metadata.Profiles.DEFAULT;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -39,8 +40,10 @@ public class Cache2kCacheManager implements CacheManager {
 
 	@Override
 	public void put(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace) {
-		if (key == null || value == null)
-			return;
+		if (key == null)
+			throw new IllegalArgumentException("key should not be null");
+		if (value == null)
+			throw new IllegalArgumentException("value should not be null");
 		Cache<String, Object> cache = getCache(namespace, true);
 		cache.invoke(key, e -> e.setValue(value).setExpiryTime(timeToLive == 0 ? ExpiryTimeValues.ETERNAL
 				: (System.currentTimeMillis() + timeUnit.toMillis(timeToLive))));
@@ -54,7 +57,7 @@ public class Cache2kCacheManager implements CacheManager {
 	@Override
 	public boolean exists(String key, String namespace) {
 		if (key == null)
-			return false;
+			throw new IllegalArgumentException("key should not be null");
 		Cache<String, Object> cache = getCache(namespace, false);
 		if (cache == null)
 			return false;
@@ -64,7 +67,7 @@ public class Cache2kCacheManager implements CacheManager {
 	@Override
 	public Object get(String key, String namespace) {
 		if (key == null)
-			return null;
+			throw new IllegalArgumentException("key should not be null");
 		Cache<String, Object> cache = getCache(namespace, false);
 		if (cache == null)
 			return null;
@@ -74,7 +77,7 @@ public class Cache2kCacheManager implements CacheManager {
 	@Override
 	public Object getWithTti(String key, String namespace, int timeToIdle, TimeUnit timeUnit) {
 		if (key == null)
-			return null;
+			throw new IllegalArgumentException("key should not be null");
 		Cache<String, Object> cache = getCache(namespace, false);
 		if (cache == null)
 			return null;
@@ -90,16 +93,19 @@ public class Cache2kCacheManager implements CacheManager {
 
 	@Override
 	public void setTtl(String key, String namespace, int timeToLive, TimeUnit timeUnit) {
+		if (key == null)
+			throw new IllegalArgumentException("key should not be null");
+		if (timeToLive <= 0)
+			throw new IllegalArgumentException("timeToLive should be postive");
 		Cache<String, Object> cache = getCache(namespace, false);
-		if (cache == null || timeToLive <= 0)
-			return;
-		cache.expireAt(key, System.currentTimeMillis() + timeUnit.toMillis(timeToLive));
+		if (cache != null)
+			cache.expireAt(key, System.currentTimeMillis() + timeUnit.toMillis(timeToLive));
 	}
 
 	@Override
 	public void delete(String key, String namespace) {
 		if (key == null)
-			return;
+			throw new IllegalArgumentException("key should not be null");
 		Cache<String, Object> cache = getCache(namespace, false);
 		if (cache != null)
 			cache.remove(key);
@@ -108,7 +114,7 @@ public class Cache2kCacheManager implements CacheManager {
 	@Override
 	public void mput(Map<String, Object> map, int timeToLive, TimeUnit timeUnit, String namespace) {
 		if (map == null)
-			return;
+			throw new IllegalArgumentException("map should not be null");
 		Cache<String, Object> cache = getCache(namespace, true);
 		for (Map.Entry<String, Object> entry : map.entrySet())
 			cache.invoke(entry.getKey(),
@@ -119,10 +125,10 @@ public class Cache2kCacheManager implements CacheManager {
 	@Override
 	public Map<String, Object> mget(Collection<String> keys, String namespace) {
 		if (keys == null)
-			return null;
+			throw new IllegalArgumentException("keys should not be null");
 		Cache<String, Object> cache = getCache(namespace, false);
 		if (cache == null)
-			return null;
+			return Collections.emptyMap();
 		keys = keys.stream().filter(StringUtils::isNotBlank).collect(Collectors.toCollection(HashSet::new));
 		return cache.getAll(keys);
 	}
@@ -130,7 +136,7 @@ public class Cache2kCacheManager implements CacheManager {
 	@Override
 	public void mdelete(Collection<String> keys, String namespace) {
 		if (keys == null)
-			return;
+			throw new IllegalArgumentException("keys should not be null");
 		Cache<String, Object> cache = getCache(namespace, false);
 		if (cache != null)
 			cache.removeAll(
@@ -139,8 +145,10 @@ public class Cache2kCacheManager implements CacheManager {
 
 	@Override
 	public boolean putIfAbsent(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace) {
-		if (key == null || value == null)
-			return false;
+		if (key == null)
+			throw new IllegalArgumentException("key should not be null");
+		if (value == null)
+			throw new IllegalArgumentException("value should not be null");
 		Cache<String, Object> cache = getCache(namespace, true);
 		boolean b = cache.putIfAbsent(key, value);
 		if (b)
@@ -151,6 +159,8 @@ public class Cache2kCacheManager implements CacheManager {
 
 	@Override
 	public long increment(String key, long delta, int timeToLive, TimeUnit timeUnit, String namespace) {
+		if (key == null)
+			throw new IllegalArgumentException("key should not be null");
 		Cache<String, Object> cache = getCache(namespace, true);
 		CacheEntry<String, Object> ce = cache.invoke(key, e -> {
 			if (e.exists()) {
@@ -170,6 +180,8 @@ public class Cache2kCacheManager implements CacheManager {
 	@Override
 	public long decrementAndReturnNonnegative(String key, long delta, int timeToLive, TimeUnit timeUnit,
 			String namespace) {
+		if (key == null)
+			throw new IllegalArgumentException("key should not be null");
 		if (delta <= 0)
 			throw new IllegalArgumentException("delta should great than 0");
 		Cache<String, Object> cache = getCache(namespace, true);

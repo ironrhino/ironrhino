@@ -85,12 +85,15 @@ public class RedisCacheManager implements CacheManager {
 
 	@Override
 	public void put(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace) {
+		if (value == null)
+			throw new IllegalArgumentException("value should not be null");
+		String actualKey = generateKey(key, namespace);
 		RedisTemplate redisTemplate = findRedisTemplate(namespace);
 		try {
 			if (timeToLive > 0)
-				redisTemplate.opsForValue().set(generateKey(key, namespace), value, timeToLive, timeUnit);
+				redisTemplate.opsForValue().set(actualKey, value, timeToLive, timeUnit);
 			else
-				redisTemplate.opsForValue().set(generateKey(key, namespace), value);
+				redisTemplate.opsForValue().set(actualKey, value);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
@@ -103,10 +106,9 @@ public class RedisCacheManager implements CacheManager {
 
 	@Override
 	public boolean exists(String key, String namespace) {
-		if (key == null)
-			return false;
+		String actualKey = generateKey(key, namespace);
 		try {
-			Boolean b = findRedisTemplate(namespace).hasKey(generateKey(key, namespace));
+			Boolean b = findRedisTemplate(namespace).hasKey(actualKey);
 			return b != null && b;
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -116,10 +118,9 @@ public class RedisCacheManager implements CacheManager {
 
 	@Override
 	public Object get(String key, String namespace) {
-		if (key == null)
-			return null;
+		String actualKey = generateKey(key, namespace);
 		try {
-			return findRedisTemplate(namespace).opsForValue().get(generateKey(key, namespace));
+			return findRedisTemplate(namespace).opsForValue().get(actualKey);
 		} catch (SerializationException e) {
 			log.warn(e.getMessage());
 			delete(key, namespace);
@@ -132,8 +133,6 @@ public class RedisCacheManager implements CacheManager {
 
 	@Override
 	public Object getWithTti(String key, String namespace, int timeToIdle, TimeUnit timeUnit) {
-		if (key == null)
-			return null;
 		String actualKey = generateKey(key, namespace);
 		RedisTemplate redisTemplate = findRedisTemplate(namespace);
 		try {
@@ -153,8 +152,6 @@ public class RedisCacheManager implements CacheManager {
 
 	@Override
 	public long ttl(String key, String namespace) {
-		if (key == null)
-			return 0;
 		String actualKey = generateKey(key, namespace);
 		Long value = findRedisTemplate(namespace).getExpire(actualKey, TimeUnit.MILLISECONDS);
 		if (value == null)
@@ -166,17 +163,16 @@ public class RedisCacheManager implements CacheManager {
 
 	@Override
 	public void setTtl(String key, String namespace, int timeToLive, TimeUnit timeUnit) {
-		if (key == null || timeToLive <= 0)
-			return;
+		if (timeToLive <= 0)
+			throw new IllegalArgumentException("timeToLive should be postive");
 		findRedisTemplate(namespace).expire(generateKey(key, namespace), timeToLive, timeUnit);
 	}
 
 	@Override
 	public void delete(String key, String namespace) {
-		if (StringUtils.isBlank(key))
-			return;
+		String actualKey = generateKey(key, namespace);
 		try {
-			findRedisTemplate(namespace).delete(generateKey(key, namespace));
+			findRedisTemplate(namespace).delete(actualKey);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
@@ -185,7 +181,7 @@ public class RedisCacheManager implements CacheManager {
 	@Override
 	public void mput(Map<String, Object> map, final int timeToLive, TimeUnit timeUnit, String namespace) {
 		if (map == null)
-			return;
+			throw new IllegalArgumentException("map should not be null");
 		RedisTemplate redisTemplate = findRedisTemplate(namespace);
 		try {
 			Map<String, Object> temp = new HashMap<>();
@@ -201,7 +197,7 @@ public class RedisCacheManager implements CacheManager {
 	@Override
 	public Map<String, Object> mget(Collection<String> keys, String namespace) {
 		if (keys == null)
-			return null;
+			throw new IllegalArgumentException("keys should not be null");
 		keys = keys.stream().filter(StringUtils::isNotBlank).collect(Collectors.toCollection(HashSet::new));
 		try {
 			List<Object> list = findRedisTemplate(namespace).opsForValue()
@@ -222,7 +218,7 @@ public class RedisCacheManager implements CacheManager {
 	@Override
 	public void mdelete(Collection<String> keys, final String namespace) {
 		if (keys == null)
-			return;
+			throw new IllegalArgumentException("keys should not be null");
 		try {
 			findRedisTemplate(namespace).delete(keys.stream().filter(StringUtils::isNotBlank)
 					.map(key -> generateKey(key, namespace)).collect(Collectors.toList()));
@@ -233,6 +229,8 @@ public class RedisCacheManager implements CacheManager {
 
 	@Override
 	public boolean putIfAbsent(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace) {
+		if (value == null)
+			throw new IllegalArgumentException("value should not be null");
 		String actualkey = generateKey(key, namespace);
 		RedisTemplate redisTemplate = findRedisTemplate(namespace);
 		Boolean result;
