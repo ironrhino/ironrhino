@@ -137,9 +137,10 @@ public class RedisCacheManager implements CacheManager {
 		String actualKey = generateKey(key, namespace);
 		RedisTemplate redisTemplate = findRedisTemplate(namespace);
 		try {
-			if (timeToIdle > 0)
+			Object result = redisTemplate.opsForValue().get(actualKey);
+			if (result != null && timeToIdle > 0)
 				redisTemplate.expire(actualKey, timeToIdle, timeUnit);
-			return redisTemplate.opsForValue().get(actualKey);
+			return result;
 		} catch (SerializationException e) {
 			log.warn(e.getMessage());
 			delete(key, namespace);
@@ -165,7 +166,7 @@ public class RedisCacheManager implements CacheManager {
 
 	@Override
 	public void setTtl(String key, String namespace, int timeToLive, TimeUnit timeUnit) {
-		if (key == null)
+		if (key == null || timeToLive <= 0)
 			return;
 		findRedisTemplate(namespace).expire(generateKey(key, namespace), timeToLive, timeUnit);
 	}
@@ -190,7 +191,8 @@ public class RedisCacheManager implements CacheManager {
 			Map<String, Object> temp = new HashMap<>();
 			map.forEach((key, value) -> temp.put(generateKey(key, namespace), value));
 			redisTemplate.opsForValue().multiSet(temp);
-			temp.keySet().forEach(key -> redisTemplate.expire(key, timeToLive, timeUnit));
+			if (timeToLive > 0)
+				temp.keySet().forEach(key -> redisTemplate.expire(key, timeToLive, timeUnit));
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
