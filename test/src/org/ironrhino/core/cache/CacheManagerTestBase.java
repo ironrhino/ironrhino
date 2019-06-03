@@ -204,7 +204,15 @@ public abstract class CacheManagerTestBase {
 			error = true;
 		}
 		assertThat(cacheManager.decrementAndReturnNonnegative(key, 1, -1, TimeUnit.SECONDS, NAMESPACE), is(0L));
-		cacheManager.delete(key, NAMESPACE);
+		assertThat(cacheManager.increment(key, 2, -1, TimeUnit.SECONDS, NAMESPACE), is(2L));
+		assertThat(cacheManager.decrementAndReturnNonnegative(key, 2, 1, TimeUnit.SECONDS, NAMESPACE), is(0L));
+		assertThat(cacheManager.exists(key, NAMESPACE), is(true));
+		try {
+			TimeUnit.MILLISECONDS.sleep(1100);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		assertThat(cacheManager.exists(key, NAMESPACE), is(false));
 	}
 
 }
