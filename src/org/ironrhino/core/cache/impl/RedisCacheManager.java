@@ -233,12 +233,15 @@ public class RedisCacheManager implements CacheManager {
 	public boolean putIfAbsent(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace) {
 		String actualkey = generateKey(key, namespace);
 		RedisTemplate redisTemplate = findRedisTemplate(namespace);
-		Boolean success = redisTemplate.opsForValue().setIfAbsent(actualkey, value);
-		if (success == null)
-			return false;
-		if (success && timeToLive > 0)
-			redisTemplate.expire(actualkey, timeToLive, timeUnit);
-		return success;
+		Boolean result;
+		if (timeToLive > 0) {
+			result = redisTemplate.opsForValue().setIfAbsent(actualkey, value, timeToLive, timeUnit);
+		} else {
+			result = redisTemplate.opsForValue().setIfAbsent(actualkey, value);
+		}
+		if (result == null)
+			throw new RuntimeException("Unexpected null");
+		return result;
 	}
 
 	@Override
