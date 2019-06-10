@@ -85,12 +85,17 @@ public class RegionSetup {
 			areacode = regionAreacodeMap.get(region.getName());
 		region.setAreacode(areacode);
 		if (region.getParent() != null) {
-			Rgn rgn = findMatched(region);
-			if (rgn != null) {
-				if (region.getAreacode() == null && StringUtils.isNotBlank(rgn.getI()))
-					region.setAreacode(rgn.getI());
-				if (StringUtils.isNotBlank(rgn.getZ()))
-					region.setPostcode(rgn.getZ());
+			if (region.getFullname().matches("^(台湾|香港|澳门).*$")) {
+				region.setAreacode(null);
+				region.setPostcode(null);
+			} else {
+				Rgn rgn = findMatched(region);
+				if (rgn != null) {
+					if (region.getAreacode() == null && StringUtils.isNotBlank(rgn.getI()))
+						region.setAreacode(rgn.getI());
+					if (StringUtils.isNotBlank(rgn.getZ()))
+						region.setPostcode(rgn.getZ());
+				}
 			}
 		}
 		if (regionCoordinateMap != null) {
@@ -252,6 +257,10 @@ public class RegionSetup {
 				map.put(parentName + name, areacode);
 			}
 		}
+		map.put("上海市宝山区", "310113");
+		map.put("双鸭山市宝山区", "230506");
+		map.put("重庆市江北区", "500105");
+		map.put("宁波市江北区", "330205");
 		return map;
 	}
 
