@@ -1,11 +1,9 @@
 package org.ironrhino.security.action;
 
-import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,17 +17,14 @@ import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.JsonConfig;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.model.LabelValue;
-import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.security.event.ProfileEditedEvent;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.security.role.UserRoleFilter;
 import org.ironrhino.core.security.role.UserRoleManager;
 import org.ironrhino.core.struts.EntityAction;
 import org.ironrhino.core.util.AuthzUtils;
-import org.ironrhino.core.util.BeanUtils;
 import org.ironrhino.security.model.User;
 import org.ironrhino.security.service.UserManager;
-import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -82,16 +77,9 @@ public class UserAction extends EntityAction<User> {
 	}
 
 	@Override
-	public String input() {
-		String id = getUid();
-		if (StringUtils.isNotBlank(id)) {
-			user = userManager.get(id);
-			if (user == null)
-				user = userManager.findByNaturalId(id);
-		}
-		if (user == null) {
-			user = new User();
-		}
+	public String input() throws Exception {
+		String result = super.input();
+		user = (User) getEntity();
 		Map<String, String> map = userRoleManager.getAllRoles(true);
 		if (userRoleFilter != null) {
 			Map<String, String> temp = userRoleFilter.filter(user, map);
@@ -113,7 +101,7 @@ public class UserAction extends EntityAction<User> {
 				}
 			}
 		}
-		return INPUT;
+		return result;
 	}
 
 	@Override
@@ -122,79 +110,20 @@ public class UserAction extends EntityAction<User> {
 			@RequiredStringValidator(type = ValidatorType.FIELD, fieldName = "user.name", trim = true, key = "validation.required") }, emails = {
 					@EmailValidator(fieldName = "user.email", key = "validation.invalid") }, regexFields = {
 							@RegexFieldValidator(type = ValidatorType.FIELD, fieldName = "user.username", regex = User.USERNAME_REGEX, key = "validation.invalid") })
-	public String save() {
-		if (!makeEntityValid())
-			return INPUT;
-		int previousVersion = user.getVersion();
-		userManager.save(user);
-		int currentVersion = user.getVersion();
-		if (currentVersion != previousVersion)
-			ServletActionContext.getResponse().addHeader("X-Postback", "user.version=" + currentVersion);
-		notify("save.success");
-		return SUCCESS;
-	}
-
-	@Override
-	@Validations(regexFields = {
-			@RegexFieldValidator(type = ValidatorType.FIELD, fieldName = "user.username", regex = User.USERNAME_REGEX, key = "validation.invalid") })
-	public String checkavailable() {
-		makeEntityValid();
-		return JSON;
+	public String save() throws Exception {
+		return super.save();
 	}
 
 	@Override
 	protected boolean makeEntityValid() {
-		if (user == null) {
-			addActionError(getText("access.denied"));
+		if (!super.makeEntityValid())
 			return false;
-		}
-		if (user.isNew()) {
-			if (StringUtils.isNotBlank(user.getUsername())) {
-				user.setUsername(user.getUsername().toLowerCase(Locale.ROOT));
-				if (userManager.existsOne(true, new Serializable[] { "username", user.getUsername() })) {
-					addFieldError("user.username", getText("validation.already.exists"));
-					return false;
-				}
-			}
-			if (StringUtils.isNotBlank(user.getEmail())
-					&& userManager.existsOne(true, new Serializable[] { "email", user.getEmail() })) {
-				addFieldError("user.email", getText("validation.already.exists"));
-				return false;
-			}
-		} else {
-			User temp = user;
-			user = userManager.get(temp.getId());
-			if (StringUtils.isNotBlank(temp.getEmail()) && !temp.getEmail().equals(user.getEmail())
-					&& userManager.existsOne(true, new Serializable[] { "email", temp.getEmail() })) {
-				addFieldError("user.email", getText("validation.already.exists"));
-				return false;
-			}
-			BeanUtils.copyProperties(temp, user);
-			int versionInDb = user.getVersion();
-			int versionInUi = temp.getVersion();
-			if (versionInUi > -1 && versionInUi != versionInDb) {
-				addActionError(getText("validation.version.conflict"));
-				return false;
-			}
-		}
+		user = (User) getEntity();
 		try {
 			userRoleManager.checkMutex(user.getRoles());
 		} catch (Exception e) {
 			addFieldError("user.roles", e.getLocalizedMessage());
 			return false;
-		}
-		BeanWrapperImpl bw = new BeanWrapperImpl(user);
-		PropertyDescriptor[] pds = bw.getPropertyDescriptors();
-		for (PropertyDescriptor pd : pds) {
-			if (pd.getReadMethod() == null || pd.getWriteMethod() == null)
-				continue;
-			String name = pd.getName();
-			Object value = bw.getPropertyValue(name);
-			if (value instanceof Persistable) {
-				if (((Persistable<?>) value).isNew()) {
-					bw.setPropertyValue(name, null);
-				}
-			}
 		}
 		return true;
 	}
