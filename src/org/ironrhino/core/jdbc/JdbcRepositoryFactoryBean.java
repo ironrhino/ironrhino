@@ -359,9 +359,12 @@ public class JdbcRepositoryFactoryBean extends MethodInterceptorFactoryBean
 			}
 			if (returnType == void.class) {
 				return null;
-			} else if (returnType == int.class || returnType == Integer.class || returnType == long.class
-					|| returnType == Long.class) {
+			} else if (returnType == int.class || returnType == Integer.class) {
 				return rows;
+			} else if (returnType == long.class || returnType == Long.class) {
+				return (long) rows;
+			} else if (returnType == short.class || returnType == Short.class) {
+				return (short) rows;
 			} else if (returnType == boolean.class || returnType == Boolean.class) {
 				return rows > 0;
 			} else {

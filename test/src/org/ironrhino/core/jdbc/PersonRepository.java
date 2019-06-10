@@ -30,6 +30,14 @@ public interface PersonRepository {
 	@Sql("update t_person set amount=:newAmount where name=:name and amount=:oldAmount")
 	boolean updateAmount(String name, BigDecimal oldAmount, BigDecimal newAmount);
 
+	@Transactional
+	@Sql("update t_person set amount=:newAmount where name=:name and amount=:oldAmount")
+	int updateAmountAndReturnIntRows(String name, BigDecimal oldAmount, BigDecimal newAmount);
+
+	@Transactional
+	@Sql("update t_person set amount=:newAmount where name=:name and amount=:oldAmount")
+	long updateAmountAndReturnLongRows(String name, BigDecimal oldAmount, BigDecimal newAmount);
+
 	@Transactional(readOnly = true)
 	Person get(String name);
 

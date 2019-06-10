@@ -80,6 +80,10 @@ public class JdbcRepositoryTest {
 		assertThat(personRepository.listAges().size(), is(1));
 		assertThat(personRepository.updateAmount("test", new BigDecimal("11.00"), new BigDecimal("120.00")), is(false));
 		assertThat(personRepository.updateAmount("test", new BigDecimal("12.00"), new BigDecimal("120.00")), is(true));
+		assertThat(personRepository.updateAmountAndReturnIntRows("test", new BigDecimal("120.00"),
+				new BigDecimal("12.00")), is(1));
+		assertThat(personRepository.updateAmountAndReturnLongRows("test", new BigDecimal("12.00"),
+				new BigDecimal("120.00")), is(1L));
 		Person p3 = personRepository.get("test");
 		assertThat(p3.getAmount(), is(new BigDecimal("120.00")));
 		int rows = personRepository.delete("test");
