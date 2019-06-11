@@ -48,6 +48,7 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 @PropertySources({
+		@PropertySource(name = RandomValuePropertySourceFactory.RANDOM_PROPERTY_SOURCE_NAME, factory = RandomValuePropertySourceFactory.class, value = ""),
 		@PropertySource(ignoreResourceNotFound = true, value = "classpath:resources/spring/applicationContext.properties"),
 		@PropertySource(ignoreResourceNotFound = true, value = "classpath:resources/spring/applicationContext.yaml", factory = YamlPropertySourceFactory.class),
 		@PropertySource(ignoreResourceNotFound = true, value = "classpath:resources/spring/applicationContext.${STAGE}.properties"),
