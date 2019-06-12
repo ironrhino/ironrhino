@@ -2,7 +2,8 @@ package org.ironrhino.core.spring.configuration;
 
 import java.util.concurrent.Executor;
 
-import org.slf4j.LoggerFactory;
+import org.ironrhino.core.util.AppInfo;
+import org.slf4j.MDC;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -20,6 +21,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Order(0)
 @EnableScheduling
 @EnableAsync(order = -999, proxyTargetClass = true)
@@ -54,6 +58,10 @@ public class SchedulingConfiguration implements SchedulingConfigurer, AsyncConfi
 		ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
 		threadPoolTaskScheduler.setPoolSize(taskSchedulerPoolSize);
 		threadPoolTaskScheduler.setThreadNamePrefix("taskScheduler-");
+		threadPoolTaskScheduler.setErrorHandler(ex -> {
+			MDC.put("server", " server:" + AppInfo.getInstanceId(true));
+			log.error("Unexpected error occurred in scheduled task.", ex);
+		});
 		return threadPoolTaskScheduler;
 	}
 
@@ -71,8 +79,8 @@ public class SchedulingConfiguration implements SchedulingConfigurer, AsyncConfi
 	@Override
 	public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
 		return (ex, method, args) -> {
-			LoggerFactory.getLogger(AsyncUncaughtExceptionHandler.class)
-					.error("method ( " + method.toString() + " ) error", ex);
+			MDC.put("server", " server:" + AppInfo.getInstanceId(true));
+			log.error("Unexpected error occurred when call method ( " + method.toString() + " ) asynchronously", ex);
 		};
 	}
 
