@@ -112,13 +112,9 @@ public class Region extends BaseTreeableEntity<Region> {
 		if (areacode.equals(this.getAreacode()))
 			return this;
 		for (Region t : getChildren()) {
-			if (areacode.equals(t.getAreacode())) {
-				return t;
-			} else {
-				Region tt = t.getDescendantOrSelfByAreacode(areacode);
-				if (tt != null)
-					return tt;
-			}
+			Region tt = t.getDescendantOrSelfByAreacode(areacode);
+			if (tt != null)
+				return tt;
 		}
 		return null;
 	}

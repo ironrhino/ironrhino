@@ -154,13 +154,9 @@ public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extend
 		if (id.equals(this.getId()))
 			return (T) this;
 		for (T t : getChildren()) {
-			if (id.equals(t.getId())) {
-				return t;
-			} else {
-				T tt = t.getDescendantOrSelfById(id);
-				if (tt != null)
-					return tt;
-			}
+			T tt = t.getDescendantOrSelfById(id);
+			if (tt != null)
+				return tt;
 		}
 		return null;
 	}
@@ -171,13 +167,9 @@ public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extend
 		if (name.equals(this.getName()))
 			return (T) this;
 		for (T t : getChildren()) {
-			if (name.equals(t.getName())) {
-				return t;
-			} else {
-				T tt = t.getDescendantOrSelfByName(name);
-				if (tt != null)
-					return tt;
-			}
+			T tt = t.getDescendantOrSelfByName(name);
+			if (tt != null)
+				return tt;
 		}
 		return null;
 	}
