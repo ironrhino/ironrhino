@@ -160,7 +160,7 @@ public class AccessFilter implements Filter {
 				s = "";
 			MDC.put("userAgent", " UserAgent:" + s);
 			s = request.getHeader("Referer");
-			if (s == null)
+			if (s == null || !s.startsWith("http"))
 				s = "";
 			MDC.put("referer", " Referer:" + s);
 			s = RequestUtils.getCookieValue(request, DefaultAuthenticationSuccessHandler.COOKIE_NAME_LOGIN_USER);
