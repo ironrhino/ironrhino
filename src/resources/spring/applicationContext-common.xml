@@ -10,5 +10,6 @@
 		<context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
 		<context:exclude-filter type="assignable" expression="org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport"/>
 		<context:exclude-filter type="assignable" expression="org.springframework.web.socket.config.annotation.WebSocketConfigurer"/>
+		<context:exclude-filter type="assignable" expression="org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer"/>
 	</context:component-scan>
 </beans>
