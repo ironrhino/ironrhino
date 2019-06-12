@@ -104,24 +104,19 @@
 						if (video)
 							destroy();
 					};
-					// stream.onended = noStream;
-					try {
-						video.srcObject = stream;
-					} catch (e) {
-						if (window.webkitURL)
-							video.src = window.webkitURL
-									.createObjectURL(stream);
-						else if (video.mozSrcObject !== undefined) {// FF18a
-							video.mozSrcObject = stream;
-							video.play();
-						} else if (navigator.mozGetUserMedia) {// FF16a,
-							// 17a
-							video.src = stream;
-							video.play();
-						} else if (window.URL)
-							video.src = window.URL.createObjectURL(stream);
-						else
-							video.src = stream;
+					if ('srcObject' in video) {
+						video.srcObject = stream; // modern
+					} else if (window.webkitURL) {
+						video.src = window.webkitURL.createObjectURL(stream);
+					} else if (video.mozSrcObject !== undefined) {// FF18a
+						video.mozSrcObject = stream;
+						video.play();
+					} else if (navigator.mozGetUserMedia) {// FF16a,
+						// 17a
+						video.src = stream;
+						video.play();
+					} else if (window.URL) {
+						video.src = window.URL.createObjectURL(stream);
 					}
 				}, function() {
 					if (typeof Indicator.hide != 'undefined')
@@ -148,14 +143,19 @@
 				videoStream.stop();
 			else if (videoStream.msStop)
 				videoStream.msStop();
-			videoStream.onended = null;
+			else if (videoStream.getTracks)
+				videoStream.getTracks().forEach(function(track) {
+							track.stop()
+						});
 			videoStream = null;
 		}
 		video.onerror = null;
 		video.pause();
 		if (video.mozSrcObject)
 			video.mozSrcObject = null;
-		if (window.URL)
+		if (video.srcObject)
+			video.srcObject = null;
+		if (window.URL && video.src)
 			window.URL.revokeObjectURL(video.src);
 		video.src = '';
 		video.parentNode.removeChild(video);
