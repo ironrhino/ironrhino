@@ -247,7 +247,6 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 				MDC.remove(AccessFilter.MDC_KEY_REQUEST_ID);
 				MDC.remove("request");
 			}
-			MDC.remove("role");
 		}
 		return result;
 	}
