@@ -16,6 +16,7 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.ironrhino.core.log4j.MyThreadContextMap;
 import org.ironrhino.core.log4j.SimpleMergeStrategy;
 import org.ironrhino.core.spring.configuration.YamlPropertySourceFactory;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
@@ -430,6 +431,7 @@ public class AppInfo {
 			if (System.getProperty("AsyncLogger.RingBufferSize") == null)
 				System.setProperty("AsyncLogger.RingBufferSize", "16384");
 		}
+		System.setProperty("log4j2.threadContextMap", MyThreadContextMap.class.getName());
 		if (System.getProperty("hibernate.logger.level") == null)
 			System.setProperty("hibernate.logger.level", AppInfo.getStage() == Stage.DEVELOPMENT ? "TRACE" : "INFO");
 		if (System.getProperty("console.logger.level") == null)
