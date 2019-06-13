@@ -20,9 +20,9 @@ wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-
 yum makecache
 
 cat>/etc/yum.repos.d/mysql-community.repo<<EOF
-[mysql57-community]
-name=MySQL 5.7 Community Server
-baseurl=http://repo.mysql.com/yum/mysql-5.7-community/el/\$releasever/\$basearch/
+[mysql80-community]
+name=MySQL 8.0 Community Server
+baseurl=http://repo.mysql.com/yum/mysql-8.0-community/el/\$releasever/\$basearch/
 gpgcheck=0
 enabled=1
 EOF
@@ -214,8 +214,6 @@ fi
 if [ -f "/etc/my.cnf" ] && ! $(more /etc/my.cnf|grep collation-server >/dev/null 2>&1) ; then
 sed -i '/\[mysqld\]/a\lower_case_table_names = 1' /etc/my.cnf
 sed -i '/\[mysqld\]/a\innodb_stats_on_metadata = off' /etc/my.cnf
-sed -i '/\[mysqld\]/a\collation-server = utf8mb4_unicode_ci' /etc/my.cnf
-sed -i '/\[mysqld\]/a\character-set-server = utf8mb4' /etc/my.cnf
 sed -i '/\[mysqld\]/a\open_files_limit = 8192' /etc/my.cnf
 sed -i '/\[mysqld\]/a\max_connections = 1000' /etc/my.cnf
 sed -i '/\[mysqld\]/a\innodb_buffer_pool_size = 1G' /etc/my.cnf
