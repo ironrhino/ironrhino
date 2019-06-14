@@ -180,13 +180,8 @@ public class RequestUtils {
 		} catch (UnsupportedEncodingException e) {
 		}
 		Cookie cookie = new Cookie(cookieName, cookieValue);
-		String ua = request.getHeader("User-Agent");
-		// lower version android webview was buggy
-		boolean downgrade = (ua != null && ua.toLowerCase(Locale.ROOT).contains("android"));
-		if (!downgrade) {
-			cookie.setHttpOnly(httpOnly);
-			cookie.setMaxAge(maxAge);
-		}
+		cookie.setHttpOnly(httpOnly);
+		cookie.setMaxAge(maxAge);
 		if (StringUtils.isNotBlank(domain))
 			cookie.setDomain(domain);
 		cookie.setPath(path);
