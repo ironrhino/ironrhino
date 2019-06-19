@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -30,7 +31,7 @@ public class Cache2kCacheManager implements CacheManager {
 
 	@PostConstruct
 	public void init() {
-		cache2kCacheManager = org.cache2k.CacheManager.getInstance();
+		cache2kCacheManager = org.cache2k.CacheManager.getInstance(UUID.randomUUID().toString());
 	}
 
 	@PreDestroy
