@@ -51,6 +51,8 @@ public class DatabaseCyclicSequenceDelegate extends AbstractDatabaseCyclicSequen
 			seq = new DerbyCyclicSequence();
 		else if (databaseProduct == DatabaseProduct.CUBRID)
 			seq = new CubridCyclicSequence();
+		else if (databaseProduct == DatabaseProduct.FIREBIRD)
+			seq = new FirebirdCyclicSequence();
 		else
 			throw new RuntimeException("not implemented for database " + databaseProduct);
 		seq.setDataSource(getDataSource());

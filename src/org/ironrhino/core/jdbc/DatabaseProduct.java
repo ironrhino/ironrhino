@@ -398,6 +398,41 @@ public enum DatabaseProduct {
 		protected String getRecommendedJdbcUrlQueryString() {
 			return "charSet=utf-8&zeroDateTimeBehavior=convertToNull";
 		}
+	},
+	FIREBIRD {
+		@Override
+		public int getDefaultPort() {
+			return 3050;
+		}
+
+		@Override
+		public String getDefaultDriverClass() {
+			return "org.firebirdsql.jdbc.FBDriver";
+		}
+
+		@Override
+		public String getJdbcUrlPrefix() {
+			return "jdbc:firebirdsql";
+		}
+
+		@Override
+		public String getJdbcUrl(String host, int port, String databaseName, String params) {
+			StringBuilder sb = new StringBuilder(getJdbcUrlPrefix());
+			sb.append(StringUtils.isNotBlank(host) ? host : "localhost");
+			sb.append(":").append(port);
+			sb.append(":").append(databaseName);
+			if (StringUtils.isNotBlank(params)) {
+				if (!params.startsWith("?"))
+					sb.append("?");
+				sb.append(params);
+			}
+			return sb.toString();
+		}
+
+		@Override
+		protected String getRecommendedJdbcUrlQueryString() {
+			return "charSet=utf-8";
+		}
 	};
 
 	public static DatabaseProduct parse(String nameOrUrl) {
@@ -431,8 +466,10 @@ public enum DatabaseProduct {
 				return HSQL;
 			else if (nameOrUrl.toLowerCase(Locale.ROOT).contains("derby"))
 				return DERBY;
-			else if (nameOrUrl.toLowerCase(Locale.ROOT).equals("cubrid"))
+			else if (nameOrUrl.toLowerCase(Locale.ROOT).contains("cubrid"))
 				return CUBRID;
+			else if (nameOrUrl.toLowerCase(Locale.ROOT).contains("firebird"))
+				return FIREBIRD;
 		}
 		return null;
 	}

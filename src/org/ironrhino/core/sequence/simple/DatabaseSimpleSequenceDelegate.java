@@ -51,6 +51,8 @@ public class DatabaseSimpleSequenceDelegate extends AbstractDatabaseSimpleSequen
 			seq = new DerbySimpleSequence();
 		else if (databaseProduct == DatabaseProduct.CUBRID)
 			seq = new CubridSimpleSequence();
+		else if (databaseProduct == DatabaseProduct.FIREBIRD)
+			seq = new FirebirdSimpleSequence();
 		else
 			throw new RuntimeException("not implemented for database " + databaseProduct);
 		seq.setDataSource(getDataSource());
