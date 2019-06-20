@@ -12,7 +12,8 @@ import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.env.Profiles;
 import org.springframework.core.type.AnnotatedTypeMetadata;
-import org.springframework.core.type.classreading.AnnotationMetadataReadingVisitor;
+import org.springframework.core.type.ClassMetadata;
+import org.springframework.core.type.MethodMetadata;
 
 import javassist.ClassClassPath;
 import javassist.ClassPool;
@@ -29,8 +30,14 @@ class ServiceImplementationCondition implements Condition {
 		if (context.getEnvironment() != null) {
 			ServiceImplementationConditional annotation = AnnotationUtils.getAnnotation(metadata,
 					ServiceImplementationConditional.class);
-			String serviceInterfaceName = null;
-			String className = ((AnnotationMetadataReadingVisitor) metadata).getClassName();
+			String serviceInterfaceName, className;
+			if (metadata instanceof ClassMetadata) {
+				className = ((ClassMetadata) metadata).getClassName();
+			} else if (metadata instanceof MethodMetadata) {
+				className = ((MethodMetadata) metadata).getReturnTypeName();
+			} else {
+				return true;
+			}
 			Class<?> serviceInterface = annotation.serviceInterface();
 			if (serviceInterface != void.class) {
 				serviceInterfaceName = serviceInterface.getName();
@@ -51,18 +58,14 @@ class ServiceImplementationCondition implements Condition {
 					}
 					boolean matched = implementationClassName.equals(className);
 					if (matched) {
-						String key = serviceInterfaceName + '=' + implementationClassName;
-						if (!set.contains(key)) {
-							log.info("Select implementation {} for service {}", implementationClassName,
-									serviceInterfaceName);
-							set.add(key);
-						}
+						info(serviceInterfaceName, className);
 					}
 					return matched;
 				}
 			}
 			String[] profiles = annotation.profiles();
 			if (profiles.length == 0 || context.getEnvironment().acceptsProfiles(Profiles.of(profiles))) {
+				info(serviceInterfaceName, className);
 				return true;
 			}
 			return false;
@@ -70,11 +73,19 @@ class ServiceImplementationCondition implements Condition {
 		return true;
 	}
 
-	private String findMostMatchedInterface(String className) {
+	private static void info(String serviceInterfaceName, String className) {
+		String key = serviceInterfaceName + '=' + className;
+		if (!set.contains(key)) {
+			log.info("Select implementation {} for service {}", className, serviceInterfaceName);
+			set.add(key);
+		}
+	}
+
+	private static String findMostMatchedInterface(String className) {
 		List<String> interfaceNames = new ArrayList<>();
 		try {
 			ClassPool classPool = ClassPool.getDefault();
-			classPool.insertClassPath(new ClassClassPath(getClass()));
+			classPool.insertClassPath(new ClassClassPath(ServiceImplementationCondition.class));
 			CtClass cc = classPool.get(className);
 			while (!cc.getName().equals(Object.class.getName())) {
 				CtClass[] interfaces = cc.getInterfaces();
