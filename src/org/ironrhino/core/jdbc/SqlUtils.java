@@ -298,7 +298,7 @@ public class SqlUtils {
 	}
 
 	static String expandCollectionParameter(String sql, String paramName, int size) {
-		if (size < 1 || size > 100)
+		if (size < 1)
 			throw new IllegalArgumentException("invalid size: " + size);
 		boolean padding = true; // https://hibernate.atlassian.net/browse/HHH-12469
 		int count = padding ? (1 << -Integer.numberOfLeadingZeros(size - 1)) : size;

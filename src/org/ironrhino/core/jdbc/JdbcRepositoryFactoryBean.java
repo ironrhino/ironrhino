@@ -35,6 +35,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.dao.DataAccessException;
@@ -50,8 +51,14 @@ import org.springframework.util.Assert;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import lombok.Setter;
+
 public class JdbcRepositoryFactoryBean extends MethodInterceptorFactoryBean
 		implements BeanFactoryAware, InitializingBean {
+
+	@Value("${jdbcRepository.maxCollectionSize:1000}")
+	@Setter
+	private int maxCollectionSize = 1000;
 
 	private final Class<?> jdbcRepositoryClass;
 
@@ -223,6 +230,9 @@ public class JdbcRepositoryFactoryBean extends MethodInterceptorFactoryBean
 					}
 					if (arg instanceof Object[]) {
 						Object[] objects = (Object[]) arg;
+						if (objects.length > maxCollectionSize)
+							throw new IllegalArgumentException(
+									"Array length is " + objects.length + ", exceed max allowed " + maxCollectionSize);
 						sql = SqlUtils.expandCollectionParameter(sql, names[i], objects.length);
 						if (objects.length > 0 && Enum.class.isAssignableFrom(arg.getClass().getComponentType())) {
 							for (int j = 0; j < objects.length; j++)
@@ -234,6 +244,9 @@ public class JdbcRepositoryFactoryBean extends MethodInterceptorFactoryBean
 					}
 					if (arg instanceof Collection) {
 						Collection<?> collection = (Collection<?>) arg;
+						if (collection.size() > maxCollectionSize)
+							throw new IllegalArgumentException("Collection size is " + collection.size()
+									+ ", exceed max allowed " + maxCollectionSize);
 						// sql = SqlUtils.expandCollectionParameter(sql, names[i], collection.size());
 						if (collection.size() > 0 && collection.iterator().next() instanceof Enum) {
 							List<Object> objects = new ArrayList<>();
