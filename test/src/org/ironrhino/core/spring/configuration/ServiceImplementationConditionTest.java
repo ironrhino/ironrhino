@@ -36,8 +36,7 @@ public class ServiceImplementationConditionTest {
 
 	@Test
 	public void testClassNotFound() {
-		try {
-			new AnnotationConfigApplicationContext(FooServiceImpl.class);
+		try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(FooServiceImpl.class)) {
 			fail("Expected exception");
 		} catch (RuntimeException e) {
 			assertThat(e.getCause() instanceof ClassNotFoundException, is(true));
