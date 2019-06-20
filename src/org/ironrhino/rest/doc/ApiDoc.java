@@ -1,5 +1,6 @@
 package org.ironrhino.rest.doc;
 
+import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -30,6 +31,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -86,6 +88,8 @@ public class ApiDoc implements Serializable {
 	protected List<FieldObject> requestBody;
 
 	protected List<FieldObject> responseBody;
+
+	protected boolean download;
 
 	protected boolean requestBodyRequired = true;
 
@@ -247,16 +251,22 @@ public class ApiDoc implements Serializable {
 			if (isRestResult && !(responseSample instanceof RestResult))
 				responseSample = RestResult.of(responseSample);
 
-			JsonView jsonView = AnnotationUtils.findAnnotation(method, JsonView.class);
-			if (view == null && jsonView != null)
-				view = jsonView.value()[0];
-			if (view == null)
-				responseBodySample = objectMapper.writeValueAsString(responseSample);
-			else
-				responseBodySample = objectMapper.writerWithView(view).writeValueAsString(responseSample);
+			if (responseSample instanceof Resource || responseSample instanceof InputStream
+					|| responseSample instanceof byte[]) {
+				download = true;
+			} else {
+				JsonView jsonView = AnnotationUtils.findAnnotation(method, JsonView.class);
+				if (view == null && jsonView != null)
+					view = jsonView.value()[0];
+				if (view == null)
+					responseBodySample = objectMapper.writeValueAsString(responseSample);
+				else
+					responseBodySample = objectMapper.writerWithView(view).writeValueAsString(responseSample);
+			}
 		}
 
-		responseBody = FieldObject.createList(responseBodyClass, responseFields, view, false);
+		if (!download)
+			responseBody = FieldObject.createList(responseBodyClass, responseFields, view, false);
 
 		Class<?>[] parameterTypes = method.getParameterTypes();
 		Type[] genericParameterTypes = method.getGenericParameterTypes();

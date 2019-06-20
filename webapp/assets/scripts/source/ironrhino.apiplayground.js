@@ -22,6 +22,31 @@ Initialization.apiplayground = function() {
 		var data;
 		var contentType = false;
 		var processData = true;
+		if (form.hasClass('download')) {
+			var sf = $('<form/>').insertAfter(form);
+			var action = url;
+			if (accessToken) {
+				if (method == 'GET')
+					$('<input type="hidden"/>').appendTo(sf).attr('name',
+							'access_token').val(accessToken);
+				else
+					action += '?access_token=' + accessToken;
+			}
+			sf.attr('method', method).attr('action', action).attr('target',
+					'_blank');
+			form.find('table.requestParams tr').each(function(i, v) {
+				var row = $(this);
+				var input = row.find(':input:eq(1)');
+				var name = input.attr('name') || row.find('input:eq(0)').val();
+				if (!name)
+					return;
+				$('<input type="hidden"/>').appendTo(sf).attr('name', name)
+						.val(input.val());
+			});
+			sf.submit();
+			sf.remove();
+			return false;
+		}
 		if (form.find('table.requestParams input[type="file"]').length) {
 			var formdata = new FormData();
 			form.find('table.requestParams tr').each(function(i, v) {

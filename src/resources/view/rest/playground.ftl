@@ -2,7 +2,7 @@
 <#assign method=apiDoc.methods[0]>
 <#assign url=apiBaseUrl+apiDoc.url>
 <#assign url=url?replace('\\{([^{}]+)\\}','<span style="background:yellow;border-bottom:1px solid;padding:2px;" contenteditable="plaintext-only">$1</span>','r')>
-<form class="api-playground" method="${method}">
+<form class="api-playground<#if apiDoc.download> download</#if>" method="${method}">
 <table class="table">
 <tbody>
 <@classPresentConditional value="org.ironrhino.security.oauth.server.model.Authorization">
@@ -60,6 +60,7 @@
 	</tbody></table>
 </td></tr>
 </#if>
+<#if !apiDoc.download>
 <#if apiDoc.requestHeaders?has_content>
 <tr><td>请求头</td><td class="compact-horizontal">
 	<table class="requestHeaders table datagrid adaptive"><tbody>
@@ -99,7 +100,9 @@
 <p class="responseHeaders"></p>
 </td></tr>
 <tr><td>响应消息体</td><td>
-<code class="responseBody block json" style="display:inline-block;box-sizing:border-box;min-width:100%;min-height:50px;"></code></td></tr>
+<code class="responseBody block json" style="display:inline-block;box-sizing:border-box;min-width:100%;min-height:50px;"></code>
+</td></tr>
+</#if>
 </tbody>
 </table>
 <button type="submit" class="btn btn-primary btn-block">${getText('confirm')}</button>
