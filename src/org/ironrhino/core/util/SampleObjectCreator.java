@@ -31,6 +31,8 @@ import java.util.function.BiFunction;
 import org.ironrhino.common.model.Coordinate;
 import org.ironrhino.core.model.ResultPage;
 import org.springframework.beans.BeanUtils;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -230,14 +232,16 @@ public class SampleObjectCreator {
 			return new ByteArrayInputStream(new byte[0]);
 		if (OutputStream.class == type)
 			return new ByteArrayOutputStream();
+		if (Resource.class == type)
+			return new InputStreamResource(new ByteArrayInputStream(new byte[0]));
 		if (String.class == type)
 			return suggestStringValue(fieldName, sampleClass);
 		if ((Boolean.TYPE == type) || (Boolean.class == type))
 			return true;
 		if ((Byte.TYPE == type) || (Byte.class == type))
-			return 0;
+			return (byte) 0;
 		if ((Short.TYPE == type) || (Short.class == type))
-			return 10;
+			return (short) 10;
 		if ((Integer.TYPE == type) || (Integer.class == type))
 			return 100;
 		if ((Long.TYPE == type) || (Long.class == type))
