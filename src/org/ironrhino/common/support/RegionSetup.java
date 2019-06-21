@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
@@ -45,18 +46,16 @@ import com.fasterxml.jackson.core.type.TypeReference;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 public class RegionSetup {
-
-	private Map<String, String> regionAreacodeMap;
-
-	private Map<String, List<String>> regionCoordinateMap;
-
-	private Map<String, List<Rgn>> rgnMap;
 
 	@Autowired
 	private EntityManager<Region> entityManager;
+
+	private AtomicInteger count = new AtomicInteger();
 
 	@Setup
 	@Async
@@ -65,25 +64,45 @@ public class RegionSetup {
 		entityManager.setEntityClass(Region.class);
 		if (entityManager.countAll() > 0)
 			return;
-		regionAreacodeMap = regionAreacodeMap();
-		regionCoordinateMap = regionCoordinateMap();
-		rgnMap = rgnMap();
-		List<Region> regions = RegionParser.parse();
-		for (Region region : regions)
+		count.set(0);
+		long time = System.currentTimeMillis();
+		log.info("Inserting started");
+		List<Region> regions = parseRegions();
+		int displayOrder = 0;
+		for (Region region : regions) {
+			region.setDisplayOrder(++displayOrder);
 			save(region);
-		regionCoordinateMap = null;
-		regionAreacodeMap = null;
-		rgnMap = null;
+		}
+		log.info("Inserted {} in {}ms", count.get(), System.currentTimeMillis() - time);
+		_regionCoordinateMap = null;
+		_regionAreacodeMap = null;
+		_rgnMap = null;
 	}
 
 	private void save(Region region) {
+		walk(region);
+		AopContext.setBypass(PublishAspect.class);
+		entityManager.save(region);
+		if (count.incrementAndGet() % 5000 == 0)
+			log.info("Inserting {} ...", count.get());
+		for (Region child : region.getChildren())
+			save(child);
+	}
+
+	private static List<Region> parseRegions() throws IOException {
+		return RegionParser.parse();
+	}
+
+	private static void walk(Region region) {
 		String shortName = LocationUtils.shortenName(region.getName());
-		String areacode = null;
-		if (region.getParent() != null)
-			areacode = regionAreacodeMap.get(region.getParent().getName() + region.getName());
-		if (areacode == null)
-			areacode = regionAreacodeMap.get(region.getName());
-		region.setAreacode(areacode);
+		if (StringUtils.isBlank(region.getAreacode()) || "0".equals(region.getAreacode())) {
+			String areacode = null;
+			if (region.getParent() != null)
+				areacode = getRegionAreacodeMap().get(region.getParent().getName() + region.getName());
+			if (areacode == null)
+				areacode = getRegionAreacodeMap().get(region.getName());
+			region.setAreacode(areacode);
+		}
 		if (region.getParent() != null) {
 			if (region.getFullname().matches("^(台湾|香港|澳门).*$")) {
 				region.setAreacode(null);
@@ -98,10 +117,10 @@ public class RegionSetup {
 				}
 			}
 		}
-		if (regionCoordinateMap != null) {
-			List<String> coordinateAndParentName = regionCoordinateMap.get(region.getName());
+		if (getRegionCoordinateMap() != null) {
+			List<String> coordinateAndParentName = getRegionCoordinateMap().get(region.getName());
 			if (coordinateAndParentName == null)
-				coordinateAndParentName = regionCoordinateMap.get(shortName);
+				coordinateAndParentName = getRegionCoordinateMap().get(shortName);
 			if (coordinateAndParentName != null)
 				for (String s : coordinateAndParentName) {
 					String[] arr = s.split("\\s");
@@ -137,22 +156,47 @@ public class RegionSetup {
 			else
 				region.setRank(4);
 		}
-		AopContext.setBypass(PublishAspect.class);
-		entityManager.save(region);
 		List<Region> list = new ArrayList<>();
-		for (Region child : region.getChildren())
+		int displayOrder = 0;
+		for (Region child : region.getChildren()) {
+			child.setParent(region);
+			child.setDisplayOrder(++displayOrder);
 			list.add(child);
+		}
 		list.sort(null);
-		for (Region child : list)
-			save(child);
+		region.setChildren(list);
 	}
 
-	private Rgn findMatched(Region region) {
+	private static Map<String, String> _regionAreacodeMap;
+
+	private static Map<String, List<String>> _regionCoordinateMap;
+
+	private static Map<String, List<Rgn>> _rgnMap;
+
+	private static Map<String, String> getRegionAreacodeMap() {
+		if (_regionAreacodeMap == null)
+			_regionAreacodeMap = regionAreacodeMap();
+		return _regionAreacodeMap;
+	}
+
+	private static Map<String, List<String>> getRegionCoordinateMap() {
+		if (_regionCoordinateMap == null)
+			_regionCoordinateMap = regionCoordinateMap();
+		return _regionCoordinateMap;
+	}
+
+	private static Map<String, List<Rgn>> getRgnMap() {
+		if (_rgnMap == null)
+			_rgnMap = rgnMap();
+		return _rgnMap;
+	}
+
+	private static Rgn findMatched(Region region) {
 		if (region.getAreacode() != null) {
-			List<Rgn> rgns = rgnMap.get(region.getAreacode().substring(0, 2) + "0000");
+			List<Rgn> rgns = getRgnMap().get(region.getAreacode().substring(0, 2) + "0000");
 			return findMatched(region, rgns);
 		} else {
-			for (List<Rgn> rgns : rgnMap.values()) {
+			for (List<Rgn> rgns : getRgnMap().values()) {
 				Rgn rgn = findMatched(region, rgns);
 				if (rgn != null)
 					return rgn;
@@ -161,7 +205,7 @@ public class RegionSetup {
 		return null;
 	}
 
-	private Rgn findMatched(Region region, List<Rgn> rgns) {
+	private static Rgn findMatched(Region region, List<Rgn> rgns) {
 		if (rgns == null || rgns.isEmpty())
 			return null;
 		for (Rgn rgn : rgns) {
@@ -261,6 +305,11 @@ public class RegionSetup {
 		map.put("双鸭山市宝山区", "230506");
 		map.put("重庆市江北区", "500105");
 		map.put("宁波市江北区", "330205");
+		map.put("邢台市桥东区", "130502");
+		map.put("张家口市桥东区", "130702");
+		map.put("石家庄市桥西区", "130104");
+		map.put("邢台市桥西区", "130503");
+		map.put("张家口市桥西区", "130703");
 		return map;
 	}
 
