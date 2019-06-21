@@ -4,31 +4,17 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import java.io.IOException;
-
-import org.ironrhino.core.model.NullObject;
 import org.ironrhino.core.remoting.serializer.AbstractJsonRpcHttpInvokerSerializer.JsonRpcException;
-import org.ironrhino.core.util.JsonSerializationUtils;
 import org.ironrhino.sample.remoting.TestService;
 import org.junit.Test;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.core.JsonFactory;
 
-public class JsonHttpInvokerSerializerTest extends SmileHttpInvokerSerializerTest {
+public class JsonHttpInvokerSerializerTest extends AbstractJsonHttpInvokerSerializerTest {
 
-	public JsonHttpInvokerSerializerTest() {
-		objectMapper = JsonSerializationUtils.createNewObjectMapper(null)
-				.registerModule(new SimpleModule().addSerializer(NullObject.class, new JsonSerializer<NullObject>() {
-					@Override
-					public void serialize(NullObject nullObject, JsonGenerator jsonGenerator,
-							SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
-						jsonGenerator.writeNull();
-					}
-				}));
+	@Override
+	protected JsonFactory jsonFactory() {
+		return null;
 	}
 
 	@Override
