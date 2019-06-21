@@ -27,8 +27,8 @@ public class EntityBeanPropertySqlParameterSource extends BeanPropertySqlParamet
 	}
 
 	@Override
-	public boolean hasValue(String name) {
-		boolean b = super.hasValue(name);
+	public boolean hasValue(String paramName) {
+		boolean b = super.hasValue(paramName);
 		if (b)
 			return b;
 		for (PropertyDescriptor pd : beanWrapper.getPropertyDescriptors()) {
@@ -40,24 +40,26 @@ public class EntityBeanPropertySqlParameterSource extends BeanPropertySqlParamet
 				} catch (NoSuchFieldException e) {
 				}
 			}
-			if (column != null && name.equalsIgnoreCase(column.name()))
+			if (column != null && paramName.equalsIgnoreCase(column.name()))
 				return true;
 		}
 		return false;
 	}
 
 	@Override
-	public Object getValue(String name) throws IllegalArgumentException {
-		if (beanWrapper.isReadableProperty(name)) {
-			Object value = beanWrapper.getPropertyValue(name);
+	public Object getValue(String paramName) throws IllegalArgumentException {
+		if (!hasValue(paramName))
+			throw new IllegalArgumentException("No value registered for key '" + paramName + "'");
+		if (beanWrapper.isReadableProperty(paramName)) {
+			Object value = beanWrapper.getPropertyValue(paramName);
 			if (value instanceof Enum) {
-				Method getter = beanWrapper.getPropertyDescriptor(name).getReadMethod();
+				Method getter = beanWrapper.getPropertyDescriptor(paramName).getReadMethod();
 				Enumerated enumerated = getter.getAnnotation(Enumerated.class);
 				if (enumerated == null) {
 					try {
-						enumerated = ReflectionUtils
-								.getField(getter.getDeclaringClass(),
-										(name.indexOf('.') > 0 ? name.substring(name.lastIndexOf('.') + 1) : name))
+						enumerated = ReflectionUtils.getField(getter.getDeclaringClass(),
+								(paramName.indexOf('.') > 0 ? paramName.substring(paramName.lastIndexOf('.') + 1)
+										: paramName))
 								.getAnnotation(Enumerated.class);
 					} catch (NoSuchFieldException e) {
 					}
@@ -87,7 +89,7 @@ public class EntityBeanPropertySqlParameterSource extends BeanPropertySqlParamet
 					} catch (NoSuchFieldException e) {
 					}
 				}
-				if (column != null && name.equalsIgnoreCase(column.name())) {
+				if (column != null && paramName.equalsIgnoreCase(column.name())) {
 					Object value = beanWrapper.getPropertyValue(pd.getName());
 					if (value instanceof Enum) {
 						Enum<?> en = ((Enum<?>) value);
@@ -97,7 +99,7 @@ public class EntityBeanPropertySqlParameterSource extends BeanPropertySqlParamet
 				}
 			}
 			throw new IllegalArgumentException(
-					"No such property '" + name + "' of bean " + beanWrapper.getWrappedClass().getName());
+					"No such property '" + paramName + "' of bean " + beanWrapper.getWrappedClass().getName());
 		}
 
 	}

@@ -91,6 +91,8 @@ public class NestedPathMapSqlParameterSource extends MapSqlParameterSource {
 	public Object getValue(String paramName) throws IllegalArgumentException {
 		if (super.hasValue(paramName))
 			return super.getValue(paramName);
+		if (!hasValue(paramName))
+			throw new IllegalArgumentException("No value registered for key '" + paramName + "'");
 		int index1 = paramName.indexOf('[');
 		int index2 = paramName.indexOf(']');
 		int index3 = paramName.indexOf('.');

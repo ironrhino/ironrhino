@@ -105,4 +105,8 @@ public interface PersonRepository {
 	@Transactional(readOnly = true)
 	Person getWithShadow(String name);
 
+	@Transactional(readOnly = true)
+	@Sql("select * from t_person where name = :notExistedParamName")
+	Person findByNotExistedParamName(String name);
+
 }
