@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
-public abstract class AbstractJsonHttpInvokerSerializerTest extends JavaHttpInvokerSerializerTest {
+public abstract class AbstractJsonHttpInvokerSerializerTestBase extends HttpInvokerSerializerTestBase {
 
 	protected final static String VERSION = "2.0";
 	protected final static String JSONRPC = "jsonrpc";
@@ -49,7 +49,7 @@ public abstract class AbstractJsonHttpInvokerSerializerTest extends JavaHttpInvo
 
 	protected ObjectMapper objectMapper;
 
-	public AbstractJsonHttpInvokerSerializerTest() {
+	public AbstractJsonHttpInvokerSerializerTestBase() {
 		this.objectMapper = JsonSerializationUtils.createNewObjectMapper(jsonFactory())
 				.registerModule(new SimpleModule().addSerializer(NullObject.class, new JsonSerializer<NullObject>() {
 					@Override
@@ -61,9 +61,6 @@ public abstract class AbstractJsonHttpInvokerSerializerTest extends JavaHttpInvo
 	}
 
 	protected abstract JsonFactory jsonFactory();
-
-	@Override
-	protected abstract String serializationType();
 
 	@Test
 	@Override

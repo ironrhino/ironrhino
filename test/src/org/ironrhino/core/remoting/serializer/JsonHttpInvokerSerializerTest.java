@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonFactory;
 
-public class JsonHttpInvokerSerializerTest extends AbstractJsonHttpInvokerSerializerTest {
+public class JsonHttpInvokerSerializerTest extends AbstractJsonHttpInvokerSerializerTestBase {
 
 	@Override
 	protected JsonFactory jsonFactory() {
