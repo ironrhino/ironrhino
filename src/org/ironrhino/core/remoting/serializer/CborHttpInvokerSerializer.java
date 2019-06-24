@@ -14,7 +14,7 @@ public class CborHttpInvokerSerializer extends AbstractJsonRpcHttpInvokerSeriali
 
 	@Override
 	public String getContentType() {
-		return RemotingContext.CONTENT_TYPE_CBOR_RPC;
+		return RemotingContext.CONTENT_TYPE_CBOR;
 	}
 
 }

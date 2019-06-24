@@ -14,7 +14,7 @@ public class SmileHttpInvokerSerializer extends AbstractJsonRpcHttpInvokerSerial
 
 	@Override
 	public String getContentType() {
-		return RemotingContext.CONTENT_TYPE_SMILE_RPC;
+		return RemotingContext.CONTENT_TYPE_SMILE;
 	}
 
 }

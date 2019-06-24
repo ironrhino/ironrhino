@@ -11,11 +11,11 @@ public class RemotingContext {
 
 	public static final String CONTENT_TYPE_FST_SERIALIZED_OBJECT = "application/x-fst-serialized-object";
 
-	public static final String CONTENT_TYPE_JSON_RPC = "application/json-rpc";
+	public static final String CONTENT_TYPE_JSON = "application/json";
 
-	public static final String CONTENT_TYPE_SMILE_RPC = "application/smile-rpc";
+	public static final String CONTENT_TYPE_SMILE = "application/x-jackson-smile";
 
-	public static final String CONTENT_TYPE_CBOR_RPC = "application/cbor-rpc";
+	public static final String CONTENT_TYPE_CBOR = "application/cbor";
 
 	public static final String HTTP_HEADER_EXCEPTION_MESSAGE = "X-Exception-Message";
 

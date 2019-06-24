@@ -12,7 +12,7 @@ public class JsonHttpInvokerSerializer extends AbstractJsonRpcHttpInvokerSeriali
 
 	@Override
 	public String getContentType() {
-		return RemotingContext.CONTENT_TYPE_JSON_RPC;
+		return RemotingContext.CONTENT_TYPE_JSON;
 	}
 
 }
