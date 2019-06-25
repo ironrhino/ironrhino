@@ -88,7 +88,7 @@ public class XWorkBasicConverter extends DefaultTypeConverter {
         } else if (toType == boolean.class) {
             result = doConvertToBoolean(value);
         } else if (toType == Boolean.class) {
-            result = doConvertToBoolean(value);
+            result = doConvertToBooleanObject(value);
         } else if (toType.isArray()) {
             result = doConvertToArray(context, o, member, propertyName, value, toType);
         } else if (Date.class.isAssignableFrom(toType)) {
@@ -155,6 +155,18 @@ public class XWorkBasicConverter extends DefaultTypeConverter {
             String bStr = (String) value;
             bStr = bStr.toLowerCase();
             return bStr.equals("true") || bStr.equals("on") || bStr.equals("yes") || bStr.equals("1");
+        }
+        return null;
+    }
+
+    private Object doConvertToBooleanObject(Object value) {
+        if (value instanceof String) {
+            String bStr = (String) value;
+            bStr = bStr.toLowerCase();
+            if (bStr.equals("true") || bStr.equals("on") || bStr.equals("yes") || bStr.equals("1"))
+                return Boolean.TRUE;
+            else if (bStr.equals("false") || bStr.equals("off") || bStr.equals("no") || bStr.equals("0"))
+                return Boolean.FALSE;
         }
         return null;
     }
