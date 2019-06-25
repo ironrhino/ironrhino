@@ -151,18 +151,16 @@ public class ReflectionUtils {
 	}
 
 	public static String[] getParameterNames(JoinPoint jp) {
-		if (!jp.getKind().equals(JoinPoint.METHOD_EXECUTION))
-			return null;
-		Class<?> clz = jp.getTarget().getClass();
 		MethodSignature sig = (MethodSignature) jp.getSignature();
+		Class<?> clz = jp.getTarget().getClass();
 		Method method;
 		try {
 			method = Proxy.isProxyClass(clz) ? sig.getMethod()
 					: clz.getDeclaredMethod(sig.getName(), sig.getParameterTypes());
-			return getParameterNames(method);
-		} catch (Exception e) {
-			return null;
+		} catch (NoSuchMethodException e) {
+			method = sig.getMethod();
 		}
+		return getParameterNames(method);
 	}
 
 	private static String[] doGetParameterNames(Executable executable) {
