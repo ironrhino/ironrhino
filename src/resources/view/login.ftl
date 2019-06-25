@@ -44,7 +44,7 @@
 			</#if>
 		</@s.textfield>
 		<#else>
-		<@s.checkbox name="rememberme" class="switch span2"/>
+		<#if (properties['rememberMe.disabled']!)!='true'><@s.checkbox name="rememberme" class="switch span2"/></#if>
 		<@captcha/>
 		</#if>
 		<#if verificationCodeEnabled></div></#if>

@@ -16,6 +16,9 @@ import org.springframework.util.StringUtils;
 @ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
 public class DefaultTokenBasedRememberMeServices extends TokenBasedRememberMeServices {
 
+	@Value("${rememberMe.disabled:false}")
+	private boolean disabled;
+
 	public DefaultTokenBasedRememberMeServices(@Value("${rememberMe.key:youcannotguessme}") String key,
 			UserDetailsService userDetailsService) {
 		super(key, userDetailsService);
@@ -40,7 +43,7 @@ public class DefaultTokenBasedRememberMeServices extends TokenBasedRememberMeSer
 
 	@Override
 	protected boolean rememberMeRequested(HttpServletRequest request, String parameter) {
-		if (StringUtils.hasText(request.getParameter(parameter)))
+		if (!disabled && StringUtils.hasText(request.getParameter(parameter)))
 			return true;
 		return false;
 	}
