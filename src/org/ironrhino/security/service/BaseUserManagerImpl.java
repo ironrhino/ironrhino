@@ -1,12 +1,17 @@
 package org.ironrhino.security.service;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.aop.AopContext;
+import org.ironrhino.core.cache.CheckCache;
+import org.ironrhino.core.cache.EvictCache;
 import org.ironrhino.core.security.role.UserRoleMapper;
 import org.ironrhino.core.service.BaseManagerImpl;
 import org.ironrhino.core.spring.security.password.PasswordGenerator;
@@ -25,6 +30,8 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManagerImpl<T> implements BaseUserManager<T> {
 
+	protected static final String DEFAULT_CACHE_NAMESPACE = "user";
+
 	@Autowired(required = false)
 	private PasswordGenerator passwordGenerator;
 
@@ -42,6 +49,7 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 
 	@Override
 	@Transactional
+	@EvictCache(namespace = DEFAULT_CACHE_NAMESPACE, key = "${user.username}")
 	public void save(T user) {
 		if (user.isNew() && user.getPassword() == null) {
 			resetPassword(user);
@@ -49,8 +57,31 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 		super.save(user);
 	}
 
-	@Transactional
 	@Override
+	@Transactional
+	@EvictCache(namespace = DEFAULT_CACHE_NAMESPACE, key = "${user.username}")
+	public void update(T user) {
+		super.update(user);
+	}
+
+	@Override
+	@Transactional
+	@EvictCache(namespace = DEFAULT_CACHE_NAMESPACE, key = "${user.username}")
+	public void delete(T user) {
+		super.delete(user);
+	}
+
+	@Override
+	@Transactional
+	@EvictCache(namespace = DEFAULT_CACHE_NAMESPACE, key = "${key = [];foreach (user : " + AopContext.CONTEXT_KEY_RETVAL
+			+ ") { key.add(user.username); key.add(user.email);} return key;}")
+	public List<T> delete(Serializable... id) {
+		return super.delete(id);
+	}
+
+	@Override
+	@Transactional
+	@EvictCache(namespace = DEFAULT_CACHE_NAMESPACE, key = "${user.username}")
 	public void resetPassword(T user) {
 		T u = user.isNew() ? user : get(user.getId());
 		String newPassword = passwordGenerator != null ? passwordGenerator.generate(user) : user.getUsername();
@@ -71,8 +102,9 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 		super.save(u);
 	}
 
-	@Transactional
 	@Override
+	@Transactional
+	@EvictCache(namespace = DEFAULT_CACHE_NAMESPACE, key = "${user.username}")
 	public void changePassword(T user, String password) {
 		T u = get(user.getId());
 		u.setPassword(passwordEncoder.encode(password));
@@ -88,8 +120,9 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 		super.save(u);
 	}
 
-	@Transactional
 	@Override
+	@Transactional
+	@EvictCache(namespace = DEFAULT_CACHE_NAMESPACE, key = "${user.username}")
 	public void changePassword(T user, String currentPassword, String password) {
 		T u = get(user.getId());
 		if (!passwordEncoder.matches(currentPassword, u.getPassword()))
@@ -109,6 +142,7 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 
 	@Override
 	@Transactional(readOnly = true)
+	@CheckCache(namespace = DEFAULT_CACHE_NAMESPACE, key = "${username}", cacheNull = true)
 	public T loadUserByUsername(String username) {
 		if (StringUtils.isBlank(username))
 			return null;
@@ -124,7 +158,13 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 	}
 
 	protected T doLoadUserByUsername(String username) {
-		return findByNaturalId(username);
+		username = username.toLowerCase(Locale.ROOT);
+		T user;
+		if (username.indexOf('@') > 0)
+			user = findOne("email", username);
+		else
+			user = findByNaturalId(username);
+		return user;
 	}
 
 	protected void populateAuthorities(T user) {
