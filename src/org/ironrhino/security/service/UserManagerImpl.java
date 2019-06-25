@@ -45,17 +45,10 @@ public class UserManagerImpl extends BaseUserManagerImpl<User> implements UserMa
 		if (i > 0)
 			candidate = candidate.substring(0, i);
 		candidate = candidate.replace('.', '_');
-		User user = findByNaturalId(candidate);
-		if (user == null)
-			return candidate;
 		i = 10;
-		int digits = 1;
-		i = CodecUtils.randomInt(digits);
-		user = findByNaturalId(candidate + i);
-		while (user != null) {
-			digits++;
+		while (existsNaturalId(candidate + i)) {
+			int digits = 2;
 			i = CodecUtils.randomInt(digits);
-			user = findByNaturalId(candidate + i);
 		}
 		return candidate + i;
 	}
