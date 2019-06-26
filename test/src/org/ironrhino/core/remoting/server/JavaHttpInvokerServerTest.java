@@ -207,7 +207,7 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 	}
 
 	@Test
-	public void testContcreteType() throws Exception {
+	public void testConcreteType() throws Exception {
 		assertThat(testService.loadUserByUsername(null), is(nullValue()));
 		then(mockTestService).should().loadUserByUsername(isNull());
 
@@ -223,7 +223,7 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 	}
 
 	@Test
-	public void testNonContcreteType() throws Exception {
+	public void testNonConcreteType() throws Exception {
 		assertThat(testService.echoUserDetails(null), is(nullValue()));
 		then(mockTestService).should().echoUserDetails(isNull());
 		User user = new User();
@@ -505,8 +505,8 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 
 	@Test
 	public void testSerializationDowngrade() throws Exception {
-		String defaultSerizliazer = HttpInvokerSerializers.DEFAULT_SERIALIZER.getSerializationType();
-		if (!defaultSerizliazer.equals(serializationType)) {
+		String defaultSerializer = HttpInvokerSerializers.DEFAULT_SERIALIZER.getSerializationType();
+		if (!defaultSerializer.equals(serializationType)) {
 			final int maxAttempts = 5;
 			barServiceClient.setMaxAttempts(maxAttempts);
 			willThrow(new SerializationFailedException("test")).given(mockHttpInvokerRequestExecutor).executeRequest(
@@ -519,7 +519,7 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 				error = true;
 			}
 			assertThat(error, is(true));
-			assertThat(mockHttpInvokerRequestExecutor.getSerializer().getSerializationType(), is(defaultSerizliazer));
+			assertThat(mockHttpInvokerRequestExecutor.getSerializer().getSerializationType(), is(defaultSerializer));
 			then(mockHttpInvokerRequestExecutor).should().setSerializer(HttpInvokerSerializers.DEFAULT_SERIALIZER);
 			then(mockHttpInvokerRequestExecutor).should(times(maxAttempts)).executeRequest(
 					contains(BarService.class.getName()), argThat(ri -> "test".contentEquals(ri.getMethodName())),

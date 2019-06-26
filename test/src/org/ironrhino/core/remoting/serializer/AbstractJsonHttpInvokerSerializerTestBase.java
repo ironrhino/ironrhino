@@ -64,7 +64,7 @@ public abstract class AbstractJsonHttpInvokerSerializerTestBase extends HttpInvo
 
 	@Test
 	@Override
-	public void testWriteReadRemoteInovcation() throws NoSuchMethodException, SecurityException, IOException {
+	public void testWriteReadRemoteInvocation() throws NoSuchMethodException, SecurityException, IOException {
 		Method method = TestService.class.getDeclaredMethod("echo", String.class);
 		MethodInvocation mi = createMethodInvocation(method, "test");
 		RemoteInvocation ri = serializer.createRemoteInvocation(mi);
