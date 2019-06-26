@@ -46,7 +46,7 @@ public class CircuitBreakerAspectTest {
 		assertThat(success.get(), is(EchoService.SIZE_IN_CLOSED_STATE / 2));
 		assertThat(fail.get(), is(EchoService.SIZE_IN_CLOSED_STATE / 2));
 		assertThat(opened, is(true));
-		echoService.recover();
+		echoService.recover(true);
 		assertThat(isOpen(), is(true));
 		Thread.sleep(TimeUnit.SECONDS.toMillis(EchoService.WAIT_DURATION_IN_OPEN_STATE) / 2);
 		assertThat(isOpen(), is(true));
@@ -54,6 +54,46 @@ public class CircuitBreakerAspectTest {
 		for (int i = 0; i < 100; i++) {
 			assertThat(echoService.echo("test"), is("test"));
 		}
+	}
+
+	@Test
+	public void testHalfOpen() throws InterruptedException {
+		boolean opened = false;
+		AtomicInteger success = new AtomicInteger();
+		AtomicInteger fail = new AtomicInteger();
+		echoService.recover(false);
+		try {
+			for (int i = 0; i < EchoService.SIZE_IN_CLOSED_STATE + 1; i++) {
+				try {
+					echoService.echo("test");
+					success.incrementAndGet();
+				} catch (IOException e) {
+					fail.incrementAndGet();
+				}
+			}
+		} catch (CircuitBreakerOpenException ex) {
+			opened = true;
+		}
+		assertThat(success.get(), is(EchoService.SIZE_IN_CLOSED_STATE / 2));
+		assertThat(fail.get(), is(EchoService.SIZE_IN_CLOSED_STATE / 2));
+		assertThat(opened, is(true));
+		Thread.sleep(TimeUnit.SECONDS.toMillis(EchoService.WAIT_DURATION_IN_OPEN_STATE));
+		opened = false;
+		try {
+			for (int i = 0; i < EchoService.SIZE_IN_HALF_OPEN_STATE + 1; i++) {
+				try {
+					echoService.echo("test");
+					success.incrementAndGet();
+				} catch (IOException e) {
+					fail.incrementAndGet();
+				}
+			}
+		} catch (CircuitBreakerOpenException ex) {
+			opened = true;
+		}
+		assertThat(opened, is(true));
+		assertThat(success.get(), is((EchoService.SIZE_IN_CLOSED_STATE + EchoService.SIZE_IN_HALF_OPEN_STATE) / 2));
+		assertThat(fail.get(), is((EchoService.SIZE_IN_CLOSED_STATE + EchoService.SIZE_IN_HALF_OPEN_STATE) / 2));
 	}
 
 	private boolean isOpen() {
@@ -70,13 +110,14 @@ public class CircuitBreakerAspectTest {
 	public static class EchoService {
 
 		public static final int SIZE_IN_CLOSED_STATE = 10;
-		public static final int WAIT_DURATION_IN_OPEN_STATE = 4;
+		public static final int SIZE_IN_HALF_OPEN_STATE = 6;
+		public static final int WAIT_DURATION_IN_OPEN_STATE = 2;
 
 		public AtomicInteger count = new AtomicInteger();
 
 		private volatile boolean recovered;
 
-		@CircuitBreaker(include = IOException.class, failureRateThreshold = 50, waitDurationInOpenState = WAIT_DURATION_IN_OPEN_STATE, ringBufferSizeInClosedState = SIZE_IN_CLOSED_STATE)
+		@CircuitBreaker(include = IOException.class, failureRateThreshold = 50, waitDurationInOpenState = WAIT_DURATION_IN_OPEN_STATE, ringBufferSizeInClosedState = SIZE_IN_CLOSED_STATE, ringBufferSizeInHalfOpenState = SIZE_IN_HALF_OPEN_STATE)
 		public String echo(String s) throws IOException {
 			if (recovered)
 				return s;
@@ -85,8 +126,8 @@ public class CircuitBreakerAspectTest {
 			return s;
 		}
 
-		public void recover() {
-			recovered = true;
+		public void recover(boolean recovered) {
+			this.recovered = recovered;
 		}
 
 	}

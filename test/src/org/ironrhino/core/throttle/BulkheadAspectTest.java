@@ -32,8 +32,31 @@ public class BulkheadAspectTest {
 		test(0);
 	}
 
+	@Test
 	public void testNotPermit() throws Exception {
 		test(5);
+	}
+
+	@Test
+	public void testWaitTime() throws Exception {
+		final int overflow = 5;
+		ExecutorService es = Executors.newFixedThreadPool(TestService.MAX_CONCURRENT_CALLS + overflow);
+		AtomicInteger success = new AtomicInteger();
+		AtomicInteger error = new AtomicInteger();
+		for (int i = 0; i < TestService.MAX_CONCURRENT_CALLS + overflow; i++) {
+			es.execute(() -> {
+				try {
+					testService.testWaitTime();
+					success.getAndIncrement();
+				} catch (BulkheadFullException e) {
+					error.getAndIncrement();
+				}
+			});
+		}
+		es.shutdown();
+		es.awaitTermination(100, TimeUnit.MILLISECONDS);
+		assertThat(success.get(), is(TestService.MAX_CONCURRENT_CALLS + overflow));
+		assertThat(error.get(), is(0));
 	}
 
 	private void test(int overflow) throws Exception {
@@ -66,6 +89,11 @@ public class BulkheadAspectTest {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+		}
+
+		@Bulkhead(maxConcurrentCalls = MAX_CONCURRENT_CALLS, maxWaitTime = 100)
+		public void testWaitTime() {
+			test();
 		}
 
 	}

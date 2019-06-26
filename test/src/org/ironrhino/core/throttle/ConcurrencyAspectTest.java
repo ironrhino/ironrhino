@@ -30,14 +30,22 @@ public class ConcurrencyAspectTest {
 
 	@Test(expected = IllegalConcurrentAccessException.class)
 	public void test() throws Throwable {
-		int concurrency = 10;
+		concurrentExecute(10, () -> echoService.echo("test"));
+	}
+
+	@Test
+	public void testBlock() throws Throwable {
+		concurrentExecute(10, () -> echoService.blockEcho("test"));
+	}
+
+	private <T> void concurrentExecute(int concurrency, Callable<T> callable) throws Throwable {
 		ExecutorService es = Executors.newFixedThreadPool(concurrency);
-		Collection<Callable<String>> tasks = new ArrayList<>();
+		Collection<Callable<T>> tasks = new ArrayList<>();
 		for (int i = 0; i < concurrency; i++)
-			tasks.add(() -> echoService.echo("test"));
-		List<Future<String>> results = es.invokeAll(tasks);
+			tasks.add(callable);
+		List<Future<T>> results = es.invokeAll(tasks);
 		try {
-			for (Future<String> f : results) {
+			for (Future<T> f : results) {
 				f.get();
 			}
 		} catch (ExecutionException e) {
@@ -53,6 +61,11 @@ public class ConcurrencyAspectTest {
 		public String echo(String s) throws Exception {
 			Thread.sleep(100);
 			return s;
+		}
+
+		@Concurrency(permits = "5", block = true)
+		public String blockEcho(String s) throws Exception {
+			return echo(s);
 		}
 
 	}

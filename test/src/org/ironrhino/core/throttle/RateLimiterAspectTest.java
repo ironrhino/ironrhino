@@ -35,11 +35,22 @@ public class RateLimiterAspectTest {
 		}
 	}
 
+	@Test
+	public void testTimeout() throws InterruptedException {
+		Thread.sleep(500);
+		for (int i = 0; i < 101; i++) {
+			testService.testTimeout();
+		}
+	}
+
 	public static class TestService {
 		@RateLimiter(timeoutDuration = 0, limitForPeriod = 100)
 		public void test() {
 		}
 
+		@RateLimiter(timeoutDuration = 600)
+		public void testTimeout() {
+		}
 	}
 
 	@Configuration

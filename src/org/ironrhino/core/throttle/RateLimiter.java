@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface RateLimiter {
 
-	long timeoutDuration() default 5000; // seconds
+	long timeoutDuration() default 5000; // ms
 
 	long limitRefreshPeriod() default 500; // ms
 
