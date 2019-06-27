@@ -47,8 +47,7 @@ public class LoggingBodyHttpServletRequest extends HttpServletRequestWrapper {
 		ServletInputStream temp = servletInputStream;
 		if (temp == null) {
 			synchronized (this) {
-				temp = servletInputStream;
-				if (temp == null)
+				if ((temp = servletInputStream) == null)
 					servletInputStream = temp = new ContentCachingInputStream(super.getInputStream());
 			}
 		}

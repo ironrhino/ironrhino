@@ -34,7 +34,11 @@ public class RedisKeyspaceNotifier {
 	public void afterPropertiesSet() {
 		if (listeners.isEmpty())
 			return;
-		int database = ((LettuceConnectionFactory) messageListenerContainer.getConnectionFactory()).getDatabase();
+		LettuceConnectionFactory connectionFactory = (LettuceConnectionFactory) messageListenerContainer
+				.getConnectionFactory();
+		if (connectionFactory == null)
+			return;
+		int database = connectionFactory.getDatabase();
 		String pattern = "__key" + (eventBased ? "event" : "space") + "@" + database + "__:*";
 		// notify-keyspace-events KEg$x
 		messageListenerContainer.addMessageListener((message, p) -> {

@@ -34,8 +34,7 @@ public class ScheduledTaskRegistry {
 		List<ScheduledTask> temp = tasks;
 		if (temp == null) {
 			synchronized (this) {
-				temp = tasks;
-				if (temp == null)
+				if ((temp = tasks) == null)
 					tasks = temp = doGetTasks();
 			}
 		}

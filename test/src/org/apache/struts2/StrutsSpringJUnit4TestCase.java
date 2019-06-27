@@ -42,6 +42,7 @@ public abstract class StrutsSpringJUnit4TestCase<T> extends StrutsJUnit4TestCase
 				applicationContext);
 	}
 
+	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
 	}

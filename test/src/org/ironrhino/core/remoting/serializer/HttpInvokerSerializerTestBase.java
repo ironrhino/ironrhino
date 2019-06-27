@@ -90,8 +90,9 @@ public abstract class HttpInvokerSerializerTestBase {
 		assertThat(rir.getValue(), is(nullValue()));
 		assertThat(rir.hasInvocationTargetException(), is(true));
 		assertThat(((InvocationTargetException) rir.getException()).getTargetException().getMessage(), is("error"));
-		assertThat(((InvocationTargetException) rir.getException()).getTargetException() instanceof RuntimeException,
-				is(true));
+		InvocationTargetException ex = (InvocationTargetException) rir.getException();
+		assertThat(ex, notNullValue());
+		assertThat(ex.getTargetException() instanceof RuntimeException, is(true));
 	}
 
 	@Test

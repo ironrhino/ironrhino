@@ -79,10 +79,13 @@ public class ScheduledTasksIntegrationTest {
 		scheduleControl(5, task, true);
 
 		lock.lock();
-		assertThat(start.await(100, TimeUnit.MILLISECONDS), is(false));
-		assertThat(status, is(ENDED));
-		assertThat(exception, is(true));
-		lock.unlock();
+		try {
+			assertThat(start.await(100, TimeUnit.MILLISECONDS), is(false));
+			assertThat(status, is(ENDED));
+			assertThat(exception, is(true));
+		} finally {
+			lock.unlock();
+		}
 
 		for (int i = 6; i < 10; i++) {
 			scheduleControl(i, task, false);

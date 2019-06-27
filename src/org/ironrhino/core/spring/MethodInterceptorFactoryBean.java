@@ -122,8 +122,7 @@ public abstract class MethodInterceptorFactoryBean implements MethodInterceptor,
 		ExecutorService es = executorService;
 		if (es == null) {
 			synchronized (this) {
-				es = executorService;
-				if (es == null) {
+				if ((es = executorService) == null) {
 					Class<?> objectType = getObjectType();
 					if (objectType == null)
 						throw new RuntimeException("Unexpected null");

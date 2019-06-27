@@ -56,8 +56,7 @@ public class ApplicationContextConsole {
 		Map<String, Object> temp = beans;
 		if (temp == null) {
 			synchronized (this) {
-				temp = beans;
-				if (temp == null) {
+				if ((temp = beans) == null) {
 					temp = new HashMap<>();
 					String[] beanNames = ctx.getBeanDefinitionNames();
 					for (String beanName : beanNames) {

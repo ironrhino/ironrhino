@@ -7,7 +7,6 @@ import java.util.UUID;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.core.io.support.PropertySourceFactory;
-import org.springframework.lang.Nullable;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 
@@ -16,7 +15,7 @@ public class RandomValuePropertySourceFactory implements PropertySourceFactory {
 	public static final String RANDOM_PROPERTY_SOURCE_NAME = "random";
 
 	@Override
-	public PropertySource<?> createPropertySource(@Nullable String name, EncodedResource resource) throws IOException {
+	public PropertySource<?> createPropertySource(String name, EncodedResource resource) throws IOException {
 		return new RandomValuePropertySource(name);
 	}
 

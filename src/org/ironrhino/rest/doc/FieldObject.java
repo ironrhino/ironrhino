@@ -254,8 +254,11 @@ public class FieldObject implements Serializable {
 					JsonSerialize jsonSerialize = f.getAnnotation(JsonSerialize.class);
 					if (jsonSerialize != null && jsonSerialize.using() == ToIdJsonSerializer.class) {
 						reference = true;
-						if (!(type.isArray() || Collection.class.isAssignableFrom(type)))
-							type = BeanUtils.getPropertyDescriptor(type, "id").getPropertyType();
+						if (!(type.isArray() || Collection.class.isAssignableFrom(type))) {
+							PropertyDescriptor idPropertyDescriptor = BeanUtils.getPropertyDescriptor(type, "id");
+							if (idPropertyDescriptor != null)
+								type = idPropertyDescriptor.getPropertyType();
+						}
 					}
 					fd = f.getAnnotation(Field.class);
 					if (Persistable.class.isAssignableFrom(domainClass)) {

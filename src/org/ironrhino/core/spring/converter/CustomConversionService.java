@@ -24,8 +24,7 @@ public class CustomConversionService extends DefaultConversionService {
 		CustomConversionService cs = sharedInstance;
 		if (cs == null) {
 			synchronized (DefaultConversionService.class) {
-				cs = sharedInstance;
-				if (cs == null)
+				if ((cs = sharedInstance) == null)
 					sharedInstance = cs = new CustomConversionService();
 			}
 		}

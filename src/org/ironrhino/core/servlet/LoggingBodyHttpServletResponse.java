@@ -91,8 +91,7 @@ public class LoggingBodyHttpServletResponse extends HttpServletResponseWrapper {
 		ServletOutputStream temp = streamOutputStream;
 		if (temp == null) {
 			synchronized (this) {
-				temp = streamOutputStream;
-				if (temp == null)
+				if ((temp = streamOutputStream) == null)
 					streamOutputStream = temp = new ResponseServletOutputStream(super.getOutputStream());
 			}
 		}

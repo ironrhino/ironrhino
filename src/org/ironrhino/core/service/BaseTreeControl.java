@@ -58,8 +58,7 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 		T temp = tree;
 		if (temp == null) {
 			synchronized (this) {
-				temp = tree;
-				if (temp == null)
+				if ((temp = tree) == null)
 					tree = temp = buildTree();
 			}
 		}

@@ -79,7 +79,7 @@ public class UserAction extends EntityAction<User> {
 	@Override
 	public String input() throws Exception {
 		String result = super.input();
-		user = (User) getEntity();
+		user = getEntity();
 		Map<String, String> map = userRoleManager.getAllRoles(true);
 		if (userRoleFilter != null) {
 			Map<String, String> temp = userRoleFilter.filter(user, map);
@@ -118,7 +118,7 @@ public class UserAction extends EntityAction<User> {
 	protected boolean makeEntityValid() {
 		if (!super.makeEntityValid())
 			return false;
-		user = (User) getEntity();
+		user = getEntity();
 		try {
 			userRoleManager.checkMutex(user.getRoles());
 		} catch (Exception e) {

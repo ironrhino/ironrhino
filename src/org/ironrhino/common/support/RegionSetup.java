@@ -157,11 +157,11 @@ public class RegionSetup {
 		region.setChildren(list);
 	}
 
-	private static Map<String, String> _regionAreacodeMap;
+	private static volatile Map<String, String> _regionAreacodeMap;
 
-	private static Map<String, List<String>> _regionCoordinateMap;
+	private static volatile Map<String, List<String>> _regionCoordinateMap;
 
-	private static Map<String, List<Rgn>> _rgnMap;
+	private static volatile Map<String, List<Rgn>> _rgnMap;
 
 	private static Map<String, String> getRegionAreacodeMap() {
 		if (_regionAreacodeMap == null)

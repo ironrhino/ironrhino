@@ -35,8 +35,7 @@ public class LazyCommitResponseWrapper extends HttpServletResponseWrapper {
 		Buffer temp = buffer;
 		if (temp == null)
 			synchronized (this) {
-				temp = buffer;
-				if (temp == null)
+				if ((temp = buffer) == null)
 					buffer = temp = new Buffer(getCharacterEncoding());
 			}
 		return temp.getOutputStream();
@@ -49,8 +48,7 @@ public class LazyCommitResponseWrapper extends HttpServletResponseWrapper {
 		Buffer temp = buffer;
 		if (temp == null)
 			synchronized (this) {
-				temp = buffer;
-				if (temp == null)
+				if ((temp = buffer) == null)
 					buffer = temp = new Buffer(getCharacterEncoding());
 			}
 		return temp.getWriter();

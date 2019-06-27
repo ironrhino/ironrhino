@@ -56,8 +56,7 @@ public class ServicePlayground {
 		Map<String, Object> temp = services;
 		if (temp == null) {
 			synchronized (this) {
-				temp = services;
-				if (temp == null) {
+				if ((temp = services) == null) {
 					temp = new TreeMap<>();
 					temp.putAll(serviceRegistry.getExportedServices());
 					if (serviceRegistry instanceof AbstractServiceRegistry) {

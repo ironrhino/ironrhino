@@ -52,8 +52,7 @@ public class ApplicationContextInspector {
 		Map<String, String> temp = overridedProperties;
 		if (temp == null) {
 			synchronized (this) {
-				temp = overridedProperties;
-				if (temp == null) {
+				if ((temp = overridedProperties) == null) {
 					Map<String, String> map = new TreeMap<>();
 					for (PropertySource<?> ps : env.getPropertySources()) {
 						addOverridedProperties(map, ps);
@@ -83,8 +82,7 @@ public class ApplicationContextInspector {
 		Map<String, String> temp = defaultProperties;
 		if (temp == null) {
 			synchronized (this) {
-				temp = defaultProperties;
-				if (temp == null) {
+				if ((temp = defaultProperties) == null) {
 					List<String> list = new ArrayList<>();
 					for (String s : ctx.getBeanDefinitionNames()) {
 						BeanDefinition bd = ctx.getBeanDefinition(s);

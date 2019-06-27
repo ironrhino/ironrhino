@@ -189,24 +189,29 @@ public abstract class StrutsJUnit4TestCase<T> extends XWorkJUnit4TestCase implem
 
 	public void finishExecution() {
 		HttpSession session = this.request.getSession();
-		Enumeration<String> attributeNames = session.getAttributeNames();
+		if (session != null) {
+			Enumeration<String> attributeNames = session.getAttributeNames();
 
-		MockHttpServletRequest nextRequest = new MockHttpServletRequest();
+			MockHttpServletRequest nextRequest = new MockHttpServletRequest();
 
-		while (attributeNames.hasMoreElements()) {
-			String key = (String) attributeNames.nextElement();
-			Object attribute = session.getAttribute(key);
-			nextRequest.getSession().setAttribute(key, attribute);
+			while (attributeNames.hasMoreElements()) {
+				String key = attributeNames.nextElement();
+				Object attribute = session.getAttribute(key);
+				HttpSession s = nextRequest.getSession();
+				if (s != null)
+					s.setAttribute(key, attribute);
+			}
+
+			this.response = new MockHttpServletResponse();
+			this.request = nextRequest;
 		}
-
-		this.response = new MockHttpServletResponse();
-		this.request = nextRequest;
 	}
 
 	/**
 	 * Sets up the configuration settings, XWork configuration, and message
 	 * resources
 	 */
+	@Override
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
@@ -244,6 +249,7 @@ public abstract class StrutsJUnit4TestCase<T> extends XWorkJUnit4TestCase implem
 		return null;
 	}
 
+	@Override
 	@After
 	public void tearDown() throws Exception {
 		super.tearDown();
