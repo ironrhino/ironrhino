@@ -49,7 +49,7 @@ public class PublishAspect implements TransactionSynchronization, Ordered {
 	}
 
 	@Before("execution(public * *(..)) and @annotation(transactional)")
-	public void registerTransactionSyncrhonization(JoinPoint jp, Transactional transactional) {
+	public void registerTransactionSynchronization(JoinPoint jp, Transactional transactional) {
 		if (!isBypass() && !transactional.readOnly())
 			TransactionSynchronizationManager.registerSynchronization(this);
 	}
