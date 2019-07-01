@@ -432,6 +432,7 @@ public class AppInfo {
 				System.setProperty("AsyncLogger.RingBufferSize", "16384");
 		}
 		System.setProperty("log4j2.threadContextMap", MyThreadContextMap.class.getName());
+		System.setProperty("log4j2.isThreadContextMapInheritable", String.valueOf(true));
 		if (System.getProperty("hibernate.logger.level") == null)
 			System.setProperty("hibernate.logger.level", AppInfo.getStage() == Stage.DEVELOPMENT ? "TRACE" : "INFO");
 		if (System.getProperty("console.logger.level") == null)
