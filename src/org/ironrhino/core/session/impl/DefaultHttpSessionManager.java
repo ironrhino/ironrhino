@@ -114,6 +114,10 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 
 	@Override
 	public String changeSessionId(WrappedHttpSession session) {
+		if (session.isCacheBased()) {
+			cacheBased.invalidate(session);
+			session.setDirty(true);
+		}
 		session.setNew(true);
 		session.setId(nextSessionId());
 		session.setSessionTracker(getSessionTracker(session));
