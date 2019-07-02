@@ -29,6 +29,8 @@ public class DownloadController {
 	@Api("下载")
 	@GetMapping
 	public ResponseEntity<Resource> download(@RequestParam String filename) {
+		if (filename.equals("test"))
+			throw new IllegalArgumentException("filename cannot be \"test\"");
 		HttpHeaders respHeaders = new HttpHeaders();
 		respHeaders.setContentType(MediaType.TEXT_PLAIN);
 		respHeaders.set(HttpHeaders.CONTENT_DISPOSITION,

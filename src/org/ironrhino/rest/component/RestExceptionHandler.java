@@ -59,6 +59,7 @@ public class RestExceptionHandler {
 			response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 			return RestStatus.valueOf(RestStatus.CODE_FORBIDDEN, ex.getMessage());
 		} else if (ex instanceof MethodArgumentTypeMismatchException || ex instanceof IllegalArgumentException) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, ex.getMessage());
 		} else if (ex instanceof BindException || ex instanceof MethodArgumentNotValidException) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
