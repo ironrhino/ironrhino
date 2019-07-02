@@ -41872,10 +41872,17 @@ Initialization.apiplayground = function() {
 		if (hidden.length)
 			options.contentType = hidden.val();
 		hidden = form.find(':input[name="Accept"]');
-		if (hidden.length)
-			options.accepts = {
-				json : hidden.val()
+		if (hidden.length) {
+			options.dataType = 'custom';
+			options.converters = {
+				'text custom' : function(result) {
+					return result;
+				}
 			};
+			options.accepts = {
+				custom : hidden.val()
+			};
+		}
 		$.ajax(options);
 		return false;
 	}).on('click', 'form.api-playground .last-accessToken', function() {
