@@ -6,8 +6,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -27,11 +27,15 @@ import org.springframework.stereotype.Component;
 @ServiceImplementationConditional(profiles = DEFAULT)
 public class Cache2kCacheManager implements CacheManager {
 
+	private static final AtomicInteger INSTANCE_NUMBER = new AtomicInteger();
+
 	private org.cache2k.CacheManager cache2kCacheManager;
 
 	@PostConstruct
 	public void init() {
-		cache2kCacheManager = org.cache2k.CacheManager.getInstance(UUID.randomUUID().toString());
+		int number = INSTANCE_NUMBER.getAndIncrement();
+		String name = number > 0 ? "ironrhino" + number : "ironrhino";
+		cache2kCacheManager = org.cache2k.CacheManager.getInstance(name);
 	}
 
 	@PreDestroy
