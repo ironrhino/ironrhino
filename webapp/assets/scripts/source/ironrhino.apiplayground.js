@@ -82,6 +82,8 @@ Initialization.apiplayground = function() {
 			method : method,
 			headers : headers,
 			beforeSend : function() {
+				form.find('.responseStatus,.responseHeaders,.responseBody')
+						.text('');
 				if (typeof $.fn.mask != 'undefined')
 					form.mask();
 				else
@@ -100,6 +102,7 @@ Initialization.apiplayground = function() {
 				var responseText = xhr.responseText;
 				if (responseText && responseType
 						&& responseType.indexOf('application/json') == 0) {
+					console.log(xhr.response);
 					try {
 						responseText = JSON.stringify(JSON.parse(responseText),
 								null, '   ');
