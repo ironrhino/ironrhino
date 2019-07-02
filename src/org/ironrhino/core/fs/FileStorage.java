@@ -17,19 +17,19 @@ public interface FileStorage {
 
 	Comparator<FileInfo> COMPARATOR = Comparator.comparing(FileInfo::isFile).thenComparing(FileInfo::getName);
 
-	public default String getName() {
+	default String getName() {
 		return "default";
 	}
 
-	public default boolean isBucketBased() {
+	default boolean isBucketBased() {
 		return false;
 	}
 
-	public default boolean isRelativeProtocolAllowed() {
+	default boolean isRelativeProtocolAllowed() {
 		return false;
 	}
 
-	public default void migrateTo(FileStorage target, String directory, boolean removeSourceFiles) throws IOException {
+	default void migrateTo(FileStorage target, String directory, boolean removeSourceFiles) throws IOException {
 		if (directory == null)
 			directory = "/";
 		if (!directory.endsWith("/"))
@@ -69,42 +69,42 @@ public interface FileStorage {
 			this.delete(directory);
 	}
 
-	public default void write(File file, String path) throws IOException {
+	default void write(File file, String path) throws IOException {
 		try (FileInputStream is = new FileInputStream(file)) {
 			write(is, path, file.length());
 		}
 	}
 
-	public default void write(InputStream is, String path, long contentLength) throws IOException {
+	default void write(InputStream is, String path, long contentLength) throws IOException {
 		int index = path.lastIndexOf('/');
 		String contentType = MediaTypeFactory.getMediaType(index >= 0 ? path.substring(index + 1) : path)
 				.map(Object::toString).orElse(null);
 		write(is, path, contentLength, contentType);
 	}
 
-	public default void write(InputStream is, String path, long contentLength, String contentType) throws IOException {
+	default void write(InputStream is, String path, long contentLength, String contentType) throws IOException {
 		write(is, path);
 	}
 
-	public void write(InputStream is, String path) throws IOException;
+	void write(InputStream is, String path) throws IOException;
 
-	public InputStream open(String path) throws IOException;
+	InputStream open(String path) throws IOException;
 
-	public boolean mkdir(String path);
+	boolean mkdir(String path);
 
-	public boolean delete(String path);
+	boolean delete(String path);
 
-	public boolean exists(String path);
+	boolean exists(String path);
 
-	public boolean rename(String fromPath, String toPath);
+	boolean rename(String fromPath, String toPath);
 
-	public boolean isDirectory(String path);
+	boolean isDirectory(String path);
 
-	public long getLastModified(String path);
+	long getLastModified(String path);
 
-	public List<FileInfo> listFiles(String path);
+	List<FileInfo> listFiles(String path);
 
-	public default Paged<FileInfo> listFiles(String path, int limit, String marker) {
+	default Paged<FileInfo> listFiles(String path, int limit, String marker) {
 		if (limit < 1 || limit > MAX_PAGE_SIZE)
 			limit = DEFAULT_PAGE_SIZE;
 		if (marker != null && marker.isEmpty())
@@ -112,9 +112,9 @@ public interface FileStorage {
 		return Paged.from(listFiles(path), limit, marker, FileInfo::getName);
 	}
 
-	public List<FileInfo> listFilesAndDirectory(String path);
+	List<FileInfo> listFilesAndDirectory(String path);
 
-	public default Paged<FileInfo> listFilesAndDirectory(String path, int limit, String marker) {
+	default Paged<FileInfo> listFilesAndDirectory(String path, int limit, String marker) {
 		if (limit < 1 || limit > MAX_PAGE_SIZE)
 			limit = DEFAULT_PAGE_SIZE;
 		if (marker != null && marker.isEmpty())
@@ -122,6 +122,6 @@ public interface FileStorage {
 		return Paged.from(listFilesAndDirectory(path), limit, marker, FileInfo::getName);
 	}
 
-	public String getFileUrl(String path);
+	String getFileUrl(String path);
 
 }

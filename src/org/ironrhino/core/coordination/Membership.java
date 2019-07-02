@@ -4,14 +4,14 @@ import java.util.List;
 
 public interface Membership {
 
-	public void join(String group) throws Exception;
+	void join(String group) throws Exception;
 
-	public void leave(String group) throws Exception;
+	void leave(String group) throws Exception;
 
-	public boolean isLeader(String group) throws Exception;
+	boolean isLeader(String group) throws Exception;
 
-	public String getLeader(String group) throws Exception;
+	String getLeader(String group) throws Exception;
 
-	public List<String> getMembers(String group) throws Exception;
+	List<String> getMembers(String group) throws Exception;
 
 }

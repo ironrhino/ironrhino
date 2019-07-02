@@ -2,12 +2,12 @@ package org.ironrhino.core.jdbc;
 
 public interface LineHandler {
 
-	public boolean isWithHeader();
+	boolean isWithHeader();
 
-	public String getColumnSeperator();
+	String getColumnSeperator();
 
-	public String getLineSeperator();
+	String getLineSeperator();
 
-	public void handleLine(int index, String line);
+	void handleLine(int index, String line);
 
 }

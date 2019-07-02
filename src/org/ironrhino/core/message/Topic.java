@@ -6,11 +6,11 @@ import org.ironrhino.core.metadata.Scope;
 
 public interface Topic<T extends Serializable> {
 
-	public void subscribe(T message);
+	void subscribe(T message);
 
-	public void publish(T message, Scope scope);
+	void publish(T message, Scope scope);
 
-	public default void publish(T message) {
+	default void publish(T message) {
 		publish(message, null);
 	}
 

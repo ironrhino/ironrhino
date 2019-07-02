@@ -2,10 +2,10 @@ package org.ironrhino.core.session;
 
 public interface SessionCompressor<T> {
 
-	public boolean supportsKey(String key);
+	boolean supportsKey(String key);
 
-	public String compress(T value) throws Exception;
+	String compress(T value) throws Exception;
 
-	public T uncompress(String string) throws Exception;
+	T uncompress(String string) throws Exception;
 
 }

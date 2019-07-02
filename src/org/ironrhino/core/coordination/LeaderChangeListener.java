@@ -2,10 +2,10 @@ package org.ironrhino.core.coordination;
 
 public interface LeaderChangeListener {
 
-	public boolean supports(String group);
+	boolean supports(String group);
 
-	public void notLeader();
+	void notLeader();
 
-	public void isLeader();
+	void isLeader();
 
 }

@@ -6,6 +6,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public interface UserRoleFilter {
 
-	public Map<String, String> filter(UserDetails user, Map<String, String> roles);
+	Map<String, String> filter(UserDetails user, Map<String, String> roles);
 
 }

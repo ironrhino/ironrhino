@@ -4,7 +4,7 @@ import java.util.Collection;
 
 public interface Treeable<T extends Treeable<T>> {
 
-	public default int getLevel() {
+	default int getLevel() {
 		int level = 1;
 		T parent = getParent();
 		while (parent != null) {
@@ -14,16 +14,16 @@ public interface Treeable<T extends Treeable<T>> {
 		return level;
 	}
 
-	public T getParent();
+	T getParent();
 
-	public void setParent(T parent);
+	void setParent(T parent);
 
-	public Collection<T> getChildren();
+	Collection<T> getChildren();
 
-	public void setChildren(Collection<T> children);
+	void setChildren(Collection<T> children);
 
 	@SuppressWarnings("unchecked")
-	public default void addChild(T... children) {
+	default void addChild(T... children) {
 		for (T child : children) {
 			child.setParent((T) this);
 			getChildren().add(child);

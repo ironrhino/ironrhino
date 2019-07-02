@@ -19,58 +19,58 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface UserClient {
 
 	@RequestMapping(value = "/@self", method = RequestMethod.GET)
-	public User self();
+	User self();
 
 	@RequestMapping(value = "/@all", method = RequestMethod.GET)
-	public List<User> all();
+	List<User> all();
 
 	@RequestMapping(value = "/@paged", method = RequestMethod.GET)
-	public ResultPage<User> paged(@RequestParam(defaultValue = "1") Integer pageNo,
+	ResultPage<User> paged(@RequestParam(defaultValue = "1") Integer pageNo,
 			@RequestParam(defaultValue = "10") Integer pageSize);
 
 	@RequestMapping(value = "/@pagedRestResult", method = RequestMethod.GET)
 	@JsonPointer("/data")
-	public ResultPage<User> pagedRestResult(@RequestParam(defaultValue = "1") Integer pageNo,
+	ResultPage<User> pagedRestResult(@RequestParam(defaultValue = "1") Integer pageNo,
 			@RequestParam(defaultValue = "10") Integer pageSize);
 
 	@JsonPointer("/result")
 	@RequestMapping(value = "/@paged", method = RequestMethod.GET)
-	public List<User> pagedResult(@RequestParam(defaultValue = "1") Integer pageNo,
+	List<User> pagedResult(@RequestParam(defaultValue = "1") Integer pageNo,
 			@RequestParam(defaultValue = "10") Integer pageSize);
 
 	@JsonPointer(value = "/result", validator = MyJsonValidator.class)
 	@RequestMapping(value = "/@paged", method = RequestMethod.GET)
-	public List<User> pagedResultWithValidator(@RequestParam(defaultValue = "1") Integer pageNo,
+	List<User> pagedResultWithValidator(@RequestParam(defaultValue = "1") Integer pageNo,
 			@RequestParam(defaultValue = "10") Integer pageSize);
 
 	@RequestMapping(value = "/@self", method = RequestMethod.PATCH)
-	public void patch(@RequestBody User user);
+	void patch(@RequestBody User user);
 
 	@RequestMapping(value = "/@self/password", method = RequestMethod.PATCH)
-	public RestStatus validatePassword(@RequestBody User user);
+	RestStatus validatePassword(@RequestBody User user);
 
 	@RequestMapping(value = "/{username}", method = RequestMethod.GET)
-	public User get(String username);
+	User get(String username);
 
 	@RequestMapping(method = RequestMethod.POST)
-	public void post(@RequestBody User user);
+	void post(@RequestBody User user);
 
 	@RequestMapping(value = "/{username}", method = RequestMethod.PATCH)
-	public void patch(String username, @RequestBody User user);
+	void patch(String username, @RequestBody User user);
 
 	@RequestMapping(value = "/{username}", method = RequestMethod.DELETE)
-	public void delete(String username);
+	void delete(String username);
 
 	@RequestMapping(value = "/{username}/password", method = RequestMethod.PATCH)
-	public RestStatus validatePassword(@PathVariable String username, @RequestBody User user);
+	RestStatus validatePassword(@PathVariable String username, @RequestBody User user);
 
 	@RequestMapping(method = RequestMethod.POST)
-	public void postStream(InputStream is);
+	void postStream(InputStream is);
 
 	@RequestMapping(method = RequestMethod.POST)
-	public void postByteArray(byte[] bytes);
+	void postByteArray(byte[] bytes);
 
 	@RequestMapping(value = "/@self", method = RequestMethod.GET)
-	public InputStream getStream();
+	InputStream getStream();
 
 }

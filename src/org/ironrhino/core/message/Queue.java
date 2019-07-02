@@ -4,8 +4,8 @@ import java.io.Serializable;
 
 public interface Queue<T extends Serializable> {
 
-	public void consume(T message);
+	void consume(T message);
 
-	public void produce(T message);
+	void produce(T message);
 
 }

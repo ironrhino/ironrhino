@@ -4,6 +4,6 @@ import javax.servlet.http.HttpServletRequest;
 
 public interface LoginEntryPointHandler {
 
-	public String handle(HttpServletRequest request, String targetUrl);
+	String handle(HttpServletRequest request, String targetUrl);
 
 }

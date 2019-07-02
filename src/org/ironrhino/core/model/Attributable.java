@@ -4,8 +4,8 @@ import java.util.List;
 
 public interface Attributable {
 
-	public List<Attribute> getAttributes();
+	List<Attribute> getAttributes();
 
-	public void setAttributes(List<Attribute> attributes);
+	void setAttributes(List<Attribute> attributes);
 
 }

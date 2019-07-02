@@ -6,18 +6,18 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public interface Token extends Serializable {
 
-	public String getAccessToken();
+	String getAccessToken();
 
-	public String getRefreshToken();
+	String getRefreshToken();
 
-	public String getTokenType();
+	String getTokenType();
 
-	public int getExpiresIn();
+	int getExpiresIn();
 
-	public long getCreateTime();
+	long getCreateTime();
 
 	@JsonIgnore
-	public default boolean isExpired() {
+	default boolean isExpired() {
 		int expiresIn = getExpiresIn();
 		long createTime = getCreateTime();
 		if (expiresIn <= 0 || createTime <= 0)

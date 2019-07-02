@@ -14,7 +14,7 @@ import org.springframework.remoting.support.RemoteInvocationResult;
 
 public interface HttpInvokerSerializer {
 
-	public default String getSerializationType() {
+	default String getSerializationType() {
 		String name = getClass().getSimpleName();
 		String suffix = HttpInvokerSerializer.class.getSimpleName();
 		if (name.endsWith(suffix))
@@ -22,23 +22,23 @@ public interface HttpInvokerSerializer {
 		return name.toUpperCase(Locale.ROOT);
 	}
 
-	public String getContentType();
+	String getContentType();
 
-	public default RemoteInvocation createRemoteInvocation(MethodInvocation methodInvocation) {
+	default RemoteInvocation createRemoteInvocation(MethodInvocation methodInvocation) {
 		return new RemoteInvocation(methodInvocation);
 	}
 
-	public void writeRemoteInvocation(RemoteInvocation invocation, OutputStream os) throws IOException;
+	void writeRemoteInvocation(RemoteInvocation invocation, OutputStream os) throws IOException;
 
-	public RemoteInvocation readRemoteInvocation(Class<?> serviceInterface, InputStream is) throws IOException;
+	RemoteInvocation readRemoteInvocation(Class<?> serviceInterface, InputStream is) throws IOException;
 
-	public void writeRemoteInvocationResult(RemoteInvocation invocation, RemoteInvocationResult result, OutputStream os)
+	void writeRemoteInvocationResult(RemoteInvocation invocation, RemoteInvocationResult result, OutputStream os)
 			throws IOException;
 
-	public RemoteInvocationResult readRemoteInvocationResult(MethodInvocation methodInvocation, InputStream is)
+	RemoteInvocationResult readRemoteInvocationResult(MethodInvocation methodInvocation, InputStream is)
 			throws IOException;
 
-	public default boolean handleException(Exception ex, HttpServletRequest request, HttpServletResponse response)
+	default boolean handleException(Exception ex, HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		return false;
 	}

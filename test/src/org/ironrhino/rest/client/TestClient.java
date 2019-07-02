@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface TestClient {
 
 	@RequestMapping(value = "/echo", method = RequestMethod.POST)
-	public String echo(@RequestParam String name);
+	String echo(@RequestParam String name);
 
 }

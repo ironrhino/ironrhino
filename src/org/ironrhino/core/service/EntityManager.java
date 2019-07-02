@@ -4,6 +4,6 @@ import org.ironrhino.core.model.Persistable;
 
 public interface EntityManager<T extends Persistable<?>> extends BaseManager<T> {
 
-	public void setEntityClass(Class<T> clazz);
+	void setEntityClass(Class<T> clazz);
 
 }

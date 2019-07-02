@@ -4,6 +4,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public interface UserRoleMapper {
 
-	public String[] map(UserDetails user);
+	String[] map(UserDetails user);
 
 }

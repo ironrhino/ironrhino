@@ -7,22 +7,22 @@ import org.ironrhino.core.model.ResultPage;
 
 public interface SearchService<T> {
 
-	public ResultPage<T> search(ResultPage<T> resultPage);
+	ResultPage<T> search(ResultPage<T> resultPage);
 
-	public List<T> search(SearchCriteria searchCriteria);
+	List<T> search(SearchCriteria searchCriteria);
 
-	public ResultPage<T> search(ResultPage<T> resultPage, Mapper<T> mapper);
+	ResultPage<T> search(ResultPage<T> resultPage, Mapper<T> mapper);
 
-	public List<T> search(SearchCriteria searchCriteria, Mapper<T> mapper);
+	List<T> search(SearchCriteria searchCriteria, Mapper<T> mapper);
 
-	public List<T> search(SearchCriteria searchCriteria, Mapper<T> mapper, int limit);
+	List<T> search(SearchCriteria searchCriteria, Mapper<T> mapper, int limit);
 
-	public Map<String, Integer> countTermsByField(SearchCriteria searchCriteria, String field);
+	Map<String, Integer> countTermsByField(SearchCriteria searchCriteria, String field);
 
 	@FunctionalInterface
-	public static interface Mapper<T> {
+	interface Mapper<T> {
 
-		public T map(T source);
+		T map(T source);
 
 	}
 

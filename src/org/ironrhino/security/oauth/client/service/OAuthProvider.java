@@ -7,18 +7,18 @@ import org.ironrhino.security.oauth.client.model.Profile;
 
 public interface OAuthProvider extends Comparable<OAuthProvider> {
 
-	public String getVersion();
+	String getVersion();
 
-	public String getName();
+	String getName();
 
-	public String getLogo();
+	String getLogo();
 
-	public boolean isEnabled();
+	boolean isEnabled();
 
-	public String getAuthRedirectURL(HttpServletRequest request, String targetUrl) throws Exception;
+	String getAuthRedirectURL(HttpServletRequest request, String targetUrl) throws Exception;
 
-	public Profile getProfile(HttpServletRequest request) throws Exception;
+	Profile getProfile(HttpServletRequest request) throws Exception;
 
-	public OAuthToken getToken(HttpServletRequest request) throws Exception;
+	OAuthToken getToken(HttpServletRequest request) throws Exception;
 
 }

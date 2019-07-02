@@ -28,14 +28,14 @@ public interface HttpSessionManager extends HttpSessionStore {
 
 	int DEFAULT_MINACTIVEINTERVAL = 60;// in seconds
 
-	public String getSessionId(HttpServletRequest request);
+	String getSessionId(HttpServletRequest request);
 
-	public String changeSessionId(WrappedHttpSession session);
+	String changeSessionId(WrappedHttpSession session);
 
-	public String getSessionTrackerName();
+	String getSessionTrackerName();
 
-	public String getLocaleCookieName();
+	String getLocaleCookieName();
 
-	public Locale getLocale(HttpServletRequest request);
+	Locale getLocale(HttpServletRequest request);
 
 }

@@ -2,8 +2,8 @@ package org.ironrhino.core.model;
 
 public interface Enableable {
 
-	public boolean isEnabled();
+	boolean isEnabled();
 
-	public void setEnabled(boolean enabled);
+	void setEnabled(boolean enabled);
 
 }

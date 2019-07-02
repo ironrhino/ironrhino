@@ -128,7 +128,7 @@ public class RemotingServiceFallbackTest {
 
 	}
 
-	public static interface EchoService {
+	public interface EchoService {
 		String echo(String str);
 	}
 

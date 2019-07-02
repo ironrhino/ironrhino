@@ -14,42 +14,42 @@ public interface OAuthManager {
 
 	int DEFAULT_EXPIRE_TIME = 14 * 24 * 3600;
 
-	public default Authorization grant(Client client) {
+	default Authorization grant(Client client) {
 		return grant(client, null, null);
 	}
 
-	public Authorization grant(Client client, String deviceId, String deviceName);
+	Authorization grant(Client client, String deviceId, String deviceName);
 
-	public default Authorization grant(Client client, String grantor) {
+	default Authorization grant(Client client, String grantor) {
 		return grant(client, grantor, null, null);
 	}
 
-	public Authorization grant(Client client, String grantor, String deviceId, String deviceName);
+	Authorization grant(Client client, String grantor, String deviceId, String deviceName);
 
-	public Authorization generate(Client client, String redirectUri, String scope, ResponseType responseType);
+	Authorization generate(Client client, String redirectUri, String scope, ResponseType responseType);
 
-	public Authorization reuse(Authorization authorization);
+	Authorization reuse(Authorization authorization);
 
-	public Authorization grant(String authorizationId, String grantor);
+	Authorization grant(String authorizationId, String grantor);
 
-	public void deny(String authorizationId);
+	void deny(String authorizationId);
 
-	public Authorization authenticate(String code, Client client);
+	Authorization authenticate(String code, Client client);
 
-	public Authorization retrieve(String accessToken);
+	Authorization retrieve(String accessToken);
 
-	public Authorization refresh(Client client, String refreshToken);
+	Authorization refresh(Client client, String refreshToken);
 
-	public boolean revoke(String accessToken);
+	boolean revoke(String accessToken);
 
-	public void create(Authorization authorization);
+	void create(Authorization authorization);
 
-	public List<Authorization> findAuthorizationsByGrantor(String grantor);
+	List<Authorization> findAuthorizationsByGrantor(String grantor);
 
-	public void deleteAuthorizationsByGrantor(String grantor, String client, GrantType grantType);
+	void deleteAuthorizationsByGrantor(String grantor, String client, GrantType grantType);
 
-	public Client findClientById(String clientId);
+	Client findClientById(String clientId);
 
-	public List<Client> findClientByOwner(UserDetails user);
+	List<Client> findClientByOwner(UserDetails user);
 
 }

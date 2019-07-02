@@ -4,12 +4,12 @@ import java.util.concurrent.TimeUnit;
 
 public interface LockService {
 
-	public boolean tryLock(String name);
+	boolean tryLock(String name);
 
-	public boolean tryLock(String name, long timeout, TimeUnit unit);
+	boolean tryLock(String name, long timeout, TimeUnit unit);
 
-	public void lock(String name);
+	void lock(String name);
 
-	public void unlock(String name);
+	void unlock(String name);
 
 }

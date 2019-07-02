@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public interface Persistable<PK extends Serializable> extends Serializable {
 
 	@JsonIgnore
-	public default boolean isNew() {
+	default boolean isNew() {
 		PK id = getId();
 		if (id instanceof String) {
 			String str = (String) id;
@@ -20,6 +20,6 @@ public interface Persistable<PK extends Serializable> extends Serializable {
 		}
 	}
 
-	public PK getId();
+	PK getId();
 
 }

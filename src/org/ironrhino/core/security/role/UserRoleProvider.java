@@ -4,6 +4,6 @@ import java.util.Map;
 
 public interface UserRoleProvider {
 
-	public Map<String, String> getRoles();
+	Map<String, String> getRoles();
 
 }

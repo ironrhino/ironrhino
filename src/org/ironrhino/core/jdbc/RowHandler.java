@@ -2,8 +2,8 @@ package org.ironrhino.core.jdbc;
 
 public interface RowHandler {
 
-	public boolean isWithHeader();
+	boolean isWithHeader();
 
-	public void handleRow(int index, Object[] row);
+	void handleRow(int index, Object[] row);
 
 }

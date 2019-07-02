@@ -8,13 +8,13 @@ import org.apache.commons.lang3.time.FastDateFormat;
 public interface CyclicSequence extends Sequence {
 
 	@Override
-	public default int nextIntValue() {
+	default int nextIntValue() {
 		return Integer.valueOf(nextStringValue().substring(getCycleType().getPattern().length()));
 	}
 
-	public CycleType getCycleType();
+	CycleType getCycleType();
 
-	public static enum CycleType {
+	static enum CycleType {
 
 		MINUTE("yyyyMMddHHmm") {
 			@Override

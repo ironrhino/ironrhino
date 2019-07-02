@@ -88,8 +88,8 @@ public class HtmlUtils {
 	}
 
 	@FunctionalInterface
-	public static interface Replacer {
-		public String replace(StartTag st, Attribute attr);
+	public interface Replacer {
+		String replace(StartTag st, Attribute attr);
 	}
 
 }

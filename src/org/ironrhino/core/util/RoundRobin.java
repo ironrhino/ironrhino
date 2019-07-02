@@ -63,7 +63,7 @@ public class RoundRobin<T> {
 	}
 
 	@FunctionalInterface
-	public static interface UsableChecker<T> {
+	public interface UsableChecker<T> {
 
 		boolean isUsable(T target);
 

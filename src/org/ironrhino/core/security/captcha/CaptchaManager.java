@@ -8,12 +8,12 @@ public interface CaptchaManager {
 
 	String KEY_CAPTCHA = "captcha";
 
-	public String getChallenge(HttpServletRequest request, String token);
+	String getChallenge(HttpServletRequest request, String token);
 
-	public boolean verify(HttpServletRequest request, String token, boolean cleanup);
+	boolean verify(HttpServletRequest request, String token, boolean cleanup);
 
-	public CaptchaStatus getCaptchaStatus(HttpServletRequest request, Captcha captcha);
+	CaptchaStatus getCaptchaStatus(HttpServletRequest request, Captcha captcha);
 
-	public void addCaptchaCount(HttpServletRequest request);
+	void addCaptchaCount(HttpServletRequest request);
 
 }

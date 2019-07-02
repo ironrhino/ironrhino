@@ -136,8 +136,8 @@ public class ConsistentHash<K, V> {
 	}
 
 	@FunctionalInterface
-	public static interface Hash {
-		public long hash(String s);
+	interface Hash {
+		long hash(String s);
 	}
 
 	/**

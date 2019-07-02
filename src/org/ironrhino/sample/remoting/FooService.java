@@ -5,6 +5,6 @@ import org.ironrhino.core.remoting.Remoting;
 @Remoting
 public interface FooService {
 
-	public String test(String value);
+	String test(String value);
 
 }

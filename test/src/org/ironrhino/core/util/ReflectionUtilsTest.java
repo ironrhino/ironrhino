@@ -106,7 +106,7 @@ public class ReflectionUtilsTest {
 
 	}
 
-	static interface Service {
+	interface Service {
 		String echo(String name1, @Param("test2") String name2);
 	}
 

@@ -4,10 +4,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public interface ConcreteUserDetailsService<T extends UserDetails> {
 
-	public default boolean accepts(String username) {
+	default boolean accepts(String username) {
 		return true;
 	}
 
-	public T loadUserByUsername(String username);
+	T loadUserByUsername(String username);
 
 }

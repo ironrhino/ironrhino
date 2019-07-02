@@ -6,5 +6,5 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public interface RoledUserDetails extends UserDetails {
 
-	public Collection<String> getRoles();
+	Collection<String> getRoles();
 }

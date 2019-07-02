@@ -7,8 +7,8 @@ import org.ironrhino.core.metadata.UiConfig;
 public interface Attachmentable {
 
 	@UiConfig(hidden = true)
-	public List<String> getAttachments();
+	List<String> getAttachments();
 
-	public void setAttachments(List<String> attachments);
+	void setAttachments(List<String> attachments);
 
 }

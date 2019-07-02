@@ -175,13 +175,13 @@ public class CacheAspectTest {
 
 	}
 
-	public static interface TimeService {
+	public interface TimeService {
 
-		public static final String CACHE_NAMESPACE = "time";
-		public static final String CACHE_KEY = "nano";
+		String CACHE_NAMESPACE = "time";
+		String CACHE_KEY = "nano";
 
 		@CheckCache(key = CACHE_KEY, namespace = CACHE_NAMESPACE)
-		public long nanoTime();
+		long nanoTime();
 
 	}
 

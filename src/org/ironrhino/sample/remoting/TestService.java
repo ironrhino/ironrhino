@@ -32,65 +32,64 @@ public interface TestService {
 		private String name;
 	}
 
-	public default String defaultEcho(String value) {
+	default String defaultEcho(String value) {
 		return echo(value);
 	}
 
-	public void ping();
+	void ping();
 
-	public void throwException(String message) throws Exception;
+	void throwException(String message) throws Exception;
 
-	public String echo();
+	String echo();
 
-	public String echo(String value);
+	String echo(String value);
 
-	public boolean echoBoolean(boolean value);
+	boolean echoBoolean(boolean value);
 
-	public int echoInt(int value);
+	int echoInt(int value);
 
-	public Long echoLong(Long value);
+	Long echoLong(Long value);
 
-	public Date echoDate(Date value);
+	Date echoDate(Date value);
 
-	public Scope echoScope(@NotNull Scope value);
+	Scope echoScope(@NotNull Scope value);
 
-	public Immutable echoImmutable(Immutable value);
+	Immutable echoImmutable(Immutable value);
 
-	public User echoUser(@Valid User value);
+	User echoUser(@Valid User value);
 
-	public UserDetails echoUserDetails(@Valid UserDetails value);
+	UserDetails echoUserDetails(@Valid UserDetails value);
 
-	public List<String> echoList(List<String> list);
+	List<String> echoList(List<String> list);
 
-	public List<String[]> echoListWithArray(List<String[]> list);
+	List<String[]> echoListWithArray(List<String[]> list);
 
-	public int countAndAdd(List<String> list, int param);
+	int countAndAdd(List<String> list, int param);
 
-	public String[] echoArray(String[] arr);
+	String[] echoArray(String[] arr);
 
-	public User loadUserByUsername(String username);
+	User loadUserByUsername(String username);
 
-	public UserDetails loadUserDetailsByUsername(String username);
+	UserDetails loadUserDetailsByUsername(String username);
 
-	public List<User> searchUser(String keyword);
+	List<User> searchUser(String keyword);
 
-	public List<? extends UserDetails> searchUserDetails(String keyword);
+	List<? extends UserDetails> searchUserDetails(String keyword);
 
-	public Optional<User> loadOptionalUserByUsername(String username);
+	Optional<User> loadOptionalUserByUsername(String username);
 
-	public Optional<? extends UserDetails> loadOptionalUserDetailsByUsername(String username);
+	Optional<? extends UserDetails> loadOptionalUserDetailsByUsername(String username);
 
-	public Future<User> loadFutureUserByUsername(String username, @NotNull FutureType futureType);
+	Future<User> loadFutureUserByUsername(String username, @NotNull FutureType futureType);
 
-	public Future<? extends UserDetails> loadFutureUserDetailsByUsername(String username,
-			@NotNull FutureType futureType);
+	Future<? extends UserDetails> loadFutureUserDetailsByUsername(String username, @NotNull FutureType futureType);
 
-	public ListenableFuture<User> loadListenableFutureUserByUsername(String username);
+	ListenableFuture<User> loadListenableFutureUserByUsername(String username);
 
-	public ListenableFuture<? extends UserDetails> loadListenableFutureUserDetailsByUsername(String username);
+	ListenableFuture<? extends UserDetails> loadListenableFutureUserDetailsByUsername(String username);
 
-	public Callable<User> loadCallableUserByUsername(String username);
+	Callable<User> loadCallableUserByUsername(String username);
 
-	public Callable<? extends UserDetails> loadCallableUserDetailsByUsername(String username);
+	Callable<? extends UserDetails> loadCallableUserDetailsByUsername(String username);
 
 }

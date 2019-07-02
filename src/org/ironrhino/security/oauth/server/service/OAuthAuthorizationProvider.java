@@ -4,6 +4,6 @@ import org.ironrhino.security.oauth.server.domain.OAuthAuthorization;
 
 public interface OAuthAuthorizationProvider {
 
-	public OAuthAuthorization get(String accessToken);
+	OAuthAuthorization get(String accessToken);
 
 }

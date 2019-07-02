@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface UploadClient {
 
 	@RequestMapping(value = "/upload", method = RequestMethod.POST)
-	public String upload(InputStream is);
+	String upload(InputStream is);
 
 	@RequestMapping(value = "/upload", method = RequestMethod.POST)
-	public String upload(byte[] bytes);
+	String upload(byte[] bytes);
 
 	@RequestMapping(value = "/upload", method = RequestMethod.POST)
-	public Map<String, String> upload(@RequestParam String name, @RequestParam File file);
+	Map<String, String> upload(@RequestParam String name, @RequestParam File file);
 
 }

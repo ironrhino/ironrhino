@@ -8,16 +8,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public interface VerificationAware extends UserDetails {
 
 	@JsonIgnore
-	public default boolean isVerificationRequired() {
+	default boolean isVerificationRequired() {
 		return true;
 	}
 
 	@JsonIgnore
-	public default boolean isPasswordRequired() {
+	default boolean isPasswordRequired() {
 		return StringUtils.isNotBlank(getPassword());
 	}
 
 	@JsonIgnore
-	public String getReceiver();
+	String getReceiver();
 
 }

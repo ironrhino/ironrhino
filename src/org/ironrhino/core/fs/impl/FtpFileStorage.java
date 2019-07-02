@@ -438,8 +438,8 @@ public class FtpFileStorage extends AbstractFileStorage {
 		}
 	}
 
-	public static interface Callback<T> {
-		public T doWithFTPClient(FTPClient ftpClient) throws IOException;
+	interface Callback<T> {
+		T doWithFTPClient(FTPClient ftpClient) throws IOException;
 	}
 
 	static abstract class ProxyInputStream extends FilterInputStream {

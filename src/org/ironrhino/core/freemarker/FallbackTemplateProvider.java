@@ -8,8 +8,8 @@ import freemarker.template.Template;
 
 public interface FallbackTemplateProvider {
 
-	public void setConfiguration(Configuration configuration);
+	void setConfiguration(Configuration configuration);
 
-	public Template getTemplate(String name, Locale locale, String encoding, boolean parse) throws IOException;
+	Template getTemplate(String name, Locale locale, String encoding, boolean parse) throws IOException;
 
 }

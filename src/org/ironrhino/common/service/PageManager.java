@@ -9,28 +9,28 @@ import org.ironrhino.core.service.BaseManager;
 
 public interface PageManager extends BaseManager<Page> {
 
-	public Page getByPath(String path);
+	Page getByPath(String path);
 
-	public Page saveDraft(Page page);
+	Page saveDraft(Page page);
 
-	public Page getDraftByPath(String path);
+	Page getDraftByPath(String path);
 
-	public Page dropDraft(String id);
+	Page dropDraft(String id);
 
-	public void pullDraft(Page page);
+	void pullDraft(Page page);
 
-	public List<Page> findListByTag(String tag);
+	List<Page> findListByTag(String tag);
 
-	public List<Page> findListByTag(String... tag);
+	List<Page> findListByTag(String... tag);
 
-	public Page[] findPreviousAndNextPage(Page page, String... tags);
+	Page[] findPreviousAndNextPage(Page page, String... tags);
 
-	public List<Page> findListByTag(int limit, String... tag);
+	List<Page> findListByTag(int limit, String... tag);
 
-	public ResultPage<Page> findResultPageByTag(ResultPage<Page> resultPage, String tag);
+	ResultPage<Page> findResultPageByTag(ResultPage<Page> resultPage, String tag);
 
-	public ResultPage<Page> findResultPageByTag(ResultPage<Page> resultPage, String... tag);
+	ResultPage<Page> findResultPageByTag(ResultPage<Page> resultPage, String... tag);
 
-	public Map<String, Integer> findMatchedTags(String keyword);
+	Map<String, Integer> findMatchedTags(String keyword);
 
 }

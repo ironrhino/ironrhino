@@ -15,7 +15,7 @@ public interface ResultProvider {
 
 	Logger logger = LoggerFactory.getLogger(ResultProvider.class);
 
-	public default void registerResults(PackageConfig config) {
+	default void registerResults(PackageConfig config) {
 		Map<String, ResultTypeConfig> resultTypeConfigs = new HashMap<>(config.getResultTypeConfigs());
 		getResultTypeConfigs().entrySet().stream().forEach(entry -> {
 			if (!resultTypeConfigs.containsKey(entry.getKey())) {
@@ -38,8 +38,8 @@ public interface ResultProvider {
 		ReflectionUtils.setFieldValue(config, "globalResultConfigs", globalResultConfigs);
 	}
 
-	public Map<String, ResultTypeConfig> getResultTypeConfigs();
+	Map<String, ResultTypeConfig> getResultTypeConfigs();
 
-	public Map<String, ResultConfig> getGlobalResultConfigs();
+	Map<String, ResultConfig> getGlobalResultConfigs();
 
 }

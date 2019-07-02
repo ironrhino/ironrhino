@@ -4,6 +4,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 public interface VersionedPasswordEncoder extends PasswordEncoder {
 
-	public int getVersion();
+	int getVersion();
 
 }

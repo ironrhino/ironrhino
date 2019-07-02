@@ -8,6 +8,6 @@ import org.ironrhino.core.service.BaseManager;
 
 public interface AuditEventManager extends BaseManager<AuditEvent> {
 
-	public List<AuditEvent> findRecentEvents(String username, Date since, int size);
+	List<AuditEvent> findRecentEvents(String username, Date since, int size);
 
 }

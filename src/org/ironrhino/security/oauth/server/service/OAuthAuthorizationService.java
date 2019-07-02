@@ -6,6 +6,6 @@ import org.ironrhino.security.oauth.server.domain.OAuthAuthorization;
 @Remoting
 public interface OAuthAuthorizationService {
 
-	public OAuthAuthorization get(String accessToken);
+	OAuthAuthorization get(String accessToken);
 
 }

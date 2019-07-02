@@ -2,12 +2,12 @@ package org.ironrhino.core.sequence;
 
 public interface Sequence {
 
-	public static final String DEFAULT_TABLE_NAME = "common_sequence";
+	String DEFAULT_TABLE_NAME = "common_sequence";
 
-	public int nextIntValue();
+	int nextIntValue();
 
-	public long nextLongValue();
+	long nextLongValue();
 
-	public String nextStringValue();
+	String nextStringValue();
 
 }
