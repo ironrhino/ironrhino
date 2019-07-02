@@ -41751,31 +41751,6 @@ Initialization.apiplayground = function() {
 		var data;
 		var contentType = false;
 		var processData = true;
-		if (form.hasClass('download')) {
-			var sf = $('<form/>').insertAfter(form);
-			var action = url;
-			if (accessToken) {
-				if (method == 'GET')
-					$('<input type="hidden"/>').appendTo(sf).attr('name',
-							'access_token').val(accessToken);
-				else
-					action += '?access_token=' + accessToken;
-			}
-			sf.attr('method', method).attr('action', action).attr('target',
-					'_blank');
-			form.find('table.requestParams tr').each(function(i, v) {
-				var row = $(this);
-				var input = row.find(':input:eq(1)');
-				var name = input.attr('name') || row.find('input:eq(0)').val();
-				if (!name)
-					return;
-				$('<input type="hidden"/>').appendTo(sf).attr('name', name)
-						.val(input.val());
-			});
-			sf.submit();
-			sf.remove();
-			return false;
-		}
 		if (form.find('table.requestParams input[type="file"]').length) {
 			var formdata = new FormData();
 			form.find('table.requestParams tr').each(function(i, v) {
@@ -41835,14 +41810,12 @@ Initialization.apiplayground = function() {
 			processData : processData,
 			method : method,
 			headers : headers,
-			dataType : 'json',
 			beforeSend : function() {
 				if (typeof $.fn.mask != 'undefined')
 					form.mask();
 				else
 					form.addClass('loading');
 			},
-
 			complete : function(xhr) {
 				if (typeof $.fn.mask != 'undefined')
 					form.unmask();
@@ -41863,6 +41836,38 @@ Initialization.apiplayground = function() {
 				form.find('.responseBody').text(responseText);
 			}
 		};
+		if (form.hasClass('download')) {
+			options.xhrFields = {
+				responseType : 'blob'
+			};
+			options.success = function(data, status, xhr) {
+				var filename = 'unknown';
+				var cd = xhr.getResponseHeader('Content-Disposition');
+				if (cd && cd.indexOf('filename=') > 0) {
+					var arr = cd.split(/;\s*/);
+					for (var i = 0; i < arr.length; i++) {
+						var s = arr[i];
+						if (s.indexOf('filename=') == 0) {
+							s = s.substring(s.indexOf('=') + 1);
+							if (s.indexOf('"') == 0)
+								s = s.substring(1, s.length - 1);
+							filename = s;
+							break;
+						}
+					}
+				}
+				var url = URL.createObjectURL(data, {
+							type : xhr.getResponseHeader('Content-Type')
+						});
+				var link = $('<a/>').appendTo(document.body).attr('download',
+						filename).attr('href', url);
+				link[0].click(); // jquery click doesn't works
+				URL.revokeObjectURL(url);
+				link.remove();
+			};
+		} else {
+			options.dataType = 'json';
+		}
 		var hidden = form.find(':input[name="Content-Type"]');
 		if (hidden.length)
 			options.contentType = hidden.val();

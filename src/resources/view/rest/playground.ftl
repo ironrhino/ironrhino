@@ -60,7 +60,6 @@
 	</tbody></table>
 </td></tr>
 </#if>
-<#if !apiDoc.download>
 <#if apiDoc.requestHeaders?has_content>
 <tr><td>请求头</td><td class="compact-horizontal">
 	<table class="requestHeaders table datagrid adaptive"><tbody>
@@ -102,7 +101,6 @@
 <tr><td>响应消息体</td><td>
 <code class="responseBody block json" style="display:inline-block;box-sizing:border-box;min-width:100%;min-height:50px;"></code>
 </td></tr>
-</#if>
 </tbody>
 </table>
 <button type="submit" class="btn btn-primary btn-block">${getText('confirm')}</button>
