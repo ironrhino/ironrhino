@@ -98,23 +98,49 @@ Initialization.apiplayground = function() {
 						+ xhr.statusText + ' <span class="badge">'
 						+ (new Date().getTime() - startTime) + 'ms</span>');
 				form.find('.responseHeaders').text(xhr.getAllResponseHeaders());
-				var responseType = xhr.getResponseHeader('Content-Type');
-				var responseText = xhr.responseText;
-				if (responseText && responseType
-						&& responseType.indexOf('application/json') == 0) {
-					console.log(xhr.response);
-					try {
-						responseText = JSON.stringify(JSON.parse(responseText),
-								null, '   ');
-					} catch (e) {
+				var rb = form.find('.responseBody');
+				if (!rb.text()) { // maybe read from response by options.error
+					var responseType = xhr.getResponseHeader('Content-Type');
+					var responseText = xhr.responseText;
+					if (responseText && responseType
+							&& responseType.indexOf('application/json') == 0) {
+						try {
+							responseText = JSON.stringify(JSON
+											.parse(responseText), null, '   ');
+						} catch (e) {
+						}
 					}
+					rb.text(responseText);
 				}
-				form.find('.responseBody').text(responseText);
 			}
 		};
 		if (form.hasClass('download')) {
-			options.xhrFields = {
-				responseType : 'blob'
+			var xhr;
+			options.xhr = function() {
+				xhr = new XMLHttpRequest();
+				xhr.responseType = 'blob';
+				return xhr;
+			};
+			options.error = function() {
+				var rb = form.find('.responseBody');
+				var reader = new FileReader();
+				reader.addEventListener('loadend', function(e) {
+							var responseType = xhr
+									.getResponseHeader('Content-Type');
+							var responseText = e.srcElement.result;
+							if (responseText
+									&& responseType
+									&& responseType.indexOf('application/json') == 0) {
+								try {
+									responseText = JSON.stringify(JSON
+													.parse(responseText), null,
+											'   ');
+								} catch (e) {
+								}
+							}
+							rb.text(responseText);
+						});
+				reader.readAsText(xhr.response);
 			};
 			options.success = function(data, status, xhr) {
 				var filename = 'unknown';
