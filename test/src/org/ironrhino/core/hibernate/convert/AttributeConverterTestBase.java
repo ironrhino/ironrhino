@@ -34,7 +34,7 @@ public abstract class AttributeConverterTestBase {
 	}
 
 	MetadataImplementor buildMetadata(StandardServiceRegistry ssr, Class<?> entity,
-			Class<? extends AttributeConverter> converter) {
+			Class<? extends AttributeConverter<?, ?>> converter) {
 		return (MetadataImplementor) new MetadataSources(ssr).addAnnotatedClass(entity).getMetadataBuilder()
 				.applyAttributeConverter(converter).build();
 	}
@@ -42,7 +42,7 @@ public abstract class AttributeConverterTestBase {
 	void assertDetermineType(MetadataImplementor metadata, Class<?> entity, String fieldName, int expectedType) {
 		PersistentClass tester = metadata.getEntityBinding(entity.getName());
 		SimpleValue simpleValue = (SimpleValue) tester.getProperty(fieldName).getValue();
-		AbstractStandardBasicType basicType = (AbstractStandardBasicType) simpleValue.getType();
+		AbstractStandardBasicType<?> basicType = (AbstractStandardBasicType<?>) simpleValue.getType();
 		assertThat(basicType.getSqlTypeDescriptor().getSqlType(), is(expectedType));
 	}
 
