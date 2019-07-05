@@ -151,12 +151,12 @@ public class AnnotationUtilsTest {
 	}
 
 	@Test
-	public void testGetAnnotatedPropertyNameAndAnnnotations() {
+	public void testGetAnnotatedPropertyNameAndAnnotations() {
 		for (int i = 0; i < 100; i++)
-			doTestGetAnnotatedPropertyNameAndAnnnotations();
+			doTestGetAnnotatedPropertyNameAndAnnotations();
 	}
 
-	public void doTestGetAnnotatedPropertyNameAndAnnnotations() {
+	public void doTestGetAnnotatedPropertyNameAndAnnotations() {
 		Map<String, UiConfig> map = AnnotationUtils.getAnnotatedPropertyNameAndAnnotations(User.class, UiConfig.class);
 		assertThat(map.size(), equalTo(4));
 		assertThat(map.get("attributes").hidden(), equalTo(true));

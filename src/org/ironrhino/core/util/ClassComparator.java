@@ -18,7 +18,7 @@ public class ClassComparator implements Comparator<Class<?>> {
 		o = org.springframework.core.annotation.AnnotationUtils.getAnnotation(b, Order.class);
 		if (o != null)
 			order2 = o.value();
-		int v = order1 == order2 ? 0 : order1 < order2 ? -1 : 1;
+		int v = Integer.compare(order1, order2);
 		if (v != 0)
 			return v;
 		v = b.getName().split("\\.").length - a.getName().split("\\.").length;
