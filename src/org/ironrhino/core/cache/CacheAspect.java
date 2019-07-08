@@ -112,7 +112,7 @@ public class CacheAspect extends BaseAspect {
 			if (cacheResult != null) {
 				if (checkCache.eternal()) {
 					for (String key : keys)
-						cacheManager.put(key, cacheResult, 0, checkCache.timeUnit(), namespace);
+						cacheManager.putIfAbsent(key, cacheResult, 0, checkCache.timeUnit(), namespace);
 				} else {
 					int timeToLive = ExpressionUtils.evalInt(checkCache.timeToLive(), context, 0);
 					int timeToIdle = ExpressionUtils.evalInt(checkCache.timeToIdle(), context, 0);
@@ -120,7 +120,7 @@ public class CacheAspect extends BaseAspect {
 						if (timeToIdle > 0 && cacheManager.supportsTti())
 							cacheManager.putWithTti(key, cacheResult, timeToIdle, checkCache.timeUnit(), namespace);
 						else
-							cacheManager.put(key, cacheResult, timeToLive, checkCache.timeUnit(), namespace);
+							cacheManager.putIfAbsent(key, cacheResult, timeToLive, checkCache.timeUnit(), namespace);
 				}
 			}
 			if (result != null)
