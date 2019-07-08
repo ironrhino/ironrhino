@@ -158,8 +158,9 @@ public class CacheAspect extends BaseAspect {
 				keys = ExpressionUtils.evalList(evictCache.key(), context);
 				keys = keys.stream().filter(s -> s != null).collect(Collectors.toList());
 			}
+			int timeToLive = ExpressionUtils.evalInt(evictCache.renewTimeToLive(), context, 0);
 			for (Object key : keys)
-				cacheManager.put(key.toString(), value, 0, TimeUnit.SECONDS, namespace);
+				cacheManager.put(key.toString(), value, timeToLive, TimeUnit.SECONDS, namespace);
 		}
 		return retval;
 	}

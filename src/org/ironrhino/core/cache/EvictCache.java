@@ -19,6 +19,10 @@ public @interface EvictCache {
 	// mvel expression
 	String onEvict() default "";
 
+	// mvel expression
 	String renew() default "";
+
+	// mvel expression
+	String renewTimeToLive() default "3600";
 
 }
