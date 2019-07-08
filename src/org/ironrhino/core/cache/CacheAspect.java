@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -40,7 +41,8 @@ public class CacheAspect extends BaseAspect {
 		Map<String, Object> context = buildContext(jp);
 		String namespace = ExpressionUtils.evalString(checkCache.namespace(), context);
 		List<String> keys = ExpressionUtils.evalList(checkCache.key(), context);
-		if (keys == null || keys.isEmpty())
+		keys = keys.stream().filter(s -> s != null).collect(Collectors.toList());
+		if (keys.isEmpty())
 			return jp.proceed();
 		String keyMutex = MUTEX + String.join("_", keys);
 		boolean mutexed = false;
@@ -144,18 +146,20 @@ public class CacheAspect extends BaseAspect {
 		putReturnValueIntoContext(context, retval);
 		if (fallback)
 			keys = ExpressionUtils.evalList(evictCache.key(), context);
-		if (isBypass() || keys == null || keys.size() == 0)
+		keys = keys.stream().filter(s -> s != null).collect(Collectors.toList());
+		if (isBypass() || keys.isEmpty())
 			return retval;
 		cacheManager.mdelete(new HashSet<>(keys), namespace);
 		ExpressionUtils.eval(evictCache.onEvict(), context);
 		if (StringUtils.isNotBlank(evictCache.renew())) {
 			Object value = ExpressionUtils.eval(evictCache.renew(), context);
 			// keys may be changed, eval again
-			if (!fallback)
+			if (!fallback) {
 				keys = ExpressionUtils.evalList(evictCache.key(), context);
+				keys = keys.stream().filter(s -> s != null).collect(Collectors.toList());
+			}
 			for (Object key : keys)
-				if (key != null)
-					cacheManager.put(key.toString(), value, 0, TimeUnit.SECONDS, namespace);
+				cacheManager.put(key.toString(), value, 0, TimeUnit.SECONDS, namespace);
 		}
 		return retval;
 	}
