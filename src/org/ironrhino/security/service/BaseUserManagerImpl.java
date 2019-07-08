@@ -74,7 +74,7 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 	@Override
 	@Transactional
 	@EvictCache(namespace = DEFAULT_CACHE_NAMESPACE, key = "${key = [];foreach (user : " + AopContext.CONTEXT_KEY_RETVAL
-			+ ") { key.add(user.username); key.add(user.email);} return key;}")
+			+ ") { key.add(user.username); } return key;}")
 	public List<T> delete(Serializable... id) {
 		return super.delete(id);
 	}
@@ -158,13 +158,7 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 	}
 
 	protected T doLoadUserByUsername(String username) {
-		username = username.toLowerCase(Locale.ROOT);
-		T user;
-		if (username.indexOf('@') > 0)
-			user = findOne("email", username);
-		else
-			user = findByNaturalId(username);
-		return user;
+		return findByNaturalId(username.toLowerCase(Locale.ROOT));
 	}
 
 	protected void populateAuthorities(T user) {
