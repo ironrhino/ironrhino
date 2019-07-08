@@ -39105,14 +39105,16 @@ Observation._richtable = function(container) {
 					if (!select.hasClass('required'))
 						$('<option value=""></option>').appendTo(select);
 					var map = option.data('map');
-					if (map.indexOf('{') == 0)
-						map = map.substring(1, map.length - 1);
-					map = map.split(/,\s*/);
-					for (var i = 0; i < map.length; i++) {
-						var arr = map[i].split('=', 2);
-						$('<option value="' + arr[0] + '">'
-								+ (arr[1] || arr[0]) + '</option>')
-								.appendTo(select);
+					if (typeof map == 'string') {
+						if (map.indexOf('{') == 0)
+							map = map.substring(1, map.length - 1);
+						map = map.split(/,\s*/);
+						for (var i = 0; i < map.length; i++) {
+							var arr = map[i].split('=', 2);
+							$('<option value="' + arr[0] + '">'
+									+ (arr[1] || arr[0]) + '</option>')
+									.appendTo(select);
+						}
 					}
 				} else if ('treeselect' == type) {
 					$('<input name="' + property.val()
