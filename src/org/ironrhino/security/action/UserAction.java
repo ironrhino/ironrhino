@@ -157,7 +157,7 @@ public class UserAction extends EntityAction<User> {
 		user.setName(temp.getName());
 		user.setEmail(temp.getEmail());
 		user.setPhone(temp.getPhone());
-		userManager.save(user);
+		userManager.update(user);
 		notify("save.success");
 		eventPublisher.publish(
 				new ProfileEditedEvent(user.getUsername(), ServletActionContext.getRequest().getRemoteAddr()),

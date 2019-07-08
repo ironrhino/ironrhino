@@ -59,9 +59,15 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 
 	@Override
 	@Transactional
-	@EvictCache(namespace = DEFAULT_CACHE_NAMESPACE, key = "${user.username}")
+	@EvictCache(namespace = DEFAULT_CACHE_NAMESPACE, key = "${user.username}", renew = "${user}")
 	public void update(T user) {
 		super.update(user);
+
+		// for renew
+		if (user.getAuthorities().isEmpty()) {
+			populateAuthorities(user);
+			populateExpires(user);
+		}
 	}
 
 	@Override
