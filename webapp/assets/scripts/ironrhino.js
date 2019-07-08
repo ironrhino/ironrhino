@@ -39073,7 +39073,7 @@ Observation._richtable = function(container) {
 										+ '">' + v.label + '</option>');
 						});
 				$('td:eq(2)', t.closest('tr')).html('');
-				operator.change();
+				operator.trigger('change', [true]); // propertyChanged
 			} else {
 				operator.removeAttr('name');
 				$('td:eq(2) :input', t.closest('tr')).removeAttr('name');
@@ -39084,14 +39084,15 @@ Observation._richtable = function(container) {
 						});
 			}
 		});
-		$('table.criteria select.operator', t).change(function() {
+		$('table.criteria select.operator', t).change(function(e, pc) {
 			var t = $(this);
 			var property = $('select.property', t.closest('tr'));
 			var option = $('option:selected', property);
 			var type = option.data('type');
 			var parameters = $('option:selected', t).data('parameters');
 			var td = $('td:eq(2)', t.closest('tr'));
-			if (parameters == td.data('parameters'))
+			// pc = propertyChanged
+			if (!pc && parameters == td.data('parameters'))
 				return;
 			td.data('parameters', parameters);
 			$(':input,.input-pseudo,.removeonadd,label', td).remove();
