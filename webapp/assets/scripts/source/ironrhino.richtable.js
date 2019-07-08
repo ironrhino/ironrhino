@@ -924,7 +924,11 @@ Observation._richtable = function(container) {
 					if (!select.hasClass('required'))
 						$('<option value=""></option>').appendTo(select);
 					var map = option.data('map');
-					if (typeof map == 'string') {
+					if (typeof map == 'object') {
+						for (var key in map)
+							$('<option value="' + key + '">' + map[key]
+									+ '</option>').appendTo(select);
+					} else {
 						if (map.indexOf('{') == 0)
 							map = map.substring(1, map.length - 1);
 						map = map.split(/,\s*/);

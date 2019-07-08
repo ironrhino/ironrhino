@@ -338,13 +338,13 @@ ${formFooter!}
 						</#if>
 					</#if>
 					<#if value.propertyType.enum>
-					<option value="${key}" data-class="${value.cssClass}" data-type="select" data-map="{<#list statics['org.ironrhino.core.util.EnumUtils'].enumToMap(value.propertyType) as key,value>${key}=${value}<#sep>,</#list>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.genericPropertyType)?join(',')}">${getText(label)}</option>
+					<option value="${key}" data-class="${value.cssClass}" data-type="select" data-map="{<#list statics['org.ironrhino.core.util.EnumUtils'].enumToMap(value.propertyType) as key,value>&quot;${key}&quot;:&quot;${value}&quot;<#sep>,</#list>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.genericPropertyType)?join(',')}">${getText(label)}</option>
 					<#elseif value.type='dictionary'>
 					<#local templateName><@value.templateName?interpret /></#local>
-					<option value="${key}" data-class="${value.cssClass}" data-type="select" data-map="{<#list beans['dictionaryControl'].getItemsAsMap(templateName) as key,value>${key}=${value}<#sep>,</#list>}" data-operators="<#if value.multiple>CONTAINS,NOTCONTAINS<#else>EQ,NEQ,ISNOTNULL,ISNULL,ISNOTEMPTY,ISEMPTY,IN,NOTIN</#if>">${getText(label)}</option>
+					<option value="${key}" data-class="${value.cssClass}" data-type="select" data-map="{<#list beans['dictionaryControl'].getItemsAsMap(templateName) as key,value>&quot;${key}&quot;:&quot;${value}&quot;<#sep>,</#list>}" data-operators="<#if value.multiple>CONTAINS,NOTCONTAINS<#else>EQ,NEQ,ISNOTNULL,ISNULL,ISNOTEMPTY,ISEMPTY,IN,NOTIN</#if>">${getText(label)}</option>
 					<#elseif value.type='select'>
 					<#local options=value.listOptions?eval>
-					<option value="${key}" data-class="${value.cssClass}" data-type="select" data-map="{<#if value.listOptions?starts_with('{')><#list options as key,value>${key}=${value}<#sep>,</#list><#elseif value.listOptions?starts_with('[')><#list options as key>${key}=${key}<#sep>,</#list></#if>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.genericPropertyType)?join(',')}">${getText(label)}</option>
+					<option value="${key}" data-class="${value.cssClass}" data-type="select" data-map="{<#if value.listOptions?starts_with('{')><#list options as key,value>&quot;${key}&quot;:&quot;${value}&quot;<#sep>,</#list><#elseif value.listOptions?starts_with('[')><#list options as key>&quot;${key}&quot;:&quot;${key}&quot;<#sep>,</#list></#if>}" data-operators="${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.genericPropertyType)?join(',')}">${getText(label)}</option>
 					<#elseif value.type='listpick'||value.type='treeselect'>
 					<#local pickUrl><@value.pickUrl?interpret/></#local>
 					<option value="${key}" data-type="${value.type}" data-pickurl="<@url value=pickUrl/>" data-operators="<#if value.multiple&&value.reference>CONTAINS<#else>${statics['org.ironrhino.core.hibernate.CriterionOperator'].getSupportedOperators(value.genericPropertyType)?join(',')}</#if>">${getText(label)}</option>
