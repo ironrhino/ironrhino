@@ -40,7 +40,7 @@ public class MainAppInitializer implements WebApplicationInitializer {
 		String context = servletContext.getRealPath("/");
 		if (context == null)
 			context = "";
-		System.setProperty("app.context", context);
+		System.setProperty("app.context", context.replaceAll("\\\\", "/"));
 		String defaultProfiles = System.getProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME);
 		logger = LoggerFactory.getLogger(getClass());
 		printVersion(servletContext);
