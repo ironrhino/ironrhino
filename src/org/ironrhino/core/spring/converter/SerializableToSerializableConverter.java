@@ -67,7 +67,7 @@ public class SerializableToSerializableConverter implements ConditionalGenericCo
 			return source;
 		if (Persistable.class.isAssignableFrom(targetClass) && sourceClass == String.class) {
 			try {
-				Object target = org.springframework.beans.BeanUtils.instantiateClass(targetClass);
+				Object target = targetClass.getConstructor().newInstance();
 				BeanUtils.setPropertyValue(target, "id", source);
 				return target;
 			} catch (Exception e) {
@@ -85,7 +85,7 @@ public class SerializableToSerializableConverter implements ConditionalGenericCo
 			return bw.getPropertyValue("id");
 		}
 		try {
-			Object target = org.springframework.beans.BeanUtils.instantiateClass(targetClass);
+			Object target = targetClass.getConstructor().newInstance();
 			BeanUtils.copyProperties(source, target);
 			return target;
 		} catch (Exception e) {
