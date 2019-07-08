@@ -55,11 +55,6 @@ public class Cache2kCacheManager implements CacheManager {
 	}
 
 	@Override
-	public void putWithTti(String key, Object value, int timeToIdle, TimeUnit timeUnit, String namespace) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public boolean exists(String key, String namespace) {
 		if (key == null)
 			throw new IllegalArgumentException("key should not be null");
@@ -210,11 +205,6 @@ public class Cache2kCacheManager implements CacheManager {
 				throw (IllegalStateException) e.getCause();
 			throw e;
 		}
-	}
-
-	@Override
-	public boolean supportsTti() {
-		return false;
 	}
 
 	@Override

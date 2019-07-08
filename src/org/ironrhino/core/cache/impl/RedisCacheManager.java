@@ -100,11 +100,6 @@ public class RedisCacheManager implements CacheManager {
 	}
 
 	@Override
-	public void putWithTti(String key, Object value, int timeToIdle, TimeUnit timeUnit, String namespace) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public boolean exists(String key, String namespace) {
 		String actualKey = generateKey(key, namespace);
 		try {
@@ -292,11 +287,6 @@ public class RedisCacheManager implements CacheManager {
 		} else {
 			return key;
 		}
-	}
-
-	@Override
-	public boolean supportsTti() {
-		return false;
 	}
 
 	@Override

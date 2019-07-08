@@ -46,15 +46,40 @@ public class CacheAspect extends BaseAspect {
 			return jp.proceed();
 		String keyMutex = MUTEX + String.join("_", keys);
 		boolean mutexed = false;
-		if (CacheContext.isForceFlush()) {
-			cacheManager.mdelete(new HashSet<>(keys), namespace);
+		Class<?> returnType = ((MethodSignature) jp.getSignature()).getMethod().getReturnType();
+		int timeToIdle = ExpressionUtils.evalInt(checkCache.timeToIdle(), context, 0);
+		for (String key : keys) {
+			Object value = timeToIdle > 0 ? cacheManager.getWithTti(key, namespace, timeToIdle, checkCache.timeUnit())
+					: cacheManager.get(key, namespace);
+			if (value instanceof NullObject) {
+				ExpressionUtils.eval(checkCache.onHit(), context);
+				instrument(namespace, true);
+				return null;
+			}
+			if (value != null) {
+				if (returnType.isPrimitive() && value.getClass() == ClassUtils.primitiveToWrapper(returnType)
+						|| returnType.isAssignableFrom(value.getClass())) {
+					putReturnValueIntoContext(context, value);
+					ExpressionUtils.eval(checkCache.onHit(), context);
+					instrument(namespace, true);
+					return value;
+				} else {
+					cacheManager.delete(key, namespace);
+				}
+			}
+		}
+		int throughPermits = checkCache.throughPermits();
+		int waitTimeout = checkCache.waitTimeout();
+		if (waitTimeout <= 0)
+			waitTimeout = 200;
+		else if (waitTimeout > 10000)
+			waitTimeout = 10000;
+		if (cacheManager.increment(keyMutex, 1, waitTimeout, TimeUnit.MILLISECONDS, namespace) <= throughPermits) {
+			mutexed = true;
 		} else {
-			Class<?> returnType = ((MethodSignature) jp.getSignature()).getMethod().getReturnType();
-			int timeToIdle = ExpressionUtils.evalInt(checkCache.timeToIdle(), context, 0);
+			Thread.sleep(waitTimeout);
 			for (String key : keys) {
-				Object value = (timeToIdle > 0 && !cacheManager.supportsTti())
-						? cacheManager.getWithTti(key, namespace, timeToIdle, checkCache.timeUnit())
-						: cacheManager.get(key, namespace);
+				Object value = cacheManager.get(key, namespace);
 				if (value instanceof NullObject) {
 					ExpressionUtils.eval(checkCache.onHit(), context);
 					instrument(namespace, true);
@@ -72,39 +97,9 @@ public class CacheAspect extends BaseAspect {
 					}
 				}
 			}
-			int throughPermits = checkCache.throughPermits();
-			int waitTimeout = checkCache.waitTimeout();
-			if (waitTimeout <= 0)
-				waitTimeout = 200;
-			else if (waitTimeout > 10000)
-				waitTimeout = 10000;
-			if (cacheManager.increment(keyMutex, 1, waitTimeout, TimeUnit.MILLISECONDS, namespace) <= throughPermits) {
-				mutexed = true;
-			} else {
-				Thread.sleep(waitTimeout);
-				for (String key : keys) {
-					Object value = cacheManager.get(key, namespace);
-					if (value instanceof NullObject) {
-						ExpressionUtils.eval(checkCache.onHit(), context);
-						instrument(namespace, true);
-						return null;
-					}
-					if (value != null) {
-						if (returnType.isPrimitive() && value.getClass() == ClassUtils.primitiveToWrapper(returnType)
-								|| returnType.isAssignableFrom(value.getClass())) {
-							putReturnValueIntoContext(context, value);
-							ExpressionUtils.eval(checkCache.onHit(), context);
-							instrument(namespace, true);
-							return value;
-						} else {
-							cacheManager.delete(key, namespace);
-						}
-					}
-				}
-			}
-			ExpressionUtils.eval(checkCache.onMiss(), context);
-			instrument(namespace, false);
 		}
+		ExpressionUtils.eval(checkCache.onMiss(), context);
+		instrument(namespace, false);
 		Object result = jp.proceed();
 		putReturnValueIntoContext(context, result);
 		if (ExpressionUtils.evalBoolean(checkCache.when(), context, true)) {
@@ -115,12 +110,8 @@ public class CacheAspect extends BaseAspect {
 						cacheManager.putIfAbsent(key, cacheResult, 0, checkCache.timeUnit(), namespace);
 				} else {
 					int timeToLive = ExpressionUtils.evalInt(checkCache.timeToLive(), context, 0);
-					int timeToIdle = ExpressionUtils.evalInt(checkCache.timeToIdle(), context, 0);
 					for (String key : keys)
-						if (timeToIdle > 0 && cacheManager.supportsTti())
-							cacheManager.putWithTti(key, cacheResult, timeToIdle, checkCache.timeUnit(), namespace);
-						else
-							cacheManager.putIfAbsent(key, cacheResult, timeToLive, checkCache.timeUnit(), namespace);
+						cacheManager.putIfAbsent(key, cacheResult, timeToLive, checkCache.timeUnit(), namespace);
 				}
 			}
 			if (result != null)

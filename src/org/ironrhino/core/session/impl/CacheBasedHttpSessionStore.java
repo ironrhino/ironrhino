@@ -51,7 +51,7 @@ public class CacheBasedHttpSessionStore implements HttpSessionStore {
 	public void initialize(WrappedHttpSession session) {
 		session.setCacheBased(true);
 		String sessionString;
-		if (!cacheManager.supportsTti() && cacheManager.supportsUpdateTtl())
+		if (cacheManager.supportsUpdateTtl())
 			sessionString = (String) cacheManager.getWithTti(session.getId(), CACHE_NAMESPACE,
 					session.getMaxInactiveInterval(), TimeUnit.SECONDS);
 		else
@@ -72,11 +72,7 @@ public class CacheBasedHttpSessionStore implements HttpSessionStore {
 			cacheManager.delete(session.getId(), CACHE_NAMESPACE);
 			return;
 		}
-		if (cacheManager.supportsTti()) {
-			if (session.isDirty())
-				cacheManager.putWithTti(session.getId(), sessionString, session.getMaxInactiveInterval(),
-						TimeUnit.SECONDS, CACHE_NAMESPACE);
-		} else if (cacheManager.supportsUpdateTtl()) {
+		if (cacheManager.supportsUpdateTtl()) {
 			if (session.isDirty())
 				cacheManager.put(session.getId(), sessionString, session.getMaxInactiveInterval(), TimeUnit.SECONDS,
 						CACHE_NAMESPACE);

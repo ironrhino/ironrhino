@@ -67,16 +67,6 @@
 	</#if>
 </#macro>
 
-<#macro cache key scope="application" timeToIdle="-1" timeToLive="3600">
-<#local keyExists=statics['org.ironrhino.core.cache.CacheContext'].eval(key)??>
-<#local content=statics['org.ironrhino.core.cache.CacheContext'].getPageFragment(key,scope)!>
-<#if keyExists&&content??&&content?length gt 0>${content}<#else>
-<#local content><#nested/></#local>  
-${content}
-${statics['org.ironrhino.core.cache.CacheContext'].putPageFragment(key,content,scope,timeToIdle,timeToLive)}
-</#if>
-</#macro>
-
 <#macro captcha theme="">
 <#if captchaRequired!false>
 	<@s.textfield name="captcha" theme=theme class="required captcha" style="width:60px;" maxlength=4 data\-captcha="${base}/captcha.jpg?token=${session.id}"/>

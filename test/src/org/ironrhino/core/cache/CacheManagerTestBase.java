@@ -93,24 +93,7 @@ public abstract class CacheManagerTestBase {
 			e.printStackTrace();
 		}
 		cacheManager.setTtl(key, NAMESPACE, 2, TimeUnit.SECONDS);
-		if (cacheManager.supportsTti()) {
-			cacheManager.putWithTti(key, value, 2, TimeUnit.SECONDS, NAMESPACE);
-			assertThat(cacheManager.get(key, NAMESPACE), is(value));
-			for (int i = 0; i < 3; i++) {
-				try {
-					TimeUnit.SECONDS.sleep(1);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				assertThat(cacheManager.get(key, NAMESPACE), is(value));
-			}
-			try {
-				TimeUnit.SECONDS.sleep(2);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			assertThat(cacheManager.exists(key, NAMESPACE), is(false));
-		} else if (cacheManager.supportsUpdateTtl()) {
+		if (cacheManager.supportsUpdateTtl()) {
 			try {
 				TimeUnit.SECONDS.sleep(1);
 			} catch (InterruptedException e) {

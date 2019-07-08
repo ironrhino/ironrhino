@@ -8,8 +8,6 @@ public interface CacheManager {
 
 	void put(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace);
 
-	void putWithTti(String key, Object value, int timeToIdle, TimeUnit timeUnit, String namespace);
-
 	default boolean containsKey(String key, String namespace) {
 		return exists(key, namespace);
 	}
@@ -53,8 +51,6 @@ public interface CacheManager {
 		}
 		return result;
 	}
-
-	boolean supportsTti();
 
 	boolean supportsGetTtl();
 
