@@ -9,10 +9,17 @@ import org.hibernate.criterion.Restrictions;
 import org.ironrhino.common.model.AuditEvent;
 import org.ironrhino.core.service.BaseManagerImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuditEventManagerImpl extends BaseManagerImpl<AuditEvent> implements AuditEventManager {
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void save(AuditEvent auditEvent) {
+		super.save(auditEvent);
+	}
 
 	@Override
 	@Transactional(readOnly = true)
