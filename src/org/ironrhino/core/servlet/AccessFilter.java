@@ -203,6 +203,7 @@ public class AccessFilter implements Filter {
 			}
 			MDC.put("request", sb.toString());
 
+			MDC.put("server", " server:" + AppInfo.getInstanceId(true));
 			long start = System.currentTimeMillis();
 			try {
 				chain.doFilter(request, response);
