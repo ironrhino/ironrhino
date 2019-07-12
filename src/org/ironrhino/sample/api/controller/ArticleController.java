@@ -7,6 +7,8 @@ import java.util.Map;
 
 import org.ironrhino.rest.RestStatus;
 import org.ironrhino.sample.api.model.Article;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -38,6 +40,13 @@ public class ArticleController implements ArticleService {
 		if (article == null)
 			throw RestStatus.NOT_FOUND;
 		return article;
+	}
+
+	@Override
+	public RestStatus put(@PathVariable Integer id, @RequestBody Article article) {
+		article.setId(id);
+		articles.put(id, article);
+		return RestStatus.OK;
 	}
 
 	@Override

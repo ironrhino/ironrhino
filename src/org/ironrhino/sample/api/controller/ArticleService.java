@@ -5,6 +5,7 @@ import java.util.Collection;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.View;
 import org.ironrhino.core.security.role.UserRole;
+import org.ironrhino.rest.RestStatus;
 import org.ironrhino.rest.client.RestApi;
 import org.ironrhino.rest.doc.annotation.Api;
 import org.ironrhino.rest.doc.annotation.ApiModule;
@@ -12,6 +13,7 @@ import org.ironrhino.rest.doc.annotation.Status;
 import org.ironrhino.sample.api.model.Article;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,11 +33,16 @@ public interface ArticleService {
 	@JsonView(View.Summary.class)
 	Collection<Article> list();
 
-	@Order(3)
+	@Order(2)
 	@Api(value = "获取文章详情", statuses = { @Status(code = 404, description = "文章不存在") })
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	@JsonView(View.Detail.class)
 	Article view(@PathVariable Integer id);
+
+	@Order(3)
+	@Api(value = "发布文章")
+	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+	RestStatus put(@PathVariable Integer id, @RequestBody Article article);
 
 	@RequestMapping(method = RequestMethod.POST)
 	Article postForm(Article article);
