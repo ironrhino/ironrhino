@@ -29,8 +29,6 @@ public class MainAppInitializer implements WebApplicationInitializer {
 
 	public static ServletContext SERVLET_CONTEXT;
 
-	private Logger logger;
-
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
 		AppInfo.initialize();
@@ -42,28 +40,33 @@ public class MainAppInitializer implements WebApplicationInitializer {
 			context = "";
 		System.setProperty("app.context", context.replaceAll("\\\\", "/"));
 		String defaultProfiles = System.getProperty(AbstractEnvironment.DEFAULT_PROFILES_PROPERTY_NAME);
-		logger = LoggerFactory.getLogger(getClass());
-		printVersion(servletContext);
+		int port = 0;
+		if (AppInfo.getHttpPort() == 0) {
+			// early detecting for instanceId which affect server tag in log
+			port = ServletContainerHelper.detectHttpPort(servletContext, false);
+			if (port > 0) {
+				AppInfo.setHttpPort(port);
+			}
+		}
+		System.setProperty(AppInfo.KEY_APP_INSTANCEID, AppInfo.getInstanceId(true));
+		Logger logger = LoggerFactory.getLogger(getClass());
+		printVersion(logger, servletContext);
 		String serverInfo = ServletContainerHelper.getServerInfo(servletContext);
 		if (serverInfo != null) {
 			AppInfo.setServerInfo(serverInfo);
 			logger.info("Server info detected: {}", serverInfo);
 		}
-		if (AppInfo.getHttpPort() == 0) {
-			int port = ServletContainerHelper.detectHttpPort(servletContext, false);
-			if (port > 0) {
-				AppInfo.setHttpPort(port);
-				logger.info("Server http port auto detected: {}", port);
-			}
+		if (port > 0) {
+			AppInfo.setHttpPort(port);
+			logger.info("Server http port auto detected: {}", port);
 		}
 		if (AppInfo.getHttpsPort() == 0) {
-			int port = ServletContainerHelper.detectHttpPort(servletContext, true);
+			port = ServletContainerHelper.detectHttpPort(servletContext, true);
 			if (port > 0) {
 				AppInfo.setHttpsPort(port);
 				logger.info("Server https port auto detected: {}", port);
 			}
 		}
-		System.setProperty(AppInfo.KEY_APP_INSTANCEID, AppInfo.getInstanceId(true));
 		logger.info("Default timezone {}", TimeZone.getDefault().getID());
 		logger.info(
 				"app.name={},app.version={},app.instanceid={},app.stage={},app.runlevel={},app.home={},hostname={},hostaddress={},profiles={}",
@@ -150,7 +153,7 @@ public class MainAppInitializer implements WebApplicationInitializer {
 		}
 	}
 
-	private void printVersion(ServletContext servletContext) {
+	private void printVersion(Logger logger, ServletContext servletContext) {
 		for (String path : servletContext.getResourcePaths("/WEB-INF/lib")) {
 			String filename = path.substring(path.lastIndexOf('/') + 1);
 			if (filename.startsWith("ironrhino-core-") && filename.endsWith(".jar")) {
