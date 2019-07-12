@@ -11,6 +11,7 @@ import org.ironrhino.core.validation.constraints.SocialCreditIdentifier;
 
 /**
  * GB32100-2015
+ * https://zh.wikisource.org/zh-hans/GB_32100-2015_%E6%B3%95%E4%BA%BA%E5%92%8C%E5%85%B6%E4%BB%96%E7%BB%84%E7%BB%87%E7%BB%9F%E4%B8%80%E7%A4%BE%E4%BC%9A%E4%BF%A1%E7%94%A8%E4%BB%A3%E7%A0%81%E7%BC%96%E7%A0%81%E8%A7%84%E5%88%99
  */
 public class SocialCreditIdentifierValidator implements ConstraintValidator<SocialCreditIdentifier, String> {
 
@@ -25,10 +26,10 @@ public class SocialCreditIdentifierValidator implements ConstraintValidator<Soci
 		if (input == null || input.length() != 18 || !StringUtils.isAlphanumeric(input))
 			return false;
 		char ch = input.charAt(0);
-		if (ch != '1' && ch != '5' && ch != '9' && ch != 'Y')
+		if (!(ch >= '1' && ch <= '9' || ch == 'A' || ch == 'N' || ch == 'Y'))
 			return false;
 		ch = input.charAt(1);
-		if (ch != '1' && ch != '2' && ch != '3' && ch != '9')
+		if (!(ch >= '1' && ch <= '5' || ch == '9'))
 			return false;
 		String province = input.substring(2, 4);
 		if (!provinces.contains(province))

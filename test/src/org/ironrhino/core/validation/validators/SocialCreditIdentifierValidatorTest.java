@@ -21,6 +21,7 @@ public class SocialCreditIdentifierValidatorTest {
 		assertThat(SocialCreditIdentifierValidator.isValid("92340202MA2REG3M4F"), is(true));
 		assertThat(SocialCreditIdentifierValidator.isValid("91510108MA6C8G954F"), is(true));
 		assertThat(SocialCreditIdentifierValidator.isValid("92370725MA3MJ0PK96"), is(true));
+		assertThat(SocialCreditIdentifierValidator.isValid("31110000358343139K"), is(true));
 	}
 
 }
