@@ -37,6 +37,9 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 	@Autowired
 	private StringRedisTemplate stringRedisTemplate;
 
+	@Autowired(required = false)
+	private List<AuthorizationCodeResolver> authorizationCodeResolvers;
+
 	private static final String NAMESPACE_AUTHORIZATION = "oauth:authorization:";
 	private static final String NAMESPACE_AUTHORIZATION_GRANTOR = "oauth:authorization:grantor:";
 
@@ -231,6 +234,41 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
+		if (auth == null && authorizationCodeResolvers != null) {
+			Client c = findClientById(client.getClientId());
+			if (c == null)
+				throw new OAuthError(OAuthError.UNAUTHORIZED_CLIENT, "client_id_mismatch");
+			if (!c.getSecret().equals(client.getSecret()))
+				throw new OAuthError(OAuthError.UNAUTHORIZED_CLIENT, "client_secret_mismatch");
+			for (AuthorizationCodeResolver authorizationCodeResolver : authorizationCodeResolvers) {
+				if (!authorizationCodeResolver.accepts(code))
+					continue;
+				Optional<String> grantor = authorizationCodeResolver.resolver(code);
+				if (grantor.isPresent()) {
+					auth = new Authorization();
+					auth.setClient(client.getClientId());
+					auth.setRefreshToken(CodecUtils.nextId(32));
+					auth.setGrantor(grantor.get());
+					auth.setGrantType(GrantType.authorization_code);
+					auth.setModifyDate(new Date());
+					try {
+						auth.setAddress(RequestContext.getRequest().getRemoteAddr());
+					} catch (NullPointerException npe) {
+					}
+					Authorization auth2 = auth;
+					stringRedisTemplate.execute((SessionCallback) redisOperations -> {
+						redisOperations.multi();
+						redisOperations.delete(key);
+						redisOperations.opsForValue().set(NAMESPACE_AUTHORIZATION + auth2.getId(),
+								JsonUtils.toJson(auth2), auth2.getExpiresIn(), TimeUnit.SECONDS);
+						redisOperations.opsForValue().set(NAMESPACE_AUTHORIZATION + auth2.getRefreshToken(),
+								NAMESPACE_AUTHORIZATION + auth2.getId(), auth2.getExpiresIn(), TimeUnit.SECONDS);
+						return redisOperations.exec();
+					});
+					return auth;
+				}
+			}
+		}
 		if (auth == null)
 			throw new OAuthError(OAuthError.INVALID_GRANT, "code_invalid");
 		if (auth.isClientSide())
@@ -250,7 +288,7 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 		auth.setRefreshToken(CodecUtils.nextId(32));
 		auth.setGrantType(GrantType.authorization_code);
 		auth.setModifyDate(new Date());
-		final Authorization auth2 = auth;
+		Authorization auth2 = auth;
 		stringRedisTemplate.execute((SessionCallback) redisOperations -> {
 			redisOperations.multi();
 			redisOperations.delete(key);

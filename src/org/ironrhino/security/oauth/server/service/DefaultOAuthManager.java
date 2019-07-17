@@ -7,6 +7,7 @@ import static org.ironrhino.core.metadata.Profiles.DUAL;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.DetachedCriteria;
@@ -36,6 +37,9 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 
 	@Autowired
 	private AuthorizationManager authorizationManager;
+
+	@Autowired(required = false)
+	private List<AuthorizationCodeResolver> authorizationCodeResolvers;
 
 	@Override
 	public Authorization grant(Client client, String deviceId, String deviceName) {
@@ -158,6 +162,32 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 	@Override
 	public Authorization authenticate(String code, Client client) {
 		Authorization auth = authorizationManager.findOne("code", code);
+		if (auth == null && authorizationCodeResolvers != null) {
+			Client c = findClientById(client.getClientId());
+			if (c == null)
+				throw new OAuthError(OAuthError.UNAUTHORIZED_CLIENT, "client_id_mismatch");
+			if (!c.getSecret().equals(client.getSecret()))
+				throw new OAuthError(OAuthError.UNAUTHORIZED_CLIENT, "client_secret_mismatch");
+			for (AuthorizationCodeResolver authorizationCodeResolver : authorizationCodeResolvers) {
+				if (!authorizationCodeResolver.accepts(code))
+					continue;
+				Optional<String> grantor = authorizationCodeResolver.resolver(code);
+				if (grantor.isPresent()) {
+					auth = new Authorization();
+					auth.setClient(client.getClientId());
+					auth.setRefreshToken(CodecUtils.nextId(32));
+					auth.setGrantor(grantor.get());
+					auth.setGrantType(GrantType.authorization_code);
+					auth.setModifyDate(new Date());
+					try {
+						auth.setAddress(RequestContext.getRequest().getRemoteAddr());
+					} catch (NullPointerException npe) {
+					}
+					authorizationManager.save(auth);
+					return auth;
+				}
+			}
+		}
 		if (auth == null)
 			throw new OAuthError(OAuthError.INVALID_GRANT, "code_invalid");
 		if (auth.isClientSide())
