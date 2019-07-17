@@ -14,6 +14,7 @@ import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import lombok.Getter;
 
@@ -29,6 +30,9 @@ public class DefaultAuthenticationManager extends ProviderManager {
 
 	@Value("${authenticationManager.maxAttempts:5}")
 	private int maxAttempts = 5;
+
+	@Value("${authenticationManager.usernameMaxLength:32}")
+	private int usernameMaxLength = 32;
 
 	@Autowired
 	@Getter
@@ -54,6 +58,8 @@ public class DefaultAuthenticationManager extends ProviderManager {
 		String username = authentication.getName();
 		if (StringUtils.isBlank(username))
 			return super.authenticate(authentication);
+		if (username.length() > usernameMaxLength)
+			throw new UsernameNotFoundException("Bad username");
 		long times = cacheManager.increment(username, 0, 0, TimeUnit.SECONDS, CACHE_NAMESPACE);
 		if (times >= maxAttempts)
 			throw new LockedException("Failed login attempts exceed " + maxAttempts);
