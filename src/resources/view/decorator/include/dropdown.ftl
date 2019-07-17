@@ -18,7 +18,7 @@
 	<#assign divider=false/>
 	<#if user.isNew??>
 	<li><a href="<@url value="${ssoServerBase!}/${user.class.simpleName?uncap_first}/profile"/>" class="popmodal nocache">${getText('profile')}</a></li>
-	<#if !user.getAttribute('oauth_provider')??>
+	<#if !user.getAttribute?? || !user.getAttribute('oauth_provider')??>
 	<#assign passwordUrl=getUrl('/password')>
 	<#if request.getAttribute('SSO')??><#assign passwordUrl=properties['portal.baseUrl']+'/password'><#elseif ssoServerBase?has_content><#assign passwordUrl=ssoServerBase!+'/password'></#if>
 	<li><a href="${passwordUrl}" class="popmodal">${getText('change')}${getText('password')}</a></li>
