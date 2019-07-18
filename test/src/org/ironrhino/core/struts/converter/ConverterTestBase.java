@@ -15,15 +15,15 @@ public abstract class ConverterTestBase<T extends StrutsTypeConverter> {
 	@SuppressWarnings("unchecked")
 	ConverterTestBase() {
 		try {
-			converter = (T) ReflectionUtils.getGenericClass(this.getClass()).newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
+			converter = (T) ReflectionUtils.getGenericClass(this.getClass()).getConstructor().newInstance();
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	@Test
 	public void testNull() {
-		assertThat(converter.convertFromString(null, new String[]{null}, null), is(nullValue()));
-		assertThat(converter.convertFromString(null, new String[]{""}, null), is(nullValue()));
+		assertThat(converter.convertFromString(null, new String[] { null }, null), is(nullValue()));
+		assertThat(converter.convertFromString(null, new String[] { "" }, null), is(nullValue()));
 	}
 }
