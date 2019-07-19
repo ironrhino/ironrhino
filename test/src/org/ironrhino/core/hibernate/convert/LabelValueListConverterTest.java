@@ -36,7 +36,7 @@ public class LabelValueListConverterTest extends AttributeConverterTestBase {
 			metadata = buildMetadata(ssr, TestEntity.class, LabelValueListConverter.class);
 			assertDetermineType(metadata, TestEntity.class, "labelValueList", Types.VARCHAR);
 
-			try (final SessionFactory sf = metadata.buildSessionFactory()) {
+			try (SessionFactory sf = metadata.buildSessionFactory()) {
 				List<LabelValue> labelValueList = Arrays.asList(new LabelValue("1", "1"), new LabelValue("2", "2"));
 				persist(sf, new TestEntity(1L, labelValueList));
 				TestEntity entity = get(sf, TestEntity.class, 1L);

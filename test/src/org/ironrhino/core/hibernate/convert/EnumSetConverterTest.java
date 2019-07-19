@@ -36,7 +36,7 @@ public class EnumSetConverterTest extends AttributeConverterTestBase {
 			metadata = buildMetadata(ssr, TestEntity.class, TestEnumSetConverter.class);
 			assertDetermineType(metadata, TestEntity.class, "enumSet", Types.VARCHAR);
 
-			try (final SessionFactory sf = metadata.buildSessionFactory()) {
+			try (SessionFactory sf = metadata.buildSessionFactory()) {
 				Set<TestEnum> set = new HashSet<>(Arrays.asList(TestEnum.BAR, TestEnum.BAZ, TestEnum.FOO));
 				persist(sf, new TestEntity(1L, set));
 				TestEntity entity = get(sf, TestEntity.class, 1L);

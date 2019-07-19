@@ -31,7 +31,7 @@ public class IntegerArrayConverterTest extends AttributeConverterTestBase {
 			metadata = buildMetadata(ssr, TestEntity.class, IntegerArrayConverter.class);
 			assertDetermineType(metadata, TestEntity.class, "integerArray", Types.VARCHAR);
 
-			try (final SessionFactory sf = metadata.buildSessionFactory()) {
+			try (SessionFactory sf = metadata.buildSessionFactory()) {
 				persist(sf, new TestEntity(1L, new Integer[]{1, 2, 3, 4, 5}));
 				TestEntity entity = get(sf, TestEntity.class, 1L);
 				assertThat(entity.getIntegerArray(), is(new Integer[]{1, 2, 3, 4, 5}));

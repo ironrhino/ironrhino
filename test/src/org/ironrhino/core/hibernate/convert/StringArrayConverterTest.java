@@ -32,7 +32,7 @@ public class StringArrayConverterTest extends AttributeConverterTestBase {
 			metadata = buildMetadata(ssr, TestEntity.class, StringArrayConverter.class);
 			assertDetermineType(metadata, TestEntity.class, "stringArray", Types.VARCHAR);
 
-			try (final SessionFactory sf = metadata.buildSessionFactory()) {
+			try (SessionFactory sf = metadata.buildSessionFactory()) {
 				persist(sf, new TestEntity(1L, new String[]{"1", "2", "3", "4", "5"}));
 				TestEntity entity = get(sf, TestEntity.class, 1L);
 				assertThat(entity.getStringArray(), is(new String[]{"1", "2", "3", "4", "5"}));

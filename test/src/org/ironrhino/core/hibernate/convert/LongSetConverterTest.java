@@ -35,7 +35,7 @@ public class LongSetConverterTest extends AttributeConverterTestBase {
 			metadata = buildMetadata(ssr, TestEntity.class, LongSetConverter.class);
 			assertDetermineType(metadata, TestEntity.class, "longSet", Types.VARCHAR);
 
-			try (final SessionFactory sf = metadata.buildSessionFactory()) {
+			try (SessionFactory sf = metadata.buildSessionFactory()) {
 				Set<Long> set = new HashSet<>(Arrays.asList(1L, 2L, 3L, 4L, 5L));
 				persist(sf, new TestEntity(1L, set));
 				TestEntity entity = get(sf, TestEntity.class, 1L);

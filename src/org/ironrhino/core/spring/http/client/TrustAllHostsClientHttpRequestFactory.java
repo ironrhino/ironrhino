@@ -14,7 +14,7 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 public class TrustAllHostsClientHttpRequestFactory extends SimpleClientHttpRequestFactory {
 
 	@Override
-	protected void prepareConnection(final HttpURLConnection connection, final String httpMethod) throws IOException {
+	protected void prepareConnection(HttpURLConnection connection, String httpMethod) throws IOException {
 		if (connection instanceof HttpsURLConnection) {
 			((HttpsURLConnection) connection).setHostnameVerifier((hostname, session) -> true);
 			((HttpsURLConnection) connection).setSSLSocketFactory(initSSLContext().getSocketFactory());
@@ -41,7 +41,7 @@ public class TrustAllHostsClientHttpRequestFactory extends SimpleClientHttpReque
 			SSLContext sslContext = SSLContext.getInstance("SSL");
 			sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
 			return sslContext;
-		} catch (final Exception ex) {
+		} catch (Exception ex) {
 			return null;
 		}
 	}

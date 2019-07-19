@@ -34,7 +34,7 @@ public class StringListConverterTest extends AttributeConverterTestBase {
 			metadata = buildMetadata(ssr, TestEntity.class, StringListConverter.class);
 			assertDetermineType(metadata, TestEntity.class, "stringList", Types.VARCHAR);
 
-			try (final SessionFactory sf = metadata.buildSessionFactory()) {
+			try (SessionFactory sf = metadata.buildSessionFactory()) {
 				persist(sf, new TestEntity(1L, Arrays.asList("1", "2", "3", "4", "5")));
 				TestEntity entity = get(sf, TestEntity.class, 1L);
 				assertThat(entity.getStringList(), is(Arrays.asList("1", "2", "3", "4", "5")));

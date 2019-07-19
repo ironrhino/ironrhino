@@ -34,7 +34,7 @@ public class StringMapConverterTest extends AttributeConverterTestBase {
 			metadata = buildMetadata(ssr, TestEntity.class, StringMapConverter.class);
 			assertDetermineType(metadata, TestEntity.class, "stringMap", Types.VARCHAR);
 
-			try (final SessionFactory sf = metadata.buildSessionFactory()) {
+			try (SessionFactory sf = metadata.buildSessionFactory()) {
 				Map<String, String> map = new HashMap<>();
 				map.put("1", "1");
 				map.put("2", "2");

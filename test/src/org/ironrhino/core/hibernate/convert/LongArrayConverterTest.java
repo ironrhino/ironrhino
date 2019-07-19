@@ -32,7 +32,7 @@ public class LongArrayConverterTest extends AttributeConverterTestBase {
 			metadata = buildMetadata(ssr, TestEntity.class, LongArrayConverter.class);
 			assertDetermineType(metadata, TestEntity.class, "longArray", Types.VARCHAR);
 
-			try (final SessionFactory sf = metadata.buildSessionFactory()) {
+			try (SessionFactory sf = metadata.buildSessionFactory()) {
 				persist(sf, new TestEntity(1L, new Long[]{1L, 2L, 3L, 4L, 5L}));
 				TestEntity entity = get(sf, TestEntity.class, 1L);
 				assertThat(entity.getLongArray(), is(new Long[]{1L, 2L, 3L, 4L, 5L}));

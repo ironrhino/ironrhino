@@ -32,7 +32,7 @@ public class YearMonthConverterTest extends AttributeConverterTestBase {
 			metadata = buildMetadata(ssr, TestEntity.class, YearMonthConverter.class);
 			assertDetermineType(metadata, TestEntity.class, "yearMonth", Types.VARCHAR);
 
-			try (final SessionFactory sf = metadata.buildSessionFactory()) {
+			try (SessionFactory sf = metadata.buildSessionFactory()) {
 				persist(sf, new TestEntity(1L, YearMonth.of(2019, 7)));
 				TestEntity entity = get(sf, TestEntity.class, 1L);
 				assertThat(entity.getYearMonth(), is(YearMonth.of(2019, 7)));

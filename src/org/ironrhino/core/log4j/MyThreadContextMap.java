@@ -11,7 +11,7 @@ public class MyThreadContextMap extends DefaultThreadContextMap {
 		this(true);
 	}
 
-	public MyThreadContextMap(final boolean useMap) {
+	public MyThreadContextMap(boolean useMap) {
 		super(useMap);
 		put("server", " server:" + AppInfo.getInstanceId(true));
 	}

@@ -34,7 +34,7 @@ public class LongListConverterTest extends AttributeConverterTestBase {
 			metadata = buildMetadata(ssr, TestEntity.class, LongListConverter.class);
 			assertDetermineType(metadata, TestEntity.class, "longList", Types.VARCHAR);
 
-			try (final SessionFactory sf = metadata.buildSessionFactory()) {
+			try (SessionFactory sf = metadata.buildSessionFactory()) {
 				persist(sf, new TestEntity(1L, Arrays.asList(1L, 2L, 3L, 4L, 5L)));
 				TestEntity entity = get(sf, TestEntity.class, 1L);
 				assertThat(entity.getLongList(), is(Arrays.asList(1L, 2L, 3L, 4L, 5L)));

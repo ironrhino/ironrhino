@@ -36,7 +36,7 @@ public class AttributeListConverterTest extends AttributeConverterTestBase {
 			metadata = buildMetadata(ssr, TestEntity.class, AttributeListConverter.class);
 			assertDetermineType(metadata, TestEntity.class, "attributeList", Types.VARCHAR);
 
-			try (final SessionFactory sf = metadata.buildSessionFactory()) {
+			try (SessionFactory sf = metadata.buildSessionFactory()) {
 				List<Attribute> attributeList = Arrays.asList(new Attribute("1", "1"), new Attribute("2", "2"));
 				persist(sf, new TestEntity(1L, attributeList));
 				TestEntity entity = get(sf, TestEntity.class, 1L);

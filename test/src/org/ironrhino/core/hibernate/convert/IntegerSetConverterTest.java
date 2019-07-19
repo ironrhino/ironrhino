@@ -35,7 +35,7 @@ public class IntegerSetConverterTest extends AttributeConverterTestBase {
 			metadata = buildMetadata(ssr, TestEntity.class, IntegerSetConverter.class);
 			assertDetermineType(metadata, TestEntity.class, "integerSet", Types.VARCHAR);
 
-			try (final SessionFactory sf = metadata.buildSessionFactory()) {
+			try (SessionFactory sf = metadata.buildSessionFactory()) {
 				Set<Integer> set = new HashSet<>(Arrays.asList(1, 2, 3, 4, 5));
 				persist(sf, new TestEntity(1L, set));
 				TestEntity entity = get(sf, TestEntity.class, 1L);

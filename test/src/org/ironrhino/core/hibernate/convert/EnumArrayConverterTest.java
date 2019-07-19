@@ -33,10 +33,10 @@ public class EnumArrayConverterTest extends AttributeConverterTestBase {
 			metadata = buildMetadata(ssr, TestEntity.class, TestEnumArrayConverter.class);
 			assertDetermineType(metadata, TestEntity.class, "enumArray", Types.VARCHAR);
 
-			try (final SessionFactory sf = metadata.buildSessionFactory()) {
-				persist(sf, new TestEntity(1L, new TestEnum[]{TestEnum.BAR, TestEnum.BAZ, TestEnum.FOO}));
+			try (SessionFactory sf = metadata.buildSessionFactory()) {
+				persist(sf, new TestEntity(1L, new TestEnum[] { TestEnum.BAR, TestEnum.BAZ, TestEnum.FOO }));
 				TestEntity entity = get(sf, TestEntity.class, 1L);
-				assertThat(entity.getEnumArray(), is(new TestEnum[]{TestEnum.BAR, TestEnum.BAZ, TestEnum.FOO}));
+				assertThat(entity.getEnumArray(), is(new TestEnum[] { TestEnum.BAR, TestEnum.BAZ, TestEnum.FOO }));
 				delete(sf, entity);
 
 				persist(sf, new TestEntity(2L, null));
@@ -67,8 +67,7 @@ public class EnumArrayConverterTest extends AttributeConverterTestBase {
 
 	@Converter(autoApply = true)
 	static class TestEnumArrayConverter extends EnumArrayConverter<TestEnum>
-			implements
-				AttributeConverter<TestEnum[], String> {
+			implements AttributeConverter<TestEnum[], String> {
 
 	}
 }

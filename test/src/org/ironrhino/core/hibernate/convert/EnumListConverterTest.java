@@ -35,7 +35,7 @@ public class EnumListConverterTest extends AttributeConverterTestBase {
 			metadata = buildMetadata(ssr, TestEntity.class, TestEnumListConverter.class);
 			assertDetermineType(metadata, TestEntity.class, "enumList", Types.VARCHAR);
 
-			try (final SessionFactory sf = metadata.buildSessionFactory()) {
+			try (SessionFactory sf = metadata.buildSessionFactory()) {
 				persist(sf, new TestEntity(1L, Arrays.asList(TestEnum.BAR, TestEnum.BAZ, TestEnum.FOO)));
 				TestEntity entity = get(sf, TestEntity.class, 1L);
 				assertThat(entity.getEnumList(), is(Arrays.asList(TestEnum.BAR, TestEnum.BAZ, TestEnum.FOO)));

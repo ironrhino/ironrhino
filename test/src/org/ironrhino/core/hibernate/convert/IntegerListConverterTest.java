@@ -34,7 +34,7 @@ public class IntegerListConverterTest extends AttributeConverterTestBase {
 			metadata = buildMetadata(ssr, TestEntity.class, IntegerListConverter.class);
 			assertDetermineType(metadata, TestEntity.class, "integerList", Types.VARCHAR);
 
-			try (final SessionFactory sf = metadata.buildSessionFactory()) {
+			try (SessionFactory sf = metadata.buildSessionFactory()) {
 				persist(sf, new TestEntity(1L, Arrays.asList(1, 2, 3, 4, 5)));
 				TestEntity entity = get(sf, TestEntity.class, 1L);
 				assertThat(entity.getIntegerList(), is(Arrays.asList(1, 2, 3, 4, 5)));
