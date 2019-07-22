@@ -214,7 +214,7 @@ public class JdbcRepositoryFactoryBean extends MethodInterceptorFactoryBean
 		Map<String, Object> context = new HashMap<>();
 		RowCallbackHandler rch = null;
 		if (arguments.length > 0) {
-			String[] names = ReflectionUtils.getParameterNames(methodInvocation.getMethod());
+			String[] names = ReflectionUtils.getParameterNames(method);
 			if (names == null)
 				throw new RuntimeException("No parameter names discovered for method, please consider using @Param");
 			for (int i = 0; i < names.length; i++) {
@@ -236,8 +236,7 @@ public class JdbcRepositoryFactoryBean extends MethodInterceptorFactoryBean
 						sql = SqlUtils.expandCollectionParameter(sql, names[i], objects.length);
 						if (objects.length > 0 && Enum.class.isAssignableFrom(arg.getClass().getComponentType())) {
 							for (int j = 0; j < objects.length; j++)
-								objects[j] = JdbcHelper.convertEnum(objects[j],
-										methodInvocation.getMethod().getParameterAnnotations()[i]);
+								objects[j] = JdbcHelper.convertEnum(objects[j], method.getParameterAnnotations()[i]);
 							arg = objects;
 
 						}
@@ -251,13 +250,12 @@ public class JdbcRepositoryFactoryBean extends MethodInterceptorFactoryBean
 						if (collection.size() > 0 && collection.iterator().next() instanceof Enum) {
 							List<Object> objects = new ArrayList<>();
 							for (Object obj : collection)
-								objects.add(JdbcHelper.convertEnum(obj,
-										methodInvocation.getMethod().getParameterAnnotations()[i]));
+								objects.add(JdbcHelper.convertEnum(obj, method.getParameterAnnotations()[i]));
 							arg = objects;
 						}
 					}
 					if (arg instanceof Enum) {
-						arg = JdbcHelper.convertEnum(arg, methodInvocation.getMethod().getParameterAnnotations()[i]);
+						arg = JdbcHelper.convertEnum(arg, method.getParameterAnnotations()[i]);
 					}
 					sqlParameterSource.addValue(names[i], arg);
 				}
@@ -344,7 +342,7 @@ public class JdbcRepositoryFactoryBean extends MethodInterceptorFactoryBean
 				try {
 					Number key = keyHolder.getKey();
 					if (key != null) {
-						Type[] types = methodInvocation.getMethod().getGenericParameterTypes();
+						Type[] types = method.getGenericParameterTypes();
 						for (int index = 0; index < arguments.length; index++) {
 							Object arg = arguments[index];
 							if (arg == null || BeanUtils.isSimpleValueType(arg.getClass()))

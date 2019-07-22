@@ -3,6 +3,7 @@ package org.ironrhino.core.remoting.client;
 import java.io.IOException;
 import java.io.InvalidClassException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.ConnectException;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -211,13 +212,14 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 			MDC.put("request", "request:" + requestId);
 			requestIdGenerated = true;
 		}
-		String service = ReflectionUtils.stringify(methodInvocation.getMethod());
+		Method method = methodInvocation.getMethod();
+		String service = ReflectionUtils.stringify(method);
 		MDC.put("role", "CLIENT");
 		MDC.put("service", service);
 		if (loggingPayload) {
 			Object payload;
 			Object[] arguments = methodInvocation.getArguments();
-			String[] parameterNames = ReflectionUtils.getParameterNames(methodInvocation.getMethod());
+			String[] parameterNames = ReflectionUtils.getParameterNames(method);
 			if (parameterNames != null) {
 				Map<String, Object> parameters = new LinkedHashMap<>();
 				for (int i = 0; i < parameterNames.length; i++)

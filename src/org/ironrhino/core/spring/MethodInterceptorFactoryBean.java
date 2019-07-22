@@ -54,7 +54,7 @@ public abstract class MethodInterceptorFactoryBean implements MethodInterceptor,
 	@Override
 	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
 		Method method = methodInvocation.getMethod();
-		if (AopUtils.isToStringMethod(methodInvocation.getMethod())) {
+		if (AopUtils.isToStringMethod(method)) {
 			Class<?> objectType = getObjectType();
 			return "Dynamic proxy for [" + (objectType != null ? objectType.getName() : "Unknown") + "]";
 		}
