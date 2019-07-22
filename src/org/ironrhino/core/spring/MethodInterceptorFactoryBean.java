@@ -51,6 +51,9 @@ public abstract class MethodInterceptorFactoryBean implements MethodInterceptor,
 	@Autowired(required = false)
 	private Validator validator;
 
+	@Autowired(required = false)
+	private MethodInvocationFilter methodInvocationFilter;
+
 	@Override
 	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
 		Method method = methodInvocation.getMethod();
@@ -99,7 +102,11 @@ public abstract class MethodInterceptorFactoryBean implements MethodInterceptor,
 				return getExecutorService().submit(callable);
 			}
 		}
-		Object returnValue = doInvoke(methodInvocation);
+		Object returnValue;
+		if (methodInvocationFilter != null)
+			returnValue = methodInvocationFilter.filter(methodInvocation, this::doInvoke);
+		else
+			returnValue = doInvoke(methodInvocation);
 		if (executableValidator != null) {
 			Set<ConstraintViolation<Object>> constraintViolations = executableValidator.validateReturnValue(bean,
 					method, returnValue, groups);

@@ -16,9 +16,11 @@ import org.ironrhino.core.remoting.impl.StandaloneServiceRegistry;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializers;
 import org.ironrhino.core.remoting.server.HttpInvokerServerTestBase.HttpInvokerConfiguration;
 import org.ironrhino.core.servlet.AccessFilter;
+import org.ironrhino.core.spring.MethodInvocationFilter;
 import org.ironrhino.core.spring.configuration.Fallback;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.CodecUtils;
+import org.ironrhino.core.util.ThrowableFunction;
 import org.ironrhino.sample.remoting.BarService;
 import org.ironrhino.sample.remoting.BarServiceImpl;
 import org.ironrhino.sample.remoting.FooService;
@@ -124,6 +126,21 @@ public abstract class HttpInvokerServerTestBase {
 		@Bean
 		public LocalValidatorFactoryBean validatorFactory() {
 			return new LocalValidatorFactoryBean();
+		}
+
+		@Bean
+		public MethodInvocationFilter methodInvocationFilter() {
+			return new MethodInvocationFilter() {
+				@Override
+				public Object filter(MethodInvocation methodInvocation,
+						ThrowableFunction<MethodInvocation, Object, Throwable> actualInvocation) throws Throwable {
+					Object[] args = methodInvocation.getArguments();
+					if (methodInvocation.getMethod().getName().equals("test") && args.length > 0
+							&& "chaos".equals(args[0]))
+						throw new IllegalArgumentException("Chaos occurred");
+					return actualInvocation.apply(methodInvocation);
+				}
+			};
 		}
 	}
 

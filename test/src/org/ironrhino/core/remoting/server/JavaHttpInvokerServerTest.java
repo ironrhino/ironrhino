@@ -562,6 +562,11 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 		then(mockFooService).should().test("test");
 	}
 
+	@Test(expected = IllegalArgumentException.class)
+	public void testChaos() throws Exception {
+		fooService.test("chaos");
+	}
+
 	protected void verifyUserDetails(UserDetails userDetails) {
 		if (FstHttpInvokerSerializer.INSTANCE.getSerializationType().equals(serializationType)
 				|| JavaHttpInvokerSerializer.INSTANCE.getSerializationType().equals(serializationType)) {

@@ -12,4 +12,6 @@ public interface Profiles {
 
 	public static final String SANDBOX = "sandbox";
 
+	public static final String CHAOS = "chaos";
+
 }
