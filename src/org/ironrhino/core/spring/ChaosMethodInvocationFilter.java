@@ -29,6 +29,12 @@ public class ChaosMethodInvocationFilter implements MethodInvocationFilter {
 	@Value("${chaosMethodInvocationFilter.attack:EXCEPTION}")
 	private Attack attack;
 
+	@Value("${chaosMethodInvocationFilter.attack.exception:}")
+	private String exception;
+
+	@Value("${chaosMethodInvocationFilter.attack.latency:20000}")
+	private long latency;
+
 	private JdkRegexpMethodPointcut pointcut;
 
 	@PostConstruct
@@ -43,7 +49,7 @@ public class ChaosMethodInvocationFilter implements MethodInvocationFilter {
 		Class<?> clazz = method.getDeclaringClass();
 		if (pointcut.getClassFilter().matches(clazz) && pointcut.getMethodMatcher().matches(method, clazz)) {
 			if (strategy.shouldCreateChaos(method))
-				attack.perform();
+				attack.perform(this);
 		}
 		return actualInvocation.apply(methodInvocation);
 	}
@@ -79,26 +85,42 @@ public class ChaosMethodInvocationFilter implements MethodInvocationFilter {
 
 	static enum Attack {
 		EXCEPTION {
-			void perform() {
-				throw new RuntimeException("Chaos created");
+			void perform(ChaosMethodInvocationFilter _this) {
+				String message = "Chaos created";
+				String ex = _this.exception;
+				RuntimeException re;
+				if (!ex.isEmpty()) {
+					String[] arr = ex.split(":\\s*", 2);
+					try {
+						Class<?> c = Class.forName(arr[0]);
+						if (arr.length > 1)
+							message = arr[1];
+						re = (RuntimeException) c.getConstructor(String.class).newInstance(message);
+					} catch (Exception e) {
+						re = new RuntimeException(e);
+					}
+				} else {
+					re = new RuntimeException(message);
+				}
+				throw re;
 			}
 		},
 		LATENCY {
-			void perform() {
+			void perform(ChaosMethodInvocationFilter _this) {
 				try {
-					Thread.sleep(20000);
+					Thread.sleep(_this.latency);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
 		},
 		KILL {
-			void perform() {
+			void perform(ChaosMethodInvocationFilter _this) {
 				System.exit(1);
 			}
 		};
 
-		abstract void perform();
+		abstract void perform(ChaosMethodInvocationFilter _this);
 	}
 
 }
