@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.spring.security.DefaultLoginUrlAuthenticationEntryPoint;
 import org.ironrhino.core.util.IteratorEnumeration;
 import org.ironrhino.core.util.RequestUtils;
 
@@ -109,7 +110,8 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 	@Override
 	public void setAttribute(String key, Object object) {
 		attrMap.put(key, object);
-		setDirty(true);
+		if (!key.equals(DefaultLoginUrlAuthenticationEntryPoint.SAVED_REQUEST))
+			setDirty(true);
 	}
 
 	@Override
@@ -120,7 +122,8 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 	@Override
 	public void removeAttribute(String key) {
 		attrMap.remove(key);
-		setDirty(true);
+		if (!key.equals(DefaultLoginUrlAuthenticationEntryPoint.SAVED_REQUEST))
+			setDirty(true);
 	}
 
 	@Override

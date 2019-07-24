@@ -21,7 +21,8 @@ import lombok.Setter;
 
 public class DefaultLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticationEntryPoint {
 
-	static final String SAVED_REQUEST = "SPRING_SECURITY_SAVED_REQUEST";
+	public static final String SAVED_REQUEST = "SPRING_SECURITY_SAVED_REQUEST";
+	// org.springframework.security.web.savedrequest.HttpSessionRequestCache.SAVED_REQUEST
 
 	@Value("${login.ignoreSavedRequest:false}")
 	private boolean ignoreSavedRequest;
