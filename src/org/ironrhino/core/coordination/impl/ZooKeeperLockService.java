@@ -30,7 +30,7 @@ public class ZooKeeperLockService implements LockService {
 	@Value("${lockService.zooKeeperPath:" + DEFAULT_ZOOKEEPER_PATH + "}")
 	private String zooKeeperPath = DEFAULT_ZOOKEEPER_PATH;
 
-	private ConcurrentHashMap<String, InterProcessMutex> locks = new ConcurrentHashMap<>();
+	private Map<String, InterProcessMutex> locks = new ConcurrentHashMap<>();
 
 	@Override
 	public boolean tryLock(String name) {

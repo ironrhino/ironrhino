@@ -2,6 +2,7 @@ package org.ironrhino.core.coordination.impl;
 
 import static org.ironrhino.core.metadata.Profiles.DEFAULT;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Component;
 @ServiceImplementationConditional(profiles = DEFAULT)
 public class StandaloneLockService implements LockService {
 
-	private ConcurrentHashMap<String, Long> locks = new ConcurrentHashMap<>();
+	private Map<String, Long> locks = new ConcurrentHashMap<>();
 
 	@Override
 	public boolean tryLock(String name) {

@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -264,8 +263,8 @@ public class RedisServiceStats implements ServiceStats {
 	}
 
 	private void flush(StatsType type) {
-		ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicInteger>> buffer = type.getCountBuffer();
-		for (Map.Entry<String, ConcurrentHashMap<String, AtomicInteger>> entry : buffer.entrySet()) {
+		Map<String, Map<String, AtomicInteger>> buffer = type.getCountBuffer();
+		for (Map.Entry<String, Map<String, AtomicInteger>> entry : buffer.entrySet()) {
 			remotingStringRedisTemplate.opsForSet().add(NAMESPACE_SERVICES + entry.getKey(),
 					entry.getValue().keySet().toArray(new String[entry.getValue().size()]));
 			for (Map.Entry<String, AtomicInteger> entry2 : entry.getValue().entrySet()) {

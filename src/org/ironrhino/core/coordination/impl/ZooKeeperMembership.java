@@ -41,7 +41,7 @@ public class ZooKeeperMembership implements Membership {
 	@Value("${membership.zooKeeperPath:" + DEFAULT_ZOOKEEPER_PATH + "}")
 	private String zooKeeperPath = DEFAULT_ZOOKEEPER_PATH;
 
-	private ConcurrentHashMap<String, LeaderLatch> latchs = new ConcurrentHashMap<>();
+	private Map<String, LeaderLatch> latchs = new ConcurrentHashMap<>();
 
 	@Autowired
 	public ZooKeeperMembership(CuratorFramework curatorFramework) {

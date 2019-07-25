@@ -2,6 +2,7 @@ package org.ironrhino.core.throttle.impl;
 
 import static org.ironrhino.core.metadata.Profiles.DEFAULT;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Component;
 @ServiceImplementationConditional(profiles = DEFAULT)
 public class StandaloneConcurrencyService implements ConcurrencyService {
 
-	private ConcurrentHashMap<String, Semaphore> semaphores = new ConcurrentHashMap<>();
+	private Map<String, Semaphore> semaphores = new ConcurrentHashMap<>();
 
 	@Override
 	public boolean tryAcquire(String name, int permits) {

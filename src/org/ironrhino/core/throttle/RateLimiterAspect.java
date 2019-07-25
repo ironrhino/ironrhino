@@ -1,6 +1,7 @@
 package org.ironrhino.core.throttle;
 
 import java.time.Duration;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -19,7 +20,7 @@ import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 @ClassPresentConditional("io.github.resilience4j.ratelimiter.RateLimiter")
 public class RateLimiterAspect extends BaseAspect {
 
-	private ConcurrentHashMap<String, io.github.resilience4j.ratelimiter.RateLimiter> rateLimiters = new ConcurrentHashMap<>();
+	private Map<String, io.github.resilience4j.ratelimiter.RateLimiter> rateLimiters = new ConcurrentHashMap<>();
 
 	public RateLimiterAspect() {
 		order = Ordered.HIGHEST_PRECEDENCE + 2;

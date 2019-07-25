@@ -1,5 +1,6 @@
 package org.ironrhino.core.remoting.stats;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -9,8 +10,8 @@ public enum StatsType implements Displayable {
 
 	SERVER_SIDE("server"), CLIENT_SIDE("client"), CLIENT_FAILED("cfailed");
 
-	private ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicInteger>> countBuffer = new ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicInteger>>();
-	private ConcurrentHashMap<String, InvocationSampler> sampleBuffer = new ConcurrentHashMap<String, InvocationSampler>();
+	private Map<String, Map<String, AtomicInteger>> countBuffer = new ConcurrentHashMap<>();
+	private Map<String, InvocationSampler> sampleBuffer = new ConcurrentHashMap<>();
 
 	private String namespace;
 
@@ -18,11 +19,11 @@ public enum StatsType implements Displayable {
 		this.namespace = namespace;
 	}
 
-	public ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicInteger>> getCountBuffer() {
+	public Map<String, Map<String, AtomicInteger>> getCountBuffer() {
 		return countBuffer;
 	}
 
-	public ConcurrentHashMap<String, InvocationSampler> getSampleBuffer() {
+	public Map<String, InvocationSampler> getSampleBuffer() {
 		return sampleBuffer;
 	}
 
@@ -31,7 +32,7 @@ public enum StatsType implements Displayable {
 	}
 
 	public void increaseCount(String serviceName, String method) {
-		ConcurrentHashMap<String, AtomicInteger> serviceMap = countBuffer.computeIfAbsent(serviceName, key -> {
+		Map<String, AtomicInteger> serviceMap = countBuffer.computeIfAbsent(serviceName, key -> {
 			ConcurrentHashMap<String, AtomicInteger> methodMap = new ConcurrentHashMap<>();
 			methodMap.put(method, new AtomicInteger());
 			return methodMap;

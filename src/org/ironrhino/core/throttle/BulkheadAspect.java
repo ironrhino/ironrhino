@@ -1,5 +1,6 @@
 package org.ironrhino.core.throttle;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -18,7 +19,7 @@ import io.github.resilience4j.bulkhead.utils.BulkheadUtils;
 @ClassPresentConditional("io.github.resilience4j.bulkhead.Bulkhead")
 public class BulkheadAspect extends BaseAspect {
 
-	private ConcurrentHashMap<String, io.github.resilience4j.bulkhead.Bulkhead> bulkheads = new ConcurrentHashMap<>();
+	private Map<String, io.github.resilience4j.bulkhead.Bulkhead> bulkheads = new ConcurrentHashMap<>();
 
 	public BulkheadAspect() {
 		order = Ordered.HIGHEST_PRECEDENCE + 2;
