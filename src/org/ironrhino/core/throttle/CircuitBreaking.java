@@ -7,9 +7,7 @@ import static io.github.resilience4j.circuitbreaker.utils.MetricNames.NOT_PERMIT
 import static io.github.resilience4j.circuitbreaker.utils.MetricNames.STATE;
 import static io.github.resilience4j.circuitbreaker.utils.MetricNames.SUCCESSFUL;
 
-import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 import org.ironrhino.core.metrics.Metrics;
@@ -28,7 +26,6 @@ public class CircuitBreaking {
 	private static final boolean resilience4jPresent = ClassUtils
 			.isPresent("io.github.resilience4j.circuitbreaker.CircuitBreaker", CircuitBreaking.class.getClassLoader());
 
-	private static Map<String, CircuitBreaker> circuitBreakers = new ConcurrentHashMap<>();
 
 	public static boolean isResilience4jPresent() {
 		return resilience4jPresent;
@@ -88,7 +85,7 @@ public class CircuitBreaking {
 	}
 
 	private static CircuitBreaker of(String key, Predicate<Throwable> predicate) {
-		return circuitBreakers.computeIfAbsent(key, name -> {
+		return Registry.getCircuitBreakers().computeIfAbsent(key, name -> {
 			CircuitBreaker circuitBreaker = CircuitBreaker.of(name,
 					CircuitBreakerConfig.custom().failureRateThreshold(95).recordFailure(predicate).build());
 			if (Metrics.isEnabled()) {

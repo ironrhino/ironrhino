@@ -1,8 +1,5 @@
 package org.ironrhino.core.throttle;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -19,8 +16,6 @@ import io.github.resilience4j.bulkhead.utils.BulkheadUtils;
 @ClassPresentConditional("io.github.resilience4j.bulkhead.Bulkhead")
 public class BulkheadAspect extends BaseAspect {
 
-	private Map<String, io.github.resilience4j.bulkhead.Bulkhead> bulkheads = new ConcurrentHashMap<>();
-
 	public BulkheadAspect() {
 		order = Ordered.HIGHEST_PRECEDENCE + 2;
 	}
@@ -28,7 +23,7 @@ public class BulkheadAspect extends BaseAspect {
 	@Around("execution(public * *(..)) and @annotation(bulkhead)")
 	public Object control(ProceedingJoinPoint jp, Bulkhead bulkhead) throws Throwable {
 		String key = buildKey(jp);
-		io.github.resilience4j.bulkhead.Bulkhead bh = bulkheads.computeIfAbsent(key, k -> {
+		io.github.resilience4j.bulkhead.Bulkhead bh = Registry.getBulkheads().computeIfAbsent(key, k -> {
 			BulkheadConfig config = BulkheadConfig.custom().maxConcurrentCalls(bulkhead.maxConcurrentCalls())
 					.maxWaitTime(bulkhead.maxWaitTime()).build();
 			return io.github.resilience4j.bulkhead.Bulkhead.of(k, config);
