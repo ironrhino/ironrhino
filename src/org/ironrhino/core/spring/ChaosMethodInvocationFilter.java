@@ -20,6 +20,10 @@ import org.springframework.stereotype.Component;
 @Profile(Profiles.CHAOS)
 public class ChaosMethodInvocationFilter implements MethodInvocationFilter {
 
+	private static final Map<Method, AtomicInteger> counters = new ConcurrentHashMap<>();
+
+	private static final Random random = new Random();
+
 	@Value("${chaosMethodInvocationFilter.pattern:.*}")
 	private String pattern;
 
@@ -32,8 +36,8 @@ public class ChaosMethodInvocationFilter implements MethodInvocationFilter {
 	@Value("${chaosMethodInvocationFilter.attack.exception:}")
 	private String exception;
 
-	@Value("${chaosMethodInvocationFilter.attack.latency:20000}")
-	private long latency;
+	@Value("${chaosMethodInvocationFilter.attack.latency:5000-20000}")
+	private String latency;
 
 	private JdkRegexpMethodPointcut pointcut;
 
@@ -76,10 +80,6 @@ public class ChaosMethodInvocationFilter implements MethodInvocationFilter {
 			}
 		};
 
-		private static final Random random = new Random();
-
-		private static final Map<Method, AtomicInteger> counters = new ConcurrentHashMap<>();
-
 		abstract boolean shouldCreateChaos(Method method);
 	}
 
@@ -108,8 +108,17 @@ public class ChaosMethodInvocationFilter implements MethodInvocationFilter {
 		LATENCY {
 			void perform(ChaosMethodInvocationFilter _this) {
 				try {
-					Thread.sleep(_this.latency);
-				} catch (InterruptedException e) {
+					String s = _this.latency;
+					int index = s.indexOf('-');
+					if (index < 0) {
+						Thread.sleep(Long.parseLong(s));
+					} else {
+						long min = Long.parseLong(s.substring(0, index));
+						long max = Long.parseLong(s.substring(index + 1));
+						long latency = min + random.nextInt((int) (max + 1 - min));
+						Thread.sleep(latency);
+					}
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
