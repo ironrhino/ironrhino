@@ -5,16 +5,19 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.ironrhino.core.aop.BaseAspect;
 import org.ironrhino.core.spring.configuration.ClassPresentConditional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
 import io.github.resilience4j.bulkhead.BulkheadConfig;
-import io.github.resilience4j.bulkhead.utils.BulkheadUtils;
 
 @Aspect
 @Component
 @ClassPresentConditional("io.github.resilience4j.bulkhead.Bulkhead")
 public class BulkheadAspect extends BaseAspect {
+
+	@Autowired
+	private BulkheadRegistry bulkheadRegistry;
 
 	public BulkheadAspect() {
 		order = Ordered.HIGHEST_PRECEDENCE + 2;
@@ -22,18 +25,9 @@ public class BulkheadAspect extends BaseAspect {
 
 	@Around("execution(public * *(..)) and @annotation(bulkhead)")
 	public Object control(ProceedingJoinPoint jp, Bulkhead bulkhead) throws Throwable {
-		String key = buildKey(jp);
-		io.github.resilience4j.bulkhead.Bulkhead bh = Registry.getBulkheads().computeIfAbsent(key, k -> {
-			BulkheadConfig config = BulkheadConfig.custom().maxConcurrentCalls(bulkhead.maxConcurrentCalls())
-					.maxWaitTime(bulkhead.maxWaitTime()).build();
-			return io.github.resilience4j.bulkhead.Bulkhead.of(k, config);
-		});
-		BulkheadUtils.isCallPermitted(bh);
-		try {
-			return jp.proceed();
-		} finally {
-			bh.onComplete();
-		}
+		return bulkheadRegistry.executeThrowableCallable(buildKey(jp), () -> BulkheadConfig.custom()
+				.maxConcurrentCalls(bulkhead.maxConcurrentCalls()).maxWaitTime(bulkhead.maxWaitTime()).build(),
+				jp::proceed);
 	}
 
 }

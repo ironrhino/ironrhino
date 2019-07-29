@@ -112,5 +112,10 @@ public class BulkheadAspectTest {
 			return new BulkheadAspect();
 		}
 
+		@Bean
+		public BulkheadRegistry bulkheadRegistry() {
+			return new BulkheadRegistry();
+		}
+
 	}
 }

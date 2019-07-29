@@ -67,5 +67,10 @@ public class RateLimiterAspectTest {
 			return new RateLimiterAspect();
 		}
 
+		@Bean
+		public RateLimiterRegistry rateLimiterRegistry() {
+			return new RateLimiterRegistry();
+		}
+
 	}
 }

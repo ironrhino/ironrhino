@@ -14,6 +14,7 @@ import org.ironrhino.core.remoting.client.HttpInvokerRequestExecutor;
 import org.ironrhino.core.remoting.client.RemotingServiceRegistryPostProcessor;
 import org.ironrhino.core.remoting.impl.StandaloneServiceRegistry;
 import org.ironrhino.core.spring.configuration.Fallback;
+import org.ironrhino.core.throttle.CircuitBreakerRegistry;
 import org.ironrhino.sample.remoting.TestService;
 import org.ironrhino.sample.remoting.TestServiceImpl;
 import org.junit.Test;
@@ -114,6 +115,11 @@ public class RemotingServiceFallbackTest {
 					throw new ConnectException("Connection refused");
 				}
 			};
+		}
+
+		@Bean
+		public CircuitBreakerRegistry circuitBreakerRegistry() {
+			return new CircuitBreakerRegistry();
 		}
 
 	}

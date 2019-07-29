@@ -28,7 +28,7 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.spring.FallbackSupportMethodInterceptorFactoryBean;
-import org.ironrhino.core.throttle.CircuitBreaking;
+import org.ironrhino.core.throttle.CircuitBreakerRegistry;
 import org.ironrhino.core.util.MaxAttemptsExceededException;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.rest.RestStatus;
@@ -36,6 +36,7 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -100,9 +101,8 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 	@Setter
 	private int maxAttempts = 3;
 
-	@Getter
-	@Setter
-	private boolean circuitBreakerEnabled = true;
+	@Autowired(required = false)
+	private CircuitBreakerRegistry circuitBreakerRegistry;
 
 	public RestApiFactoryBean(Class<?> restApiClass) {
 		this(restApiClass, (RestTemplate) null);
@@ -190,7 +190,8 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 			} while (--remainingAttempts > 0);
 			throw new MaxAttemptsExceededException(maxAttempts);
 		};
-		return circuitBreakerEnabled ? CircuitBreaking.execute(restApiClass.getName(), IO_ERROR_PREDICATE, callable)
+		return circuitBreakerRegistry != null
+				? circuitBreakerRegistry.execute(restApiClass.getName(), IO_ERROR_PREDICATE, callable)
 				: callable.call();
 	}
 

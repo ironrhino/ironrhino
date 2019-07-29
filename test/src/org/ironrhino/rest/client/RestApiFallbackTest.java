@@ -11,6 +11,7 @@ import java.net.ConnectException;
 
 import org.ironrhino.core.spring.configuration.Fallback;
 import org.ironrhino.core.spring.http.client.RestTemplate;
+import org.ironrhino.core.throttle.CircuitBreakerRegistry;
 import org.ironrhino.rest.client.RestApiFallbackTest.RestApiConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -79,6 +80,11 @@ public class RestApiFallbackTest {
 							new ResourceAccessException("I/O error on POST request for \"http://localhost/api/echo\"",
 									new ConnectException("Connection refused: connect")));
 			return restTemplate;
+		}
+
+		@Bean
+		public CircuitBreakerRegistry circuitBreakerRegistry() {
+			return new CircuitBreakerRegistry();
 		}
 
 	}

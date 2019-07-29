@@ -16,10 +16,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerOpenException;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CircuitBreakingTest {
+public class CircuitBreakerRegistryTest {
 
 	@Mock
 	EchoService echoService;
+
+	CircuitBreakerRegistry registry = new CircuitBreakerRegistry();
 
 	@Test(expected = CircuitBreakerOpenException.class)
 	public void test() throws Exception {
@@ -34,7 +36,7 @@ public class CircuitBreakingTest {
 		AtomicInteger error = new AtomicInteger();
 		for (int i = 0; i < 100; i++) {
 			try {
-				CircuitBreaking.executeThrowableCallable(this.getClass().getName(), ex -> ex instanceof IOException,
+				registry.executeThrowableCallable(this.getClass().getName(), ex -> ex instanceof IOException,
 						() -> echoService.echo("test"));
 				success.incrementAndGet();
 			} catch (IOException e) {
@@ -43,7 +45,7 @@ public class CircuitBreakingTest {
 		}
 		assertThat(success.get(), is(5));
 		assertThat(error.get(), is(95));
-		CircuitBreaking.executeThrowableCallable(this.getClass().getName(), ex -> ex instanceof IOException,
+		registry.executeThrowableCallable(this.getClass().getName(), ex -> ex instanceof IOException,
 				() -> echoService.echo("test"));
 	}
 

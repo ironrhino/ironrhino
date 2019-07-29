@@ -146,5 +146,10 @@ public class CircuitBreakerAspectTest {
 			return new CircuitBreakerAspect();
 		}
 
+		@Bean
+		public CircuitBreakerRegistry circuitBreakerRegistry() {
+			return new CircuitBreakerRegistry();
+		}
+
 	}
 }
