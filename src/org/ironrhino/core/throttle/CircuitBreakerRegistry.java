@@ -17,9 +17,11 @@ import java.util.function.Supplier;
 import org.ironrhino.core.metrics.Metrics;
 import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.ironrhino.core.util.ThrowableCallable;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Component;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker.State;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.circuitbreaker.utils.CircuitBreakerUtils;
 import lombok.Getter;
@@ -66,7 +68,7 @@ public class CircuitBreakerRegistry {
 	}
 
 	public CircuitBreaker of(String name, Supplier<CircuitBreakerConfig> configSupplier) {
-		return getCircuitBreakers().computeIfAbsent(name, key -> {
+		return circuitBreakers.computeIfAbsent(name, key -> {
 			CircuitBreaker circuitBreaker = CircuitBreaker.of(key, configSupplier.get());
 			if (Metrics.isEnabled()) {
 				String prefix = DEFAULT_PREFIX + '.' + key + '.';
@@ -85,6 +87,41 @@ public class CircuitBreakerRegistry {
 
 	public CircuitBreakerConfig.Builder defaultBuilder() {
 		return CircuitBreakerConfig.custom().failureRateThreshold(95);
+	}
+
+	public void transitionState(String name, String oldState, String newState) {
+		transitionState(name, State.valueOf(oldState), State.valueOf(newState));
+	}
+
+	public void transitionState(String name, State oldState, State newState) {
+		CircuitBreaker circuitBreaker = circuitBreakers.get(name);
+		if (circuitBreaker != null) {
+			synchronized (circuitBreaker) {
+				if (circuitBreaker.getState() == oldState) {
+					switch (newState) {
+					case DISABLED:
+						circuitBreaker.transitionToDisabledState();
+						break;
+					case CLOSED:
+						circuitBreaker.transitionToClosedState();
+						break;
+					case OPEN:
+						circuitBreaker.transitionToOpenState();
+						break;
+					case FORCED_OPEN:
+						circuitBreaker.transitionToForcedOpenState();
+						break;
+					case HALF_OPEN:
+						circuitBreaker.transitionToHalfOpenState();
+						break;
+					default:
+						break;
+					}
+				} else {
+					throw new OptimisticLockingFailureException("State changed, please refresh and retry.");
+				}
+			}
+		}
 	}
 
 }

@@ -10,8 +10,10 @@ import java.util.function.Supplier;
 import org.ironrhino.core.metrics.Metrics;
 import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.ironrhino.core.util.ThrowableCallable;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Component;
 
+import io.github.resilience4j.bulkhead.Bulkhead;
 import io.github.resilience4j.bulkhead.BulkheadConfig;
 import io.github.resilience4j.bulkhead.utils.BulkheadUtils;
 import lombok.Getter;
@@ -21,11 +23,11 @@ import lombok.Getter;
 @ClassPresentConditional("io.github.resilience4j.bulkhead.Bulkhead")
 public class BulkheadRegistry {
 
-	private final Map<String, io.github.resilience4j.bulkhead.Bulkhead> bulkheads = new ConcurrentHashMap<>();
+	private final Map<String, Bulkhead> bulkheads = new ConcurrentHashMap<>();
 
 	public <T, E extends Throwable> T executeThrowableCallable(String name, Supplier<BulkheadConfig> configSupplier,
 			ThrowableCallable<T, E> callable) throws E {
-		io.github.resilience4j.bulkhead.Bulkhead bh = of(name, configSupplier);
+		Bulkhead bh = of(name, configSupplier);
 		BulkheadUtils.isCallPermitted(bh);
 		try {
 			return callable.call();
@@ -34,10 +36,9 @@ public class BulkheadRegistry {
 		}
 	}
 
-	public io.github.resilience4j.bulkhead.Bulkhead of(String name, Supplier<BulkheadConfig> configSupplier) {
-		return getBulkheads().computeIfAbsent(name, key -> {
-			io.github.resilience4j.bulkhead.Bulkhead bulkhead = io.github.resilience4j.bulkhead.Bulkhead.of(key,
-					configSupplier.get());
+	public Bulkhead of(String name, Supplier<BulkheadConfig> configSupplier) {
+		return bulkheads.computeIfAbsent(name, key -> {
+			Bulkhead bulkhead = Bulkhead.of(key, configSupplier.get());
 			if (Metrics.isEnabled()) {
 				String prefix = DEFAULT_PREFIX + '.' + key + '.';
 				Metrics.gauge(prefix + AVAILABLE_CONCURRENT_CALLS, bulkhead,
@@ -45,6 +46,21 @@ public class BulkheadRegistry {
 			}
 			return bulkhead;
 		});
+	}
+
+	public void changeMaxConcurrentCalls(String name, int oldMaxConcurrentCalls, int newMaxConcurrentCalls) {
+		Bulkhead bulkhead = bulkheads.get(name);
+		if (bulkhead != null) {
+			synchronized (bulkhead) {
+				if (bulkhead.getBulkheadConfig().getMaxConcurrentCalls() == oldMaxConcurrentCalls) {
+					BulkheadConfig oldConfig = bulkhead.getBulkheadConfig();
+					bulkhead.changeConfig(BulkheadConfig.custom().maxConcurrentCalls(newMaxConcurrentCalls)
+							.maxWaitTime(oldConfig.getMaxWaitTime()).build());
+				} else {
+					throw new OptimisticLockingFailureException("State changed, please refresh and retry.");
+				}
+			}
+		}
 	}
 
 }

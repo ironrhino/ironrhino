@@ -11,8 +11,10 @@ import java.util.function.Supplier;
 import org.ironrhino.core.metrics.Metrics;
 import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.ironrhino.core.util.ThrowableCallable;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Component;
 
+import io.github.resilience4j.ratelimiter.RateLimiter;
 import io.github.resilience4j.ratelimiter.RateLimiterConfig;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import lombok.Getter;
@@ -22,11 +24,11 @@ import lombok.Getter;
 @ClassPresentConditional("io.github.resilience4j.ratelimiter.RateLimiter")
 public class RateLimiterRegistry {
 
-	private final Map<String, io.github.resilience4j.ratelimiter.RateLimiter> rateLimiters = new ConcurrentHashMap<>();
+	private final Map<String, RateLimiter> rateLimiters = new ConcurrentHashMap<>();
 
 	public <T, E extends Throwable> T executeThrowableCallable(String name, Supplier<RateLimiterConfig> configSupplier,
 			ThrowableCallable<T, E> callable) throws E {
-		io.github.resilience4j.ratelimiter.RateLimiter limiter = of(name, configSupplier);
+		RateLimiter limiter = of(name, configSupplier);
 		RateLimiterConfig rateLimiterConfig = limiter.getRateLimiterConfig();
 		boolean permission = limiter.getPermission(rateLimiterConfig.getTimeoutDuration());
 		if (Thread.interrupted()) {
@@ -38,17 +40,30 @@ public class RateLimiterRegistry {
 		return callable.call();
 	}
 
-	public io.github.resilience4j.ratelimiter.RateLimiter of(String name, Supplier<RateLimiterConfig> configSupplier) {
-		return getRateLimiters().computeIfAbsent(name, key -> {
-			io.github.resilience4j.ratelimiter.RateLimiter limiter = io.github.resilience4j.ratelimiter.RateLimiter
-					.of(key, configSupplier.get());
+	public RateLimiter of(String name, Supplier<RateLimiterConfig> configSupplier) {
+		return rateLimiters.computeIfAbsent(name, key -> {
+			RateLimiter rateLimiter = RateLimiter.of(key, configSupplier.get());
 			if (Metrics.isEnabled()) {
 				String prefix = DEFAULT_PREFIX + '.' + key + '.';
-				Metrics.gauge(prefix + WAITING_THREADS, limiter, rl -> rl.getMetrics().getNumberOfWaitingThreads());
-				Metrics.gauge(prefix + AVAILABLE_PERMISSIONS, limiter, rl -> rl.getMetrics().getAvailablePermissions());
+				Metrics.gauge(prefix + WAITING_THREADS, rateLimiter, rl -> rl.getMetrics().getNumberOfWaitingThreads());
+				Metrics.gauge(prefix + AVAILABLE_PERMISSIONS, rateLimiter,
+						rl -> rl.getMetrics().getAvailablePermissions());
 			}
-			return limiter;
+			return rateLimiter;
 		});
+	}
+
+	public void changeLimitForPeriod(String name, int oldLimitForPeriod, int newLimitForPeriod) {
+		RateLimiter rateLimiter = rateLimiters.get(name);
+		if (rateLimiter != null) {
+			synchronized (rateLimiter) {
+				if (rateLimiter.getRateLimiterConfig().getLimitForPeriod() == oldLimitForPeriod) {
+					rateLimiter.changeLimitForPeriod(newLimitForPeriod);
+				} else {
+					throw new OptimisticLockingFailureException("State changed, please refresh and retry.");
+				}
+			}
+		}
 	}
 
 }
