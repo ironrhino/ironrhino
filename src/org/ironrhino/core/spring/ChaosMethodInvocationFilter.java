@@ -47,6 +47,7 @@ public class ChaosMethodInvocationFilter implements MethodInvocationFilter {
 		pointcut.setPattern(pattern);
 	}
 
+	@Override
 	public Object filter(MethodInvocation methodInvocation,
 			CheckedFunction<MethodInvocation, Object, Throwable> actualInvocation) throws Throwable {
 		Method method = methodInvocation.getMethod();
@@ -60,21 +61,25 @@ public class ChaosMethodInvocationFilter implements MethodInvocationFilter {
 
 	static enum Strategy {
 		ALWAYS {
+			@Override
 			boolean shouldCreateChaos(Method method) {
 				return true;
 			}
 		},
 		ALTERNATING {
+			@Override
 			boolean shouldCreateChaos(Method method) {
 				return counters.computeIfAbsent(method, m -> new AtomicInteger()).getAndIncrement() % 2 == 0;
 			}
 		},
 		RANDOM {
+			@Override
 			boolean shouldCreateChaos(Method method) {
 				return random.nextBoolean();
 			}
 		},
 		NONE {
+			@Override
 			boolean shouldCreateChaos(Method method) {
 				return false;
 			}
@@ -85,6 +90,7 @@ public class ChaosMethodInvocationFilter implements MethodInvocationFilter {
 
 	static enum Attack {
 		EXCEPTION {
+			@Override
 			void perform(ChaosMethodInvocationFilter _this) {
 				String message = "Chaos created";
 				String ex = _this.exception;
@@ -106,6 +112,7 @@ public class ChaosMethodInvocationFilter implements MethodInvocationFilter {
 			}
 		},
 		LATENCY {
+			@Override
 			void perform(ChaosMethodInvocationFilter _this) {
 				try {
 					String s = _this.latency;
@@ -124,6 +131,7 @@ public class ChaosMethodInvocationFilter implements MethodInvocationFilter {
 			}
 		},
 		KILL {
+			@Override
 			void perform(ChaosMethodInvocationFilter _this) {
 				System.exit(1);
 			}
