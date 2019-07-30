@@ -6,8 +6,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.function.ToDoubleFunction;
 
-import org.ironrhino.core.util.ThrowableCallable;
-import org.ironrhino.core.util.ThrowableRunnable;
+import org.ironrhino.core.util.CheckedCallable;
+import org.ironrhino.core.util.CheckedRunnable;
 import org.springframework.util.ClassUtils;
 
 import io.micrometer.core.instrument.Tag;
@@ -48,7 +48,7 @@ public class Metrics {
 		io.micrometer.core.instrument.Metrics.timer(name, tags).record(runnable);
 	}
 
-	public static <T, E extends Throwable> T recordThrowableCallable(String name, ThrowableCallable<T, E> callable,
+	public static <T, E extends Throwable> T recordCheckedCallable(String name, CheckedCallable<T, E> callable,
 			String... tags) throws E {
 		if (!enabled)
 			return callable.call();
@@ -61,7 +61,7 @@ public class Metrics {
 		}
 	}
 
-	public static <E extends Throwable> void recordThrowableRunnable(String name, ThrowableRunnable<E> runnable,
+	public static <E extends Throwable> void recordCheckedRunnable(String name, CheckedRunnable<E> runnable,
 			String... tags) throws E {
 		if (!enabled) {
 			runnable.run();

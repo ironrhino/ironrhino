@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 
 import org.ironrhino.core.metrics.Metrics;
 import org.ironrhino.core.spring.configuration.ClassPresentConditional;
-import org.ironrhino.core.util.ThrowableCallable;
+import org.ironrhino.core.util.CheckedCallable;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Component;
 
@@ -39,17 +39,17 @@ public class CircuitBreakerRegistry {
 		return of(name, predicate).executeCallable(callable);
 	}
 
-	public <T, E extends Throwable> T executeThrowableCallable(String name, Predicate<Throwable> predicate,
-			ThrowableCallable<T, E> callable) throws E {
-		return executeThrowableCallable(of(name, predicate), callable);
+	public <T, E extends Throwable> T executeCheckedCallable(String name, Predicate<Throwable> predicate,
+			CheckedCallable<T, E> callable) throws E {
+		return executeCheckedCallable(of(name, predicate), callable);
 	}
 
-	public <T, E extends Throwable> T executeThrowableCallable(String name,
-			Supplier<CircuitBreakerConfig> configSupplier, ThrowableCallable<T, E> callable) throws E {
-		return executeThrowableCallable(of(name, configSupplier), callable);
+	public <T, E extends Throwable> T executeCheckedCallable(String name, Supplier<CircuitBreakerConfig> configSupplier,
+			CheckedCallable<T, E> callable) throws E {
+		return executeCheckedCallable(of(name, configSupplier), callable);
 	}
 
-	<T, E extends Throwable> T executeThrowableCallable(CircuitBreaker circuitBreaker, ThrowableCallable<T, E> callable)
+	<T, E extends Throwable> T executeCheckedCallable(CircuitBreaker circuitBreaker, CheckedCallable<T, E> callable)
 			throws E {
 		CircuitBreakerUtils.isCallPermitted(circuitBreaker);
 		long start = System.nanoTime();

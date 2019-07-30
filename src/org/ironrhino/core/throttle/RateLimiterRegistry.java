@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 
 import org.ironrhino.core.metrics.Metrics;
 import org.ironrhino.core.spring.configuration.ClassPresentConditional;
-import org.ironrhino.core.util.ThrowableCallable;
+import org.ironrhino.core.util.CheckedCallable;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Component;
 
@@ -28,8 +28,8 @@ public class RateLimiterRegistry {
 
 	private final Map<String, RateLimiter> rateLimiters = new ConcurrentHashMap<>();
 
-	public <T, E extends Throwable> T executeThrowableCallable(String name, Supplier<RateLimiterConfig> configSupplier,
-			ThrowableCallable<T, E> callable) throws E {
+	public <T, E extends Throwable> T executeCheckedCallable(String name, Supplier<RateLimiterConfig> configSupplier,
+			CheckedCallable<T, E> callable) throws E {
 		RateLimiter limiter = of(name, configSupplier);
 		RateLimiterConfig rateLimiterConfig = limiter.getRateLimiterConfig();
 		boolean permission = limiter.getPermission(rateLimiterConfig.getTimeoutDuration());

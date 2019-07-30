@@ -36,7 +36,7 @@ public class CircuitBreakerRegistryTest {
 		AtomicInteger error = new AtomicInteger();
 		for (int i = 0; i < 100; i++) {
 			try {
-				registry.executeThrowableCallable(this.getClass().getName(), ex -> ex instanceof IOException,
+				registry.executeCheckedCallable(this.getClass().getName(), ex -> ex instanceof IOException,
 						() -> echoService.echo("test"));
 				success.incrementAndGet();
 			} catch (IOException e) {
@@ -45,7 +45,7 @@ public class CircuitBreakerRegistryTest {
 		}
 		assertThat(success.get(), is(5));
 		assertThat(error.get(), is(95));
-		registry.executeThrowableCallable(this.getClass().getName(), ex -> ex instanceof IOException,
+		registry.executeCheckedCallable(this.getClass().getName(), ex -> ex instanceof IOException,
 				() -> echoService.echo("test"));
 	}
 

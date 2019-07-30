@@ -24,7 +24,7 @@ public class MetricsAspect extends AbstractInstrumentAspect {
 		Mapping mapping = getMapping(pjp);
 		if (mapping == null)
 			return pjp.proceed();
-		return Metrics.recordThrowableCallable("rest.calls", pjp::proceed, "method", mapping.getMethod(), "uri",
+		return Metrics.recordCheckedCallable("rest.calls", pjp::proceed, "method", mapping.getMethod(), "uri",
 				mapping.getUri());
 	}
 

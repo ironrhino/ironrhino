@@ -27,7 +27,7 @@ public class CircuitBreakerAspect extends BaseAspect {
 
 	@Around("execution(public * *(..)) and @annotation(circuitBreaker)")
 	public Object control(ProceedingJoinPoint jp, CircuitBreaker circuitBreaker) throws Throwable {
-		return circuitBreakerRegistry.executeThrowableCallable(buildKey(jp),
+		return circuitBreakerRegistry.executeCheckedCallable(buildKey(jp),
 				() -> CircuitBreakerConfig.custom().failureRateThreshold(circuitBreaker.failureRateThreshold())
 						.waitDurationInOpenState(Duration.ofSeconds(circuitBreaker.waitDurationInOpenState()))
 						.ringBufferSizeInHalfOpenState(circuitBreaker.ringBufferSizeInHalfOpenState())

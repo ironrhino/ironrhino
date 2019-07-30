@@ -26,9 +26,9 @@ import org.ironrhino.core.remoting.serializer.HttpInvokerSerializers;
 import org.ironrhino.core.remoting.stats.ServiceStats;
 import org.ironrhino.core.servlet.AccessFilter;
 import org.ironrhino.core.servlet.ProxySupportHttpServletRequest;
+import org.ironrhino.core.util.CheckedFunction;
 import org.ironrhino.core.util.ExceptionUtils;
 import org.ironrhino.core.util.JsonDesensitizer;
-import org.ironrhino.core.util.ThrowableFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -173,7 +173,7 @@ public class HttpInvokerServer implements HttpRequestHandler {
 	}
 
 	private void invoke(HttpServletRequest request, HttpServletResponse response,
-			ThrowableFunction<HttpServletRequest, RemoteInvocation, Exception> invocationFunction,
+			CheckedFunction<HttpServletRequest, RemoteInvocation, Exception> invocationFunction,
 			Function<RemoteInvocation, RemoteInvocationResult> invocationResultFunction, Runnable completion) {
 		HttpInvokerSerializer serializer = HttpInvokerSerializers.forRequest(request);
 		try {

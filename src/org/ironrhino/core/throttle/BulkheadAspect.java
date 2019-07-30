@@ -25,7 +25,7 @@ public class BulkheadAspect extends BaseAspect {
 
 	@Around("execution(public * *(..)) and @annotation(bulkhead)")
 	public Object control(ProceedingJoinPoint jp, Bulkhead bulkhead) throws Throwable {
-		return bulkheadRegistry.executeThrowableCallable(buildKey(jp), () -> BulkheadConfig.custom()
+		return bulkheadRegistry.executeCheckedCallable(buildKey(jp), () -> BulkheadConfig.custom()
 				.maxConcurrentCalls(bulkhead.maxConcurrentCalls()).maxWaitTime(bulkhead.maxWaitTime()).build(),
 				jp::proceed);
 	}

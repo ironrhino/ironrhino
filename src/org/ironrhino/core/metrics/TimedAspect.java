@@ -12,8 +12,8 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.ironrhino.core.aop.BaseAspect;
 import org.ironrhino.core.spring.NameGenerator;
 import org.ironrhino.core.spring.configuration.ClassPresentConditional;
+import org.ironrhino.core.util.CheckedCallable;
 import org.ironrhino.core.util.ExpressionUtils;
-import org.ironrhino.core.util.ThrowableCallable;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -58,7 +58,7 @@ public class TimedAspect extends BaseAspect {
 		}
 		if (timed.longTask()) {
 			LongTaskTimer longTaskTimer = LongTaskTimer.builder(name).tags(tags).register(registry);
-			return recordThrowable(longTaskTimer, () -> recordThrowable(longTaskTimer, pjp::proceed));
+			return record(longTaskTimer, () -> record(longTaskTimer, pjp::proceed));
 		} else {
 			Timer.Builder timerBuilder = Timer.builder(name).tags(tags);
 			if (timed.histogram())
@@ -66,7 +66,7 @@ public class TimedAspect extends BaseAspect {
 			if (timed.percentiles().length > 0)
 				timerBuilder = timerBuilder.publishPercentiles(timed.percentiles());
 			Timer timer = timerBuilder.register(registry);
-			return recordThrowable(timer, pjp::proceed);
+			return record(timer, pjp::proceed);
 		}
 	}
 
@@ -81,8 +81,7 @@ public class TimedAspect extends BaseAspect {
 		return timing(pjp, timed);
 	}
 
-	private static Object recordThrowable(LongTaskTimer timer, ThrowableCallable<Object, Throwable> f)
-			throws Throwable {
+	private static Object record(LongTaskTimer timer, CheckedCallable<Object, Throwable> f) throws Throwable {
 		LongTaskTimer.Sample timing = timer.start();
 		try {
 			return f.call();
@@ -91,7 +90,7 @@ public class TimedAspect extends BaseAspect {
 		}
 	}
 
-	private static Object recordThrowable(Timer timer, ThrowableCallable<Object, Throwable> f) throws Throwable {
+	private static Object record(Timer timer, CheckedCallable<Object, Throwable> f) throws Throwable {
 		long start = System.nanoTime();
 		try {
 			return f.call();

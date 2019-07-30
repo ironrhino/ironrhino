@@ -10,7 +10,7 @@ import javax.annotation.PostConstruct;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.ironrhino.core.metadata.Profiles;
-import org.ironrhino.core.util.ThrowableFunction;
+import org.ironrhino.core.util.CheckedFunction;
 import org.springframework.aop.support.JdkRegexpMethodPointcut;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -48,7 +48,7 @@ public class ChaosMethodInvocationFilter implements MethodInvocationFilter {
 	}
 
 	public Object filter(MethodInvocation methodInvocation,
-			ThrowableFunction<MethodInvocation, Object, Throwable> actualInvocation) throws Throwable {
+			CheckedFunction<MethodInvocation, Object, Throwable> actualInvocation) throws Throwable {
 		Method method = methodInvocation.getMethod();
 		Class<?> clazz = method.getDeclaringClass();
 		if (pointcut.getClassFilter().matches(clazz) && pointcut.getMethodMatcher().matches(method, clazz)) {

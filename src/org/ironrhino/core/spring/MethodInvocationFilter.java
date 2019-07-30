@@ -1,11 +1,11 @@
 package org.ironrhino.core.spring;
 
 import org.aopalliance.intercept.MethodInvocation;
-import org.ironrhino.core.util.ThrowableFunction;
+import org.ironrhino.core.util.CheckedFunction;
 
 public interface MethodInvocationFilter {
 
 	Object filter(MethodInvocation methodInvocation,
-			ThrowableFunction<MethodInvocation, Object, Throwable> actualInvocation) throws Throwable;
+			CheckedFunction<MethodInvocation, Object, Throwable> actualInvocation) throws Throwable;
 
 }

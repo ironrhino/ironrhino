@@ -19,8 +19,8 @@ import org.ironrhino.core.servlet.AccessFilter;
 import org.ironrhino.core.spring.MethodInvocationFilter;
 import org.ironrhino.core.spring.configuration.Fallback;
 import org.ironrhino.core.util.AppInfo;
+import org.ironrhino.core.util.CheckedFunction;
 import org.ironrhino.core.util.CodecUtils;
-import org.ironrhino.core.util.ThrowableFunction;
 import org.ironrhino.sample.remoting.BarService;
 import org.ironrhino.sample.remoting.BarServiceImpl;
 import org.ironrhino.sample.remoting.FooService;
@@ -133,7 +133,7 @@ public abstract class HttpInvokerServerTestBase {
 			return new MethodInvocationFilter() {
 				@Override
 				public Object filter(MethodInvocation methodInvocation,
-						ThrowableFunction<MethodInvocation, Object, Throwable> actualInvocation) throws Throwable {
+						CheckedFunction<MethodInvocation, Object, Throwable> actualInvocation) throws Throwable {
 					Object[] args = methodInvocation.getArguments();
 					if (methodInvocation.getMethod().getName().equals("test") && args.length > 0
 							&& "chaos".equals(args[0]))

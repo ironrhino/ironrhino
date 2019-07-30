@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 
 import org.ironrhino.core.metrics.Metrics;
 import org.ironrhino.core.spring.configuration.ClassPresentConditional;
-import org.ironrhino.core.util.ThrowableCallable;
+import org.ironrhino.core.util.CheckedCallable;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Component;
 
@@ -27,8 +27,8 @@ public class BulkheadRegistry {
 
 	private final Map<String, Bulkhead> bulkheads = new ConcurrentHashMap<>();
 
-	public <T, E extends Throwable> T executeThrowableCallable(String name, Supplier<BulkheadConfig> configSupplier,
-			ThrowableCallable<T, E> callable) throws E {
+	public <T, E extends Throwable> T executeCheckedCallable(String name, Supplier<BulkheadConfig> configSupplier,
+			CheckedCallable<T, E> callable) throws E {
 		Bulkhead bh = of(name, configSupplier);
 		BulkheadUtils.isCallPermitted(bh);
 		try {
