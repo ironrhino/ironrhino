@@ -14,7 +14,7 @@ import org.ironrhino.core.session.SessionCompressorManager;
 import org.ironrhino.core.session.WrappedHttpSession;
 import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.ErrorMessage;
-import org.ironrhino.core.util.JsonUtils;
+import org.ironrhino.core.util.JsonSerializationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -124,10 +124,11 @@ public class CacheBasedHttpSessionStore implements HttpSessionStore {
 						String id = list.get(i);
 						try {
 							Map<String, String> map = new HashMap<>();
-							map.put(SESSION_KEY_KICKED_OUT_FROM, ip);
-							map.put(SESSION_KEY_KICKED_OUT_DATE, DateUtils.formatDatetime(new Date()));
-							cacheManager.put(id, JsonUtils.toJson(map), session.getMaxInactiveInterval(),
-									TimeUnit.SECONDS, CACHE_NAMESPACE);
+							map.put(SESSION_KEY_KICKED_OUT_FROM, JsonSerializationUtils.serialize(ip));
+							map.put(SESSION_KEY_KICKED_OUT_DATE,
+									JsonSerializationUtils.serialize(DateUtils.formatDatetime(new Date())));
+							cacheManager.put(id, JsonSerializationUtils.serialize(map),
+									session.getMaxInactiveInterval(), TimeUnit.SECONDS, CACHE_NAMESPACE);
 							log.info("user[{}] session[{}] is kicked out by session[{}] from {}", username, id,
 									session.getId(), ip);
 						} catch (Exception e) {
