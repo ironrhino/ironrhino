@@ -18,10 +18,12 @@ import io.github.resilience4j.ratelimiter.RateLimiter;
 import io.github.resilience4j.ratelimiter.RateLimiterConfig;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Getter
 @ClassPresentConditional("io.github.resilience4j.ratelimiter.RateLimiter")
+@Slf4j
 public class RateLimiterRegistry {
 
 	private final Map<String, RateLimiter> rateLimiters = new ConcurrentHashMap<>();
@@ -59,6 +61,8 @@ public class RateLimiterRegistry {
 			synchronized (rateLimiter) {
 				if (rateLimiter.getRateLimiterConfig().getLimitForPeriod() == oldLimitForPeriod) {
 					rateLimiter.changeLimitForPeriod(newLimitForPeriod);
+					log.info("Change limitForPeriod of RateLimiter('{}') from {} to {}", name, oldLimitForPeriod,
+							newLimitForPeriod);
 				} else {
 					throw new OptimisticLockingFailureException("State changed, please refresh and retry.");
 				}

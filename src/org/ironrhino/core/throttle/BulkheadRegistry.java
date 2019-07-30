@@ -17,10 +17,12 @@ import io.github.resilience4j.bulkhead.Bulkhead;
 import io.github.resilience4j.bulkhead.BulkheadConfig;
 import io.github.resilience4j.bulkhead.utils.BulkheadUtils;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Getter
 @ClassPresentConditional("io.github.resilience4j.bulkhead.Bulkhead")
+@Slf4j
 public class BulkheadRegistry {
 
 	private final Map<String, Bulkhead> bulkheads = new ConcurrentHashMap<>();
@@ -56,6 +58,8 @@ public class BulkheadRegistry {
 					BulkheadConfig oldConfig = bulkhead.getBulkheadConfig();
 					bulkhead.changeConfig(BulkheadConfig.custom().maxConcurrentCalls(newMaxConcurrentCalls)
 							.maxWaitTime(oldConfig.getMaxWaitTime()).build());
+					log.info("Change maxConcurrentCalls of Bulkhead('{}') from {} to {}", name, oldMaxConcurrentCalls,
+							newMaxConcurrentCalls);
 				} else {
 					throw new OptimisticLockingFailureException("State changed, please refresh and retry.");
 				}

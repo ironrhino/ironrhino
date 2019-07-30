@@ -25,10 +25,12 @@ import io.github.resilience4j.circuitbreaker.CircuitBreaker.State;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.circuitbreaker.utils.CircuitBreakerUtils;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Getter
 @ClassPresentConditional("io.github.resilience4j.circuitbreaker.CircuitBreaker")
+@Slf4j
 public class CircuitBreakerRegistry {
 
 	private final Map<String, CircuitBreaker> circuitBreakers = new ConcurrentHashMap<>();
@@ -117,6 +119,7 @@ public class CircuitBreakerRegistry {
 					default:
 						break;
 					}
+					log.info("Change state of CircuitBreaker('{}') from {} to {}", name, oldState, newState);
 				} else {
 					throw new OptimisticLockingFailureException("State changed, please refresh and retry.");
 				}
