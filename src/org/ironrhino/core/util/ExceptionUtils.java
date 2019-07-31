@@ -68,7 +68,7 @@ public class ExceptionUtils {
 			Set<ConstraintViolation<?>> cvs = new LinkedHashSet<ConstraintViolation<?>>();
 			for (ConstraintViolation<?> cv : cve.getConstraintViolations()) {
 				cvs.add(ConstraintViolationImpl.forBeanValidation(cv.getMessageTemplate(), null, null, cv.getMessage(),
-						null, null, null, null, cv.getPropertyPath(), null, null, null));
+						null, null, null, cv.getPropertyPath(), null, null, null));
 			}
 			ConstraintViolationException ex = new ConstraintViolationException(cvs);
 			ex.setStackTrace(cve.getStackTrace());

@@ -25,8 +25,8 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/fst-2.53.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/h2-1.4.196.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/hibernate-commons-annotations-5.1.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/hibernate-core-5.4.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/hibernate-validator-6.0.14.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/hibernate-core-5.4.10.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/hibernate-validator-6.1.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/HikariCP-3.4.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/httpclient-4.5.10.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/httpcore-4.4.12.jar"/>
