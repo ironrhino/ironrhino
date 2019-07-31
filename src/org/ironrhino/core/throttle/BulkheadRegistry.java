@@ -9,13 +9,11 @@ import java.util.function.Supplier;
 
 import org.ironrhino.core.metrics.Metrics;
 import org.ironrhino.core.spring.configuration.ClassPresentConditional;
-import org.ironrhino.core.util.CheckedCallable;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Component;
 
 import io.github.resilience4j.bulkhead.Bulkhead;
 import io.github.resilience4j.bulkhead.BulkheadConfig;
-import io.github.resilience4j.bulkhead.utils.BulkheadUtils;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,17 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 public class BulkheadRegistry {
 
 	private final Map<String, Bulkhead> bulkheads = new ConcurrentHashMap<>();
-
-	public <T, E extends Throwable> T executeCheckedCallable(String name, Supplier<BulkheadConfig> configSupplier,
-			CheckedCallable<T, E> callable) throws E {
-		Bulkhead bh = of(name, configSupplier);
-		BulkheadUtils.isCallPermitted(bh);
-		try {
-			return callable.call();
-		} finally {
-			bh.onComplete();
-		}
-	}
 
 	public Bulkhead of(String name, Supplier<BulkheadConfig> configSupplier) {
 		return bulkheads.computeIfAbsent(name, key -> {
@@ -57,7 +44,7 @@ public class BulkheadRegistry {
 				if (bulkhead.getBulkheadConfig().getMaxConcurrentCalls() == oldMaxConcurrentCalls) {
 					BulkheadConfig oldConfig = bulkhead.getBulkheadConfig();
 					bulkhead.changeConfig(BulkheadConfig.custom().maxConcurrentCalls(newMaxConcurrentCalls)
-							.maxWaitTime(oldConfig.getMaxWaitTime()).build());
+							.maxWaitDuration(oldConfig.getMaxWaitDuration()).build());
 					log.info("Change maxConcurrentCalls of Bulkhead('{}') from {} to {}", name, oldMaxConcurrentCalls,
 							newMaxConcurrentCalls);
 				} else {

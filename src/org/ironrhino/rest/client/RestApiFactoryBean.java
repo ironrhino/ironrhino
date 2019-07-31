@@ -75,7 +75,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.github.resilience4j.circuitbreaker.CircuitBreakerOpenException;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -166,7 +166,7 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 
 	@Override
 	protected boolean shouldFallBackFor(Throwable ex) {
-		return ex instanceof CircuitBreakerOpenException;
+		return ex instanceof CallNotPermittedException;
 	}
 
 	@PostConstruct
@@ -207,7 +207,7 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 		callable = () -> Tracing.execute(ReflectionUtils.stringify(methodInvocation.getMethod()), old, "span.kind",
 				"client", "component", "rest");
 		return circuitBreakerRegistry != null
-				? circuitBreakerRegistry.execute(restApiClass.getName(), IO_ERROR_PREDICATE, callable)
+				? circuitBreakerRegistry.of(restApiClass.getName(), IO_ERROR_PREDICATE).executeCallable(callable)
 				: callable.call();
 	}
 

@@ -63,7 +63,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.util.concurrent.ListenableFuture;
 
-import io.github.resilience4j.circuitbreaker.CircuitBreakerOpenException;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 
 @TestPropertySource(properties = "httpInvoker.serializationType=JAVA")
 public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
@@ -545,8 +546,8 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 	public void testFallbackWithCircuitBreakerOpenException() throws Exception {
 		final int maxAttempts = 1;
 		barServiceClient.setMaxAttempts(maxAttempts);
-		willThrow(new CircuitBreakerOpenException("CircuitBreakerOpen")).given(mockHttpInvokerRequestExecutor)
-				.executeRequest(contains(BarService.class.getName()),
+		willThrow(CallNotPermittedException.createCallNotPermittedException(CircuitBreaker.ofDefaults("test")))
+				.given(mockHttpInvokerRequestExecutor).executeRequest(contains(BarService.class.getName()),
 						argThat(ri -> "test".contentEquals(ri.getMethodName())), any(MethodInvocation.class));
 		assertThat(((BarService) (barServiceClient.getObject())).test(""), is("fallback:"));
 		then(mockBarService).should(never()).test(eq(""));

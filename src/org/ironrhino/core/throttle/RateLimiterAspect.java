@@ -27,11 +27,11 @@ public class RateLimiterAspect extends BaseAspect {
 
 	@Around("execution(public * *(..)) and @annotation(rateLimiter)")
 	public Object control(ProceedingJoinPoint jp, RateLimiter rateLimiter) throws Throwable {
-		return rateLimiterRegistry.executeCheckedCallable(buildKey(jp),
+		return rateLimiterRegistry.of(buildKey(jp),
 				() -> RateLimiterConfig.custom().timeoutDuration(Duration.ofMillis(rateLimiter.timeoutDuration()))
 						.limitRefreshPeriod(Duration.ofMillis(rateLimiter.limitRefreshPeriod()))
-						.limitForPeriod(rateLimiter.limitForPeriod()).build(),
-				jp::proceed);
+						.limitForPeriod(rateLimiter.limitForPeriod()).build())
+				.executeCheckedSupplier(jp::proceed);
 	}
 
 }

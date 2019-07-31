@@ -17,7 +17,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import io.github.resilience4j.circuitbreaker.CircuitBreakerOpenException;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = CircuitBreakerConfiguration.class)
@@ -40,7 +40,7 @@ public class CircuitBreakerAspectTest {
 					fail.incrementAndGet();
 				}
 			}
-		} catch (CircuitBreakerOpenException ex) {
+		} catch (CallNotPermittedException ex) {
 			opened = true;
 		}
 		assertThat(success.get(), is(EchoService.SIZE_IN_CLOSED_STATE / 2));
@@ -71,7 +71,7 @@ public class CircuitBreakerAspectTest {
 					fail.incrementAndGet();
 				}
 			}
-		} catch (CircuitBreakerOpenException ex) {
+		} catch (CallNotPermittedException ex) {
 			opened = true;
 		}
 		assertThat(success.get(), is(EchoService.SIZE_IN_CLOSED_STATE / 2));
@@ -88,7 +88,7 @@ public class CircuitBreakerAspectTest {
 					fail.incrementAndGet();
 				}
 			}
-		} catch (CircuitBreakerOpenException ex) {
+		} catch (CallNotPermittedException ex) {
 			opened = true;
 		}
 		assertThat(opened, is(true));
@@ -99,7 +99,7 @@ public class CircuitBreakerAspectTest {
 	private boolean isOpen() {
 		try {
 			echoService.echo("test");
-		} catch (CircuitBreakerOpenException ex) {
+		} catch (CallNotPermittedException ex) {
 			return true;
 		} catch (IOException ex) {
 			return false;
@@ -117,7 +117,7 @@ public class CircuitBreakerAspectTest {
 
 		private volatile boolean recovered;
 
-		@CircuitBreaker(include = IOException.class, failureRateThreshold = 50, waitDurationInOpenState = WAIT_DURATION_IN_OPEN_STATE, ringBufferSizeInClosedState = SIZE_IN_CLOSED_STATE, ringBufferSizeInHalfOpenState = SIZE_IN_HALF_OPEN_STATE)
+		@CircuitBreaker(include = IOException.class, failureRateThreshold = 50, waitDurationInOpenState = WAIT_DURATION_IN_OPEN_STATE, slidingWindowSize = SIZE_IN_CLOSED_STATE, permittedNumberOfCallsInHalfOpenState = SIZE_IN_HALF_OPEN_STATE)
 		public String echo(String s) throws IOException {
 			if (recovered)
 				return s;

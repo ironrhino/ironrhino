@@ -12,11 +12,17 @@ public @interface CircuitBreaker {
 
 	float failureRateThreshold() default 95;
 
-	int waitDurationInOpenState() default 60;
+	float slowCallRateThreshold() default 100;
 
-	int ringBufferSizeInHalfOpenState() default 10;
+	int slowCallDurationThreshold() default 60; // Seconds
 
-	int ringBufferSizeInClosedState() default 100;
+	int waitDurationInOpenState() default 60; // Seconds
+
+	int permittedNumberOfCallsInHalfOpenState() default 10;
+
+	int minimumNumberOfCalls() default 100;
+
+	int slidingWindowSize() default 100;
 
 	Class<? extends Throwable>[] include();
 

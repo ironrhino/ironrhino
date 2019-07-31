@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import io.github.resilience4j.circuitbreaker.CircuitBreakerOpenException;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CircuitBreakerRegistryTest {
@@ -23,7 +23,7 @@ public class CircuitBreakerRegistryTest {
 
 	CircuitBreakerRegistry registry = new CircuitBreakerRegistry();
 
-	@Test(expected = CircuitBreakerOpenException.class)
+	@Test(expected = CallNotPermittedException.class)
 	public void test() throws Exception {
 		AtomicInteger count = new AtomicInteger();
 		given(echoService.echo(anyString())).willAnswer(invocation -> {
@@ -36,8 +36,8 @@ public class CircuitBreakerRegistryTest {
 		AtomicInteger error = new AtomicInteger();
 		for (int i = 0; i < 100; i++) {
 			try {
-				registry.executeCheckedCallable(this.getClass().getName(), ex -> ex instanceof IOException,
-						() -> echoService.echo("test"));
+				registry.of(this.getClass().getName(), ex -> ex instanceof IOException)
+						.executeCallable(() -> echoService.echo("test"));
 				success.incrementAndGet();
 			} catch (IOException e) {
 				error.incrementAndGet();
@@ -45,8 +45,8 @@ public class CircuitBreakerRegistryTest {
 		}
 		assertThat(success.get(), is(5));
 		assertThat(error.get(), is(95));
-		registry.executeCheckedCallable(this.getClass().getName(), ex -> ex instanceof IOException,
-				() -> echoService.echo("test"));
+		registry.of(this.getClass().getName(), ex -> ex instanceof IOException)
+				.executeCallable(() -> echoService.echo("test"));
 	}
 
 	public interface EchoService {

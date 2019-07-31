@@ -1,5 +1,7 @@
 package org.ironrhino.core.throttle;
 
+import java.time.Duration;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -25,9 +27,11 @@ public class BulkheadAspect extends BaseAspect {
 
 	@Around("execution(public * *(..)) and @annotation(bulkhead)")
 	public Object control(ProceedingJoinPoint jp, Bulkhead bulkhead) throws Throwable {
-		return bulkheadRegistry.executeCheckedCallable(buildKey(jp), () -> BulkheadConfig.custom()
-				.maxConcurrentCalls(bulkhead.maxConcurrentCalls()).maxWaitTime(bulkhead.maxWaitTime()).build(),
-				jp::proceed);
+		return bulkheadRegistry
+				.of(buildKey(jp),
+						() -> BulkheadConfig.custom().maxConcurrentCalls(bulkhead.maxConcurrentCalls())
+								.maxWaitDuration(Duration.ofMillis(bulkhead.maxWaitTime())).build())
+				.executeCheckedSupplier(jp::proceed);
 	}
 
 }
