@@ -48,13 +48,6 @@
 				text-align:center;
 				line-height: 30px;
 			}
-			input[type=text]{
-				border: hsl(247, 89%, 72%) solid 1px;
-				outline: none;
-				padding: 5px 3px;
-				font-size: 16px;
-				border-radius: 8px;
-			}
 			a{
 				text-decoration: none;
 				color: #9ECDFF;
