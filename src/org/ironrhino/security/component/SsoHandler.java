@@ -21,6 +21,7 @@ import org.ironrhino.core.servlet.AccessHandler;
 import org.ironrhino.core.session.HttpSessionManager;
 import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
 import org.ironrhino.core.util.ErrorMessage;
+import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.RequestUtils;
 import org.slf4j.MDC;
 import org.springframework.beans.BeanWrapperImpl;
@@ -42,6 +43,9 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -145,6 +149,15 @@ public class SsoHandler extends AccessHandler {
 				if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
 					redirect(request, response);
 					return true;
+				}
+				log.error(e.getMessage(), e);
+				try {
+					String body = e.getResponseBodyAsString();
+					log.error("Received: {}", body);
+					JsonNode node = JsonUtils.fromJson(body, JsonNode.class);
+					if (node.has("message"))
+						throw new ErrorMessage(node.get("message").asText());
+				} catch (JsonParseException ex) {
 				}
 				throw e;
 			}
