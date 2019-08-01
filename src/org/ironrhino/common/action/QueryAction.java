@@ -64,15 +64,20 @@ public class QueryAction extends BaseAction {
 			return NOTFOUND;
 		tables = jdbcQueryService.getTables();
 		if (StringUtils.isNotBlank(sql)) {
-			jdbcQueryService.validate(sql);
 			params = SqlUtils.extractParametersWithType(sql, jdbcQueryService.getDataSource());
 			if (params.size() > 0) {
-				if (!ServletActionContext.getRequest().getMethod().equalsIgnoreCase("POST"))
-					return SUCCESS;
-				for (String s : params.keySet()) {
-					if (!paramMap.containsKey(s)) {
-						return SUCCESS;
+				boolean ready = ServletActionContext.getRequest().getMethod().equalsIgnoreCase("POST");
+				if (ready) {
+					for (String s : params.keySet()) {
+						if (!paramMap.containsKey(s)) {
+							ready = false;
+							break;
+						}
 					}
+				}
+				if (!ready) {
+					jdbcQueryService.validate(sql);
+					return SUCCESS;
 				}
 			}
 			if (resultPage == null) {
