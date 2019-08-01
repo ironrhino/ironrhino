@@ -433,8 +433,8 @@ public class AppInfo {
 		}
 		System.setProperty("log4j2.threadContextMap", MyThreadContextMap.class.getName());
 		System.setProperty("log4j2.isThreadContextMapInheritable", String.valueOf(true));
-		if (System.getProperty("hibernate.logger.level") == null)
-			System.setProperty("hibernate.logger.level", AppInfo.getStage() == Stage.DEVELOPMENT ? "TRACE" : "INFO");
+		if (System.getProperty("sql.logger.level") == null)
+			System.setProperty("sql.logger.level", AppInfo.getStage() == Stage.DEVELOPMENT ? "TRACE" : "INFO");
 		if (System.getProperty("console.logger.level") == null)
 			System.setProperty("console.logger.level", AppInfo.getStage() == Stage.PRODUCTION
 					&& (System.getProperty("os.name") == null || !System.getProperty("os.name").startsWith("Windows"))

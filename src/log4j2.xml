@@ -24,7 +24,7 @@
 			<PatternLayout pattern="%d %c %t%X{request}%X{url} %p %m%n" charset="UTF-8"/>
 			<TimeBasedTriggeringPolicy />
 		</RollingFile>
-		<RollingFile name="HIBERNATE" fileName="${sys:app.home}/logs/${sys:port.http}/hibernate.log" filePattern="${sys:app.home}/logs/${sys:port.http}/hibernate.log.%d{yyyy-MM-dd}">
+		<RollingFile name="SQL" fileName="${sys:app.home}/logs/${sys:port.http}/sql.log" filePattern="${sys:app.home}/logs/${sys:port.http}/sql.log.%d{yyyy-MM-dd}">
 			<ThresholdFilter level="ALL"/>
 			<PatternLayout pattern="%d %c %t%X{request}%X{url} %p %m%n" charset="UTF-8"/>
 			<TimeBasedTriggeringPolicy />
@@ -61,11 +61,11 @@
 		<Logger name="com.opensymphony.xwork2.ognl.OgnlValueStack" level="ERROR"/>
 		<Logger name="com.opensymphony.xwork2.config.providers.XmlConfigurationProvider" level="ERROR"/>
 		<Logger name="io.micrometer" level="WARN"/>
-		<Logger name="org.hibernate.SQL" level="${sys:hibernate.logger.level}" additivity="false">
-			<AppenderRef ref="HIBERNATE"/>
+		<Logger name="org.hibernate.SQL" level="${sys:sql.logger.level}" additivity="false">
+			<AppenderRef ref="SQL"/>
 		</Logger>
-		<Logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="${sys:hibernate.logger.level}" additivity="false">
-			<AppenderRef ref="HIBERNATE"/>
+		<Logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="${sys:sql.logger.level}" additivity="false">
+			<AppenderRef ref="SQL"/>
 		</Logger>
 		<Logger name="remoting" level="${sys:root.logger.level}" additivity="false">
 			<AppenderRef ref="REMOTING"/>
