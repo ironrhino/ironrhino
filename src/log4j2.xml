@@ -67,6 +67,9 @@
 		<Logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="${sys:sql.logger.level}" additivity="false">
 			<AppenderRef ref="SQL"/>
 		</Logger>
+		<Logger name="org.springframework.jdbc.core" level="${sys:sql.logger.level}" additivity="false">
+			<AppenderRef ref="SQL"/>
+		</Logger>
 		<Logger name="remoting" level="${sys:root.logger.level}" additivity="false">
 			<AppenderRef ref="REMOTING"/>
 		</Logger>
