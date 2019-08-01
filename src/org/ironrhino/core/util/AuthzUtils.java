@@ -13,9 +13,12 @@ import org.springframework.beans.BeansException;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
+import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -212,6 +215,12 @@ public class AuthzUtils {
 	}
 
 	public static void autoLogin(UserDetails ud) {
+		if (!ud.isEnabled())
+			throw new DisabledException(ud.getUsername());
+		else if (!ud.isAccountNonExpired())
+			throw new AccountExpiredException(ud.getUsername());
+		else if (!ud.isAccountNonLocked())
+			throw new LockedException(ud.getUsername());
 		SecurityContext sc = SecurityContextHolder.getContext();
 		Authentication auth = new UsernamePasswordAuthenticationToken(ud, ud.getPassword(), ud.getAuthorities());
 		sc.setAuthentication(auth);
