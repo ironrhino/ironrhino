@@ -165,6 +165,7 @@ public class OAuthHandler extends AccessHandler {
 				log.error(unf.getMessage(), unf);
 			}
 			if (ud == null || !ud.isEnabled() || !ud.isAccountNonExpired() || !ud.isAccountNonLocked()) {
+				warn(ud);
 				oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.UNAUTHORIZED_CLIENT));
 				return true;
 			}
@@ -176,6 +177,7 @@ public class OAuthHandler extends AccessHandler {
 			}
 		}
 		if (ud == null || !ud.isEnabled() || !ud.isAccountNonExpired() || !ud.isAccountNonLocked()) {
+			warn(ud);
 			oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.INVALID_REQUEST, "invalid_user"));
 			return true;
 		}
@@ -190,7 +192,17 @@ public class OAuthHandler extends AccessHandler {
 		request.setAttribute(REQUEST_ATTRIBUTE_KEY_OAUTH_AUTHORIZATION, authorization);
 		request.setAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_ID_FOR_API, SESSION_ID_PREFIX + token);
 		return false;
+	}
 
+	private void warn(UserDetails ud) {
+		if (ud != null) {
+			if (!ud.isEnabled())
+				log.warn("{} is disabled", ud.getUsername());
+			else if (!ud.isAccountNonExpired())
+				log.warn("{} is expired", ud.getUsername());
+			else if (!ud.isAccountNonLocked())
+				log.warn("{} is locked", ud.getUsername());
+		}
 	}
 
 }
