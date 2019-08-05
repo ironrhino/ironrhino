@@ -32,10 +32,9 @@ public class JettyLauncher {
 			port = Integer.valueOf(p);
 		if (port == -1) {
 			port = 8080;
-			while (getTempDirectory(port).exists() || !available(port))
-				port++;
 			if (System.getenv("CONTAINER") == null) {
-				// Only 1 instance per container, log file will not conflict
+				while (getTempDirectory(port).exists() || !available(port))
+					port++;
 				System.setProperty("port.http", String.valueOf(port));
 			}
 		}
