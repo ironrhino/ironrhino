@@ -3,7 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" output="test/classes" path="test/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/amqp-client-5.5.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/antlr-runtime-3.5.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/aspectjweaver-1.9.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/batch-api-1.0.1.jar"/>
@@ -68,7 +67,6 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/sitemesh-2.4.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/slf4j-api-1.7.25.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/snakeyaml-1.21.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-amqp-2.1.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-aop-5.1.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-batch-core-4.1.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-batch-infrastructure-4.1.1.jar"/>
@@ -85,7 +83,6 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-kafka-2.2.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-messaging-5.1.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-orm-5.1.4.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-rabbit-2.1.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-retry-1.2.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-security-config-5.1.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-security-core-5.1.3.jar"/>

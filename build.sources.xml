@@ -20,8 +20,6 @@
 	<property name="remoting-client-sources-jar.includes" value="org/ironrhino/core/remoting/client/**" />
 	<property name="hibernate-config-sources-jar.name" value="ironrhino-hibernate-config-${version}-sources.jar" />
 	<property name="hibernate-config-sources-jar.includes" value="resources/spring/applicationContext-hibernate.xml" />
-	<property name="rabbitmq-config-sources-jar.name" value="ironrhino-rabbitmq-config-${version}-sources.jar" />
-	<property name="rabbitmq-config-sources-jar.includes" value="resources/spring/applicationContext-rabbitmq.xml" />
 	<property name="sitemesh-config-sources-jar.name" value="ironrhino-sitemesh-config-${version}-sources.jar" />
 	<property name="sitemesh-config-sources-jar.includes" value="resources/sitemesh/**" />
 	<property name="common-setting-sources-jar.name" value="ironrhino-common-setting-${version}-sources.jar" />
@@ -105,7 +103,6 @@
 		<delete file="${target.dir}/${remoting-server-sources-jar.name}" />
 		<delete file="${target.dir}/${remoting-client-sources-jar.name}" />
 		<delete file="${target.dir}/${hibernate-config-sources-jar.name}" />
-		<delete file="${target.dir}/${rabbitmq-config-sources-jar.name}" />
 		<delete file="${target.dir}/${sitemesh-config-sources-jar.name}" />
 		<delete file="${target.dir}/${common-setting-sources-jar.name}" />
 		<delete file="${target.dir}/${common-pageview-sources-jar.name}" />
@@ -188,17 +185,6 @@
 				<attribute name="Implementation-Vendor" value="ironrhino" />
 				<attribute name="Implementation-Version" value="${version}" />
 				<attribute name="Ironrhino-Component-Id" value="ironrhino-hibernate-config" />
-				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				<attribute name="Build-Timestamp" value="${timestamp}" />
-				<attribute name="Build-Revision" value="${revision}" />
-			</manifest>
-		</jar>
-		<jar jarfile="${target.dir}/${rabbitmq-config-sources-jar.name}" basedir="${src.dir}" includes="${rabbitmq-config-sources-jar.includes}">
-			<manifest>
-				<attribute name="Implementation-Title" value="ironrhino-rabbitmq-config" />
-				<attribute name="Implementation-Vendor" value="ironrhino" />
-				<attribute name="Implementation-Version" value="${version}" />
-				<attribute name="Ironrhino-Component-Id" value="ironrhino-rabbitmq-config" />
 				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
 				<attribute name="Build-Timestamp" value="${timestamp}" />
 				<attribute name="Build-Revision" value="${revision}" />
