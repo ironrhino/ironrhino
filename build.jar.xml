@@ -13,8 +13,6 @@
 	<property name="core-jar.includes" value="META-INF/**,log4j2.xml,ehcache.xml,es-plugin.properties,struts-plugin.xml,xwork-conversion.properties,META-INF/**,com/google/**,org/springframework/**,org/hibernate/**,org/ironrhino/core/**,org/ironrhino/common/**,resources/i18n/common/**,resources/view/common/**,resources/view/meta/**,resources/view/setup.ftl,resources/view/login.ftl,resources/view/password.ftl,resources/view/totp.ftl,resources/view/index.ftl,resources/view/locale.ftl,resources/view/decorator/**,resources/spring/applicationContext-common.xml" />
 	<property name="fs-jar.name" value="ironrhino-fs-${version}.jar" />
 	<property name="fs-jar.includes" value="org/ironrhino/core/fs/**" />
-	<property name="zookeeper-jar.name" value="ironrhino-zookeeper-${version}.jar" />
-	<property name="zookeeper-jar.includes" value="org/ironrhino/core/zookeeper/**,org/ironrhino/**/ZooKeeper*" />
 	<property name="remoting-common-jar.name" value="ironrhino-remoting-common-${version}.jar" />
 	<property name="remoting-common-jar.includes" value="org/ironrhino/core/remoting/**,org/ironrhino/core/remoting/action/**,resources/view/service/**" />
 	<property name="remoting-server-jar.name" value="ironrhino-remoting-server-${version}.jar" />
@@ -181,7 +179,6 @@
 			<delete file="${target.dir}/${assets-jar.name}" />
 			<delete file="${target.dir}/${core-jar.name}" />
 			<delete file="${target.dir}/${fs-jar.name}" />
-			<delete file="${target.dir}/${zookeeper-jar.name}" />
 			<delete file="${target.dir}/${remoting-common-jar.name}" />
 			<delete file="${target.dir}/${remoting-server-jar.name}" />
 			<delete file="${target.dir}/${remoting-client-jar.name}" />
@@ -238,7 +235,7 @@
 					<include name="*.xml" />
 				</fileset>
 			</copy>
-			<jar jarfile="${target.dir}/${core-jar.name}" basedir="${classes.dir}" includes="${core-jar.includes}" excludes="${fs-jar.includes},${zookeeper-jar.includes},${remoting-common-jar.includes},${common-setting-jar.includes},${common-cms-jar.includes},${common-dictionary-jar.includes},${common-schema-jar.includes},${common-treenode-jar.includes},${common-region-jar.includes},${common-record-jar.includes},${common-upload-jar.includes},${common-audit-jar.includes}">
+			<jar jarfile="${target.dir}/${core-jar.name}" basedir="${classes.dir}" includes="${core-jar.includes}" excludes="${fs-jar.includes},${remoting-common-jar.includes},${common-setting-jar.includes},${common-cms-jar.includes},${common-dictionary-jar.includes},${common-schema-jar.includes},${common-treenode-jar.includes},${common-region-jar.includes},${common-record-jar.includes},${common-upload-jar.includes},${common-audit-jar.includes}">
 				<manifest>
 					<attribute name="Implementation-Title" value="ironrhino-core" />
 					<attribute name="Implementation-Vendor" value="ironrhino" />
@@ -256,17 +253,6 @@
 					<attribute name="Implementation-Vendor" value="ironrhino" />
 					<attribute name="Implementation-Version" value="${version}" />
 					<attribute name="Ironrhino-Component-Id" value="ironrhino-fs" />
-					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-					<attribute name="Build-Timestamp" value="${timestamp}" />
-					<attribute name="Build-Revision" value="${revision}" />
-				</manifest>
-			</jar>
-			<jar jarfile="${target.dir}/${zookeeper-jar.name}" basedir="${classes.dir}" includes="${zookeeper-jar.includes}">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-zookeeper" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-zookeeper" />
 					<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
 					<attribute name="Build-Timestamp" value="${timestamp}" />
 					<attribute name="Build-Revision" value="${revision}" />

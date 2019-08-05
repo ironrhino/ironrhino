@@ -17,9 +17,6 @@
 |rabbitmq
 |amqp-client-\*.jar spring-rabbit-*.jar spring-amqp-*.jar
 
-|zookeeper
-|zookeeper-\*.jar curator-*.jar
-
 |批处理
 |javax.batch-api-\*.jar spring-batch-\*.jar
 |===

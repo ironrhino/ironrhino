@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.NotInCopy;
@@ -22,8 +23,6 @@ import org.ironrhino.core.model.Treeable;
 import org.ironrhino.core.spring.converter.CustomConversionService;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.convert.ConversionService;
-
-import com.google.common.base.Supplier;
 
 import lombok.experimental.UtilityClass;
 
