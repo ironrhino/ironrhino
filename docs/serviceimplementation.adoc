@@ -95,9 +95,9 @@ ironrhino通常对内置服务提供多种实现, 并且会在具体的部署规
 |org.ironrhino.core.fs.impl.LocalFileStorage
 |使用本地磁盘当做文件存储
 
-|cluster cloud
-|org.ironrhino.core.fs.impl.MongoFileStorage
-|需要mongodb服务
+|
+|org.ironrhino.core.fs.impl.FtpFileStorage
+|使用FTP服务当做文件存储
 |===
 
 * org.ironrhino.core.remoting.ServiceRegistry

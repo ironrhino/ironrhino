@@ -87,8 +87,6 @@
 					var excludes = '';
 					if(features.indexOf('rabbitmq')<0)
 						excludes+='amqp-client-*.jar,spring-rabbit-*.jar,spring-amqp-*.jar,';
-					if(features.indexOf('mongodb')<0)
-						excludes+='mongodb-driver-*.jar,spring-data-mongodb-*.jar,';
 					if(features.indexOf('zookeeper')<0)
 						excludes+='zookeeper-*.jar,curator-*.jar,';
 					if(features.indexOf('zxing')<0)
@@ -106,8 +104,6 @@
 					var includes = 'ironrhino-assets-'+version+'.jar,ironrhino-core-'+version+'.jar,ironrhino-hibernate-config-'+version+'.jar,ironrhino-security-'+version+'.jar,ironrhino-security-config-'+version+'.jar,ironrhino-sitemesh-config-'+version+'.jar,';
 					if(features.indexOf('rabbitmq')>=0)
 						includes += 'ironrhino-rabbitmq-config-'+version+'.jar,';
-					if(features.indexOf('mongodb')>=0)
-						includes += 'ironrhino-mongodb-config-'+version+'.jar,';
 					if(features.indexOf('zookeeper')>=0)
 						includes += 'ironrhino-zookeeper-'+version+'.jar,';
 					if(features.indexOf('remoting')>=0)

@@ -19,7 +19,6 @@
 +transaction-api
 +HikariCP
 -bonecp
-+mongodb-driver<-spring-data-mongodb
 +spring-data-commons
 +spring-data-keyvalue
 +spring-data-redis
