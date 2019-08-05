@@ -12,7 +12,7 @@
 |功能 |依赖包
 
 |redis
-|jedis-\*.jar commons-pool2-*.jar spring-data-redis-*.jar spring-data-commons-*.jar
+|lettuce-\*.jar commons-pool2-*.jar spring-data-redis-*.jar spring-data-commons-*.jar spring-data-keyvalue-*.jar
 
 |rabbitmq
 |amqp-client-\*.jar spring-rabbit-*.jar spring-amqp-*.jar
@@ -22,9 +22,6 @@
 
 |zookeeper
 |zookeeper-\*.jar curator-*.jar
-
-|二维码
-|zxing-*.jar
 
 |批处理
 |javax.batch-api-\*.jar spring-batch-\*.jar
