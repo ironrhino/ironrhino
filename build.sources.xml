@@ -12,8 +12,6 @@
 	<property name="core-sources-jar.name" value="ironrhino-core-${version}-sources.jar" />
 	<property name="fs-sources-jar.name" value="ironrhino-fs-${version}-sources.jar" />
 	<property name="fs-sources-jar.includes" value="org/ironrhino/core/fs/**" />
-	<property name="zookeeper-sources-jar.name" value="ironrhino-zookeeper-${version}-sources.jar" />
-	<property name="zookeeper-sources-jar.includes" value="org/ironrhino/core/zookeeper/**,org/ironrhino/**/ZooKeeper*" />
 	<property name="remoting-common-sources-jar.name" value="ironrhino-remoting-common-${version}-sources.jar" />
 	<property name="remoting-common-sources-jar.includes" value="org/ironrhino/core/remoting/**,org/ironrhino/core/remoting/action/**,resources/view/service/**" />
 	<property name="remoting-server-sources-jar.name" value="ironrhino-remoting-server-${version}-sources.jar" />
@@ -103,7 +101,6 @@
 		<delete file="${target.dir}/${assets-sources-jar.name}" />
 		<delete file="${target.dir}/${core-sources-jar.name}" />
 		<delete file="${target.dir}/${fs-sources-jar.name}" />
-		<delete file="${target.dir}/${zookeeper-sources-jar.name}" />
 		<delete file="${target.dir}/${remoting-common-sources-jar.name}" />
 		<delete file="${target.dir}/${remoting-server-sources-jar.name}" />
 		<delete file="${target.dir}/${remoting-client-sources-jar.name}" />
@@ -131,7 +128,7 @@
 		<delete file="${target.dir}/${security-oauth-server-remoting-sources-jar.name}" />
 		<delete file="${target.dir}/${rest-sources-jar.name}" />
 		<delete file="${target.dir}/${batch-sources-jar.name}" />
-		<jar jarfile="${target.dir}/${core-sources-jar.name}" basedir="${src.dir}" includes="META-INF/**,log4j2.xml,ehcache.xml,es-plugin.properties,struts-plugin.xml,xwork-conversion.properties,META-INF/**,org/springframework/**,org/apache/**,org/hibernate/**,com/opensymphony/xwork2/**,org/ironrhino/core/**,org/ironrhino/common/**,template/**,resources/i18n/common/**,resources/view/common/**,resources/view/meta/**,resources/view/setup.ftl,resources/view/login.ftl,resources/view/password.ftl,resources/view/totp.ftl,resources/view/index.ftl,resources/view/locale.ftl,resources/view/decorator/**,resources/spring/applicationContext-common.xml" excludes="${fs-sources-jar.includes},${zookeeper-sources-jar.includes},${remoting-common-sources-jar.includes},${common-setting-sources-jar.includes},${common-cms-sources-jar.includes},${common-dictionary-sources-jar.includes},${common-schema-sources-jar.includes},${common-treenode-sources-jar.includes},${common-region-sources-jar.includes},${common-record-sources-jar.includes},${common-upload-sources-jar.includes},${common-audit-sources-jar.includes}">
+		<jar jarfile="${target.dir}/${core-sources-jar.name}" basedir="${src.dir}" includes="META-INF/**,log4j2.xml,ehcache.xml,es-plugin.properties,struts-plugin.xml,xwork-conversion.properties,META-INF/**,org/springframework/**,org/apache/**,org/hibernate/**,com/opensymphony/xwork2/**,org/ironrhino/core/**,org/ironrhino/common/**,template/**,resources/i18n/common/**,resources/view/common/**,resources/view/meta/**,resources/view/setup.ftl,resources/view/login.ftl,resources/view/password.ftl,resources/view/totp.ftl,resources/view/index.ftl,resources/view/locale.ftl,resources/view/decorator/**,resources/spring/applicationContext-common.xml" excludes="${fs-sources-jar.includes},${remoting-common-sources-jar.includes},${common-setting-sources-jar.includes},${common-cms-sources-jar.includes},${common-dictionary-sources-jar.includes},${common-schema-sources-jar.includes},${common-treenode-sources-jar.includes},${common-region-sources-jar.includes},${common-record-sources-jar.includes},${common-upload-sources-jar.includes},${common-audit-sources-jar.includes}">
 			<manifest>
 				<attribute name="Implementation-Title" value="ironrhino-core" />
 				<attribute name="Implementation-Vendor" value="ironrhino" />
@@ -147,17 +144,6 @@
 				<attribute name="Implementation-Vendor" value="ironrhino" />
 				<attribute name="Implementation-Version" value="${version}" />
 				<attribute name="Ironrhino-Component-Id" value="ironrhino-fs" />
-				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
-				<attribute name="Build-Timestamp" value="${timestamp}" />
-				<attribute name="Build-Revision" value="${revision}" />
-			</manifest>
-		</jar>
-		<jar jarfile="${target.dir}/${zookeeper-sources-jar.name}" basedir="${src.dir}" includes="${zookeeper-sources-jar.includes}">
-			<manifest>
-				<attribute name="Implementation-Title" value="ironrhino-zookeeper" />
-				<attribute name="Implementation-Vendor" value="ironrhino" />
-				<attribute name="Implementation-Version" value="${version}" />
-				<attribute name="Ironrhino-Component-Id" value="ironrhino-zookeeper" />
 				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core" />
 				<attribute name="Build-Timestamp" value="${timestamp}" />
 				<attribute name="Build-Revision" value="${revision}" />

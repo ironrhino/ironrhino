@@ -51,7 +51,7 @@ ironrhino通常对内置服务提供多种实现, 并且会在具体的部署规
 
 |cluster
 |org.ironrhino.core.coordination.impl.ZooKeeperLockService
-|需要zookeeper集群
+|需要ironrhino-zookeeper.jar和zookeeper集群
 |===
 
 * org.ironrhino.core.throttle.ConcurrencyService
@@ -83,7 +83,7 @@ ironrhino通常对内置服务提供多种实现, 并且会在具体的部署规
 
 |cluster
 |org.ironrhino.core.coordination.impl.ZooKeeperMembership
-|需要zookeeper集群
+|需要ironrhino-zookeeper.jar和zookeeper集群
 |===
 
 * org.ironrhino.core.fs.FileStorage
@@ -115,7 +115,7 @@ ironrhino通常对内置服务提供多种实现, 并且会在具体的部署规
 
 |cluster
 |org.ironrhino.core.remoting.impl.ZooKeeperServiceRegistry
-|需要zookeeper集群
+|需要ironrhino-zookeeper.jar和zookeeper集群
 |===
 
 

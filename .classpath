@@ -19,9 +19,6 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-math3-3.6.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-net-3.6.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/commons-pool2-2.6.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-client-4.0.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-framework-4.0.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/curator-recipes-4.0.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/disruptor-3.4.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/dom4j-2.1.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/flyway-core-5.2.4.jar"/>
@@ -102,7 +99,6 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/transaction-api-1.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/validation-api-2.0.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/xwork-core-2.4.16.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/zookeeper-3.4.9.jar"/>
 	<classpathentry kind="lib" path="lib/annotations-api-3.0.jar"/>
 	<classpathentry kind="lib" path="lib/asm-7.0.jar"/>
 	<classpathentry kind="lib" path="lib/el-api-3.0.1.jar"/>
