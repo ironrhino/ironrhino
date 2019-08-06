@@ -207,7 +207,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 			return;
 		}
 		if (checkRemoteAddr) {
-			if (!session.getAttrMap().isEmpty() && session.getAttribute(SESSION_KEY_REMOTE_ADDR) == null)
+			if (session.getAttributeNames().hasMoreElements() && session.getAttribute(SESSION_KEY_REMOTE_ADDR) == null)
 				session.setAttribute(SESSION_KEY_REMOTE_ADDR, session.getRequest().getRemoteAddr());
 		}
 		doSave(session);
@@ -215,8 +215,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 
 	@Override
 	public void invalidate(WrappedHttpSession session) {
-		session.setInvalid(true);
-		session.getAttrMap().clear();
+		session.markAsInvalid();
 		doInvalidate(session);
 		if (session.isCacheBased()) {
 			changeSessionId(session);

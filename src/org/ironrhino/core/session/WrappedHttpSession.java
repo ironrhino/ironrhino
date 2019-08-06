@@ -216,8 +216,9 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 		return invalid;
 	}
 
-	public void setInvalid(boolean invalid) {
-		this.invalid = invalid;
+	public void markAsInvalid() {
+		this.invalid = true;
+		attrMap.clear();
 	}
 
 	public boolean isRequestedSessionIdFromCookie() {
