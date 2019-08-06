@@ -15,13 +15,15 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.core.spring.security.DefaultLoginUrlAuthenticationEntryPoint;
 import org.ironrhino.core.util.IteratorEnumeration;
 import org.ironrhino.core.util.RequestUtils;
 
 public class WrappedHttpSession implements Serializable, HttpSession {
 
 	private static final long serialVersionUID = -4227316119138095858L;
+
+	private static final String SAVED_REQUEST = "SPRING_SECURITY_SAVED_REQUEST";
+	// org.springframework.security.web.savedrequest.HttpSessionRequestCache.SAVED_REQUEST
 
 	public static Pattern SESSION_TRACKER_PATTERN;
 
@@ -110,7 +112,7 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 	@Override
 	public void setAttribute(String key, Object object) {
 		attrMap.put(key, object);
-		if (!key.equals(DefaultLoginUrlAuthenticationEntryPoint.SAVED_REQUEST))
+		if (!key.equals(SAVED_REQUEST))
 			setDirty(true);
 	}
 
@@ -122,7 +124,7 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 	@Override
 	public void removeAttribute(String key) {
 		attrMap.remove(key);
-		if (!key.equals(DefaultLoginUrlAuthenticationEntryPoint.SAVED_REQUEST))
+		if (!key.equals(SAVED_REQUEST))
 			setDirty(true);
 	}
 

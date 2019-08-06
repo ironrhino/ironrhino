@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.savedrequest.DefaultSavedRequest;
+import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.security.web.util.RedirectUrlBuilder;
 
@@ -21,8 +22,8 @@ import lombok.Setter;
 
 public class DefaultLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticationEntryPoint {
 
-	public static final String SAVED_REQUEST = "SPRING_SECURITY_SAVED_REQUEST";
-	// org.springframework.security.web.savedrequest.HttpSessionRequestCache.SAVED_REQUEST
+	@Autowired
+	private RequestCache requestCache;
 
 	@Value("${login.ignoreSavedRequest:false}")
 	private boolean ignoreSavedRequest;
@@ -41,14 +42,14 @@ public class DefaultLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticat
 	@Override
 	protected String buildRedirectUrlToLoginPage(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException authException) {
-		return buildRedirectUrlToLoginPage(request);
+		return buildRedirectUrlToLoginPage(request, response);
 	}
 
-	public String buildRedirectUrlToLoginPage(HttpServletRequest request) {
+	public String buildRedirectUrlToLoginPage(HttpServletRequest request, HttpServletResponse response) {
 		String targetUrl = null;
 		String redirectUrl = null;
-		SavedRequest savedRequest = (SavedRequest) request.getSession().getAttribute(SAVED_REQUEST);
-		request.getSession().removeAttribute(SAVED_REQUEST);
+		SavedRequest savedRequest = requestCache.getRequest(request, response);
+		requestCache.removeRequest(request, response);
 		if (!ignoreSavedRequest) {
 			if (savedRequest != null) {
 				if (savedRequest instanceof DefaultSavedRequest) {
