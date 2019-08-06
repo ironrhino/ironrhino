@@ -8,7 +8,7 @@ import javax.servlet.http.HttpSession;
 
 public class WrappedHttpServletRequest extends HttpServletRequestWrapper {
 
-	private WrappedHttpSession session;
+	private final WrappedHttpSession session;
 
 	public WrappedHttpServletRequest(HttpServletRequest request, WrappedHttpSession session) {
 		super(request);
@@ -17,11 +17,15 @@ public class WrappedHttpServletRequest extends HttpServletRequestWrapper {
 
 	@Override
 	public HttpSession getSession() {
-		return session;
+		return getSession(true);
 	}
 
 	@Override
 	public HttpSession getSession(boolean create) {
+		if (create)
+			session.getAttrMap(true);
+		else if (session.getAttrMap(false) == null)
+			return null;
 		return session;
 	}
 
@@ -58,8 +62,7 @@ public class WrappedHttpServletRequest extends HttpServletRequestWrapper {
 
 	@Override
 	public Locale getLocale() {
-		Locale locale = session.getHttpSessionManager().getLocale((HttpServletRequest) this.getRequest());
-		return locale;
+		return session.getHttpSessionManager().getLocale((HttpServletRequest) this.getRequest());
 	}
 
 }

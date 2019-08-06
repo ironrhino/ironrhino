@@ -133,7 +133,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 		Map<String, Object> sessionMap = (Map<String, Object>) session.getRequest()
 				.getAttribute(REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API);
 		if (sessionMap != null) {
-			session.setAttrMap(sessionMap);
+			session.getAttrMap(true).putAll(sessionMap);
 			return;
 		}
 
@@ -184,7 +184,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 			session.setSessionTracker(getSessionTracker(session));
 		sessionMap = (Map<String, Object>) session.getRequest().getAttribute(REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_SSO);
 		if (sessionMap != null) {
-			session.setAttrMap(sessionMap);
+			session.getAttrMap(true).putAll(sessionMap);
 			session.markAsDirty();
 		} else {
 			doInitialize(session);

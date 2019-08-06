@@ -2,6 +2,7 @@ package org.ironrhino.core.session;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +38,7 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 
 	private transient ServletContext context;
 
-	private Map<String, Object> attrMap = new HashMap<>(8);
+	private volatile Map<String, Object> attrMap;
 
 	private long creationTime;
 
@@ -96,12 +97,10 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 		return context;
 	}
 
-	public Map<String, Object> getAttrMap() {
+	public Map<String, Object> getAttrMap(boolean create) {
+		if (create && attrMap == null)
+			attrMap = new HashMap<>(8);
 		return attrMap;
-	}
-
-	public void setAttrMap(Map<String, Object> attrMap) {
-		this.attrMap = attrMap;
 	}
 
 	@Override
@@ -111,18 +110,22 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 
 	@Override
 	public void setAttribute(String key, Object object) {
-		attrMap.put(key, object);
+		getAttrMap(true).put(key, object);
 		if (!key.equals(SAVED_REQUEST))
 			markAsDirty();
 	}
 
 	@Override
 	public Object getAttribute(String key) {
+		if (attrMap == null)
+			return null;
 		return attrMap.get(key);
 	}
 
 	@Override
 	public void removeAttribute(String key) {
+		if (attrMap == null)
+			return;
 		attrMap.remove(key);
 		if (!key.equals(SAVED_REQUEST))
 			markAsDirty();
@@ -130,6 +133,8 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 
 	@Override
 	public Enumeration<String> getAttributeNames() {
+		if (attrMap == null)
+			return Collections.emptyEnumeration();
 		return new IteratorEnumeration<>(attrMap.keySet().iterator());
 	}
 
@@ -218,7 +223,7 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 
 	public void markAsInvalid() {
 		this.invalid = true;
-		attrMap.clear();
+		attrMap = null;
 	}
 
 	public boolean isRequestedSessionIdFromCookie() {

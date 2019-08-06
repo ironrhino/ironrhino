@@ -39,7 +39,11 @@ public class SessionCompressorManager {
 	private SessionCompressor defaultSessionCompressor = new DefaultSessionCompressor();
 
 	public String compress(WrappedHttpSession session) {
-		Map<String, Object> map = session.getAttrMap();
+		Map<String, Object> map = session.getAttrMap(false);
+		if (map == null)
+			return null;
+		if (map.isEmpty())
+			return "";
 		Map<String, String> compressedMap = new HashMap<>();
 		for (Map.Entry<String, Object> entry : map.entrySet()) {
 			String key = entry.getKey();
@@ -68,66 +72,68 @@ public class SessionCompressorManager {
 	}
 
 	public void uncompress(WrappedHttpSession session, String str) {
-		Map<String, Object> map = session.getAttrMap();
-		if (StringUtils.isNotBlank(str)) {
-			Map<String, String> compressedMap = null;
-			try {
-				compressedMap = JsonUtils.fromJson(str, JsonUtils.STRING_MAP_TYPE);
-			} catch (Exception e) {
-				log.error(e.getMessage(), e);
-				session.invalidate();
-				return;
-			}
-			if (compressedMap != null)
-				for (Map.Entry<String, String> entry : compressedMap.entrySet()) {
-					String key = entry.getKey();
-					SessionCompressor compressor = null;
-					if (compressors != null)
-						for (SessionCompressor var : compressors) {
-							if (var.supportsKey(key)) {
-								compressor = var;
-								break;
-							}
-						}
-					if (compressor == null)
-						compressor = defaultSessionCompressor;
-					try {
-						Object value = compressor.uncompress(entry.getValue());
-						if (value == null)
-							continue;
-						if (value instanceof SecurityContext) {
-							Authentication auth = ((SecurityContext) value).getAuthentication();
-							Object principal = auth != null ? auth.getPrincipal() : null;
-							if (principal instanceof UserDetails) {
-								UserDetails ud = (UserDetails) principal;
-								String username = ud.getUsername();
-								String uri = RequestUtils.getRequestUri(session.getRequest());
-								if (!uri.endsWith("/logout")) {
-									if (!ud.isEnabled()) {
-										throw new DisabledException(username);
-									} else if (!ud.isAccountNonExpired()) {
-										throw new AccountExpiredException(username);
-									} else if (!ud.isAccountNonLocked()) {
-										throw new LockedException(username);
-									} else if (!ud.isCredentialsNonExpired()) {
-										boolean isPasswordEntryPoint = StringUtils.isNotBlank(passwordEntryPoint)
-												? uri.equals(passwordEntryPoint)
-												: uri.endsWith("/password");
-										String accept = session.getRequest().getHeader("Accept");
-										if (!isPasswordEntryPoint && !uri.startsWith("/assets/")
-												&& (accept == null || !accept.contains("application/json")))
-											throw new CredentialsExpiredException(username);
-									}
-								}
-							}
-						}
-						map.put(key, value);
-					} catch (AccountStatusException e) {
-						throw e;
-					} catch (Exception e) {
-						log.error("uncompress error for " + key + ",it won't be restored", e);
+		if (str == null)
+			return;
+		Map<String, Object> map = session.getAttrMap(true);
+		if (str.isEmpty())
+			return;
+		Map<String, String> compressedMap = null;
+		try {
+			compressedMap = JsonUtils.fromJson(str, JsonUtils.STRING_MAP_TYPE);
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+			session.invalidate();
+			return;
+		}
+		for (Map.Entry<String, String> entry : compressedMap.entrySet()) {
+			String key = entry.getKey();
+			SessionCompressor compressor = null;
+			if (compressors != null)
+				for (SessionCompressor var : compressors) {
+					if (var.supportsKey(key)) {
+						compressor = var;
+						break;
 					}
 				}
+			if (compressor == null)
+				compressor = defaultSessionCompressor;
+			try {
+				Object value = compressor.uncompress(entry.getValue());
+				if (value == null)
+					continue;
+				if (value instanceof SecurityContext) {
+					Authentication auth = ((SecurityContext) value).getAuthentication();
+					Object principal = auth != null ? auth.getPrincipal() : null;
+					if (principal instanceof UserDetails) {
+						UserDetails ud = (UserDetails) principal;
+						String username = ud.getUsername();
+						String uri = RequestUtils.getRequestUri(session.getRequest());
+						if (!uri.endsWith("/logout")) {
+							if (!ud.isEnabled()) {
+								throw new DisabledException(username);
+							} else if (!ud.isAccountNonExpired()) {
+								throw new AccountExpiredException(username);
+							} else if (!ud.isAccountNonLocked()) {
+								throw new LockedException(username);
+							} else if (!ud.isCredentialsNonExpired()) {
+								boolean isPasswordEntryPoint = StringUtils.isNotBlank(passwordEntryPoint)
+										? uri.equals(passwordEntryPoint)
+										: uri.endsWith("/password");
+								String accept = session.getRequest().getHeader("Accept");
+								if (!isPasswordEntryPoint && !uri.startsWith("/assets/")
+										&& (accept == null || !accept.contains("application/json")))
+									throw new CredentialsExpiredException(username);
+							}
+						}
+					}
+				}
+				map.put(key, value);
+			} catch (AccountStatusException e) {
+				throw e;
+			} catch (Exception e) {
+				log.error("uncompress error for " + key + ",it won't be restored", e);
+			}
 		}
 	}
+
 }
