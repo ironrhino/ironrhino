@@ -116,7 +116,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	public String changeSessionId(WrappedHttpSession session) {
 		if (session.isCacheBased()) {
 			cacheBased.invalidate(session);
-			session.setDirty(true);
+			session.markAsDirty();
 		}
 		session.setNew(true);
 		session.setId(nextSessionId());
@@ -185,7 +185,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 		sessionMap = (Map<String, Object>) session.getRequest().getAttribute(REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_SSO);
 		if (sessionMap != null) {
 			session.setAttrMap(sessionMap);
-			session.setDirty(true);
+			session.markAsDirty();
 		} else {
 			doInitialize(session);
 			if (checkRemoteAddr) {

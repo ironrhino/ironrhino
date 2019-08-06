@@ -113,7 +113,7 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 	public void setAttribute(String key, Object object) {
 		attrMap.put(key, object);
 		if (!key.equals(SAVED_REQUEST))
-			setDirty(true);
+			markAsDirty();
 	}
 
 	@Override
@@ -125,7 +125,7 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 	public void removeAttribute(String key) {
 		attrMap.remove(key);
 		if (!key.equals(SAVED_REQUEST))
-			setDirty(true);
+			markAsDirty();
 	}
 
 	@Override
@@ -196,11 +196,8 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 		return Boolean.TRUE.equals(request.getAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_SESSION_MARK_AS_DIRTY));
 	}
 
-	public void setDirty(boolean dirty) {
-		if (dirty)
-			request.setAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_SESSION_MARK_AS_DIRTY, true);
-		else
-			request.removeAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_SESSION_MARK_AS_DIRTY);
+	public void markAsDirty() {
+		request.setAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_SESSION_MARK_AS_DIRTY, true);
 	}
 
 	public String getSessionTracker() {
