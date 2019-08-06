@@ -148,8 +148,8 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 		return isnew;
 	}
 
-	public void setNew(boolean isnew) {
-		this.isnew = isnew;
+	public void markAsNew() {
+		this.isnew = true;
 	}
 
 	@Override

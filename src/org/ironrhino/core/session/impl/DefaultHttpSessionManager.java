@@ -118,7 +118,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 			cacheBased.invalidate(session);
 			session.markAsDirty();
 		}
-		session.setNew(true);
+		session.markAsNew();
 		session.setId(nextSessionId());
 		session.setSessionTracker(getSessionTracker(session));
 		saveSessionTracker(session);
@@ -151,7 +151,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 				try {
 					String[] array = sessionTracker.split(SESSION_TRACKER_SEPERATOR);
 					if (array.length == 1) {
-						session.setNew(true);
+						session.markAsNew();
 						sessionId = nextSessionId();
 					} else {
 						sessionId = array[0];
@@ -172,7 +172,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 				}
 			}
 		} else {
-			session.setNew(true);
+			session.markAsNew();
 			sessionId = nextSessionId();
 		}
 		session.setId(sessionId);
