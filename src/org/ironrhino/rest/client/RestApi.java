@@ -8,7 +8,6 @@ import java.lang.annotation.Target;
 
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestHeader;
 
 @Validated
 @Retention(RUNTIME)

@@ -127,10 +127,10 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 		this.apiBaseUrl = (annotation != null) ? annotation.apiBaseUrl() : "";
 		Map<String, String> map = null;
 		if (annotation != null) {
-			RequestHeader[] rhs = annotation.requestHeaders();
+			org.ironrhino.rest.client.RequestHeader[] rhs = annotation.requestHeaders();
 			if (rhs.length > 0) {
 				map = new HashMap<>(rhs.length * 2);
-				for (RequestHeader h : annotation.requestHeaders())
+				for (org.ironrhino.rest.client.RequestHeader h : annotation.requestHeaders())
 					map.put(h.name(), h.value());
 			}
 		}
