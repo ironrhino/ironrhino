@@ -483,7 +483,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 				}
 			}
-			if (StringUtils.isAlphanumeric(keyword) && (keyword.length() == 32 || keyword.length() == 22)) {
+			if (StringUtils.isAlphanumeric(keyword) && (keyword.length() == 32 || keyword.length() == 22)
+					&& bw.getPropertyType("id") == String.class) {
 				dc.add(Restrictions.idEq(keyword));
 				return dc;
 			}
@@ -534,8 +535,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			}
 			if (propertyNamesInLike.size() > 0)
 				dc.add(CriterionUtils.like(keyword, propertyNamesInLike));
+			else if (bw.getPropertyType("id") == String.class)
+				dc.add(Restrictions.idEq(keyword));
 			else
-				dc.add(Restrictions.like("id", keyword, MatchMode.EXACT));
+				return dc.add(Restrictions.isNull("id")); // force empty result
 		}
 		if (criteriaState.getOrderings().isEmpty()) {
 			if (richtableConfig != null && StringUtils.isNotBlank(richtableConfig.order())) {
