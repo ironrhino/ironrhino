@@ -41,8 +41,9 @@ public class CacheAspect extends BaseAspect {
 		Map<String, Object> context = buildContext(jp);
 		String namespace = ExpressionUtils.evalString(checkCache.namespace(), context);
 		List<String> keys = ExpressionUtils.evalList(checkCache.key(), context);
-		keys = keys.stream().filter(s -> s != null).collect(Collectors.toList());
-		if (keys.isEmpty())
+		if (keys != null)
+			keys = keys.stream().filter(s -> s != null).collect(Collectors.toList());
+		if (keys == null || keys.isEmpty())
 			return jp.proceed();
 		String keyMutex = MUTEX + String.join("_", keys);
 		boolean mutexed = false;
@@ -124,12 +125,16 @@ public class CacheAspect extends BaseAspect {
 
 	@Around("execution(public * *(..)) and @annotation(evictCache)")
 	public Object remove(ProceedingJoinPoint jp, EvictCache evictCache) throws Throwable {
+		if (isBypass())
+			return jp.proceed();
 		Map<String, Object> context = buildContext(jp);
 		String namespace = ExpressionUtils.evalString(evictCache.namespace(), context);
 		boolean fallback = false;
 		List<String> keys = null;
 		try {
 			keys = ExpressionUtils.evalList(evictCache.key(), context);
+			if (keys == null)
+				fallback = true; // id generated after proceed
 		} catch (PropertyAccessException e) {
 			fallback = true; // required retval
 		}
@@ -137,8 +142,9 @@ public class CacheAspect extends BaseAspect {
 		putReturnValueIntoContext(context, retval);
 		if (fallback)
 			keys = ExpressionUtils.evalList(evictCache.key(), context);
-		keys = keys.stream().filter(s -> s != null).collect(Collectors.toList());
-		if (isBypass() || keys.isEmpty())
+		if (keys != null)
+			keys = keys.stream().filter(s -> s != null).collect(Collectors.toList());
+		if (keys == null || keys.isEmpty())
 			return retval;
 		cacheManager.mdelete(new HashSet<>(keys), namespace);
 		ExpressionUtils.eval(evictCache.onEvict(), context);
