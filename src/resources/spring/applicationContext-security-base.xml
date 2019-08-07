@@ -22,6 +22,8 @@
 		<constructor-arg value="${login.entryPoint:/login}" />
 	</bean>
 
+	<bean id="requestCache" class="org.springframework.security.web.savedrequest.NullRequestCache"/>
+
 	<bean id="authenticationFilter"
 		class="org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationFilter"
 		p:filterProcessesUrl="/check" p:authenticationManager-ref="authenticationManager"

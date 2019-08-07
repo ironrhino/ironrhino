@@ -23,9 +23,6 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 
 	private static final long serialVersionUID = -4227316119138095858L;
 
-	private static final String SAVED_REQUEST = "SPRING_SECURITY_SAVED_REQUEST";
-	// org.springframework.security.web.savedrequest.HttpSessionRequestCache.SAVED_REQUEST
-
 	public static Pattern SESSION_TRACKER_PATTERN;
 
 	private String id;
@@ -111,8 +108,7 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 	@Override
 	public void setAttribute(String key, Object object) {
 		getAttrMap(true).put(key, object);
-		if (!key.equals(SAVED_REQUEST))
-			markAsDirty();
+		markAsDirty();
 	}
 
 	@Override
@@ -127,8 +123,7 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 		if (attrMap == null)
 			return;
 		attrMap.remove(key);
-		if (!key.equals(SAVED_REQUEST))
-			markAsDirty();
+		markAsDirty();
 	}
 
 	@Override

@@ -10,6 +10,7 @@
 		<security:access-denied-handler error-page="/error/401"/>
 		<security:headers disabled="true"/>
 		<security:csrf disabled="true"/>
+		<security:request-cache ref="requestCache"/>
 		<security:x509 subject-principal-regex="CN=(.*?)," user-service-ref="userDetailsService"/>
 		<security:intercept-url pattern="/login*/**" access="permitAll" />
 		<security:intercept-url pattern="/oauth*/**" access="permitAll" />

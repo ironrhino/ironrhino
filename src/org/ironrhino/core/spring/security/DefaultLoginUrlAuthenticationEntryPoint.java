@@ -13,17 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
-import org.springframework.security.web.savedrequest.DefaultSavedRequest;
-import org.springframework.security.web.savedrequest.RequestCache;
-import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.security.web.util.RedirectUrlBuilder;
 
 import lombok.Setter;
 
 public class DefaultLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticationEntryPoint {
-
-	@Autowired
-	private RequestCache requestCache;
 
 	@Value("${login.ignoreSavedRequest:false}")
 	private boolean ignoreSavedRequest;
@@ -48,30 +42,12 @@ public class DefaultLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticat
 	public String buildRedirectUrlToLoginPage(HttpServletRequest request, HttpServletResponse response) {
 		String targetUrl = null;
 		String redirectUrl = null;
-		SavedRequest savedRequest = requestCache.getRequest(request, response);
-		requestCache.removeRequest(request, response);
 		if (!ignoreSavedRequest) {
-			if (savedRequest != null) {
-				if (savedRequest instanceof DefaultSavedRequest) {
-					DefaultSavedRequest dsr = (DefaultSavedRequest) savedRequest;
-					String queryString = dsr.getQueryString();
-					// remove jquery ajax parameter
-					if (StringUtils.isNotBlank(queryString))
-						queryString = queryString.replaceFirst("&?_=\\d{13}", "");
-					if (StringUtils.isBlank(queryString)) {
-						targetUrl = dsr.getRequestURL();
-					} else {
-						targetUrl = new StringBuilder(dsr.getRequestURL()).append("?").append(queryString).toString();
-					}
-				} else
-					targetUrl = savedRequest.getRedirectUrl();
+			String queryString = request.getQueryString();
+			if (StringUtils.isBlank(queryString)) {
+				targetUrl = request.getRequestURL().toString();
 			} else {
-				String queryString = request.getQueryString();
-				if (StringUtils.isBlank(queryString)) {
-					targetUrl = request.getRequestURL().toString();
-				} else {
-					targetUrl = new StringBuilder(request.getRequestURL()).append("?").append(queryString).toString();
-				}
+				targetUrl = new StringBuilder(request.getRequestURL()).append("?").append(queryString).toString();
 			}
 			if (StringUtils.isBlank(ssoServerBase)) {
 				String baseUrl = RequestUtils.getBaseUrl(request);
