@@ -182,19 +182,13 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 		session.setMinActiveInterval(minActiveInterval);
 		if (session.getSessionTracker() == null)
 			session.setSessionTracker(getSessionTracker(session));
-		sessionMap = (Map<String, Object>) session.getRequest().getAttribute(REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_SSO);
-		if (sessionMap != null) {
-			session.getAttrMap(true).putAll(sessionMap);
-			session.markAsDirty();
-		} else {
-			doInitialize(session);
-			if (checkRemoteAddr) {
-				String addr = (String) session.getAttribute(SESSION_KEY_REMOTE_ADDR);
-				if (addr != null && !session.getRequest().getRemoteAddr().equals(addr)) {
-					log.warn("Invalidate session[{}] that created from {} but hijacked from {}", session.getId(), addr,
-							session.getRequest().getRemoteAddr());
-					invalidate(session);
-				}
+		doInitialize(session);
+		if (checkRemoteAddr) {
+			String addr = (String) session.getAttribute(SESSION_KEY_REMOTE_ADDR);
+			if (addr != null && !session.getRequest().getRemoteAddr().equals(addr)) {
+				log.warn("Invalidate session[{}] that created from {} but hijacked from {}", session.getId(), addr,
+						session.getRequest().getRemoteAddr());
+				invalidate(session);
 			}
 		}
 	}

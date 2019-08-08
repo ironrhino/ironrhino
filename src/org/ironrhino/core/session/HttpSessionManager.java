@@ -10,8 +10,6 @@ public interface HttpSessionManager extends HttpSessionStore {
 
 	String REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API = "_session_map_in_request_for_api";
 
-	String REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_SSO = "_session_map_in_request_for_sso";
-
 	String REQUEST_ATTRIBUTE_SESSION_MARK_AS_DIRTY = "_session_mark_as_dirty";
 
 	String DEFAULT_SESSION_TRACKER_NAME = "T";
