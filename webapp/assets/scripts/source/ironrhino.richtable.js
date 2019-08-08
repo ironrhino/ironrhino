@@ -16,21 +16,9 @@ Richtable = {
 		}
 		return url;
 	},
-	getPathParams : function() {
-		var url = document.location.href;
-		var p = url.indexOf('?');
-		if (p > 0)
-			url = url.substring(0, p);
-		p = url.indexOf(';');
-		if (p > 0)
-			return url.substring(p);
-		else
-			return '';
-	},
 	getUrl : function(type, id, includeParams, form) {
 		form = form || $('form.richtable');
-		var url = Richtable.getBaseUrl(form) + '/' + type
-				+ Richtable.getPathParams();
+		var url = Richtable.getBaseUrl(form) + '/' + type;
 		if (id) {
 			url += (url.indexOf('?') > 0 ? '&' : '?');
 			if (Array.isArray(id)) {
@@ -305,8 +293,7 @@ Richtable = {
 				Message.showMessage('no.selection');
 				return false;
 			}
-			var url = Richtable.getBaseUrl(form) + '/' + action
-					+ Richtable.getPathParams();
+			var url = Richtable.getBaseUrl(form) + '/' + action;
 			url += (url.indexOf('?') > 0 ? '&' : '?') + idparams;
 			var download = btn.attr('download');
 			if (download || btn.hasClass('download')) {
@@ -422,8 +409,7 @@ Richtable = {
 						var value = $(this).data('cellvalue') || $(this).text();
 						params[name] = value;
 					});
-					var url = Richtable.getBaseUrl(form) + '/save'
-							+ Richtable.getPathParams();
+					var url = Richtable.getBaseUrl(form) + '/save';
 					ajax({
 								url : url,
 								type : 'POST',

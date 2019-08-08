@@ -7,23 +7,18 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.IteratorEnumeration;
 import org.ironrhino.core.util.RequestUtils;
 
 public class WrappedHttpSession implements Serializable, HttpSession {
 
 	private static final long serialVersionUID = -4227316119138095858L;
-
-	public static volatile Pattern SESSION_TRACKER_PATTERN;
 
 	private String id;
 
@@ -58,8 +53,6 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 
 	private boolean invalid;
 
-	private String requestURL;
-
 	public WrappedHttpSession(HttpServletRequest request, HttpServletResponse response, ServletContext context,
 			HttpSessionManager httpSessionManager) {
 		now = System.currentTimeMillis();
@@ -67,10 +60,7 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 		this.response = response;
 		this.context = context;
 		this.httpSessionManager = httpSessionManager;
-		requestURL = request.getRequestURL().toString();
 		sessionTracker = RequestUtils.getCookieValue(request, httpSessionManager.getSessionTrackerName());
-		if (SESSION_TRACKER_PATTERN == null)
-			SESSION_TRACKER_PATTERN = Pattern.compile(';' + httpSessionManager.getSessionTrackerName() + "=.+");
 		httpSessionManager.initialize(this);
 	}
 
@@ -235,40 +225,6 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 
 	public void setCacheBased(boolean cacheBased) {
 		this.cacheBased = cacheBased;
-	}
-
-	public String encodeURL(String url) {
-		if (!isRequestedSessionIdFromURL() || StringUtils.isBlank(url) || !RequestUtils.isSameOrigin(requestURL, url))
-			return url;
-		Matcher m = SESSION_TRACKER_PATTERN.matcher(url);
-		if (m.find())
-			return url;
-		return doEncodeURL(url);
-	}
-
-	public String encodeRedirectURL(String url) {
-		if (!isRequestedSessionIdFromURL() || StringUtils.isBlank(url))
-			return url;
-		Matcher m = SESSION_TRACKER_PATTERN.matcher(url);
-		url = m.replaceAll("");
-		return doEncodeURL(url);
-	}
-
-	private String doEncodeURL(String url) {
-		String[] array = url.split("\\?", 2);
-		StringBuilder sb = new StringBuilder();
-		sb.append(array[0]);
-		if (sessionTracker != null) {
-			sb.append(';');
-			sb.append(httpSessionManager.getSessionTrackerName());
-			sb.append('=');
-			sb.append(sessionTracker);
-		}
-		if (array.length == 2) {
-			sb.append('?');
-			sb.append(array[1]);
-		}
-		return sb.toString();
 	}
 
 	@Override

@@ -10,6 +10,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.ironrhino.core.servlet.LazyCommitResponseWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
@@ -27,13 +28,11 @@ public class HttpSessionFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws ServletException, IOException {
-		final WrappedHttpSession session = new WrappedHttpSession(request, response, getServletContext(),
-				httpSessionManager);
-		final boolean lazyCommit = !session.isCacheBased();
+		WrappedHttpSession session = new WrappedHttpSession(request, response, getServletContext(), httpSessionManager);
+		boolean lazyCommit = !session.isCacheBased();
 		WrappedHttpServletRequest wrappedHttpRequest = new WrappedHttpServletRequest(request, session);
 		LocaleContextHolder.setLocale(wrappedHttpRequest.getLocale(), true);
-		final HttpServletResponse wrappedHttpResponse = lazyCommit ? new WrappedHttpServletResponse(response, session)
-				: new SimpleWrappedHttpServletResponse(response, session);
+		HttpServletResponse wrappedHttpResponse = lazyCommit ? new LazyCommitResponseWrapper(response) : response;
 		if (httpSessionFilterHooks != null) {
 			int appliedHooks = 0;
 			try {
@@ -64,7 +63,7 @@ public class HttpSessionFilter extends OncePerRequestFilter {
 				e.printStackTrace();
 			} finally {
 				if (lazyCommit)
-					((WrappedHttpServletResponse) wrappedHttpResponse).commit();
+					((LazyCommitResponseWrapper) wrappedHttpResponse).commit();
 			}
 		} else {
 			wrappedHttpRequest.getAsyncContext().addListener(new AsyncListener() {
@@ -89,7 +88,7 @@ public class HttpSessionFilter extends OncePerRequestFilter {
 						e.printStackTrace();
 					} finally {
 						if (lazyCommit)
-							((WrappedHttpServletResponse) wrappedHttpResponse).commit();
+							((LazyCommitResponseWrapper) wrappedHttpResponse).commit();
 					}
 				}
 			});
