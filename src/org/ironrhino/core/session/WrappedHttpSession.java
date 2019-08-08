@@ -23,7 +23,7 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 
 	private static final long serialVersionUID = -4227316119138095858L;
 
-	public static Pattern SESSION_TRACKER_PATTERN;
+	public static volatile Pattern SESSION_TRACKER_PATTERN;
 
 	private String id;
 
