@@ -89,6 +89,7 @@ import org.springframework.util.ClassUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionProxy;
+import com.opensymphony.xwork2.conversion.impl.XWorkConverter;
 import com.opensymphony.xwork2.inject.Inject;
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 import com.opensymphony.xwork2.util.ValueStack;
@@ -1186,7 +1187,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
-		return true;
+		return !hasErrors();
 	}
 
 	protected void beforeSave(EN en) {
@@ -1822,6 +1823,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			try {
 				ReflectionContextState.setCreatingNullObjects(context, true);
 				ReflectionContextState.setDenyMethodExecution(context, true);
+				ReflectionContextState.setReportingConversionErrors(context, true);
 				for (Map.Entry<String, Object> entry : parameters.entrySet()) {
 					String name = entry.getKey();
 					Object value = entry.getValue();
@@ -1841,6 +1843,17 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			} finally {
 				ReflectionContextState.setCreatingNullObjects(context, false);
 				ReflectionContextState.setDenyMethodExecution(context, false);
+				if (Boolean.TRUE.equals(context.get(XWorkConverter.REPORT_CONVERSION_ERRORS))) {
+					Map<String, Object> conversionErrors = (Map<String, Object>) context
+							.get(ActionContext.CONVERSION_ERRORS);
+					if (conversionErrors != null && !conversionErrors.isEmpty()) {
+						for (Map.Entry<String, Object> entry : conversionErrors.entrySet()) {
+							String propertyName = (String) entry.getKey();
+							String message = XWorkConverter.getConversionErrorMessage(propertyName, temp);
+							addFieldError(propertyName, message);
+						}
+					}
+				}
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
