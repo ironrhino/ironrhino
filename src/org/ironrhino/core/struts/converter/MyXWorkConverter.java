@@ -52,7 +52,7 @@ public class MyXWorkConverter extends XWorkConverter {
 		}
 		Object result = super.convertValue(context, target, member, property, value, toClass);
 		if (TypeConverter.NO_CONVERSION_POSSIBLE.equals(result) && value != null) {
-			if (File.class.isAssignableFrom(toClass) || Path.class.isAssignableFrom(toClass)
+			if (File.class.isAssignableFrom(toClass) || Path.class.isAssignableFrom(toClass) || toClass.isPrimitive()
 					|| toClass.getName().startsWith("java."))
 				return result;
 			try {
