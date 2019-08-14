@@ -80,6 +80,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.InvalidPropertyException;
+import org.springframework.beans.PropertyAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
@@ -305,20 +306,20 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			if (StringUtils.isNotBlank(getUid())) {
 				String uid = getUid();
 				if (uid.indexOf('.') > 0) {
-					bw.setPropertyValue("id", uid.substring(0, uid.indexOf('.')));
+					safeSetPropertyValue(bw, "id", uid.substring(0, uid.indexOf('.')));
 					_entity = entityManager.get((Serializable) bw.getPropertyValue("id"));
 					if (_entity == null && naturalIds.size() == 1) {
 						String naturalIdName = naturalIds.iterator().next();
-						bw.setPropertyValue(naturalIdName, uid.substring(0, uid.indexOf('.')));
+						safeSetPropertyValue(bw, naturalIdName, uid.substring(0, uid.indexOf('.')));
 						_entity = entityManager.findByNaturalId((Serializable) bw.getPropertyValue(naturalIdName));
 					}
 				}
 				if (_entity == null) {
-					bw.setPropertyValue("id", uid);
+					safeSetPropertyValue(bw, "id", uid);
 					_entity = entityManager.get((Serializable) bw.getPropertyValue("id"));
 					if (_entity == null && naturalIds.size() == 1) {
 						String naturalIdName = naturalIds.iterator().next();
-						bw.setPropertyValue(naturalIdName, uid);
+						safeSetPropertyValue(bw, naturalIdName, uid);
 						_entity = entityManager.findByNaturalId((Serializable) bw.getPropertyValue(naturalIdName));
 					}
 				}
@@ -331,7 +332,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				for (String naturalId : naturalIds) {
 					paramters[i] = naturalId;
 					i++;
-					bw.setPropertyValue(naturalId, ServletActionContext.getRequest().getParameter(naturalId));
+					safeSetPropertyValue(bw, naturalId, ServletActionContext.getRequest().getParameter(naturalId));
 					Serializable value = (Serializable) bw.getPropertyValue(naturalId);
 					if (value != null)
 						paramters[i] = value;
@@ -474,7 +475,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		if (searchable && StringUtils.isNotBlank(keyword)) {
 			if (StringUtils.isNumeric(keyword)) {
 				try {
-					bw.setPropertyValue("id", keyword);
+					safeSetPropertyValue(bw, "id", keyword);
 					Serializable idvalue = (Serializable) bw.getPropertyValue("id");
 					if (idvalue instanceof Number) {
 						dc.add(Restrictions.idEq(idvalue));
@@ -622,7 +623,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			if (versionPropertyName != null) {
 				Object version = bw.getPropertyValue(versionPropertyName);
 				if (version instanceof Number && ((Number) version).intValue() == 0) {
-					bw.setPropertyValue(versionPropertyName, -1);
+					safeSetPropertyValue(bw, versionPropertyName, -1);
 				}
 			}
 		} else {
@@ -632,7 +633,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		if (_entity != null && _entity.isNew()) {
 			Set<String> naturalIds = getNaturalIds().keySet();
 			if (getUid() != null && naturalIds.size() == 1) {
-				bw.setPropertyValue(naturalIds.iterator().next(), getUid());
+				safeSetPropertyValue(bw, naturalIds.iterator().next(), getUid());
 			}
 		}
 		Set<String> editablePropertyNames = getUiConfigs().keySet();
@@ -652,7 +653,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 						BeanWrapperImpl bw2 = new BeanWrapperImpl(type);
 						bw2.setConversionService(conversionService);
 						if (subPropertyName.equals("id")) {
-							bw2.setPropertyValue("id", parameterValue);
+							safeSetPropertyValue(bw2, "id", parameterValue);
 							value = em.get((Serializable) bw2.getPropertyValue("id"));
 						} else {
 							try {
@@ -663,7 +664,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 								continue;
 							}
 						}
-						bw.setPropertyValue(propertyName, value);
+						safeSetPropertyValue(bw, propertyName, value);
 					}
 				}
 			} else if (editablePropertyNames.contains(propertyName)) {
@@ -675,14 +676,14 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					try {
 						BeanWrapperImpl bwt = new BeanWrapperImpl(
 								org.springframework.beans.BeanUtils.instantiateClass(type));
-						bwt.setPropertyValue("id", parameterValue);
+						safeSetPropertyValue(bwt, "id", parameterValue);
 						value = em.get((Serializable) bwt.getPropertyValue("id"));
 						if (value == null)
 							value = em.findOne(parameterValue);
 					} catch (Exception e) {
 
 					}
-					bw.setPropertyValue(propertyName, value);
+					safeSetPropertyValue(bw, propertyName, value);
 				} else if (Collection.class.isAssignableFrom(type)) {
 					Collection oldValue = (Collection) bw.getPropertyValue(propertyName);
 					Collection newValue = List.class.isAssignableFrom(type) ? new ArrayList() : new LinkedHashSet();
@@ -694,7 +695,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 							for (String id : parameterValue.split(",")) {
 								BeanWrapperImpl bwt = new BeanWrapperImpl(
 										org.springframework.beans.BeanUtils.instantiateClass(subtype));
-								bwt.setPropertyValue("id", id);
+								safeSetPropertyValue(bwt, "id", id);
 								Object item = em.get((Serializable) bwt.getPropertyValue("id"));
 								if (item == null)
 									item = em.findOne(parameterValue);
@@ -704,16 +705,16 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 						} catch (Exception e) {
 						}
 						if (oldValue == null) {
-							bw.setPropertyValue(propertyName, newValue);
+							safeSetPropertyValue(bw, propertyName, newValue);
 						} else {
 							oldValue.clear();
 							oldValue.addAll(newValue);
 						}
 					} else {
-						bw.setPropertyValue(propertyName, parameterValue);
+						safeSetPropertyValue(bw, propertyName, parameterValue);
 					}
 				} else {
-					bw.setPropertyValue(propertyName, parameterValue);
+					safeSetPropertyValue(bw, propertyName, parameterValue);
 				}
 			}
 
@@ -1885,6 +1886,14 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			}
 		}
 		return true;
+	}
+
+	private void safeSetPropertyValue(BeanWrapperImpl bw, String name, Object value) {
+		try {
+			bw.setPropertyValue(name, value);
+		} catch (PropertyAccessException e) {
+			logger.error(e.getMessage(), e);
+		}
 	}
 
 	@Inject
