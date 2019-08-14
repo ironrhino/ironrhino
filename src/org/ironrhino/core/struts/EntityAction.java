@@ -1823,7 +1823,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			try {
 				ReflectionContextState.setCreatingNullObjects(context, true);
 				ReflectionContextState.setDenyMethodExecution(context, true);
-				ReflectionContextState.setReportingConversionErrors(context, true);
+				ReflectionContextState.setReportingConversionErrors(context,
+						ServletActionContext.getRequest().getMethod().equals("POST"));
 				for (Map.Entry<String, Object> entry : parameters.entrySet()) {
 					String name = entry.getKey();
 					Object value = entry.getValue();
