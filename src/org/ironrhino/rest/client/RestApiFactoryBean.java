@@ -77,6 +77,8 @@ import lombok.Setter;
 
 public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryBean {
 
+	public static final String BASE_URL_SUFFIX = ".apiBaseUrl";
+
 	private static final Predicate<Throwable> IO_ERROR_PREDICATE = ex -> ex instanceof ResourceAccessException
 			&& ex.getCause() instanceof IOException;
 
@@ -340,7 +342,7 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 		if (ctx != null) {
 			pathFromClass = ctx.getEnvironment().resolvePlaceholders(pathFromClass);
 			pathFromMethod = ctx.getEnvironment().resolvePlaceholders(pathFromMethod);
-			baseUrl = ctx.getEnvironment().getProperty(restApiClass.getName() + ".apiBaseUrl", baseUrl);
+			baseUrl = ctx.getEnvironment().getProperty(restApiClass.getName() + BASE_URL_SUFFIX, baseUrl);
 			if (StringUtils.isBlank(baseUrl) && pathFromClass.indexOf("://") < 0 && pathFromMethod.indexOf("://") < 0
 					&& serviceRegistry != null && !(restTemplate instanceof RestClientTemplate)) {
 				baseUrl = ((ServiceRegistry) serviceRegistry).discover(restApiClass.getName(), true);
