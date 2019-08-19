@@ -40,6 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
@@ -91,7 +92,7 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 
 	private final RestTemplate restTemplate;
 
-	private final String apiBaseUrl;
+	private String apiBaseUrl;
 
 	private final Map<String, String> requestHeaders;
 
@@ -167,14 +168,19 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 
 	@PostConstruct
 	private void init() {
-		if (ClassUtils.isPresent("org.ironrhino.core.remoting.ServiceRegistry", getClass().getClassLoader())) {
-			ApplicationContext ctx = getApplicationContext();
-			if (ctx != null)
-				try {
-					serviceRegistry = ctx.getBean(ServiceRegistry.class);
-				} catch (NoSuchBeanDefinitionException e) {
-				}
+		ApplicationContext ctx = getApplicationContext();
+		Environment env = ctx.getEnvironment();
+		String baseUrl = env.getProperty(restApiClass.getName() + BASE_URL_SUFFIX);
+		if (StringUtils.isNotBlank(baseUrl)) {
+			baseUrl = env.resolvePlaceholders(baseUrl);
+			apiBaseUrl = baseUrl;
+			log.info("Discover baseUrl \"{}\" for service {} from environment", baseUrl, restApiClass.getName());
 		}
+		if (ClassUtils.isPresent("org.ironrhino.core.remoting.ServiceRegistry", getClass().getClassLoader()))
+			try {
+				serviceRegistry = ctx.getBean(ServiceRegistry.class);
+			} catch (NoSuchBeanDefinitionException e) {
+			}
 	}
 
 	@Override
@@ -342,14 +348,11 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 		if (ctx != null) {
 			pathFromClass = ctx.getEnvironment().resolvePlaceholders(pathFromClass);
 			pathFromMethod = ctx.getEnvironment().resolvePlaceholders(pathFromMethod);
-			baseUrl = ctx.getEnvironment().getProperty(restApiClass.getName() + BASE_URL_SUFFIX, baseUrl);
 			if (StringUtils.isBlank(baseUrl) && pathFromClass.indexOf("://") < 0 && pathFromMethod.indexOf("://") < 0
 					&& serviceRegistry != null && !(restTemplate instanceof RestClientTemplate)) {
 				baseUrl = ((ServiceRegistry) serviceRegistry).discover(restApiClass.getName(), true);
 				if (baseUrl.indexOf("://") < 0)
 					baseUrl = "http://" + baseUrl;
-			} else if (StringUtils.isNotBlank(baseUrl)) {
-				baseUrl = ctx.getEnvironment().resolvePlaceholders(baseUrl);
 			}
 		}
 		StringBuilder sb = new StringBuilder(baseUrl);
