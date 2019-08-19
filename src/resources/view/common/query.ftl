@@ -41,16 +41,16 @@ $(function(){
 			var pos = textarea.val().length;
 			var ta = textarea.get(0);
 			if (ta.setSelectionRange) {
-		    	ta.setSelectionRange(pos, pos);
-		    } else if (ta.createTextRange) {
-		    	var range = ta.createTextRange();
-		    	range.collapse(true);
-		    	range.moveEnd('character', pos);
-		    	range.moveStart('character', pos);
-		    	range.select();
-		    }else{
-		    	textarea.focus();
-		    }
+				ta.setSelectionRange(pos, pos);
+			} else if (ta.createTextRange) {
+				var range = ta.createTextRange();
+				range.collapse(true);
+				range.moveEnd('character', pos);
+				range.moveStart('character', pos);
+				range.select();
+			}else{
+				textarea.focus();
+			}
 			},100);
 		}
 	});
@@ -148,7 +148,7 @@ $(function(){
 				</#if>
 				<li>
 				<span class="input-append">
-				    <input type="text" name="resultPage.pageNo" value="${resultPage.pageNo}" class="inputPage integer positive" title="${getText('currentpage')}"/><span class="add-on totalPage"><strong title="${getText('totalpage')}">${resultPage.totalPage}</strong></span>
+					<input type="text" name="resultPage.pageNo" value="${resultPage.pageNo}" class="inputPage integer positive" title="${getText('currentpage')}"/><span class="add-on totalPage"><strong title="${getText('totalpage')}">${resultPage.totalPage}</strong></span>
 				</span>
 				<li class="visible-desktop">
 				<select name="resultPage.pageSize" class="pageSize" title="${getText('pagesize')}">
@@ -182,8 +182,8 @@ $(function(){
 	</div>
 	<#elseif resultPage.executed>
 	<div class="alert">
-	  <a class="close" data-dismiss="alert"></a>
-	  <strong>${getText('query.result.empty')}</strong>
+		<a class="close" data-dismiss="alert"></a>
+		<strong>${getText('query.result.empty')}</strong>
 	</div>
 	</#if>
 	</#if>

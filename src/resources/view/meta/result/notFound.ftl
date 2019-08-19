@@ -57,7 +57,7 @@
 				color:white;
 			}
 			.alert-error {
-    			color: #b94a48;
+				color: #b94a48;
 			}
 </style>
 </#if>
@@ -71,8 +71,8 @@
 	<#if !message?has_content && action.hasActionErrors()>
 	<#list action.actionErrors as error>
 		<#if error?has_content>
-           <h2 class="alert-error">${error}</h2>
-        </#if>
+		<h2 class="alert-error">${error}</h2>
+		</#if>
 	</#list>
 	</#if>
 	<a href="javascript:history.back();">${getText('back')}</a>

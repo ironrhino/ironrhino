@@ -2,20 +2,20 @@
 <#if resultPage.totalPage gt 1>
 <#if theme=="simple">
 <ul class="pager">
-  <li class="previous<#if resultPage.first> disabled</#if>">
-  	<#if resultPage.first>
-    <span>&larr; ${getText('previouspage')}</span>
-    <#else>
-    <a href="${resultPage.renderUrl(resultPage.previousPage)}" rel="prev"<@dynAttrs value=dynamicAttributes/>>&larr; ${getText('previouspage')}</a>
-    </#if>
-  </li>
-  <li class="next<#if resultPage.last> disabled</#if>">
-  	<#if resultPage.last>
-    <span>${getText('nextpage')} &rarr;</span>
-    <#else>
-    <a href="${resultPage.renderUrl(resultPage.nextPage)}" rel="next"<@dynAttrs value=dynamicAttributes/>>${getText('nextpage')} &rarr;</a>
-    </#if>
-  </li>
+	<li class="previous<#if resultPage.first> disabled</#if>">
+	<#if resultPage.first>
+	<span>&larr; ${getText('previouspage')}</span>
+	<#else>
+	<a href="${resultPage.renderUrl(resultPage.previousPage)}" rel="prev"<@dynAttrs value=dynamicAttributes/>>&larr; ${getText('previouspage')}</a>
+	</#if>
+	</li>
+	<li class="next<#if resultPage.last> disabled</#if>">
+	<#if resultPage.last>
+	<span>${getText('nextpage')} &rarr;</span>
+	<#else>
+	<a href="${resultPage.renderUrl(resultPage.nextPage)}" rel="next"<@dynAttrs value=dynamicAttributes/>>${getText('nextpage')} &rarr;</a>
+	</#if>
+	</li>
 </ul>
 <#else>
 <div class="pagination<#if align="center"> pagination-centered<#elseif align="right"> pagination-right</#if>">
@@ -47,7 +47,7 @@
 <li class="disabled"><a>...</a></li>
 <#list (resultPage.pageNo-2)..resultPage.totalPage as index>
 <li<#if index==resultPage.pageNo> class="active"</#if>><a href="${resultPage.renderUrl(index)}" rel="index"<@dynAttrs value=dynamicAttributes/>>${index}</a></li>
-</#list>        
+</#list>
 <#else>
 <#list 1..2 as index>
 <li><a href="${resultPage.renderUrl(index)}" rel="index"<@dynAttrs value=dynamicAttributes/>>${index}</a></li>

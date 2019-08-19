@@ -29,15 +29,15 @@
 </#macro>
 
 <#function authentication property>
-  <#return statics['org.ironrhino.core.util.AuthzUtils'].authentication(property)>
+	<#return statics['org.ironrhino.core.util.AuthzUtils'].authentication(property)>
 </#function>
 
 <#function hasPermission secured>
-  <#return statics['org.ironrhino.core.util.AuthzUtils'].hasPermission(secured)>
+	<#return statics['org.ironrhino.core.util.AuthzUtils'].hasPermission(secured)>
 </#function>
 
 <#function hasRole role>
-  <#return statics['org.ironrhino.core.util.AuthzUtils'].hasRole(role)>
+	<#return statics['org.ironrhino.core.util.AuthzUtils'].hasRole(role)>
 </#function>
 
 <#macro authorize ifAllGranted="" ifAnyGranted="" ifNotGranted="" authorizer="" resource="">

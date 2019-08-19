@@ -30,22 +30,22 @@ function loadMaps(){
 }
 
 function initMaps() {
-  geocoder = new google.maps.Geocoder();
-  map = new google.maps.Map(document.getElementById("map_container"), {
-    zoom: ${Parameters.zoom!8},
+	geocoder = new google.maps.Geocoder();
+	map = new google.maps.Map(document.getElementById("map_container"), {
+	zoom: ${Parameters.zoom!8},
 <#if Parameters.lat??>
-    center: new google.maps.LatLng(${Parameters.lat!}, ${Parameters.lng!}),
+	center: new google.maps.LatLng(${Parameters.lat!}, ${Parameters.lng!}),
 </#if>
-    mapTypeId: google.maps.MapTypeId.ROADMAP
-  });
+	mapTypeId: google.maps.MapTypeId.ROADMAP
+	});
 <#if !Parameters.lat??>
-  if(navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function(position) {
-      map.setCenter(new google.maps.LatLng(position.coords.latitude,position.coords.longitude));
-    }, function() {
-       map.setCenter(new google.maps.LatLng(39.8954, 116.4087));
-    });
-  }
+	if(navigator.geolocation) {
+	navigator.geolocation.getCurrentPosition(function(position) {
+		map.setCenter(new google.maps.LatLng(position.coords.latitude,position.coords.longitude));
+	}, function() {
+		map.setCenter(new google.maps.LatLng(39.8954, 116.4087));
+	});
+	}
 </#if>
 	google.maps.event.addListener(map, 'click', placeNewMarker);
 	google.maps.event.addListener(map, 'bounds_changed', closeSuccessInfoWindow);
@@ -62,8 +62,8 @@ function getMarkers(){
 		dataType:'json',
 		success:function(resp) {
 			for( i=0;i<markers.length; i++ ) 
-		        	removeMarker(markers[i]);
-		    markers = [];
+					removeMarker(markers[i]);
+			markers = [];
 			for (var i = 0; i < resp.length; i++) 
 				addMarker(resp[i]);
 			}
@@ -76,28 +76,28 @@ function addMarker(region){
 			newMarker = null;
 		}
 		var marker = new google.maps.Marker({
-		      position: new google.maps.LatLng(region.coordinate.latitude,region.coordinate.longitude), 
-		      draggable:true,
-		      map: map, 
-		      title:region.name
+			position: new google.maps.LatLng(region.coordinate.latitude,region.coordinate.longitude), 
+			draggable:true,
+			map: map, 
+			title:region.name
 		});
 		marker.region = region;
 		markers.push(marker);
 		regions[region.id+''] = region;
 		/*
-    	google.maps.event.addListener(marker, "click", function() {
-	    	  var infowindow = new google.maps.InfoWindow();
-		      infowindow.setContent(region.name);
-		      infowindow.setPosition(marker.getPosition());
-		      infowindow.open(map);
-  		});
-  		*/
-  		google.maps.event.addListener(marker, "dragstart", function(event) {
-		      marker.oldPosition = marker.getPosition();
-  		});
-  		google.maps.event.addListener(marker, "dragend", function(event) {
-		      moveMarker(marker);
-  		});
+		google.maps.event.addListener(marker, "click", function() {
+			var infowindow = new google.maps.InfoWindow();
+			infowindow.setContent(region.name);
+			infowindow.setPosition(marker.getPosition());
+			infowindow.open(map);
+		});
+		*/
+		google.maps.event.addListener(marker, "dragstart", function(event) {
+			marker.oldPosition = marker.getPosition();
+		});
+		google.maps.event.addListener(marker, "dragend", function(event) {
+			moveMarker(marker);
+		});
 }
 function removeMarker(marker){
 		marker.setMap(null);
@@ -122,12 +122,12 @@ function moveMarker(marker){
 			}	
 			$.ajax({url:'${actionBaseUrl}/mark',data:data,global:false,success:function(resp){
 				if(resp.actionMessages){
-					  closeSuccessInfoWindow();	
-					  successInfoWindow = new google.maps.InfoWindow();
-				      successInfoWindow.setContent(resp.actionMessages[0]);
-				      successInfoWindow.setPosition(marker.getPosition());
-				      successInfoWindow.open(map);
-				      }
+					closeSuccessInfoWindow();	
+					successInfoWindow = new google.maps.InfoWindow();
+					successInfoWindow.setContent(resp.actionMessages[0]);
+					successInfoWindow.setPosition(marker.getPosition());
+					successInfoWindow.open(map);
+					}
 				}});
 }
 function placeNewMarker(event){
@@ -135,9 +135,9 @@ function placeNewMarker(event){
 		return;
 	if(!newMarker){
 		newMarker = new google.maps.Marker({
-		      position: event.latLng, 
-		      map: map,
-		      title: '空白'
+			position: event.latLng, 
+			map: map,
+			title: '空白'
 		});
 	}else{
 		newMarker.setPosition(event.latLng);
@@ -158,11 +158,11 @@ function moveTo(region){
 		map.setZoom(9);
 	}else{
 		geocoder.geocode( { 'address': region.fullname||region.name}, function(results, status) {
-	      if (status == google.maps.GeocoderStatus.OK) {
-	        var pos = results[0].geometry.location;
-	        map.setCenter(pos);
-	        map.setZoom(9);
-	        region.coordinate = {
+		if (status == google.maps.GeocoderStatus.OK) {
+			var pos = results[0].geometry.location;
+			map.setCenter(pos);
+			map.setZoom(9);
+			region.coordinate = {
 				latitude:pos.lat().toFixed(6),
 				longitude:pos.lng().toFixed(6)
 			};
@@ -172,10 +172,10 @@ function moveTo(region){
 			'region.coordinate.longitude':region.coordinate.longitude
 			}
 			$.ajax({url:'${actionBaseUrl}/mark',data:data,global:false,success:function(resp){if(resp.actionMessages)addMarker(region)}});
-	      } else {
-	      	alert(status);
-	      }
-	    });
+		} else {
+			alert(status);
+		}
+		});
 		
 	}
 }
@@ -213,27 +213,27 @@ var unmarked = [];
 var delayTime = 620;
 function nextRequestInQueue(){	
 	if (unmarked.length) {
-        var item = unmarked.shift();
-        geocoder.geocode( { 'address': item.label}, function (results, status) {
-                  if (status == google.maps.GeocoderStatus.OK) {
-                  		var pos = results[0].geometry.location;
-                        var data = {
+		var item = unmarked.shift();
+		geocoder.geocode( { 'address': item.label}, function (results, status) {
+				if (status == google.maps.GeocoderStatus.OK) {
+						var pos = results[0].geometry.location;
+						var data = {
 						'region.id':item.value,
 						'region.coordinate.latitude':pos.lat().toFixed(6),
 						'region.coordinate.longitude':pos.lng().toFixed(6)
 						}
 						$.ajax({url:'${actionBaseUrl}/mark',data:data,global:false,success:function(resp){}});
 
-                  } else {
-                        if (status == "OVER_QUERY_LIMIT") {
-                                delayTime *= 1.08;
-                                unmarked.push(item);
-                        }
-                  }
-                setTimeout(nextRequestInQueue, delayTime);
-        });
-            
-    }
+				} else {
+						if (status == "OVER_QUERY_LIMIT") {
+								delayTime *= 1.08;
+								unmarked.push(item);
+						}
+				}
+				setTimeout(nextRequestInQueue, delayTime);
+		});
+			
+	}
 }
 
 
@@ -266,14 +266,14 @@ $(function(){
 </head> 
 <body>
 <div class="row<#if fluidLayout>-fluid</#if>">
-  <div class="span3" style="height: 600px;overflow-y:scroll;overflow-x:hidden;">
-  	<div class="btn-toolbar" style="margin-bottom:10px;">
+<div class="span3" style="height: 600px;overflow-y:scroll;overflow-x:hidden;">
+	<div class="btn-toolbar" style="margin-bottom:10px;">
 		<div class="btn-group btn-switch">
-		  <button class="btn active moveTo">移动</button>
-		  <button class="btn mark">标注</button>
+		<button class="btn active moveTo">移动</button>
+		<button class="btn mark">标注</button>
 		</div>
 		<div class="btn-group">
-		  <button class="btn markall" title="标注所有未标注的">一键标注</button>
+		<button class="btn markall" title="标注所有未标注的">一键标注</button>
 		</div>
 	</div>
 	<div id="regionTree"></div>

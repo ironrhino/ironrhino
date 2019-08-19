@@ -10,7 +10,7 @@
 <#if treeable?? && treeable && parentEntity?? && parentEntity.id?? && parentEntity.id gt 0>
 <ul class="breadcrumb">
 	<li>
-    	<#if !treeview><a href="${actionBaseUrl}<#if tree??>?tree=${tree}</#if>" class="ajax view">${entityDisplayName}</a><#else>${entityDisplayName}</#if> <span class="divider">/</span>
+		<#if !treeview><a href="${actionBaseUrl}<#if tree??>?tree=${tree}</#if>" class="ajax view">${entityDisplayName}</a><#else>${entityDisplayName}</#if> <span class="divider">/</span>
 	</li>
 	<#if parentEntity.level gt 1>
 	<#assign renderItem=(!tree??||tree<1)/>
@@ -21,7 +21,7 @@
 	</#if>
 	<#if renderItem>
 	<li>
-    	<#if !treeview><a href="${actionBaseUrl}?parent=${ancestor.id?string}<#if tree??>&tree=${tree}</#if>" class="ajax view">${ancestor.name}</a><#else>${ancestor.name}</#if> <span class="divider">/</span>
+		<#if !treeview><a href="${actionBaseUrl}?parent=${ancestor.id?string}<#if tree??>&tree=${tree}</#if>" class="ajax view">${ancestor.name}</a><#else>${ancestor.name}</#if> <span class="divider">/</span>
 	</li>
 	</#if>
 	</#list>

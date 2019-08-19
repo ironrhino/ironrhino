@@ -1,9 +1,9 @@
 <#assign itemCount = 0/>
 <@s.iterator value="parameters.list">
-    <#assign itemCount = itemCount + 1/>
-    <#assign itemKey = stack.findValue(parameters.listKey)/>
-    <#assign itemKeyStr = itemKey?string />
-    <#assign itemValue = stack.findString(parameters.listValue)!""/>
+<#assign itemCount = itemCount + 1/>
+<#assign itemKey = stack.findValue(parameters.listKey)/>
+<#assign itemKeyStr = itemKey?string />
+<#assign itemValue = stack.findString(parameters.listValue)!""/>
 <label for="${parameters.name?html}-${itemCount}" class="radio inline"><#rt/>
 <input type="radio"<#rt/>
  id="${parameters.name?html}-${itemCount}"<#rt/>

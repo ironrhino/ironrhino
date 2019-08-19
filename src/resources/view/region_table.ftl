@@ -1,9 +1,9 @@
 <#ftl output_format='HTML'>
 <#macro renderTR region>
 <tr id="node-${region.id}"<#if region.parent??&&region.parent.id gt 0> class="child-of-node-${region.parent.id}"</#if>>
-        <td><input type="checkbox" name="id" value="${region.id}"/></td>
-        <td>${region.name}</td>
-        <td>${region.fullname}</td>
+	<td><input type="checkbox" name="id" value="${region.id}"/></td>
+	<td>${region.name}</td>
+	<td>${region.fullname}</td>
 </tr>
 <#if region.leaf>
 	<#return>
@@ -20,18 +20,18 @@
 </head>
 <body>
 <table class="treeTable table checkboxgroup">
-  <thead>
-    <tr>
-      <th style="width:10%;text-align:left;padding-left:19px;"><input type="checkbox" class="checkall"/></th>
-      <th style="width:20%;">${getText('name')}</th>
-      <th style="width:70%;">${getText('fullname')}</th>
-    </tr>
-  </thead>
-  <tbody>
-    <#list regionTree.children as var>
-      <@renderTR var/>
-    </#list>
-  </tbody>
+<thead>
+	<tr>
+		<th style="width:10%;text-align:left;padding-left:19px;"><input type="checkbox" class="checkall"/></th>
+		<th style="width:20%;">${getText('name')}</th>
+		<th style="width:70%;">${getText('fullname')}</th>
+	</tr>
+</thead>
+<tbody>
+	<#list regionTree.children as var>
+	<@renderTR var/>
+	</#list>
+</tbody>
 </table>
 </body>
 </html>

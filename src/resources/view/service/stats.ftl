@@ -9,9 +9,9 @@ form.form-inline{
 }
 div.section{
 	border: 1px solid #DEDEDE;
-    border-radius: 5px;
-    margin: 10px 4px;
-    box-shadow: 0 0 10px rgba(189, 189, 189, 0.4);
+	border-radius: 5px;
+	margin: 10px 4px;
+	box-shadow: 0 0 10px rgba(189, 189, 189, 0.4);
 	padding: 10px;
 	margin: 20px 0;
 }
@@ -70,8 +70,8 @@ Initialization.stats = function() {
 <div class="row<#if fluidLayout>-fluid</#if>">
 	<div id="side" class="btn-group btn-switch span2 offset5" style="margin-bottom:10px;">
 	<#list statics['org.ironrhino.core.remoting.stats.StatsType'].values() as var>
-	  <button class="btn<#if !type??||type.name()==var.name()> active</#if>" data-type="${var.name()}">${var}</button>
-	</#list>  
+	<button class="btn<#if !type??||type.name()==var.name()> active</#if>" data-type="${var.name()}">${var}</button>
+	</#list>
 	</div>
 </div>
 
@@ -86,25 +86,24 @@ Initialization.stats = function() {
 </#list>
 </#if>
 <#list services as key,value>	
-  <div class="accordion-group">
-    <div class="accordion-heading">
-      <a class="accordion-toggle" data-toggle="collapse" data-parent="#services-accordion" href="#service-${key?index}">
-     	<h4>${key}</h4>
-      </a>
-    </div>
-    <div id="service-${key?index}" class="accordion-body collapse<#if service?? && service?keep_before_last('(')?keep_before_last('.')==key> in</#if>">
-      <div class="accordion-inner">
-        <ul class="nav nav-list">
-        	<#list value as var>
+<div class="accordion-group">
+	<div class="accordion-heading">
+	<a class="accordion-toggle" data-toggle="collapse" data-parent="#services-accordion" href="#service-${key?index}">
+	 	<h4>${key}</h4>
+	</a>
+	</div>
+	<div id="service-${key?index}" class="accordion-body collapse<#if service?? && service?keep_before_last('(')?keep_before_last('.')==key> in</#if>">
+	<div class="accordion-inner">
+		<ul class="nav nav-list">
+			<#list value as var>
 			<li><a href="${baseurl+baseurl?contains('?')?then('&','?')+'service='+(key+'.'+var)?url}" class="ajax view" data-replacement="count">${var}</a></li>
 			</#list>
 		</ul>
-      </div>
-    </div>
-  </div>
+	</div>
+	</div>
+</div>
  </#list> 
  </div> 
-		  
 
 <div id="count" class="section"><#if service?has_content>
 <div class="row-fluid">

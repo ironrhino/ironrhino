@@ -48,71 +48,71 @@
 </head>
 <body>
 
-  <div class="row<#if fluidLayout>-fluid</#if>">
-    <div class="span3">
+<div class="row<#if fluidLayout>-fluid</#if>">
+	<div class="span3">
 		<div class="accordion" id="api-accordion">
 		<@classPresentConditional value="org.ironrhino.security.oauth.server.model.Authorization">
-		  <div class="accordion-group">
-		    <div class="accordion-heading">
-		      <a class="accordion-toggle" data-toggle="collapse" data-parent="#api-accordion" href="#overview">
-		     	接入基础
-		      </a>
-		    </div>
-		    <div id="overview" class="accordion-body collapse<#if !module?has_content> in</#if>">
-		      <div class="accordion-inner">
-		      	<#assign partial=Parameters.partial!/>
-		        <ul class="nav nav-list">
+		<div class="accordion-group">
+			<div class="accordion-heading">
+			<a class="accordion-toggle" data-toggle="collapse" data-parent="#api-accordion" href="#overview">
+			 	接入基础
+			</a>
+			</div>
+			<div id="overview" class="accordion-body collapse<#if !module?has_content> in</#if>">
+			<div class="accordion-inner">
+				<#assign partial=Parameters.partial!/>
+				<ul class="nav nav-list">
 					<li<#if partial=='prerequisite'> class="active"</#if>><a href="${actionBaseUrl}?partial=prerequisite<#if version??>&version=${version}</#if>" class="ajax view history" data-replacement="apidoc">接入准备</a></li>
 					<li<#if partial=='oauth2'> class="active"</#if>><a href="${actionBaseUrl}?partial=oauth2<#if version??>&version=${version}</#if>" class="ajax view history" data-replacement="apidoc">OAuth2</a></li>
 					<li<#if partial=='status'> class="active"</#if>><a href="${actionBaseUrl}?partial=status<#if version??>&version=${version}</#if>" class="ajax view history" data-replacement="apidoc">通用返回状态消息</a></li>
 				</ul>
-		      </div>
-		    </div>
-		  </div>
+			</div>
+			</div>
+		</div>
 		</@classPresentConditional>
 		<#list apiModules as key,value>
-		  <#assign _category=key>
-		  <#if _category?has_content>
-		  	<div class="accordion-group">
-		    <div class="accordion-heading">
-		      <a class="accordion-toggle" data-toggle="collapse" data-parent="#api-accordion" href="#category_${key?index}">${_category}</a>
-		    </div>
-		    <div id="category_${key?index}" class="accordion-body collapse<#if _category==category> in</#if>">
-		    <div class="accordion-inner">
-		    <div id="category_accordion_${key?index}" class="accordion">
-		  </#if>
-		  <#list value as apiModule>
-		  <div class="accordion-group">
-		    <div class="accordion-heading">
-		      <a class="accordion-toggle" data-toggle="collapse" data-parent="#<#if _category?has_content>category_accordion_${key?index}<#else>api-accordion</#if>" href="#module_${key?index}_${apiModule?index}"<#if apiModule.description?has_content> title="${apiModule.description}"</#if>>${apiModule.name}</a>
-		    </div>
-		    <#assign currentModule = (!category?has_content||_category==category)&&module?has_content && module==apiModule.name>
-		    <div id="module_${key?index}_${apiModule?index}" class="accordion-body collapse<#if currentModule> in</#if>">
-		      <div class="accordion-inner">
-		        <ul class="nav nav-list">
+		<#assign _category=key>
+		<#if _category?has_content>
+			<div class="accordion-group">
+			<div class="accordion-heading">
+			<a class="accordion-toggle" data-toggle="collapse" data-parent="#api-accordion" href="#category_${key?index}">${_category}</a>
+			</div>
+			<div id="category_${key?index}" class="accordion-body collapse<#if _category==category> in</#if>">
+			<div class="accordion-inner">
+			<div id="category_accordion_${key?index}" class="accordion">
+		</#if>
+		<#list value as apiModule>
+		<div class="accordion-group">
+			<div class="accordion-heading">
+			<a class="accordion-toggle" data-toggle="collapse" data-parent="#<#if _category?has_content>category_accordion_${key?index}<#else>api-accordion</#if>" href="#module_${key?index}_${apiModule?index}"<#if apiModule.description?has_content> title="${apiModule.description}"</#if>>${apiModule.name}</a>
+			</div>
+			<#assign currentModule = (!category?has_content||_category==category)&&module?has_content && module==apiModule.name>
+			<div id="module_${key?index}_${apiModule?index}" class="accordion-body collapse<#if currentModule> in</#if>">
+			<div class="accordion-inner">
+				<ul class="nav nav-list">
 					<#list apiModule.apiDocs as apiDoc>
 					<li<#if currentModule && api?has_content && api==apiDoc.name> class="active"</#if>><a href="${actionBaseUrl}?<#if _category?has_content>category=${_category?url}&</#if>module=${apiModule.name?url}&api=${apiDoc.name?url}<#if version??>&version=${version}</#if>" class="ajax view history" data-replacement="apidoc">${apiDoc.name}</a></li>
 					</#list>
 				</ul>
-		      </div>
-		    </div>
-		  </div>
-		  </#list>
-		  <#if _category?has_content>
-		  </div>
-		  </div>
-		  </div>
-		  </div>
-		  </#if>
+			</div>
+			</div>
+		</div>
+		</#list>
+		<#if _category?has_content>
+		</div>
+		</div>
+		</div>
+		</div>
+		</#if>
 		</#list>
 		</div>
-    </div>
-    <div id="apidoc" class="span9">
+	</div>
+	<div id="apidoc" class="span9">
 		<#if apiDoc??>
 			<h4 class="center">${apiDoc.name}</h4>
 			<#if apiDoc.description?has_content>
 			<div class="alert alert-info">
-			  ${apiDoc.description?no_esc}
+			${apiDoc.description?no_esc}
 			</div>
 			</#if>
 			<table class="table">
@@ -150,7 +150,7 @@
 		<#elseif partial?has_content>
 			<#include "${partial}.ftl"/>
 		</#if>
-    </div>
-  </div>
+	</div>
+</div>
 </body>
 </html>

@@ -13,33 +13,33 @@
 	<li><a href="<@url value="/batch/job"/>" class="ajax view">${getText('job')}</a></li>
 	<li class="dropdown">
 	 	<a href="#" class="dropdown-toggle" data-toggle="dropdown">${getText('open.platform')}</a>
-	    <ul class="dropdown-menu">
+		<ul class="dropdown-menu">
 	 		<li><a href="<@url value="/oauth/client"/>" class="ajax view">${getText("client")}</a></li>
 			<li><a href="<@url value="/oauth/authorization"/>" class="ajax view">${getText("authorization")}</a></li>
 	 		<li><a href="<@url value="/rest/docs"/>" class="ajax view">${getText('docs')}</a></li>
-	    </ul>
+		</ul>
 	</li>
 	<li class="dropdown">
 	 	<a href="#" class="dropdown-toggle" data-toggle="dropdown">${getText('tool')}</a>
-	    <ul class="dropdown-menu">
-		  	<li><a href="<@url value="/common/console"/>">${getText('console')}</a></li>
-		  	<li><a href="<@url value="/common/query"/>">${getText('query')}</a></li>
-	  	</ul>
+		<ul class="dropdown-menu">
+			<li><a href="<@url value="/common/console"/>">${getText('console')}</a></li>
+			<li><a href="<@url value="/common/query"/>">${getText('query')}</a></li>
+		</ul>
 	</li>
 	<li class="dropdown">
 	 	<a href="#" class="dropdown-toggle" data-toggle="dropdown">${getText('sample')}</a>
-	    <ul class="dropdown-menu">
-		  	<li><a href="<@url value="/sample/customer"/>" class="ajax view">${getText('customer')}</a></li>
-		  	<li><a href="<@url value="/sample/company"/>" class="ajax view">${getText('company')}</a></li>
-		  	<li><a href="<@url value="/sample/boss"/>" class="ajax view">${getText('boss')}</a></li>
-		  	<li><a href="<@url value="/sample/employee"/>" class="ajax view">${getText('employee')}</a></li>
-		  	<li><a href="<@url value="/sample/task"/>" class="ajax view">${getText('task')}</a></li>
-		  	<li><a href="<@url value="/sample/message"/>" class="ajax view">${getText('message')}</a></li>
-		  	<li><a href="<@url value="/sample/person"/>" class="ajax view">${getText('person')}</a></li>
-	  	</ul>
+		<ul class="dropdown-menu">
+			<li><a href="<@url value="/sample/customer"/>" class="ajax view">${getText('customer')}</a></li>
+			<li><a href="<@url value="/sample/company"/>" class="ajax view">${getText('company')}</a></li>
+			<li><a href="<@url value="/sample/boss"/>" class="ajax view">${getText('boss')}</a></li>
+			<li><a href="<@url value="/sample/employee"/>" class="ajax view">${getText('employee')}</a></li>
+			<li><a href="<@url value="/sample/task"/>" class="ajax view">${getText('task')}</a></li>
+			<li><a href="<@url value="/sample/message"/>" class="ajax view">${getText('message')}</a></li>
+			<li><a href="<@url value="/sample/person"/>" class="ajax view">${getText('person')}</a></li>
+		</ul>
 	</li>
-  	</@authorize>
-  	<@authorize ifAnyGranted="ROLE_AUDITOR">
-  	<li><a href="<@url value="${ssoServerBase!}/auditEvent"/>" class="ajax view">${getText('auditEvent')}</a></li>
-  	</@authorize>
+	</@authorize>
+	<@authorize ifAnyGranted="ROLE_AUDITOR">
+	<li><a href="<@url value="${ssoServerBase!}/auditEvent"/>" class="ajax view">${getText('auditEvent')}</a></li>
+	</@authorize>
 </ul>

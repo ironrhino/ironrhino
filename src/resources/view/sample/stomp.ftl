@@ -67,7 +67,7 @@
 		<div class="span12">
 			<table id="conversation" class="table" style="display: none;">
 				<thead><tr><th>Greetings to <span id="username"></span></th></tr></thead>
-                <tbody id="greetings"></tbody>
+				<tbody id="greetings"></tbody>
 			</table>
 		</div>
 	</div>

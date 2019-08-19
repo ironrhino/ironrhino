@@ -7,20 +7,20 @@
 <body>
 <ul class="breadcrumb">
 	<li>
-    	<a class="ajax view" href="<@url value="/"/>">${getText('index')}</a> <span class="divider">/</span>
+		<a class="ajax view" href="<@url value="/"/>">${getText('index')}</a> <span class="divider">/</span>
 	</li>
 <#if !column?has_content>
 	<li class="active">${getText(name)}</li>
 <#else>
 	<li>
-    	<a class="ajax view" href="<@url value="/${name}"/>">${getText(name)}</a> <span class="divider">/</span>
+		<a class="ajax view" href="<@url value="/${name}"/>">${getText(name)}</a> <span class="divider">/</span>
 	</li>
 	<li class="active">${column!}</li>
 </#if>
 </ul>
 <div class="column ${name}">
-  <div class="row<#if fluidLayout>-fluid</#if>">
-    <div class="span2">
+<div class="row<#if fluidLayout>-fluid</#if>">
+	<div class="span2">
 		<ul class="nav nav-list">
 			<li class="nav-header"><a href="<@url value="/${name}"/>" class="ajax view">${name}</a></li>
 			<#list columns as var>
@@ -28,14 +28,14 @@
 			<li<#if active> class="active"</#if> style="padding-left:10px;"><a href="<@url value="/${name}/list/${var?url}"/>" class="ajax view">${var}</a></li>
 			</#list>
 		</ul>
-    </div>
-    <div class="span10">
-    <#if page??>
-    	<h3 class="title center">${page.title!}</h3>
-    	<div class="content"><@includePage path="${page.path}"/></div>
+	</div>
+	<div class="span10">
+	<#if page??>
+		<h3 class="title center">${page.title!}</h3>
+		<div class="content"><@includePage path="${page.path}"/></div>
 	</#if>
-    </div>
-  </div>
+	</div>
+</div>
 </div>
 </body>
 </html>

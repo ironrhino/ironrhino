@@ -235,7 +235,7 @@ ${formHeader!}
 </#if>
 <li class="pageNo">
 <span class="input-append">
-    <input type="text" name="resultPage.pageNo" value="${resultPage.pageNo}" class="inputPage integer positive" title="${getText('currentpage')}"/><span class="add-on totalPage" title="${getText('totalpage')}">${resultPage.totalPage}</span>
+	<input type="text" name="resultPage.pageNo" value="${resultPage.pageNo}" class="inputPage integer positive" title="${getText('currentpage')}"/><span class="add-on totalPage" title="${getText('totalpage')}">${resultPage.totalPage}</span>
 </span>
 <#if showPageSize>
 <li class="visible-desktop">
@@ -290,7 +290,7 @@ ${formHeader!}
 <div class="search span<#if showBottomButtons>2<#else>3</#if>">
 <#if searchable>
 <span class="input-append search">
-    <input type="text" name="keyword" value="${keyword!?html}" class="ignore-blank" placeholder="${getText('search')}"/><span class="add-on"><i class="glyphicon glyphicon-search clickable"></i></span>
+	<input type="text" name="keyword" value="${keyword!?html}" class="ignore-blank" placeholder="${getText('search')}"/><span class="add-on"><i class="glyphicon glyphicon-search clickable"></i></span>
 </span>
 </#if>
 <#if searchButtons?has_content>

@@ -66,7 +66,7 @@
 	<#else>
 	<ul>
 	<li>参见: 
-	<a href="https://tools.ietf.org/html/rfc6749#section-5.2" target="_blank">https://tools.ietf.org/html/rfc6749#section-5.2</a>  
+	<a href="https://tools.ietf.org/html/rfc6749#section-5.2" target="_blank">https://tools.ietf.org/html/rfc6749#section-5.2</a>
 	<a href="https://tools.ietf.org/html/rfc6750#section-3.1" target="_blank">https://tools.ietf.org/html/rfc6750#section-3.1</a>
 	</li>
 	<li>

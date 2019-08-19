@@ -34,9 +34,9 @@
 			source.addEventListener('append',function(event){
 				$('#result').append(event.data.replace(/\n/g,'<br>')+'<br/>');
 			},false);
-	        source.onmessage = function (event) {
-	           	$('#result').append(event.data.replace(/\n/g,'<br>')+'<br/>');
-	        };
+			source.onmessage = function (event) {
+				$('#result').append(event.data.replace(/\n/g,'<br>')+'<br/>');
+			};
 		});
 	});
 	</script>

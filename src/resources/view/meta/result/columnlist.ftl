@@ -7,20 +7,20 @@
 <body>
 <ul class="breadcrumb">
 	<li>
-    	<a class="ajax view" href="<@url value="/"/>">${getText('index')}</a> <span class="divider">/</span>
+		<a class="ajax view" href="<@url value="/"/>">${getText('index')}</a> <span class="divider">/</span>
 	</li>
 <#if !column?has_content>
 	<li class="active">${getText(name)}</li>
 <#else>
 	<li>
-    	<a class="ajax view" href="<@url value="/${name}"/>">${getText(name)}</a> <span class="divider">/</span>
+		<a class="ajax view" href="<@url value="/${name}"/>">${getText(name)}</a> <span class="divider">/</span>
 	</li>
 	<li class="active">${column!}</li>
 </#if>
 </ul>
 <div class="column ${name}">
-  <div class="row<#if fluidLayout>-fluid</#if>">
-    <div class="span2">
+<div class="row<#if fluidLayout>-fluid</#if>">
+	<div class="span2">
 		<ul class="nav nav-list">
 			<li class="nav-header<#if !column?has_content> active</#if>"><a href="<@url value="/${name}"/>" class="ajax view">${name}</a></li>
 			<#list columns as var>
@@ -28,16 +28,16 @@
 			<li<#if active> class="active"</#if> style="padding-left:10px;"><a href="<@url value="/${name}/list/${var?url}"/>" class="ajax view">${var}</a></li>
 			</#list>
 		</ul>
-    </div>
-    <div id="list" class="span10">
+	</div>
+	<div id="list" class="span10">
 		<ul class="unstyled">
 		<#list resultPage.result as page>
 			<li><a href="<@url value="/${name}/p${page.path}"/><#if column?has_content>?column=${column}</#if>"><#if page.title?has_content><@page.title?interpret/></#if></a></li>
 		</#list>
 		</ul>
 		<@pagination class="ajax view history cache" data\-replacement="list"/>
-    </div>
-  </div>
+	</div>
+</div>
 </div>
 </body>
 </html>

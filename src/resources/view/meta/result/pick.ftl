@@ -138,7 +138,7 @@
 <#if _parent?? && parentEntity?? && parentEntity.id?? && parentEntity.id gt 0>
 <ul class="breadcrumb">
 	<li>
-    	<a href="${href}" class="ajax view" data-replacement="${entityName}_pick">${getText(entityName)}</a> <span class="divider">/</span>
+		<a href="${href}" class="ajax view" data-replacement="${entityName}_pick">${getText(entityName)}</a> <span class="divider">/</span>
 	</li>
 	<#if parentEntity.level gt 1>
 	<#assign renderItem=(!tree??||tree<1)/>
@@ -149,7 +149,7 @@
 	</#if>
 	<#if renderItem>
 	<li>
-    	<a href="${href}<#if _parent?? && _parent gt 0>${href?contains("?")?then("&","?")+"parent="+ancestor.id}</#if>" class="ajax view" data-replacement="${entityName}_pick">${ancestor.name}</a> <span class="divider">/</span>
+		<a href="${href}<#if _parent?? && _parent gt 0>${href?contains("?")?then("&","?")+"parent="+ancestor.id}</#if>" class="ajax view" data-replacement="${entityName}_pick">${ancestor.name}</a> <span class="divider">/</span>
 	</li>
 	</#if>
 	</#list>

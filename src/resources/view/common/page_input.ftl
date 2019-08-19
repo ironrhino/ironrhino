@@ -12,14 +12,14 @@ $(function() {
 		var cmsPath= $('meta[name="cms_path"]').attr('content') || '';
 		var options = {
 			relative_urls: false,
-		    selector: "#page_content",
-		    content_css : '<#if Parameters.content_css?has_content>${Parameters.content_css}<#else><@url value="/assets/styles/ironrhino-min.css"/></#if>',
-		    plugins: [
-		        "advlist autolink lists link image charmap print preview anchor textcolor",
-		        "searchreplace visualblocks code fullscreen",
-		        "insertdatetime media table contextmenu paste"
-		    ],
-		    toolbar: "insertfile undo redo | styleselect | forecolor backcolor | fontselect fontsizeselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image"
+			selector: "#page_content",
+			content_css : '<#if Parameters.content_css?has_content>${Parameters.content_css}<#else><@url value="/assets/styles/ironrhino-min.css"/></#if>',
+			plugins: [
+				"advlist autolink lists link image charmap print preview anchor textcolor",
+				"searchreplace visualblocks code fullscreen",
+				"insertdatetime media table contextmenu paste"
+			],
+			toolbar: "insertfile undo redo | styleselect | forecolor backcolor | fontselect fontsizeselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image"
 		};
 		if(MessageBundle && MessageBundle.lang()!='en')
 			options.language=MessageBundle.lang();
@@ -98,10 +98,10 @@ $(function() {
 </script>
 </head>
 <body>
-	<#assign pageContentDynamicAttributes={}>
-	<@classPresentConditional value="org.ironrhino.common.action.UploadAction">
-	<#assign pageContentDynamicAttributes={'data-uploadurl':'/common/upload'}>
-	</@classPresentConditional>
+<#assign pageContentDynamicAttributes={}>
+<@classPresentConditional value="org.ironrhino.common.action.UploadAction">
+<#assign pageContentDynamicAttributes={'data-uploadurl':'/common/upload'}>
+</@classPresentConditional>
 <@s.form id="page_input" action="${actionBaseUrl}/${view?has_content?then('save','draft')}" method="post" class="ajax form-horizontal" style="padding-top:13px;">
 	<@s.hidden name="page.id" class="id"/>
 	<@s.hidden name="page.version" class="version"/>
@@ -163,7 +163,6 @@ $(function() {
 	</#if>
 	</#if>
 	</div>
-	
 </@s.form>
 </body>
 </html>

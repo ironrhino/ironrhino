@@ -12,9 +12,9 @@ form.form-inline{
 }
 div.section{
 	border: 1px solid #DEDEDE;
-    border-radius: 5px;
-    margin: 10px 4px;
-    box-shadow: 0 0 10px rgba(189, 189, 189, 0.4);
+	border-radius: 5px;
+	margin: 10px 4px;
+	box-shadow: 0 0 10px rgba(189, 189, 189, 0.4);
 	padding: 10px;
 	margin: 20px 0;
 }
@@ -365,6 +365,5 @@ Initialization.pageView = function() {
 <div class="ajaxpanel" data-url="${dataurl}"></div>
 </div>
 </div>
-
 </body>
 </html>
