@@ -86,7 +86,7 @@ public class RemotingBenchmarkTests {
 		public HttpInvokerClient testService() {
 			HttpInvokerClient hic = new HttpInvokerClient();
 			hic.setServiceInterface(TestService.class);
-			hic.setHost("localhost");
+			hic.setBaseUrl("http://localhost:8080");
 			return hic;
 		}
 

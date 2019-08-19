@@ -94,7 +94,7 @@ public abstract class HttpInvokerServerTestBase {
 		public HttpInvokerClient barService() {
 			HttpInvokerClient httpInvokerClient = new HttpInvokerClient();
 			httpInvokerClient.setServiceInterface(BarService.class);
-			httpInvokerClient.setHost("localhost");
+			httpInvokerClient.setBaseUrl("http://localhost:8080");
 			return httpInvokerClient;
 		}
 

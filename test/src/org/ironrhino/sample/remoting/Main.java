@@ -30,7 +30,7 @@ public class Main {
 		public HttpInvokerClient userService() {
 			HttpInvokerClient hic = new HttpInvokerClient();
 			hic.setServiceInterface(UserService.class);
-			hic.setHost("localhost");
+			hic.setBaseUrl("http://localhost:8080");
 			return hic;
 		}
 

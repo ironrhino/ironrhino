@@ -25,10 +25,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.support.RemoteInvocationResult;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = RemotingFallbackConfiguration.class)
+@TestPropertySource(properties = "org.ironrhino.core.remoting.RemotingServiceFallbackTest$EchoService"
+		+ HttpInvokerClient.BASE_URL_SUFFIX + "=http://localhost:8888")
 public class RemotingServiceFallbackTest {
 
 	@Autowired
@@ -96,8 +99,6 @@ public class RemotingServiceFallbackTest {
 		public HttpInvokerClient echoService() {
 			HttpInvokerClient hic = new HttpInvokerClient();
 			hic.setServiceInterface(EchoService.class);
-			hic.setHost("localhost");
-			hic.setPort(8888);
 			return hic;
 		}
 

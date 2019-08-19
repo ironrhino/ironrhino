@@ -23,7 +23,6 @@ import org.ironrhino.core.servlet.AccessFilter;
 import org.ironrhino.core.spring.FallbackSupportMethodInterceptorFactoryBean;
 import org.ironrhino.core.spring.RemotingClientProxy;
 import org.ironrhino.core.throttle.CircuitBreakerRegistry;
-import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.ExceptionUtils;
 import org.ironrhino.core.util.JsonDesensitizer;
@@ -54,6 +53,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBean
 		implements ApplicationListener<ServiceHostsChangedEvent> {
+
+	public static final String BASE_URL_SUFFIX = ".serviceBaseUrl";
+
+	public static final String SERIALIZATION_TYPE_SUFFIX = ".serializationType";
 
 	private static final String SERVLET_PATH_PREFIX = "/remoting/httpinvoker/";
 
@@ -99,17 +102,8 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 	@Autowired(required = false)
 	private ServiceStats serviceStats;
 
-	@Autowired
-	private Environment env;
-
 	@Setter
-	private String host;
-
-	@Setter
-	private int port;
-
-	@Setter
-	private String contextPath;
+	private String baseUrl;
 
 	@Setter
 	private int maxAttempts = 3;
@@ -142,19 +136,24 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 		Remoting anno = serviceInterface.getAnnotation(Remoting.class);
 		if (anno != null && StringUtils.isNotBlank(anno.serializationType()))
 			this.serializationType = anno.serializationType();
-		this.serializationType = env.getProperty(serviceInterface.getName() + ".serializationType",
+		Environment env = getApplicationContext().getEnvironment();
+		this.serializationType = env.getProperty(serviceInterface.getName() + SERIALIZATION_TYPE_SUFFIX,
 				this.serializationType);
 		httpInvokerRequestExecutor.setSerializer(HttpInvokerSerializers.ofSerializationType(serializationType));
 		httpInvokerRequestExecutor.setConnectTimeout(connectTimeout);
 		httpInvokerRequestExecutor.setReadTimeout(readTimeout);
-		if (StringUtils.isBlank(host)) {
+		if (StringUtils.isBlank(baseUrl)) {
+			baseUrl = env.getProperty(serviceInterface.getName() + BASE_URL_SUFFIX);
+			if (StringUtils.isNotBlank(baseUrl)) {
+				baseUrl = env.resolvePlaceholders(baseUrl);
+				log.info("Discover baseUrl \"{}\" for service {} from environment", baseUrl,
+						serviceInterface.getName());
+			}
+		}
+		if (StringUtils.isBlank(baseUrl)) {
 			Assert.notNull(serviceRegistry, "serviceRegistry is missing");
 			urlFromDiscovery = true;
 		}
-		if (port <= 0)
-			port = AppInfo.getHttpPort();
-		if (port <= 0)
-			port = 8080;
 		ProxyFactory pf = new ProxyFactory(serviceInterface, this);
 		pf.addInterface(RemotingClientProxy.class);
 		this.serviceProxy = pf.getProxy(serviceInterface.getClassLoader());
@@ -372,21 +371,14 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 	private String discoverServiceUrl(boolean polling) {
 		String serviceName = getServiceInterface().getName();
 		StringBuilder sb = new StringBuilder();
-		if (StringUtils.isBlank(host)) {
+		if (StringUtils.isBlank(baseUrl)) {
 			String ho = serviceRegistry.discover(serviceName, polling);
 			if (ho.indexOf("://") < 0)
 				sb.append("http://");
 			sb.append(ho);
 			discoveredHost = ho;
 		} else {
-			sb.append("http://");
-			sb.append(host);
-			if (port != 80) {
-				sb.append(':');
-				sb.append(port);
-			}
-			if (StringUtils.isNotBlank(contextPath))
-				sb.append(contextPath);
+			sb.append(baseUrl);
 		}
 		sb.append(SERVLET_PATH_PREFIX);
 		sb.append(serviceName);

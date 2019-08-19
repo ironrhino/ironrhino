@@ -297,7 +297,7 @@ public class JavaRemotingServiceTests {
 		public HttpInvokerClient testService() {
 			HttpInvokerClient hic = new HttpInvokerClient();
 			hic.setServiceInterface(TestService.class);
-			hic.setHost("localhost");
+			hic.setBaseUrl("http://localhost:8080");
 			return hic;
 		}
 
@@ -305,7 +305,7 @@ public class JavaRemotingServiceTests {
 		public HttpInvokerClient fooService() {
 			HttpInvokerClient hic = new HttpInvokerClient();
 			hic.setServiceInterface(FooService.class);
-			hic.setHost("localhost");
+			hic.setBaseUrl("http://localhost:8080");
 			return hic;
 		}
 
@@ -313,7 +313,7 @@ public class JavaRemotingServiceTests {
 		public HttpInvokerClient barService() {
 			HttpInvokerClient hic = new HttpInvokerClient();
 			hic.setServiceInterface(BarService.class);
-			hic.setHost("localhost");
+			hic.setBaseUrl("http://localhost:8080");
 			return hic;
 		}
 
@@ -321,7 +321,7 @@ public class JavaRemotingServiceTests {
 		public HttpInvokerClient personRepository() {
 			HttpInvokerClient hic = new HttpInvokerClient();
 			hic.setServiceInterface(PersonRepository.class);
-			hic.setHost("localhost");
+			hic.setBaseUrl("http://localhost:8080");
 			return hic;
 		}
 
