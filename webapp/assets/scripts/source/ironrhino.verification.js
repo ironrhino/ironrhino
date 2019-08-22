@@ -60,10 +60,15 @@
 			var data = {};
 			data[userparam] = userinput.val();
 			if (Form.validate(userinput)) {
+				var url = btn.data('url');
+				if (!url) {
+					url = f.formAction();
+					url += url.endsWith('/') ? '' : '/';
+					url += 'sendVerificationCode';
+				}
 				$.ajax({
 							type : 'POST',
-							url : btn.data('url') || f.formAction()
-									+ '/sendVerificationCode',
+							url : url,
 							data : data,
 							dataType : 'json',
 							success : function() {
