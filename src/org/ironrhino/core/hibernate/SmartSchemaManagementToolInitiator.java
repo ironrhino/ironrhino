@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -26,7 +27,6 @@ import org.hibernate.mapping.Index;
 import org.hibernate.mapping.KeyValue;
 import org.hibernate.mapping.SimpleValue;
 import org.hibernate.mapping.Table;
-import org.hibernate.mapping.Table.ForeignKeyKey;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 import org.hibernate.tool.schema.internal.HibernateSchemaManagementTool;
 import org.hibernate.tool.schema.internal.SchemaManagementToolInitiator;
@@ -35,7 +35,6 @@ import org.hibernate.tool.schema.spi.SchemaManagementTool;
 import org.hibernate.tool.schema.spi.SchemaMigrator;
 import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
-import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -108,9 +107,11 @@ public class SmartSchemaManagementToolInitiator implements StandardServiceInitia
 									} catch (SQLException e) {
 									}
 								}
-								Map<ForeignKeyKey, ForeignKey> foreignKeys = ReflectionUtils.getFieldValue(table,
-										"foreignKeys");
-								loop: for (ForeignKey foreignKey : foreignKeys.values()) {
+								@SuppressWarnings("unchecked")
+								Iterator<ForeignKey> foreignKeys = table.getForeignKeyIterator();
+								loop: while (foreignKeys.hasNext()) {
+									ForeignKey foreignKey = foreignKeys.next();
+									foreignKeys.remove();
 									for (String existedIndex : existedIndexes) {
 										if (foreignKey.getName().equalsIgnoreCase(existedIndex))
 											continue loop;
@@ -136,7 +137,6 @@ public class SmartSchemaManagementToolInitiator implements StandardServiceInitia
 										table.addIndex(index);
 									}
 								}
-								foreignKeys.clear();
 							}
 						}
 					} catch (SQLException ex) {
