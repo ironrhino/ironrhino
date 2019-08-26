@@ -1,5 +1,7 @@
 package org.ironrhino.core.util;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.function.Consumer;
 
 @FunctionalInterface
@@ -7,14 +9,18 @@ public interface CheckedConsumer<T, E extends Throwable> {
 
 	void accept(T t) throws E;
 
-	static <T, E extends Throwable> Consumer<T> unchecked(CheckedConsumer<T, E> consumer) {
-		return t -> {
+	default Consumer<T> uncheck() {
+		return (t) -> {
 			try {
-				consumer.accept(t);
+				accept(t);
 			} catch (Throwable e) {
-				throw new RuntimeException(e);
+				ExceptionUtils.sneakyThrow(e);
 			}
 		};
+	}
+
+	static <T, E extends Throwable> Consumer<T> unchecked(CheckedConsumer<T, E> consumer) {
+		return requireNonNull(consumer).uncheck();
 	}
 
 }

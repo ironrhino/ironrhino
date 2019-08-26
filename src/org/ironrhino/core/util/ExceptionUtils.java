@@ -99,7 +99,7 @@ public class ExceptionUtils {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <E extends Throwable> void sneakyThrow(Throwable e) throws E {
+	public static <E extends Throwable, R> R sneakyThrow(Throwable e) throws E {
 		throw (E) e;
 	}
 

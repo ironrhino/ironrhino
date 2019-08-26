@@ -1,18 +1,24 @@
 package org.ironrhino.core.util;
 
+import static java.util.Objects.requireNonNull;
+
 @FunctionalInterface
 public interface CheckedRunnable<E extends Throwable> {
 
 	void run() throws E;
 
-	static <E extends Throwable> Runnable unchecked(CheckedRunnable<E> runnable) {
+	default Runnable uncheck() {
 		return () -> {
 			try {
-				runnable.run();
+				run();
 			} catch (Throwable e) {
-				throw new RuntimeException(e);
+				ExceptionUtils.sneakyThrow(e);
 			}
 		};
+	}
+
+	static <E extends Throwable> Runnable unchecked(CheckedRunnable<E> runnable) {
+		return requireNonNull(runnable).uncheck();
 	}
 
 }
