@@ -2,12 +2,15 @@ package org.ironrhino.core.spring.configuration;
 
 import java.util.concurrent.Executor;
 
+import org.ironrhino.core.throttle.Mutex;
+import org.ironrhino.core.util.LockFailedException;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Role;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.scheduling.TaskScheduler;
@@ -73,7 +76,12 @@ public class SchedulingConfiguration implements SchedulingConfigurer, AsyncConfi
 	@Override
 	public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
 		return (ex, method, args) -> {
-			log.error("Unexpected error occurred when call method ( " + method.toString() + " ) asynchronously", ex);
+			if (AnnotationUtils.findAnnotation(method, Mutex.class) != null && ex instanceof LockFailedException)
+				log.info("Expected error occurred when call method ( " + method.toString() + " ) asynchronously: {}",
+						ex.getLocalizedMessage());
+			else
+				log.error("Unexpected error occurred when call method ( " + method.toString() + " ) asynchronously",
+						ex);
 		};
 	}
 
