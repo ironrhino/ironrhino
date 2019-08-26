@@ -41,7 +41,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
-@SuppressWarnings({ "unchecked", "rawtypes" })
 @Slf4j
 public class JobAction extends BaseAction {
 
@@ -60,7 +59,7 @@ public class JobAction extends BaseAction {
 	private JobOperator jobOperator;
 
 	@Getter
-	private List list;
+	private List<?> list;
 
 	@Getter
 	private Job job;
@@ -89,7 +88,7 @@ public class JobAction extends BaseAction {
 	@Override
 	public String execute() throws Exception {
 		Set<String> names = new TreeSet<>(jobRegistry.getJobNames());
-		list = new ArrayList<>();
+		List<JobInfo> jobInfos = new ArrayList<>();
 		for (String name : names) {
 			JobInfo info = new JobInfo();
 			Job job = jobRegistry.getJob(name);
@@ -107,7 +106,7 @@ public class JobAction extends BaseAction {
 					info.setLastExecution(jobExplorer.getJobExecution(executionIds.get(0)));
 				}
 			}
-			list.add(info);
+			jobInfos.add(info);
 		}
 		Set<String> namesInRepository = new TreeSet<>(jobExplorer.getJobNames());
 		for (String name : namesInRepository) {
@@ -118,8 +117,9 @@ public class JobAction extends BaseAction {
 			String description = getText(info.getName() + ".description");
 			if (!description.endsWith(".description"))
 				info.setDescription(description);
-			list.add(info);
+			jobInfos.add(info);
 		}
+		list = jobInfos;
 		return LIST;
 	}
 
