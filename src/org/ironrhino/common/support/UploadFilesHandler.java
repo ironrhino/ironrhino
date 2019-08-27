@@ -52,6 +52,7 @@ public class UploadFilesHandler extends AccessHandler {
 	@Value("${uploadFilesHandler.uploadDir:" + DEFAULT_UPLOAD_DIR + "}")
 	protected String uploadDir = DEFAULT_UPLOAD_DIR;
 
+	@Getter
 	private String pattern;
 
 	private boolean prependDefaultUploadDirForBucketBased;
@@ -70,11 +71,6 @@ public class UploadFilesHandler extends AccessHandler {
 		} else {
 			pattern = pathPrefix + uploadDir + "/*";
 		}
-	}
-
-	@Override
-	public String getPattern() {
-		return pattern;
 	}
 
 	public String getFileUrl(String path) {
