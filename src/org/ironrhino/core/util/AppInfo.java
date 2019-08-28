@@ -359,6 +359,8 @@ public class AppInfo {
 
 	public static void initialize() {
 
+		if (System.getProperty("http.keepAlive") == null)
+			System.setProperty("http.keepAlive", "true");
 		if (System.getProperty("http.maxConnections") == null)
 			System.setProperty("http.maxConnections", "100");
 		System.setProperty("sun.net.http.errorstream.enableBuffering", "true");

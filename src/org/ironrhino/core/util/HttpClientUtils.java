@@ -67,7 +67,7 @@ public class HttpClientUtils {
 		HttpClientBuilder builder = HttpClients.custom();
 		builder.disableAuthCaching().disableConnectionState().disableCookieManagement()
 				.setConnectionTimeToLive(60, TimeUnit.SECONDS).setDefaultRequestConfig(requestConfig)
-				.setDefaultHeaders(DEFAULT_HEADERS).setMaxConnTotal(100).setMaxConnPerRoute(10).setRetryHandler(
+				.setDefaultHeaders(DEFAULT_HEADERS).useSystemProperties().setRetryHandler(
 						(e, executionCount, httpCtx) -> executionCount < 3 && e instanceof NoHttpResponseException);
 		return builder.build();
 	}
