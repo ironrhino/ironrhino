@@ -2,11 +2,12 @@ package org.ironrhino.rest.client;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.Map;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 @RestApi(restClient = "restClient")
 public interface UploadClient {
@@ -18,6 +19,6 @@ public interface UploadClient {
 	String upload(byte[] bytes);
 
 	@RequestMapping(value = "/upload", method = RequestMethod.POST)
-	Map<String, String> upload(@RequestParam String name, @RequestParam File file);
+	JsonNode upload(@RequestParam String name, @RequestParam File file);
 
 }

@@ -6,7 +6,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
 
-import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.security.domain.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,8 +58,7 @@ public class RestClientTests {
 		params.add("name", "build");
 		params.add("file", new FileSystemResource("build.xml"));
 		HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(params, headers);
-		String response = rt.postForEntity("/upload", request, String.class).getBody();
-		JsonNode jn = JsonUtils.fromJson(response, JsonNode.class);
+		JsonNode jn = rt.postForEntity("/upload", request, JsonNode.class).getBody();
 		assertThat(jn.get("name").asText(), is("build"));
 		assertThat(jn.get("filename").asText(), is("file"));
 		assertThat(jn.get("originalFilename").asText(), is("build.xml"));

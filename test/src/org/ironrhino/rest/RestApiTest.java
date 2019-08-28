@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
@@ -41,6 +40,8 @@ import org.springframework.test.web.client.MockMvcClientHttpRequestFactory;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
@@ -137,10 +138,10 @@ public class RestApiTest {
 	@Test
 	@Ignore
 	public void testUpload() {
-		Map<String, String> result = uploadClient.upload("test", new File("build.xml"));
-		assertThat(result.get("name"), is("build"));
-		assertThat(result.get("filename"), is("file"));
-		assertThat(result.get("originalFileName"), is("build.xml"));
+		JsonNode result = uploadClient.upload("test", new File("build.xml"));
+		assertThat(result.get("name").textValue(), is("build"));
+		assertThat(result.get("filename").textValue(), is("file"));
+		assertThat(result.get("originalFileName").textValue(), is("build.xml"));
 	}
 
 	@Test

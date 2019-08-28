@@ -13,7 +13,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -27,6 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.HttpClientErrorException;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = RestClientConfiguration.class)
@@ -124,9 +125,9 @@ public class RestApiTests {
 
 	@Test
 	public void testUpload() throws IOException {
-		Map<String, String> result = uploadClient.upload("test", new File("build.xml"));
-		assertThat(result.get("name"), is("test"));
-		assertThat(result.get("originalFilename"), is("build.xml"));
+		JsonNode result = uploadClient.upload("test", new File("build.xml"));
+		assertThat(result.get("name").textValue(), is("test"));
+		assertThat(result.get("originalFilename").textValue(), is("build.xml"));
 	}
 
 }
