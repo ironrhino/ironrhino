@@ -164,13 +164,11 @@ public class JsonUtils {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public static <T> T fromJson(String json, TypeReference<T> type)
 			throws JsonParseException, JsonMappingException, IOException {
 		return (T) sharedObjectMapper.readValue(json, type);
 	}
 
-	@SuppressWarnings("unchecked")
 	public static <T> T fromJson(JsonNode json, TypeReference<T> type)
 			throws JsonParseException, JsonMappingException, IOException {
 		return (T) sharedObjectMapper.readValue(sharedObjectMapper.treeAsTokens(json), type);

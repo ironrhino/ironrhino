@@ -35,8 +35,11 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class JsonSerializationUtils {
 
-	private static final ObjectMapper defaultTypingObjectMapper = createNewObjectMapper()
-			.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+	private static final ObjectMapper defaultTypingObjectMapper = createNewObjectMapper();
+	static {
+		defaultTypingObjectMapper.activateDefaultTyping(defaultTypingObjectMapper.getPolymorphicTypeValidator(),
+				ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+	};
 
 	public static String serialize(Object object) throws IOException {
 		if (object == null)
