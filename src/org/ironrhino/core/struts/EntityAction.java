@@ -1850,7 +1850,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 							.get(ActionContext.CONVERSION_ERRORS);
 					if (conversionErrors != null && !conversionErrors.isEmpty()) {
 						for (Map.Entry<String, Object> entry : conversionErrors.entrySet()) {
-							String propertyName = (String) entry.getKey();
+							String propertyName = entry.getKey();
 							String message = XWorkConverter.getConversionErrorMessage(propertyName, temp);
 							addFieldError(propertyName, message);
 						}
