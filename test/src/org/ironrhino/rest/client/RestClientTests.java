@@ -59,9 +59,16 @@ public class RestClientTests {
 		params.add("file", new FileSystemResource("build.xml"));
 		HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(params, headers);
 		JsonNode jn = rt.postForEntity("/upload", request, JsonNode.class).getBody();
-		assertThat(jn.get("name").asText(), is("build"));
-		assertThat(jn.get("filename").asText(), is("file"));
-		assertThat(jn.get("originalFilename").asText(), is("build.xml"));
+		assertThat(jn, notNullValue());
+		JsonNode name = jn.get("name");
+		JsonNode filename = jn.get("filename");
+		JsonNode originalFilename = jn.get("originalFilename");
+		assertThat(name, notNullValue());
+		assertThat(name.asText(), is("build"));
+		assertThat(filename, notNullValue());
+		assertThat(filename.asText(), is("file"));
+		assertThat(originalFilename, notNullValue());
+		assertThat(originalFilename.asText(), is("build.xml"));
 	}
 
 }

@@ -125,9 +125,17 @@ public class RestApiTests {
 
 	@Test
 	public void testUpload() throws IOException {
-		JsonNode result = uploadClient.upload("test", new File("build.xml"));
-		assertThat(result.get("name").textValue(), is("test"));
-		assertThat(result.get("originalFilename").textValue(), is("build.xml"));
+		JsonNode jn = uploadClient.upload("build", new File("build.xml"));
+		assertThat(jn, notNullValue());
+		JsonNode name = jn.get("name");
+		JsonNode filename = jn.get("filename");
+		JsonNode originalFilename = jn.get("originalFilename");
+		assertThat(name, notNullValue());
+		assertThat(name.asText(), is("build"));
+		assertThat(filename, notNullValue());
+		assertThat(filename.asText(), is("file"));
+		assertThat(originalFilename, notNullValue());
+		assertThat(originalFilename.asText(), is("build.xml"));
 	}
 
 }
