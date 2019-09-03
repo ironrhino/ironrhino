@@ -214,7 +214,8 @@ public class SessionFactoryBean extends LocalSessionFactoryBean implements Defau
 
 		value = properties.getProperty(AvailableSettings.USE_NEW_ID_GENERATOR_MAPPINGS);
 		if (StringUtils.isBlank(value))
-			properties.put(AvailableSettings.USE_NEW_ID_GENERATOR_MAPPINGS, databaseProduct != DatabaseProduct.MYSQL);
+			properties.put(AvailableSettings.USE_NEW_ID_GENERATOR_MAPPINGS,
+					databaseProduct != DatabaseProduct.MYSQL && databaseProduct != DatabaseProduct.MARIADB);
 
 		if (multiTenantConnectionProvider != null)
 			properties.put(AvailableSettings.MULTI_TENANT, MultiTenancyStrategy.SCHEMA);
