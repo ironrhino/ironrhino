@@ -17,6 +17,7 @@ import javax.sql.DataSource;
 
 import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.ironrhino.core.metadata.Setup;
+import org.ironrhino.core.spring.configuration.BeanPresentConditional;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@BeanPresentConditional(type = JobRepositoryFactoryBean.class)
 public class BatchSchemaSetup {
 
 	@Autowired
