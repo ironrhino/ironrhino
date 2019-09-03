@@ -174,7 +174,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 					} catch (FTPConnectionClosedException e) {
 						// Ignore
 					} catch (IOException e) {
-						if (!e.getMessage().equals("Broken pipe"))
+						if (!e.getMessage().contains("Broken pipe"))
 							log.error(e.getMessage(), e);
 					} finally {
 						try {
@@ -182,7 +182,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 						} catch (FTPConnectionClosedException e) {
 							// Ignore
 						} catch (IOException e) {
-							if (!e.getMessage().equals("Broken pipe"))
+							if (!e.getMessage().contains("Broken pipe"))
 								log.error(e.getMessage(), e);
 						}
 					}
