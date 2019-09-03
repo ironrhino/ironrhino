@@ -2,7 +2,13 @@ package org.ironrhino.core.spring.configuration;
 
 import java.util.concurrent.Executor;
 
+import org.ironrhino.core.throttle.Bulkhead;
+import org.ironrhino.core.throttle.Concurrency;
+import org.ironrhino.core.throttle.Frequency;
+import org.ironrhino.core.throttle.FrequencyLimitExceededException;
 import org.ironrhino.core.throttle.Mutex;
+import org.ironrhino.core.throttle.RateLimiter;
+import org.ironrhino.core.util.IllegalConcurrentAccessException;
 import org.ironrhino.core.util.LockFailedException;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +28,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
+import io.github.resilience4j.bulkhead.BulkheadFullException;
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -76,7 +84,17 @@ public class SchedulingConfiguration implements SchedulingConfigurer, AsyncConfi
 	@Override
 	public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
 		return (ex, method, args) -> {
-			if (AnnotationUtils.findAnnotation(method, Mutex.class) != null && ex instanceof LockFailedException)
+			if (AnnotationUtils.findAnnotation(method, Frequency.class) != null
+					&& ex instanceof FrequencyLimitExceededException
+					|| AnnotationUtils.findAnnotation(method, Concurrency.class) != null
+							&& ex instanceof IllegalConcurrentAccessException
+					|| AnnotationUtils.findAnnotation(method, RateLimiter.class) != null
+							&& ex instanceof RequestNotPermitted
+					|| AnnotationUtils.findAnnotation(method, Bulkhead.class) != null
+							&& ex instanceof BulkheadFullException)
+				log.warn("Error occurred when call method ( " + method.toString() + " ) asynchronously: {}",
+						ex.getLocalizedMessage());
+			else if (AnnotationUtils.findAnnotation(method, Mutex.class) != null && ex instanceof LockFailedException)
 				log.info("Expected error occurred when call method ( " + method.toString() + " ) asynchronously: {}",
 						ex.getLocalizedMessage());
 			else
