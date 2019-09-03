@@ -157,7 +157,7 @@ public abstract class AnnotationBeanDefinitionRegistryPostProcessor<A extends An
 			}
 			if (bd instanceof RootBeanDefinition && FactoryBean.class.isAssignableFrom(beanClass)) {
 				Class<?> targetType = ((RootBeanDefinition) bd).getTargetType();
-				if (annotatedClass.isAssignableFrom(targetType)) {
+				if (targetType != null && annotatedClass.isAssignableFrom(targetType)) {
 					beanClassName = targetType.getName();
 					return true;
 				}
