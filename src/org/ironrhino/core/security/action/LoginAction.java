@@ -19,6 +19,7 @@ import org.ironrhino.core.metadata.Redirect;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.security.event.LoginEvent;
+import org.ironrhino.core.security.verfication.ReceiverNotFoundException;
 import org.ironrhino.core.security.verfication.VerificationManager;
 import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.spring.security.DefaultAuthenticationSuccessHandler;
@@ -125,7 +126,8 @@ public class LoginAction extends BaseAction {
 				log.error(failed.getMessage(), failed);
 				addActionError(ExceptionUtils.getRootMessage(failed));
 			}
-		} catch (UsernameNotFoundException | DisabledException | LockedException | AccountExpiredException failed) {
+		} catch (UsernameNotFoundException | DisabledException | LockedException | AccountExpiredException
+				| ReceiverNotFoundException failed) {
 			usernamePasswordAuthenticationFilter.unsuccess(request, response, failed);
 			addFieldError("username", getText(failed.getClass().getName()));
 		} catch (BadCredentialsException failed) {
