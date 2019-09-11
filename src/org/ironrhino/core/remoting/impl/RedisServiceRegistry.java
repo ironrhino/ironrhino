@@ -15,8 +15,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 
-import javax.annotation.PreDestroy;
-
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.event.InstanceLifecycleEvent;
@@ -42,8 +40,6 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	protected static final String NAMESPACE = "remoting:";
 
 	protected static final String NAMESPACE_SERVICES = NAMESPACE + "services:";
-
-	protected static final String NAMESPACE_HOSTS = NAMESPACE + "hosts:";
 
 	protected static final String NAMESPACE_APPS = NAMESPACE + "apps:";
 
@@ -103,18 +99,6 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	}
 
 	@Override
-	protected void writeDiscoveredServices() {
-		if (getImportedServices().isEmpty())
-			return;
-		Runnable task = () -> remotingStringRedisTemplate.opsForHash().putAll(NAMESPACE_HOSTS + getLocalHost(),
-				getImportedServices());
-		if (executorService != null)
-			executorService.execute(task);
-		else
-			task.run();
-	}
-
-	@Override
 	protected void writeExportServiceDescriptions() {
 		if (getExportedServiceDescriptions().isEmpty())
 			return;
@@ -127,53 +111,8 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	}
 
 	@Override
-	protected Map<String, Collection<String>> doGetExportedHostsByService(String serviceName) {
-		Map<String, Collection<String>> result = new TreeMap<>();
-		Map<String, String> map = getImportedHostsByService(serviceName);
-		List<String> hosts = remotingStringRedisTemplate.opsForList().range(NAMESPACE_SERVICES + serviceName, 0, -1);
-		if (hosts == null)
-			return Collections.emptyMap();
-		for (String host : hosts) {
-			List<String> consumers = new ArrayList<>();
-			for (Map.Entry<String, String> entry : map.entrySet())
-				if (entry.getValue().equals(host))
-					consumers.add(entry.getKey());
-			consumers.sort(null);
-			result.put(host, consumers);
-		}
-		return result;
-	}
-
-	@Override
-	public Map<String, String> getImportedHostsByService(String serviceName) {
-		Map<String, String> result = new TreeMap<>();
-		Set<String> hosts = remotingStringRedisTemplate.<Set<String>>execute((RedisConnection conn) -> {
-			Set<String> set = new HashSet<>();
-			Cursor<byte[]> cursor = conn
-					.scan(new ScanOptions.ScanOptionsBuilder().match(NAMESPACE_HOSTS + "*").count(100).build());
-			while (cursor.hasNext())
-				set.add((String) remotingStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
-			return set;
-		});
-		if (hosts == null)
-			return Collections.emptyMap();
-		for (String key : hosts) {
-			Map<Object, Object> map = remotingStringRedisTemplate.opsForHash().entries(key);
-			if (map.containsKey(serviceName))
-				result.put(key.substring(NAMESPACE_HOSTS.length()), (String) map.get(serviceName));
-		}
-		return result;
-	}
-
-	@Override
-	public Map<String, String> getImportedServicesByHost(String host) {
-		if (host.equals(getLocalHost()))
-			return getImportedServices();
-		Map<Object, Object> map = remotingStringRedisTemplate.opsForHash().entries(NAMESPACE_HOSTS + host);
-		Map<String, String> services = new TreeMap<>();
-		for (Map.Entry<Object, Object> entry : map.entrySet())
-			services.put((String) entry.getKey(), (String) entry.getValue());
-		return services;
+	protected Collection<String> doGetExportedHostsByService(String serviceName) {
+		return remotingStringRedisTemplate.opsForList().range(NAMESPACE_SERVICES + serviceName, 0, -1);
 	}
 
 	@Override
@@ -206,20 +145,6 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 		return services;
 	}
 
-	@Override
-	protected void publishServiceHostsChangedEvent(String serviceName) {
-		// remove serviceName from discovered for rebalance
-		remotingStringRedisTemplate.opsForHash().delete(NAMESPACE_HOSTS + getLocalHost(), serviceName);
-		super.publishServiceHostsChangedEvent(serviceName);
-	}
-
-	@PreDestroy
-	@Override
-	public void destroy() {
-		super.destroy();
-		remotingStringRedisTemplate.delete(NAMESPACE_HOSTS + getLocalHost());
-	}
-
 	@EventListener(condition = "!#event.local")
 	public void onApplicationEvent(InstanceLifecycleEvent event) {
 		String instanceId = event.getInstanceId();
@@ -236,7 +161,6 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 				List<String> hosts = getImportedServiceCandidates().get(serviceName);
 				if (hosts != null && !hosts.contains(ho)) {
 					hosts.add(ho);
-					onServiceHostsChanged(serviceName);
 				}
 			}
 		}

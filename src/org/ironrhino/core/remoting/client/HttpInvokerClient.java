@@ -14,7 +14,6 @@ import javax.annotation.PostConstruct;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.remoting.Remoting;
-import org.ironrhino.core.remoting.ServiceHostsChangedEvent;
 import org.ironrhino.core.remoting.ServiceNotFoundException;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializers;
@@ -34,7 +33,6 @@ import org.slf4j.MDC;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationListener;
 import org.springframework.core.env.Environment;
 import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.remoting.RemoteAccessException;
@@ -51,8 +49,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBean
-		implements ApplicationListener<ServiceHostsChangedEvent> {
+public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBean {
 
 	public static final String BASE_URL_SUFFIX = ".serviceBaseUrl";
 
@@ -107,10 +104,6 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 
 	@Setter
 	private int maxAttempts = 3;
-
-	@Setter
-	@Value("${httpInvoker.polling:true}")
-	private boolean polling = true;
 
 	private boolean urlFromDiscovery;
 
@@ -257,15 +250,7 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 			method = ReflectionUtils.stringify(methodInvocation.getMethod(), false, true);
 		int remainingAttempts = maxAttempts;
 		do {
-			String targetServiceUrl;
-			if (polling) {
-				targetServiceUrl = discoverServiceUrl(true);
-			} else {
-				targetServiceUrl = serviceUrl;
-				if (targetServiceUrl == null) {
-					targetServiceUrl = discoverServiceUrl(false);
-				}
-			}
+			String targetServiceUrl = discoverServiceUrl();
 			String targetDiscoveredHost = discoveredHost;
 			long time = System.currentTimeMillis();
 			try {
@@ -306,14 +291,6 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 					if (urlFromDiscovery) {
 						if (targetDiscoveredHost != null) {
 							serviceRegistry.evict(targetDiscoveredHost);
-						}
-						if (!polling && targetServiceUrl.equals(serviceUrl)) {
-							// avoid duplicated discoverServiceUrl, normally evict will trigger relocate
-							String newServiceUrl = discoverServiceUrl(false);
-							if (!newServiceUrl.equals(targetServiceUrl)) {
-								targetServiceUrl = newServiceUrl;
-								log.info("Relocate service url {}", targetServiceUrl);
-							}
 						}
 					}
 				}
@@ -368,11 +345,11 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 		return result.getValue();
 	}
 
-	private String discoverServiceUrl(boolean polling) {
+	private String discoverServiceUrl() {
 		String serviceName = getServiceInterface().getName();
 		StringBuilder sb = new StringBuilder();
 		if (StringUtils.isBlank(baseUrl)) {
-			String ho = serviceRegistry.discover(serviceName, polling);
+			String ho = serviceRegistry.discover(serviceName);
 			if (ho.indexOf("://") < 0)
 				sb.append("http://");
 			sb.append(ho);
@@ -383,24 +360,6 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 		sb.append(SERVLET_PATH_PREFIX);
 		sb.append(serviceName);
 		return serviceUrl = sb.toString();
-	}
-
-	@Override
-	public void onApplicationEvent(ServiceHostsChangedEvent event) {
-		if (!polling && event.getServiceName().equals(getServiceInterface().getName())) {
-			// force discover service for balance
-			if (serviceUrl != null) {
-				try {
-					String old = serviceUrl;
-					String newServiceUrl = discoverServiceUrl(false);
-					if (!newServiceUrl.equals(old)) {
-						log.info("Relocate service url {} for balancing", newServiceUrl);
-					}
-				} catch (ServiceNotFoundException ignored) {
-
-				}
-			}
-		}
 	}
 
 }

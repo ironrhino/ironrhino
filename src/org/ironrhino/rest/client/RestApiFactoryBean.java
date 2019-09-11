@@ -350,7 +350,7 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 			pathFromMethod = ctx.getEnvironment().resolvePlaceholders(pathFromMethod);
 			if (StringUtils.isBlank(baseUrl) && pathFromClass.indexOf("://") < 0 && pathFromMethod.indexOf("://") < 0
 					&& serviceRegistry != null && !(restTemplate instanceof RestClientTemplate)) {
-				baseUrl = ((ServiceRegistry) serviceRegistry).discover(restApiClass.getName(), true);
+				baseUrl = ((ServiceRegistry) serviceRegistry).discover(restApiClass.getName());
 				if (baseUrl.indexOf("://") < 0)
 					baseUrl = "http://" + baseUrl;
 			}

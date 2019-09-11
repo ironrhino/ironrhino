@@ -24,7 +24,7 @@ public interface ServiceRegistry {
 
 	void unregister(String serviceName, String path);
 
-	String discover(String serviceName, boolean polling);
+	String discover(String serviceName);
 
 	void evict(String host);
 
@@ -33,13 +33,6 @@ public interface ServiceRegistry {
 	// key: service name, value: service description
 	Map<String, String> getExportedServicesByAppName(String appName);
 
-	// key: service name, value: service provider host
-	Map<String, String> getImportedServicesByHost(String host);
-
-	// key: service provider host, value: service consumer hosts
-	Map<String, Collection<String>> getExportedHostsByService(String serviceName);
-
-	// key: service consumer host, value: service provider host
-	Map<String, String> getImportedHostsByService(String serviceName);
+	Collection<String> getExportedHostsByService(String serviceName);
 
 }

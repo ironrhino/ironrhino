@@ -23,7 +23,6 @@ public class StandaloneServiceRegistry extends AbstractServiceRegistry {
 	@Override
 	protected void doRegister(String serviceName, String host) {
 		services.computeIfAbsent(serviceName, key -> new CopyOnWriteArrayList<>()).add(host);
-		onServiceHostsChanged(serviceName);
 	}
 
 	@Override
@@ -44,30 +43,14 @@ public class StandaloneServiceRegistry extends AbstractServiceRegistry {
 	}
 
 	@Override
-	protected void writeDiscoveredServices() {
-
-	}
-
-	@Override
 	protected void writeExportServiceDescriptions() {
 
 	}
 
 	@Override
-	protected Map<String, Collection<String>> doGetExportedHostsByService(String serviceName) {
-		return (getExportedServices().containsKey(serviceName))
-				? Collections.singletonMap(getLocalHost(), Collections.emptyList())
-				: Collections.emptyMap();
-	}
-
-	@Override
-	public Map<String, String> getImportedHostsByService(String serviceName) {
-		return Collections.emptyMap();
-	}
-
-	@Override
-	public Map<String, String> getImportedServicesByHost(String host) {
-		return Collections.emptyMap();
+	protected Collection<String> doGetExportedHostsByService(String serviceName) {
+		return (getExportedServices().containsKey(serviceName)) ? Collections.singletonList(getLocalHost())
+				: Collections.emptyList();
 	}
 
 	@Override

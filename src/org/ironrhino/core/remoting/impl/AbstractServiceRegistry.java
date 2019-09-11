@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadLocalRandom;
@@ -20,7 +19,6 @@ import javax.servlet.ServletContext;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.remoting.DistanceMeasurer;
 import org.ironrhino.core.remoting.Remoting;
-import org.ironrhino.core.remoting.ServiceHostsChangedEvent;
 import org.ironrhino.core.remoting.ServiceNotFoundException;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.util.AppInfo;
@@ -57,9 +55,6 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	@Value("${serviceRegistry.skipExport:false}")
 	private boolean skipExport;
 
-	@Value("${serviceRegistry.lbNodesThreshold:8}")
-	private int lbNodesThreshold = 8;
-
 	@Autowired(required = false)
 	private DistanceMeasurer distanceMeasurer = DistanceMeasurer.DEFAULT;
 
@@ -69,16 +64,11 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	@Getter
 	private Map<String, List<String>> importedServiceCandidates = new ConcurrentHashMap<>();
 
-	@Getter(AccessLevel.PROTECTED)
-	private Map<String, String> importedServices = new ConcurrentHashMap<>();
-
 	@Getter
 	private Map<String, Object> exportedServices = new ConcurrentHashMap<>();
 
 	@Getter(AccessLevel.PROTECTED)
 	private Map<String, String> exportedServiceDescriptions = new ConcurrentHashMap<>();
-
-	protected boolean ready;
 
 	@Getter
 	private String localHost;
@@ -190,13 +180,12 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 			if (!tobeRemoved.isEmpty()) {
 				hosts.removeAll(tobeRemoved);
 				logger.info("Evict {} for service {}", tobeRemoved, serviceName);
-				onServiceHostsChanged(serviceName);
 			}
 		}
 	}
 
 	@Override
-	public String discover(String serviceName, boolean polling) {
+	public String discover(String serviceName) {
 		List<String> candidates = importedServiceCandidates.get(serviceName);
 		if (CollectionUtils.isEmpty(candidates)) {
 			lookup(serviceName);
@@ -204,77 +193,33 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 		}
 		if (CollectionUtils.isEmpty(candidates))
 			throw new ServiceNotFoundException(serviceName);
-		String host = null;
-		candidates = distanceMeasurer.findNearest(getLocalHost(), candidates);
-		boolean loadBalancing = !polling && (candidates != null && candidates.size() <= lbNodesThreshold);
-		if (loadBalancing) {
-			try {
-				int consumers = 0;
-				for (Map.Entry<String, Collection<String>> entry : getExportedHostsByService(serviceName).entrySet()) {
-					if (candidates.contains(entry.getKey()) && (host == null || entry.getValue().size() < consumers)) {
-						host = entry.getKey();
-						consumers = entry.getValue().size();
-					}
-				}
-			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-			}
-		}
-		if (host == null) {
-			// polling
-			List<String> list = candidates;
-			AtomicInteger counter = counters.computeIfAbsent(serviceName,
-					s -> new AtomicInteger(ThreadLocalRandom.current().nextInt(list.size())));
-			int current, next, size = list.size();
-			do {
-				current = counter.get();
-				next = (current + 1) % list.size();
-			} while (!counter.compareAndSet(current, next));
-			host = list.get((next - 1 + size) % size); // list.get(next);
-		}
-		onDiscover(serviceName, stripPath(host), polling);
+		List<String> list = distanceMeasurer.findNearest(getLocalHost(), candidates);
+		AtomicInteger counter = counters.computeIfAbsent(serviceName,
+				s -> new AtomicInteger(ThreadLocalRandom.current().nextInt(list.size())));
+		int current, next, size = list.size();
+		do {
+			current = counter.get();
+			next = (current + 1) % list.size();
+		} while (!counter.compareAndSet(current, next));
+		String host = list.get((next - 1 + size) % size); // list.get(next);
 		return normalizeHost(host);
 	}
 
-	protected void onDiscover(String serviceName, String host, boolean polling) {
-		importedServices.put(serviceName, host);
-		if (!polling) {
-			logger.info("Discovered {} from {}", serviceName, host);
-			if (ready)
-				writeDiscoveredServices();
-		}
-	}
-
-	protected void onServiceHostsChanged(String serviceName) {
-		if (getImportedServices().remove(serviceName) != null)
-			publishServiceHostsChangedEvent(serviceName);
-	}
-
-	protected void publishServiceHostsChangedEvent(String serviceName) {
-		ctx.publishEvent(new ServiceHostsChangedEvent(serviceName));
-	}
-
 	protected void onReady() {
-		writeDiscoveredServices();
 		writeExportServiceDescriptions();
-		ready = true;
 	}
-
-	protected abstract void writeDiscoveredServices();
 
 	protected abstract void writeExportServiceDescriptions();
 
 	protected abstract void lookup(String serviceName);
 
 	@Override
-	public Map<String, Collection<String>> getExportedHostsByService(String serviceName) {
-		Map<String, Collection<String>> result = new TreeMap<>();
-		doGetExportedHostsByService(serviceName).entrySet().stream()
-				.forEach(entry -> result.put(stripPath(entry.getKey()), entry.getValue()));
-		return result;
+	public Collection<String> getExportedHostsByService(String serviceName) {
+		return doGetExportedHostsByService(serviceName).stream().map(AbstractServiceRegistry::stripPath).sorted()
+				.distinct().collect(Collectors.toList());
 	}
 
-	protected abstract Map<String, Collection<String>> doGetExportedHostsByService(String serviceName);
+	protected abstract Collection<String> doGetExportedHostsByService(String serviceName);
 
 	@PreDestroy
 	public void destroy() {
