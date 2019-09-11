@@ -23,7 +23,6 @@ public class RedisServiceRegistryAdapter {
 	@Autowired
 	protected StringRedisTemplate stringRedisTemplate;
 
-	protected Map<String, String> importedServices;
 	protected Map<String, List<String>> importedServiceCandidates;
 	protected Map<String, Object> exportedServices;
 	protected Map<String, String> exportedServiceDescriptions;
@@ -35,7 +34,6 @@ public class RedisServiceRegistryAdapter {
 
 	@PostConstruct
 	public void afterPropertiesSet() {
-		importedServices = serviceRegistry.getImportedServices();
 		importedServiceCandidates = serviceRegistry.getImportedServiceCandidates();
 		exportedServices = serviceRegistry.getExportedServices();
 		exportedServiceDescriptions = serviceRegistry.getExportedServiceDescriptions();

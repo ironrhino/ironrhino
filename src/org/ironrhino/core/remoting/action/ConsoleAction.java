@@ -1,7 +1,6 @@
 package org.ironrhino.core.remoting.action;
 
 import java.util.Collection;
-import java.util.Map;
 
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
@@ -24,10 +23,7 @@ public class ConsoleAction extends BaseAction {
 	private ServiceRegistry serviceRegistry;
 
 	@Getter
-	private Map<String, Collection<String>> hosts;
-
-	@Getter
-	private Map<String, String> importedServices;
+	private Collection<String> hosts;
 
 	@Override
 	public String execute() {
@@ -37,12 +33,6 @@ public class ConsoleAction extends BaseAction {
 	@JsonConfig(root = "hosts")
 	public String hosts() {
 		hosts = serviceRegistry.getExportedHostsByService(getUid());
-		return JSON;
-	}
-
-	@JsonConfig(root = "importedServices")
-	public String services() {
-		importedServices = serviceRegistry.getImportedServicesByHost(getUid());
 		return JSON;
 	}
 
