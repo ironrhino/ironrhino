@@ -48,10 +48,10 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jsoup-1.11.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/kafka-clients-2.1.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lettuce-core-5.1.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-api-2.11.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-core-2.11.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-jcl-2.11.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-slf4j-impl-2.11.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-api-2.12.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-core-2.12.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-jcl-2.12.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-slf4j-impl-2.12.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/micrometer-core-1.1.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/micrometer-registry-influx-1.1.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/micrometer-registry-prometheus-1.1.1.jar"/>
@@ -66,7 +66,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/reactor-core-3.2.5.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/resilience4j-all-0.13.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/sitemesh-2.4.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/slf4j-api-1.7.25.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/slf4j-api-1.7.29.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/snakeyaml-1.21.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-aop-5.1.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-batch-core-4.1.1.jar"/>
