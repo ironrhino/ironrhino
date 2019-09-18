@@ -43,6 +43,7 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import lombok.Getter;
@@ -113,7 +114,7 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 		JsonNode tree;
 		try {
 			tree = objectMapper.readTree(is);
-			if (tree == null)
+			if (tree == null || tree instanceof MissingNode)
 				throw new JsonRpcException(CODE_PARSE_ERROR, "", NullObject.get());
 		} catch (JsonParseException e) {
 			throw new JsonRpcException(CODE_PARSE_ERROR, e.getMessage(), NullObject.get());
