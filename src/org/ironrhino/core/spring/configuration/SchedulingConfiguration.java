@@ -67,6 +67,14 @@ public class SchedulingConfiguration implements SchedulingConfigurer, AsyncConfi
 		ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
 		threadPoolTaskScheduler.setPoolSize(taskSchedulerPoolSize);
 		threadPoolTaskScheduler.setThreadNamePrefix("taskScheduler-");
+		threadPoolTaskScheduler.setErrorHandler(ex -> {
+			if (ex instanceof FrequencyLimitExceededException || ex instanceof IllegalConcurrentAccessException
+					|| ex instanceof RequestNotPermitted || ex instanceof BulkheadFullException
+					|| ex instanceof LockFailedException)
+				log.warn("Error occurred in scheduled task: {}", ex.getLocalizedMessage());
+			else
+				log.error("Unexpected error occurred in scheduled task", ex);
+		});
 		return threadPoolTaskScheduler;
 	}
 
