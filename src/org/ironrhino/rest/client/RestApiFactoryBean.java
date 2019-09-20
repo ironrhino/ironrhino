@@ -176,6 +176,8 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 			baseUrl = env.resolvePlaceholders(baseUrl);
 			apiBaseUrl = baseUrl;
 			log.info("Discover baseUrl \"{}\" for service {} from environment", baseUrl, restApiClass.getName());
+		} else if (StringUtils.isNotBlank(apiBaseUrl)) {
+			apiBaseUrl = env.resolvePlaceholders(apiBaseUrl);
 		}
 		if (ClassUtils.isPresent("org.ironrhino.core.remoting.ServiceRegistry", getClass().getClassLoader()))
 			try {
