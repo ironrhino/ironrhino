@@ -36749,7 +36749,6 @@ Observation.form = function(container) {
 					global : t.data('global'),
 					preflight : true,
 					quiet : true,
-					async : false,
 					type : t.data('method') || 'GET',
 					url : url,
 					data : data,
