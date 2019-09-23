@@ -28,9 +28,9 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/hibernate-core-5.4.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/hibernate-validator-6.0.14.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/HikariCP-3.3.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/httpclient-4.5.4.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/httpcore-4.4.8.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/httpmime-4.5.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/httpclient-4.5.10.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/httpcore-4.4.12.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/httpmime-4.5.10.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-annotations-2.9.8.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-core-2.9.8.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-databind-2.9.8.jar"/>
