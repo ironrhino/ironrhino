@@ -441,7 +441,7 @@ public class JdbcQueryService {
 		sql = SqlUtils.trim(sql);
 		validateAndConvertTypes(sql, paramMap);
 		boolean hasLimit = hasLimit(sql);
-		resultPage.setPaginating(!hasLimit);
+		resultPage.setPaged(!hasLimit);
 		jdbcTemplate.setQueryTimeout(queryTimeout);
 		resultPage.setTotalResults(count(sql, paramMap));
 		if (resultPage.getTotalResults() > getCsvMaxRows() && (hasLimit || !(databaseProduct == DatabaseProduct.MYSQL

@@ -217,7 +217,7 @@ ${formHeader!}
 </table>
 <div class="toolbar row-fluid">
 <div class="pagination span<#if showBottomButtons>4<#else>6</#if>">
-<#if resultPage?? && resultPage.paginating && (showPageSize||resultPage.totalPage gt 1)>
+<#if resultPage?? && resultPage.paged && (showPageSize||resultPage.totalPage gt 1)>
 <ul>
 <#if resultPage.first>
 <li class="disabled firstPage"><a title="${getText('firstpage')}"><i class="glyphicon glyphicon-fast-backward"></i></a></li>

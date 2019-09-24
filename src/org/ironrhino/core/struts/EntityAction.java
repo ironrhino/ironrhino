@@ -372,8 +372,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			}
 			if (resetPageSize && resultPage.getPageSize() != richtableConfig.defaultPageSize())
 				resultPage.setPageSize(richtableConfig.defaultPageSize());
-			if (richtableConfig != null && resultPage.getPaginating() == null)
-				resultPage.setPaginating(richtableConfig.paginating());
+			if (richtableConfig != null && resultPage.getPaged() == null)
+				resultPage.setPaged(richtableConfig.paged());
 			resultPage
 					.setCriteria(doPrepareCriteria(entityManager, bw, richtableConfig, isSearchable(), ownerProperty));
 			resultPage = entityManager.findByResultPage(resultPage);
@@ -417,7 +417,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			if (resetPageSize && resultPage.getPageSize() != richtableConfig.defaultPageSize())
 				resultPage.setPageSize(richtableConfig.defaultPageSize());
 			if (richtableConfig != null)
-				resultPage.setPaginating(richtableConfig.paginating());
+				resultPage.setPaged(richtableConfig.paged());
 			prepare(criteria);
 			resultPage.setCriteria(criteria);
 			resultPage = searchService.search(resultPage, source -> (EN) entityManager.get(source.getId()));

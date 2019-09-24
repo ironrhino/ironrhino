@@ -380,7 +380,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			}
 		}
 		long time = System.currentTimeMillis();
-		if (resultPage.isPaginating()) {
+		if (resultPage.isPaged()) {
 			int start, end;
 			if (!resultPage.isReverse()) {
 				start = (resultPage.getPageNo() - 1) * resultPage.getPageSize();

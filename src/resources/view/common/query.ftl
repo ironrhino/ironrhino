@@ -129,7 +129,7 @@ $(function(){
 		</table>
 		<div class="toolbar row-fluid">
 			<div class="span5">
-				<#if resultPage.paginating>
+				<#if resultPage.paged>
 				<div class="pagination">
 				<ul>
 				<#if resultPage.first>

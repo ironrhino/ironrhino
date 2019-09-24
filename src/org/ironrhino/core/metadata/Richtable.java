@@ -20,7 +20,7 @@ public @interface Richtable {
 
 	String order() default "";
 
-	boolean paginating() default true;
+	boolean paged() default true;
 
 	int defaultPageSize() default ResultPage.DEFAULT_PAGE_SIZE;
 
