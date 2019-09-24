@@ -32,6 +32,8 @@ public class InfluxMeterRegistryProvider implements MeterRegistryProvider, Defau
 
 	public static final String DEFAULT_STEP = "PT10S";
 
+	public static final String DEFAULT_CONNECT_TIMEOUT = "PT5S";
+
 	@Autowired
 	private Environment environment;
 
@@ -49,6 +51,7 @@ public class InfluxMeterRegistryProvider implements MeterRegistryProvider, Defau
 		String prefix = InfluxConfig.DEFAULT.prefix();
 		map.put(prefix + ".db", DEFAULT_DB);
 		map.put(prefix + ".step", DEFAULT_STEP);
+		map.put(prefix + ".connectTimeout", DEFAULT_CONNECT_TIMEOUT);
 		map.put(prefix + ".uri", InfluxConfig.DEFAULT.uri());
 		defaultProperties = Collections.unmodifiableMap(map);
 	}
