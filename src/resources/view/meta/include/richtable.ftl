@@ -216,8 +216,20 @@ ${formHeader!}
 </#if>
 </table>
 <div class="toolbar row-fluid">
-<div class="pagination span<#if showBottomButtons>4<#else>6</#if>">
-<#if ((resultPage.paged)!false) && (showPageSize||resultPage.totalPage gt 1)>
+<div class="pagination span<#if showBottomButtons>4<#else>6</#if><#if ((resultPage.useKeysetPagination)!false)> keyset</#if>">
+<#if ((resultPage.useKeysetPagination)!false)>
+<#if resultPage.marker?has_content> 
+<a class="ajax view history" href="${resultPage.renderUrlWithMarker(resultPage.previousMarker!,false)}">${getText(resultPage.previousMarker?has_content?then('previouspage','firstpage'))}</a>
+<#else>
+<span>${getText('previouspage')}</span>
+</#if>
+<#if resultPage.nextMarker??>
+<a class="ajax view history" href="${resultPage.renderUrlWithMarker(resultPage.nextMarker,true)}">${getText('nextpage')}</a>
+<#else>
+<span>${getText('nextpage')}</span>
+</#if>
+<#if !resultPage.defaultPageSize><input type="hidden" name="resultPage.pageSize" value="${resultPage.pageSize}"/></#if>
+<#elseif ((resultPage.paged)!false) && (showPageSize||resultPage.totalPage gt 1)>
 <ul>
 <#if resultPage.first>
 <li class="disabled firstPage"><a title="${getText('firstpage')}"><i class="glyphicon glyphicon-fast-backward"></i></a></li>

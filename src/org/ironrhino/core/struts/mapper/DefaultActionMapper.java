@@ -159,6 +159,12 @@ public class DefaultActionMapper extends AbstractActionMapper {
 		String ps = request.getParameter(ResultPage.PAGESIZE_PARAM_NAME);
 		if (StringUtils.isNumeric(ps))
 			params.put("resultPage.pageSize", ps);
+		String m = request.getParameter(ResultPage.MARKER_PARAM_NAME);
+		if (m != null)
+			params.put("resultPage.marker", m);
+		String pm = request.getParameter(ResultPage.PREVIOUSMARKER_PARAM_NAME);
+		if (pm != null)
+			params.put("resultPage.previousMarker", pm);
 		if (StringUtils.isNotBlank(methodAndUid)) {
 			String uid = null;
 			if (methodAndUid.indexOf('/') < 0

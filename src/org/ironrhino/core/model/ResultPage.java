@@ -26,6 +26,10 @@ public class ResultPage<T> implements Serializable {
 
 	public static final String PAGESIZE_PARAM_NAME = "ps";
 
+	public static final String MARKER_PARAM_NAME = "m";
+
+	public static final String PREVIOUSMARKER_PARAM_NAME = "pm";
+
 	public static final int DEFAULT_MAX_PAGESIZE = 1000;
 
 	public static ThreadLocal<Integer> MAX_PAGESIZE = new ThreadLocal<Integer>() {
@@ -67,6 +71,26 @@ public class ResultPage<T> implements Serializable {
 
 	@Getter
 	private Collection<T> result;
+
+	@JsonIgnore
+	@Getter
+	@Setter
+	boolean useKeysetPagination;
+
+	@JsonIgnore
+	@Getter
+	@Setter
+	protected String marker;
+
+	@JsonIgnore
+	@Getter
+	@Setter
+	protected String previousMarker;
+
+	@JsonIgnore
+	@Getter
+	@Setter
+	protected String nextMarker;
 
 	public void setPageSize(int pageSize) {
 		if (pageSize > MAX_PAGESIZE.get())
@@ -125,6 +149,17 @@ public class ResultPage<T> implements Serializable {
 	}
 
 	public String renderUrl(int pn) {
+		return doRenderUrl(PAGENO_PARAM_NAME, pn > 1 ? String.valueOf(pn) : null);
+	}
+
+	public String renderUrlWithMarker(String m, boolean forward) {
+		String url = doRenderUrl(MARKER_PARAM_NAME, m);
+		if (forward && StringUtils.isNotBlank(marker))
+			url += '&' + PREVIOUSMARKER_PARAM_NAME + '=' + marker;
+		return url;
+	}
+
+	private String doRenderUrl(String name, String value) {
 		HttpServletRequest request = RequestContext.getRequest();
 		String requestURI = (String) request.getAttribute("struts.request_uri");
 		if (requestURI == null)
@@ -136,19 +171,18 @@ public class ResultPage<T> implements Serializable {
 		if (StringUtils.isNotBlank(parameterString))
 			sb.append("?").append(parameterString);
 		if (isDefaultPageSize()) {
-			if (pn <= 1)
+			if (StringUtils.isBlank(value))
 				return sb.toString();
 			else
-				return sb.append(StringUtils.isNotBlank(parameterString) ? "&" : "?").append(PAGENO_PARAM_NAME)
-						.append("=").append(pn).toString();
+				return sb.append(StringUtils.isNotBlank(parameterString) ? "&" : "?").append(name).append("=")
+						.append(value).toString();
 		} else {
-			if (pn <= 1)
+			if (StringUtils.isBlank(value))
 				return sb.append(StringUtils.isNotBlank(parameterString) ? "&" : "?").append(PAGESIZE_PARAM_NAME)
 						.append("=").append(pageSize).toString();
 			else
-				return sb.append(StringUtils.isNotBlank(parameterString) ? "&" : "?").append(PAGENO_PARAM_NAME)
-						.append("=").append(pn).append("&").append(PAGESIZE_PARAM_NAME).append("=").append(pageSize)
-						.toString();
+				return sb.append(StringUtils.isNotBlank(parameterString) ? "&" : "?").append(name).append("=")
+						.append(value).append("&").append(PAGESIZE_PARAM_NAME).append("=").append(pageSize).toString();
 		}
 	}
 
@@ -162,7 +196,8 @@ public class ResultPage<T> implements Serializable {
 				String name = entry.getKey();
 				String[] values = entry.getValue();
 				if (values.length == 1 && values[0].equals("") || name.equals("_") || name.equals(PAGENO_PARAM_NAME)
-						|| name.equals(PAGESIZE_PARAM_NAME)
+						|| name.equals(PAGESIZE_PARAM_NAME) || name.equals(MARKER_PARAM_NAME)
+						|| name.equals(PREVIOUSMARKER_PARAM_NAME)
 						|| name.startsWith(StringUtils.uncapitalize(ResultPage.class.getSimpleName()) + '.'))
 					continue;
 				try {

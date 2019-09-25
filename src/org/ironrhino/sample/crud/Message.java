@@ -24,7 +24,7 @@ import lombok.Setter;
 @AutoConfig
 @Entity
 @Table(name = "sample_message")
-@Richtable(order = "id desc")
+@Richtable(useKeysetPagination = true)
 @Getter
 @Setter
 public class Message implements Persistable<Long> {

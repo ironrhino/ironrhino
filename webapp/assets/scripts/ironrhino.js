@@ -38857,6 +38857,8 @@ Initialization.richtable = function() {
 															- 50
 												}, 100);
 									});
+							if($(this).closest('form').find('.pagination.keyset').length)
+								f.find('table.ordering tbody,button.restore').remove();
 							qf.hide();
 						}
 					}).on('click', '.richtable .more', function(event) {

@@ -8,6 +8,8 @@ import java.lang.reflect.ParameterizedType;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.sql.Time;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -84,6 +86,7 @@ import org.springframework.beans.PropertyAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.ConverterNotFoundException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.ClassUtils;
 
@@ -374,10 +377,62 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				resultPage.setPageSize(richtableConfig.defaultPageSize());
 			DetachedCriteria dc = doPrepareCriteria(entityManager, bw, richtableConfig, isSearchable(), ownerProperty);
 			resultPage.setCriteria(dc);
+			PropertyDescriptor keysetProperty = null;
 			if (richtableConfig != null) {
 				resultPage.setPaged(richtableConfig.paged());
+				if (richtableConfig.useKeysetPagination()) {
+					resultPage.setUseKeysetPagination(true);
+					resultPage.setCounting(false);
+					resultPage.setPageNo(1);
+					resultPage.setPageSize(resultPage.getPageSize() + 1);
+					String order = richtableConfig.order();
+					if (StringUtils.isBlank(order)) {
+						order = "id desc";
+						dc.addOrder(Order.desc("id"));
+					} else {
+						order = order.split(",")[0].trim();
+					}
+					String[] arr = order.split("\\s+", 2);
+					keysetProperty = new BeanWrapperImpl(getEntityClass()).getPropertyDescriptor(arr[0]);
+					if (StringUtils.isNotBlank(resultPage.getMarker())) {
+						Object marker = conversionService.convert(resultPage.getMarker(),
+								keysetProperty.getPropertyType());
+						if (arr.length == 2 && "desc".equalsIgnoreCase(arr[1]))
+							dc.add(Restrictions.le(keysetProperty.getName(), marker));
+						else
+							dc.add(Restrictions.ge(keysetProperty.getName(), marker));
+					}
+				}
 			}
 			resultPage = entityManager.findByResultPage(resultPage);
+			if (resultPage.isUseKeysetPagination()) {
+				resultPage.setPageSize(resultPage.getPageSize() - 1);
+				Collection<EN> result = resultPage.getResult();
+				if (result.size() == resultPage.getPageSize() + 1) {
+					Iterator<EN> it = result.iterator();
+					while (it.hasNext()) {
+						EN en = it.next();
+						if (!it.hasNext()) {
+							it.remove();
+							Object val = new BeanWrapperImpl(en).getPropertyValue(keysetProperty.getName());
+							String nextMarker = null;
+							if (val instanceof Date) {
+								nextMarker = String.valueOf(((Date) val).getTime());
+							} else if (val instanceof LocalDateTime) {
+								nextMarker = String.valueOf(((LocalDateTime) val).atZone(ZoneId.systemDefault())
+										.toInstant().toEpochMilli());
+							}
+							if (nextMarker == null)
+								try {
+									nextMarker = conversionService.convert(val, String.class);
+								} catch (ConverterNotFoundException cnfe) {
+									nextMarker = String.valueOf(val);
+								}
+							resultPage.setNextMarker(nextMarker);
+						}
+					}
+				}
+			}
 		} else {
 			Set<String> searchableProperties = new HashSet<>();
 			for (Map.Entry<String, UiConfigImpl> entry : getUiConfigs().entrySet()) {

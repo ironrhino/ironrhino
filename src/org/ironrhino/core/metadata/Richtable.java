@@ -21,6 +21,8 @@ public @interface Richtable {
 	String order() default "";
 
 	boolean paged() default true;
+	
+	boolean useKeysetPagination() default false;
 
 	int defaultPageSize() default ResultPage.DEFAULT_PAGE_SIZE;
 

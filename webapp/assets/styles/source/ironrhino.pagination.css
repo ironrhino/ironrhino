@@ -106,6 +106,14 @@
 	width: 100%;
 }
 
+.toolbar .pagination.keyset {
+	line-height: 30px;
+}
+
+.toolbar .pagination.keyset :first-child {
+	margin-right: 10px;
+}
+
 .toolbar.pagination ul {
 	border-radius: 0;
 	box-shadow: none;
