@@ -8,7 +8,7 @@
 <#else>
 <#local page=pageManager.getByPath(path)!>
 </#if>
-<#if page??&&page.content??>
+<#if (page.content)??>
 <#if abbr gt 0>
 <#local _content=statics['org.ironrhino.core.util.HtmlUtils'].abbr(page.content, abbr)>
 <#else>

@@ -65,7 +65,7 @@ Initialization.pageView = function() {
 </head>
 <body>
 
-<#if domains?? && domains?size gt 0 && !Parameters.domain??>
+<#if domains?has_content && !Parameters.domain??>
 <div class="row<#if fluidLayout>-fluid</#if>" style="margin-bottom:10px;">
 	<span class="pull-right">
 	<select id="select_domain">

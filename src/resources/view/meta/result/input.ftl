@@ -255,7 +255,7 @@
 		<#if !idAssigned><@s.hidden name="${entityName}.id" class="id"/></#if>
 	<#else>
 		<#if idAssigned><input type="hidden" name="_isnew" class="disabled-on-success" value="true"/></#if>
-		<#if treeable??&&treeable><@s.hidden name="parent"/></#if>
+		<#if treeable!false><@s.hidden name="parent"/></#if>
 	</#if>
 	<#if versionPropertyName??><@s.hidden name=entityName+'.'+versionPropertyName class="version"/></#if>
 	<#list uiConfigs as key,config>

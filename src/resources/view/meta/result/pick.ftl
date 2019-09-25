@@ -13,10 +13,7 @@
 </head>
 <body>
 
-<#assign multiple=false>
-<#if Parameters.multiple?? && Parameters.multiple=='true'>
-	<#assign multiple=true>
-</#if>
+<#assign multiple='true'==Parameters.multiple!>
 <#if Parameters.columns??>
 	<#assign propertyNames=Parameters.columns?split(',')>
 	<#assign columnNames=[]>
@@ -71,9 +68,9 @@
 	<#assign allwidthed = true/>
 	<#list columnNames as column>
 		<#if treeable && column == 'name'||column == 'fullname'>
-			<#assign columns+={column:{'template':r'<#if entity.leaf??&&!entity.leaf><a href="${href}${href?contains("?")?then("&","?")+"parent="+entity.id}" class="ajax view" data-replacement="${entityName}_pick">${value}</a><#else>${value}</#if>'}}/>
+			<#assign columns+={column:{'template':r'<#if !(entity.leaf!true)><a href="${href}${href?contains("?")?then("&","?")+"parent="+entity.id}" class="ajax view" data-replacement="${entityName}_pick">${value}</a><#else>${value}</#if>'}}/>
 		<#else>
-			<#if uiConfigs?? && uiConfigs[column]??>
+			<#if (uiConfigs[column])??>
 				<#assign uiConfig = uiConfigs[column]/>
 				<#assign alias = uiConfig.alias!/>
 				<#if !uiConfig.width?has_content>
@@ -135,7 +132,7 @@
 <#if filterable><button type="button" class="btn filter">${getText("filter")}</button></#if>
 '>
 <div id="${entityName}_pick">
-<#if _parent?? && parentEntity?? && parentEntity.id?? && parentEntity.id gt 0>
+<#if _parent?? && ((parentEntity.id)!0) gt 0>
 <ul class="breadcrumb">
 	<li>
 		<a href="${href}" class="ajax view" data-replacement="${entityName}_pick">${getText(entityName)}</a> <span class="divider">/</span>
@@ -149,7 +146,7 @@
 	</#if>
 	<#if renderItem>
 	<li>
-		<a href="${href}<#if _parent?? && _parent gt 0>${href?contains("?")?then("&","?")+"parent="+ancestor.id}</#if>" class="ajax view" data-replacement="${entityName}_pick">${ancestor.name}</a> <span class="divider">/</span>
+		<a href="${href}<#if (_parent!0) gt 0>${href?contains("?")?then("&","?")+"parent="+ancestor.id}</#if>" class="ajax view" data-replacement="${entityName}_pick">${ancestor.name}</a> <span class="divider">/</span>
 	</li>
 	</#if>
 	</#list>

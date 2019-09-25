@@ -41,6 +41,9 @@ public class RegionAction extends EntityAction<Region> {
 	@Getter
 	@Setter
 	private Region region;
+	
+	@Getter
+	protected Region parentEntity;
 
 	@Getter
 	private Collection list;
@@ -67,9 +70,9 @@ public class RegionAction extends EntityAction<Region> {
 		BaseManager<Region> entityManager = getEntityManager(Region.class);
 		if (StringUtils.isBlank(keyword) || searchService == null) {
 			if (parent != null && parent > 0) {
-				region = entityManager.get(parent);
+				parentEntity = entityManager.get(parent);
+				list = parentEntity.getChildren();
 			} else {
-				region = new Region();
 				DetachedCriteria dc = entityManager.detachedCriteria();
 				if (tree != null && tree > 0) {
 					dc.add(Restrictions.eq("id", tree));
@@ -80,9 +83,8 @@ public class RegionAction extends EntityAction<Region> {
 					if (StringUtils.isNotBlank(keyword))
 						dc.add(CriterionUtils.like(keyword, "name", "areacode", "postcode"));
 				}
-				region.setChildren(entityManager.findListByCriteria(dc));
+				list = entityManager.findListByCriteria(dc);
 			}
-			list = region.getChildren();
 		} else {
 			String query = keyword.trim();
 			SearchCriteria criteria = new SearchCriteria();

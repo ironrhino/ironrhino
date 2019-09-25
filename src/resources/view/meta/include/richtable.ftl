@@ -18,7 +18,7 @@
 <#local sumColumns={}>
 <#if list?size gt 0>
 <#list columns as name,config>
-	<#if config['showSum']?? && config['showSum']>
+	<#if config['showSum']!false>
 		<#local sumColumns+={name:{"template":config['template']!}}>
 	</#if>
 </#list>
@@ -182,7 +182,7 @@ ${formHeader!}
 <#if editable && !entityReadonly>
 <@btn view="input" label="edit" windowoptions="${inputWindowOptions}"/>
 </#if>
-<#if 'treeview'!=Parameters.view!&&treeable??&&treeable>
+<#if 'treeview'!=Parameters.view!&&(treeable!false)>
 <@btn view="move"/>
 <a class="btn ajax view" href="${actionBaseUrl}?parent=${entity.id}<#if tree??>&tree=${tree}</#if>">${getText("enter")}</a>
 </#if>
@@ -217,7 +217,7 @@ ${formHeader!}
 </table>
 <div class="toolbar row-fluid">
 <div class="pagination span<#if showBottomButtons>4<#else>6</#if>">
-<#if resultPage?? && resultPage.paged && (showPageSize||resultPage.totalPage gt 1)>
+<#if ((resultPage.paged)!false) && (showPageSize||resultPage.totalPage gt 1)>
 <ul>
 <#if resultPage.first>
 <li class="disabled firstPage"><a title="${getText('firstpage')}"><i class="glyphicon glyphicon-fast-backward"></i></a></li>
@@ -265,7 +265,7 @@ ${formHeader!}
 <@buttons?interpret/>
 <#else>
 <#if !readonly>
-<#if !(treeable?? && treeable && tree?? && tree gt 0 && (!parent??||parent lt 1))>
+<#if !((treeable!false) && (tree!0) gt 0 && (parent!0) lt 1)>
 <#if creatable><@btn view="input" label="create" windowoptions="${inputWindowOptions}"/></#if>
 </#if>
 <#if celleditable><@btn action="save" confirm=true/></#if>
@@ -275,7 +275,7 @@ ${formHeader!}
 </#if>
 </#if>
 <#if !readonly||deletable><button type="button" class="btn confirm" data-action="delete" data-shown="selected" data-filterselector="<#if enableable>[data-enabled='false']</#if>:not([data-deletable='false'])">${getText("delete")}</button></#if>
-<#if 'treeview'!=Parameters.view!&&treeable??&&treeable&&parentEntity??>
+<#if ('treeview'!=Parameters.view!)&&(treeable!false)&&parentEntity??>
 <#if parentEntity.parent?? && (!tree??||parent!=tree)>
 <a class="btn ajax view" href="${actionBaseUrl+"?parent="+parentEntity.parent.id}<#if tree??>&tree=${tree}</#if>" rel="up">${getText("upward")}</a>
 <#else>
@@ -300,12 +300,12 @@ ${formHeader!}
 </div>
 <div class="status span<#if showBottomButtons>2<#else>3</#if>">
 <#local totalResults=0/>
-<#if resultPage?? && resultPage.totalResults gt 0>
+<#if ((resultPage.totalResults)!0) gt 0>
 <#local totalResults=resultPage.totalResults/>
-<#elseif list?? && list?size gt 0>
+<#elseif list?has_content>
 <#local totalResults=list?size/>
 </#if>
-${totalResults}<span class="recordLabel"> ${getText('record')}<#if resultPage?? && resultPage.tookInMillis gte 0> , ${getText('tookInMillis',[resultPage.tookInMillis])}</#if></span>
+${totalResults}<span class="recordLabel"> ${getText('record')}<#if ((resultPage.tookInMillis)!-1) gte 0> , ${getText('tookInMillis',[resultPage.tookInMillis])}</#if></span>
 <#if downloadable && request.requestURI?ends_with(actionBaseUrl) && totalResults gt 0 && totalResults lte (csvMaxRows!10000) && action.csv??>
 <#local downloadUrl=actionBaseUrl+'/csv'>
 <#list request.parameterMap as name,values>

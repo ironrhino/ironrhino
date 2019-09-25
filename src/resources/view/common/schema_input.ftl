@@ -42,7 +42,7 @@
 		</thead>
 		<tbody>
 			<#assign size = 0>
-			<#if schema.fields?? && schema.fields?size gt 0>
+			<#if schema.fields?has_content>
 				<#assign size = schema.fields?size-1>
 			</#if>
 			<#list 0..size as index>
@@ -52,7 +52,7 @@
 					<table class="datagrid adaptive showonadd linkage_component SELECT CHECKBOX">
 						<tbody>
 							<#assign size = 0>
-							<#if schema.fields[index]?? && schema.fields[index].values?? && schema.fields[index].values?size gt 0>
+							<#if (schema.fields[index].values)?has_content>
 								<#assign size = schema.fields[index].values?size-1>
 							</#if>
 							<#list 0..size as index2>

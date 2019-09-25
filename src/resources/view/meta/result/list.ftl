@@ -7,7 +7,7 @@
 </head>
 <body>
 <#assign treeview='treeview'==Parameters.view!/>
-<#if treeable?? && treeable && parentEntity?? && parentEntity.id?? && parentEntity.id gt 0>
+<#if (treeable!false) && ((parentEntity.id)!0) gt 0>
 <ul class="breadcrumb">
 	<li>
 		<#if !treeview><a href="${actionBaseUrl}<#if tree??>?tree=${tree}</#if>" class="ajax view">${entityDisplayName}</a><#else>${entityDisplayName}</#if> <span class="divider">/</span>

@@ -37,7 +37,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Richtable(actionColumnButtons = "<@btn view='input' label='edit'/><#if 'treeview'!=Parameters.view!><a class=\"btn ajax view\" href=\"${actionBaseUrl+\"?parent=\"+entity.id}<#if tree??>&tree=${tree}</#if>\">${getText(\"enter\")}</a></#if>", bottomButtons = "<#if !(tree?? && tree gt 0 && (!parent??||parent lt 1))><@btn view='input' label='create'/> </#if><@btn action='save' confirm=true/> <@btn action='delete' confirm=true/> <#if 'treeview'!=Parameters.view! && region?? && parent??><#if region.parent?? && (!tree??||parent!=tree)><a class=\"btn ajax view\" href=\"${actionBaseUrl+\"?parent=\"+region.parent.id}<#if tree??>&tree=${tree}</#if>\" rel=\"up\">${getText(\"upward\")}</a><#else><a class=\"btn ajax view\" href=\"${actionBaseUrl}<#if tree??>?tree=${tree}</#if>\" rel=\"up\">${getText(\"upward\")}</a></#if></#if>")
+@Richtable(filterable = false, actionColumnButtons = "<@btn view='input' label='edit'/><#if 'treeview'!=Parameters.view!><a class=\"btn ajax view\" href=\"${actionBaseUrl+\"?parent=\"+entity.id}<#if (tree!0) gt 0>&tree=${tree}</#if>\">${getText(\"enter\")}</a></#if>")
 public class Region extends BaseTreeableEntity<Region> {
 
 	private static final long serialVersionUID = 8878381261391688086L;

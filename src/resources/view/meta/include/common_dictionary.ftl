@@ -6,7 +6,7 @@
 	<select<#if name?has_content><#if disabled> disabled</#if> name="${name}"</#if> class="<#if required && !(dynamicAttributes['class']!)?contains('required')>required </#if><#if !strict>combobox </#if>${dynamicAttributes['class']!}"<#if multiple> multiple</#if><@dynAttrs value=dynamicAttributes exclude='class'/>><#lt>
 		<#if showHeader><option value="${headerKey}">${headerValue}</option><#lt></#if>
 		<#local exists=false>
-		<#if dictionary?? && dictionary.items?? && dictionary.items?size gt 0>
+		<#if (dictionary.items)?has_content>
 			<#local items = dictionary.items/>
 			<#if !dictionary.groupable>
 				<#list items as lv>
@@ -67,7 +67,7 @@ ${getDictionaryLabel(dictionaryName,value?string)}<#t>
 	</#if>
 	<#local dictionary=beans['dictionaryControl'].getDictionary(dictionaryName)!>
 		<#local index = 0/>
-		<#if dictionary?? && dictionary.items?? && dictionary.items?size gt 0>
+		<#if (dictionary.items)?has_content>
 			<#local items = dictionary.items/>
 			<#if !dictionary.groupable>
 				<#list items as lv>
@@ -122,7 +122,7 @@ ${getDictionaryLabel(dictionaryName,value?string)}<#t>
 	</#if>
 	<#local dictionary=beans['dictionaryControl'].getDictionary(dictionaryName)!>
 		<#local index = 0/>
-		<#if dictionary?? && dictionary.items?? && dictionary.items?size gt 0>
+		<#if (dictionary.items)?has_content>
 			<#local items = dictionary.items/>
 			<#if !dictionary.groupable>
 				<#list items as lv>

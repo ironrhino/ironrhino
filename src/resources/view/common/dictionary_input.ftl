@@ -40,7 +40,7 @@
 		</thead>
 		<tbody>
 			<#assign size = 0>
-			<#if dictionary.items?? && dictionary.items?size gt 0>
+			<#if dictionary.items?has_content>
 				<#assign size = dictionary.items?size-1>
 			</#if>
 			<#list 0..size as index>

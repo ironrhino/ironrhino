@@ -74,7 +74,7 @@ $(function(){
 	<@s.textarea name="sql" class="required sqleditor codeblock conjunct" style="width:750px;" data\-replacement="params" readonly=readonly placeholder="select username,name,email from user where username=:username and createDate>:createDate/*--datetime--*/"/>
 	</div>
 	<div class="span2">
-	<#if !readonly && tables?? && tables?size gt 0>
+	<#if !readonly && tables?has_content>
 	<@s.select id="tables" theme="simple" class="chosen input-medium" list="tables" headerKey="" headerValue=""/>
 	</div>
 	</div>

@@ -85,7 +85,7 @@
 </#if>
 <#if apiDoc.requestBodySample?has_content>
 <tr><td>请求消息体</td><td>
-<#if apiDoc.consumes?has_content && apiDoc.consumes[0]?starts_with('text/')>
+<#if (apiDoc.consumes[0])!?starts_with('text/')>
 <textarea class="requestBody input-xxlarge">${apiDoc.requestBodySample}</textarea>
 <#else>
 <code class="requestBody block json" contenteditable>${apiDoc.requestBodySample}</code>

@@ -45,7 +45,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			<#if schema?? && schema.name??>
+			<#if (schema.name)??>
 				<#local index = 0>
 				<#list schema.fields as field>
 				<#if field.type??>
@@ -125,7 +125,7 @@
 				<#else>
 					<#local size = 0>
 					<#local isnew=true>
-					<#if attributes?? && attributes?size gt 0>
+					<#if attributes?has_content>
 						<#local size = attributes?size-1>
 						<#local isnew=false>
 					</#if>
@@ -147,7 +147,7 @@
 </#macro>
 
 <#macro printAttributes attributes grouping=true excludes=[]>
-	<#if attributes?? && attributes?size gt 0>
+	<#if attributes?has_content>
 		<#if !grouping>
 			<ul class="attributes">
 			<#list attributes as attr>
@@ -222,7 +222,7 @@
 			</#if>
 		</#if>
 	</#if>
-	<#if schema?? && schema.fields??>
+	<#if (schema.fields)?has_content>
 	<#list schema.fields as field>
 		<#if field.name?? && field.name==name && field.type?? && ('SELECT'==field.type.name() || 'CHECKBOX'==field.type.name())>
 			<#return field.values>
