@@ -205,8 +205,8 @@ public class JobAction extends BaseAction {
 		int count = jobExplorer.getJobInstanceCount(jobName);
 		resultPage.setTotalResults(count);
 		if (count > 0) {
-			List<JobInstance> instances = jobExplorer.getJobInstances(jobName, resultPage.getStart(),
-					resultPage.getPageSize());
+			int start = (resultPage.getPageNo() - 1) * resultPage.getPageSize();
+			List<JobInstance> instances = jobExplorer.getJobInstances(jobName, start, resultPage.getPageSize());
 			List<JobInstanceInfo> list = new ArrayList<>(instances.size());
 			for (JobInstance instance : instances) {
 				JobInstanceInfo info = new JobInstanceInfo();

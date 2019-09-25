@@ -37,6 +37,7 @@ public class ResultPage<T> implements Serializable {
 	};
 
 	@Setter
+	@Getter
 	private int pageNo = 1;
 
 	@Getter
@@ -74,25 +75,8 @@ public class ResultPage<T> implements Serializable {
 	@Setter
 	private long tookInMillis = -1;
 
-	@JsonIgnore
-	private int start = -1;
-
 	@Getter
 	private Collection<T> result = new ArrayList<>(0);
-
-	public int getStart() {
-		return (this.pageNo - 1) * this.pageSize;
-	}
-
-	public void setStart(int start) {
-		this.pageNo = start / pageSize + 1;
-	}
-
-	public int getPageNo() {
-		if (start >= 0)
-			return start / pageSize + 1;
-		return pageNo;
-	}
 
 	public void setPageSize(int pageSize) {
 		if (pageSize > MAX_PAGESIZE.get())

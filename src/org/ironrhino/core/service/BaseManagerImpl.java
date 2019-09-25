@@ -393,7 +393,6 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 				resultPage.setResult(findBetweenListByCriteria(detachedCriteria, start, end));
 			else
 				resultPage.setResult(Collections.EMPTY_LIST);
-			resultPage.setStart(start);
 		} else {
 			resultPage.setResult(findListByCriteria(detachedCriteria));
 		}
