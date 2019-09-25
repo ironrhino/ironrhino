@@ -26,7 +26,8 @@ import lombok.Setter;
 @AutoConfig(fileupload = Person.FILE_MIME_TYPE)
 @Entity
 @Table(name = "sample_person")
-@Richtable(order = "id.identityNo asc", bottomButtons = "<@btn class='upload' data\\-accept='" + Person.FILE_MIME_TYPE
+@Richtable(order = "id.identityNo asc", paged = false, bottomButtons = "<@btn class='upload' data\\-accept='"
+		+ Person.FILE_MIME_TYPE
 		+ "' label='import'/> <@btn view='input' label='create'/> <@btn action='save'/> <@btn action='delete'/> <@btn class='reload'/> <@btn class='filter'/>")
 @Getter
 @Setter

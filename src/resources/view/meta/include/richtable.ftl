@@ -299,13 +299,11 @@ ${formHeader!}
 </#if>
 </div>
 <div class="status span<#if showBottomButtons>2<#else>3</#if>">
-<#local totalResults=0/>
-<#if ((resultPage.totalResults)!0) gt 0>
-<#local totalResults=resultPage.totalResults/>
-<#elseif list?has_content>
+<#local totalResults=(resultPage.totalResults)!-1/>
+<#if list?has_content>
 <#local totalResults=list?size/>
 </#if>
-${totalResults}<span class="recordLabel"> ${getText('record')}<#if ((resultPage.tookInMillis)!-1) gte 0> , ${getText('tookInMillis',[resultPage.tookInMillis])}</#if></span>
+<#if totalResults gte 0>${totalResults}</#if><span class="recordLabel"><#if totalResults gte 0> ${getText('record')}</#if><#if ((resultPage.tookInMillis)!-1) gte 0><#if totalResults gte 0>, </#if>${getText('tookInMillis',[resultPage.tookInMillis])}</#if></span>
 <#if downloadable && request.requestURI?ends_with(actionBaseUrl) && totalResults gt 0 && totalResults lte (csvMaxRows!10000) && action.csv??>
 <#local downloadUrl=actionBaseUrl+'/csv'>
 <#list request.parameterMap as name,values>
