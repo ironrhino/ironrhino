@@ -305,7 +305,7 @@ ${formHeader!}
 <#elseif list?? && list?size gt 0>
 <#local totalResults=list?size/>
 </#if>
-${totalResults}<span class="recordLabel"> ${getText('record')}</span>
+${totalResults}<span class="recordLabel"> ${getText('record')}<#if resultPage?? && resultPage.tookInMillis gte 0> , ${getText('tookInMillis',[resultPage.tookInMillis])}</#if></span>
 <#if downloadable && request.requestURI?ends_with(actionBaseUrl) && totalResults gt 0 && totalResults lte (csvMaxRows!10000) && action.csv??>
 <#local downloadUrl=actionBaseUrl+'/csv'>
 <#list request.parameterMap as name,values>

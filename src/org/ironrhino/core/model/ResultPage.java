@@ -72,7 +72,7 @@ public class ResultPage<T> implements Serializable {
 
 	@Getter
 	@Setter
-	private long tookInMillis;
+	private long tookInMillis = -1;
 
 	@JsonIgnore
 	private int start = -1;
