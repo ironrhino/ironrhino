@@ -372,7 +372,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			}
 			if (resetPageSize && resultPage.getPageSize() != richtableConfig.defaultPageSize())
 				resultPage.setPageSize(richtableConfig.defaultPageSize());
-			if (richtableConfig != null && resultPage.getPaged() == null)
+			if (richtableConfig != null)
 				resultPage.setPaged(richtableConfig.paged());
 			resultPage
 					.setCriteria(doPrepareCriteria(entityManager, bw, richtableConfig, isSearchable(), ownerProperty));

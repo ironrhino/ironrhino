@@ -64,7 +64,7 @@ public class ResultPage<T> implements Serializable {
 	@JsonIgnore
 	@Getter
 	@Setter
-	private Boolean paged;
+	private boolean paged = true;
 
 	@JsonIgnore
 	@Getter
@@ -86,10 +86,6 @@ public class ResultPage<T> implements Serializable {
 
 	public void setStart(int start) {
 		this.pageNo = start / pageSize + 1;
-	}
-
-	public boolean isPaged() {
-		return paged == null || paged;
 	}
 
 	public int getPageNo() {
