@@ -10956,7 +10956,7 @@ td:focus {
 	box-shadow: none;
 }
 
-.toolbar .pagination a {
+.toolbar .pagination li a {
 	padding: 0 8px;
 	line-height: 28px;
 }
