@@ -381,18 +381,13 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 		}
 		long time = System.currentTimeMillis();
 		if (resultPage.isPaged()) {
-			int start, end;
-			if (!resultPage.isReverse()) {
-				start = (resultPage.getPageNo() - 1) * resultPage.getPageSize();
-				end = resultPage.getPageNo() * resultPage.getPageSize();
-			} else {
-				start = (int) (resultPage.getTotalResults() - resultPage.getPageNo() * resultPage.getPageSize());
-				end = (int) (resultPage.getTotalResults() - (resultPage.getPageNo() - 1) * resultPage.getPageSize());
-			}
-			if (!(resultPage.isCounting() && totalResults == 0))
+			if (!(resultPage.isCounting() && totalResults == 0)) {
+				int start = (resultPage.getPageNo() - 1) * resultPage.getPageSize();
+				int end = resultPage.getPageNo() * resultPage.getPageSize();
 				resultPage.setResult(findBetweenListByCriteria(detachedCriteria, start, end));
-			else
+			} else {
 				resultPage.setResult(Collections.EMPTY_LIST);
+			}
 		} else {
 			resultPage.setResult(findListByCriteria(detachedCriteria));
 		}

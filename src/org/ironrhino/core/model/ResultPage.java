@@ -55,11 +55,6 @@ public class ResultPage<T> implements Serializable {
 	@JsonIgnore
 	@Getter
 	@Setter
-	private boolean reverse;
-
-	@JsonIgnore
-	@Getter
-	@Setter
 	private boolean counting = true;
 
 	@JsonIgnore
