@@ -13,7 +13,7 @@
 </#list>
 <#local showActionColumn=showActionColumn&&(actionColumnButtons?has_content||!readonly||viewable)/>
 <@rtmiddle width=actionColumnWidth showActionColumn=showActionColumn/>
-<#if resultPage??><#local list=resultPage.result></#if>
+<#if (resultPage.result)??><#local list=resultPage.result></#if>
 <#if !list??><#stop "No variable 'resultPage' or 'list' found"></#if>
 <#local sumColumns={}>
 <#if list?size gt 0>

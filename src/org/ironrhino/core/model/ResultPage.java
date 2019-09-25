@@ -3,7 +3,6 @@ package org.ironrhino.core.model;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
@@ -62,16 +61,12 @@ public class ResultPage<T> implements Serializable {
 	@Setter
 	private boolean paged = true;
 
-	@JsonIgnore
-	@Getter
-	private boolean executed;
-
 	@Getter
 	@Setter
 	private long tookInMillis = -1;
 
 	@Getter
-	private Collection<T> result = new ArrayList<>(0);
+	private Collection<T> result;
 
 	public void setPageSize(int pageSize) {
 		if (pageSize > MAX_PAGESIZE.get())
@@ -83,7 +78,6 @@ public class ResultPage<T> implements Serializable {
 
 	public void setResult(Collection<T> result) {
 		this.result = result;
-		this.executed = true;
 	}
 
 	public int getTotalPage() {

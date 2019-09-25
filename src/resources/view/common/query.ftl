@@ -103,7 +103,7 @@ $(function(){
 	</#if>
 	</div>
 	<@s.submit label=getText('submit') class="btn-primary"/>
-	<#if resultPage??>
+	<#if (resultPage.result)??>
 	<#if resultPage.result?size gt 0>
 	<#assign map=resultPage.result[0]/>
 	<div id="result">
@@ -180,7 +180,7 @@ $(function(){
 			</div>
 		</div>
 	</div>
-	<#elseif resultPage.executed>
+	<#else>
 	<div class="alert">
 		<a class="close" data-dismiss="alert"></a>
 		<strong>${getText('query.result.empty')}</strong>
