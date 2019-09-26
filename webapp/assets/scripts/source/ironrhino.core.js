@@ -1608,7 +1608,8 @@ Observation.common = function(container) {
 					});
 			return;
 		} else {
-			$(this).click(function(e) {
+			var t = $(this);
+			t.click(function(e) {
 				e.preventDefault();
 				if (!Ajax.fire(target, 'onprepare'))
 					return false;
@@ -1616,11 +1617,16 @@ Observation.common = function(container) {
 					$('li', $(this).closest('.nav')).removeClass('active');
 					Nav.indicate($(this));
 				}
+				var f = t.closest('form');
+				var replacement = t.data('replacement');
+				if(!replacement && t.hasClass('history') && f.hasClass('history')) {
+					replacement = f.attr('id');
+					t.attr('data-replacement', replacement);
+				}
 				var addHistory = HISTORY_ENABLED
-						&& $(this).hasClass('view')
-						&& !$(this).hasClass('nohistory')
-						&& ($(this).hasClass('history') || !($(this)
-								.data('replacement')));
+						&& t.hasClass('view')
+						&& !t.hasClass('nohistory')
+						&& (t.hasClass('history') || !replacement);
 				if (addHistory) {
 					$('.ui-dialog:visible').children().remove();
 					var hash = this.href;
@@ -1633,26 +1639,22 @@ Observation.common = function(container) {
 										url : location
 									}, '', location);
 							history.pushState({
-										replacement : $(this)
-												.data('replacement'),
+										replacement : replacement,
 										url : hash
 									}, '', hash);
 						}
 					}
 
 				}
-				var t = $(this);
 				var options = {
 					target : this,
 					url : this.href,
-					type : $(this).data('method') || 'GET',
-					cache : $(this).hasClass('cache'),
+					type : t.data('method') || 'GET',
+					cache : t.hasClass('cache'),
 					beforeSend : function() {
 						if (typeof $.fn.mask != 'undefined'
 								&& t.hasClass('view') && !t.data('quiet')) {
-							var replacement = t.attr('data-replacement')
-									|| Ajax.defaultRepacement;
-							$.each(replacement.split(/\s*,\s*/),
+							$.each((replacement || Ajax.defaultRepacement).split(/\s*,\s*/),
 									function(i, v) {
 										if (v.indexOf(':') > -1)
 											v = v.substring(0, v.indexOf(':'));
@@ -1670,9 +1672,7 @@ Observation.common = function(container) {
 					complete : function() {
 						if (typeof $.fn.mask != 'undefined'
 								&& t.hasClass('view') && !t.data('quiet')) {
-							var replacement = t.attr('data-replacement')
-									|| Ajax.defaultRepacement;
-							$.each(replacement.split(/\s*,\s*/),
+							$.each((replacement || Ajax.defaultRepacement).split(/\s*,\s*/),
 									function(i, v) {
 										$('#' + v).unmask();
 									});
@@ -1680,11 +1680,11 @@ Observation.common = function(container) {
 						t.removeClass('loading');
 					}
 				};
-				if (!$(this).hasClass('view'))
+				if (!t.hasClass('view'))
 					$.extend(options.headers, {
 								'X-Data-Type' : 'json'
 							});
-				else if (!$(this).data('replacement'))
+				else if (!t.data('replacement'))
 					options.replaceTitle = true;
 				if (addHistory)
 					options.onsuccess = function() {
