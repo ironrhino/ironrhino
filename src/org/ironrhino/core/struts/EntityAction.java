@@ -141,7 +141,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	@Autowired(required = false)
 	protected SearchService<EN> searchService;
 
-	@Autowired(required = false)
+	@Autowired
 	protected ConversionService conversionService;
 
 	@Value("${csv.defaultEncoding:GBK}")
@@ -372,10 +372,11 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			}
 			if (resetPageSize && resultPage.getPageSize() != richtableConfig.defaultPageSize())
 				resultPage.setPageSize(richtableConfig.defaultPageSize());
-			if (richtableConfig != null)
+			DetachedCriteria dc = doPrepareCriteria(entityManager, bw, richtableConfig, isSearchable(), ownerProperty);
+			resultPage.setCriteria(dc);
+			if (richtableConfig != null) {
 				resultPage.setPaged(richtableConfig.paged());
-			resultPage
-					.setCriteria(doPrepareCriteria(entityManager, bw, richtableConfig, isSearchable(), ownerProperty));
+			}
 			resultPage = entityManager.findByResultPage(resultPage);
 		} else {
 			Set<String> searchableProperties = new HashSet<>();
