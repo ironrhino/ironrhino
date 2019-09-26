@@ -22,7 +22,7 @@
 		<tr>
 			<td colspan="4" class="center">
 			<#if marker?has_content> 
-			<a class="ajax view" data-replacement="files" href="${actionBaseUrl}/pick${folderEncoded}?<#if limit??>limit=${limit}&</#if>marker=${previousMarker!}">${getText('previouspage')}</a>
+			<a class="ajax view" data-replacement="files" href="${actionBaseUrl}/pick${folderEncoded}?<#if limit??>limit=${limit}&</#if>marker=${previousMarker!}">${getText(previousMarker?has_content?then('previouspage','firstpage'))}</a>
 			<#else>
 			<span>${getText('previouspage')}</span>
 			</#if>
