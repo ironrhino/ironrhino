@@ -2,6 +2,7 @@ package org.ironrhino.core.struts.converter;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.Map;
 
@@ -15,7 +16,12 @@ public class LocalDateTimeConverter extends StrutsTypeConverter {
 	public Object convertFromString(Map context, String[] values, Class toClass) {
 		if (values[0] == null || values[0].trim().equals(""))
 			return null;
-		return DateUtils.parse(values[0].trim()).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+		String source = values[0].trim();
+		try {
+			return LocalDateTime.parse(source);
+		} catch (DateTimeParseException e) {
+			return DateUtils.parse(source).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+		}
 	}
 
 	@Override
