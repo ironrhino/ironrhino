@@ -23,22 +23,7 @@
 		</tr>
 		</thead>
 		<tfoot>
-		<#if pagedFiles?? && (marker?has_content || pagedFiles.nextMarker??)>
-		<tr>
-			<td colspan="4" class="center">
-			<#if marker?has_content> 
-			<a class="ajax view" data-replacement="files" href="${actionBaseUrl}/list${folderEncoded}?<#if limit??>limit=${limit}&</#if>marker=${previousMarker!}">${getText(previousMarker?has_content?then('previouspage','firstpage'))}</a>
-			<#else>
-			<span>${getText('previouspage')}</span>
-			</#if>
-			<#if pagedFiles.nextMarker??>
-			<a class="ajax view" data-replacement="files" href="${actionBaseUrl}/list${folderEncoded}?<#if limit??>limit=${limit}&</#if><#if pagedFiles.marker??>previousMarker=${pagedFiles.marker}&</#if>marker=${pagedFiles.nextMarker}">${getText('nextpage')}</a>
-			<#else>
-			<span>${getText('nextpage')}</span>
-			</#if>
-			</td>
-		</tr>
-		</#if>
+		<#include 'upload.pagination.ftl'/>
 		<tr>
 			<td colspan="4" class="center">
 			<button type="button" class="btn delete" data-shown="selected">${getText('delete')}</button>
