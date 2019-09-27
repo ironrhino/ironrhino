@@ -219,12 +219,12 @@ ${formHeader!}
 <div class="pagination span<#if showBottomButtons>4<#else>6</#if><#if ((resultPage.useKeysetPagination)!false)> keyset</#if>">
 <#if ((resultPage.useKeysetPagination)!false)>
 <#if resultPage.marker?has_content> 
-<a class="ajax view history" href="${resultPage.renderUrlWithMarker(resultPage.previousMarker!,false)}">${getText(resultPage.previousMarker?has_content?then('previouspage','firstpage'))}</a>
+<a class="ajax view history" href="${resultPage.renderUrlWithMarker(false)}">${getText(resultPage.previousMarker?has_content?then('previouspage','firstpage'))}</a>
 <#else>
-<span>${getText('previouspage')}</span>
+<span>${getText('firstpage')}</span>
 </#if>
-<#if resultPage.nextMarker??>
-<a class="ajax view history" href="${resultPage.renderUrlWithMarker(resultPage.nextMarker,true)}">${getText('nextpage')}</a>
+<#if resultPage.nextMarker?has_content>
+<a class="ajax view history" href="${resultPage.renderUrlWithMarker(true)}">${getText('nextpage')}</a>
 <#else>
 <span>${getText('nextpage')}</span>
 </#if>

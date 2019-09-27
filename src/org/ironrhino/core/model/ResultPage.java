@@ -3,7 +3,10 @@ package org.ironrhino.core.model;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -148,18 +151,43 @@ public class ResultPage<T> implements Serializable {
 		return this.totalResults <= DEFAULT_MAX_PAGESIZE;
 	}
 
-	public String renderUrl(int pn) {
+	public String renderUrl(int pn) throws UnsupportedEncodingException {
 		return doRenderUrl(PAGENO_PARAM_NAME, pn > 1 ? String.valueOf(pn) : null);
 	}
 
-	public String renderUrlWithMarker(String m, boolean forward) {
-		String url = doRenderUrl(MARKER_PARAM_NAME, m);
-		if (forward && StringUtils.isNotBlank(marker))
-			url += '&' + PREVIOUSMARKER_PARAM_NAME + '=' + marker;
+	public String renderUrlWithMarker(boolean forward) throws UnsupportedEncodingException {
+		String url;
+		if (forward) {
+			url = doRenderUrl(MARKER_PARAM_NAME, nextMarker);
+			if (StringUtils.isNotBlank(marker)) {
+				List<String> history = new ArrayList<>();
+				if (StringUtils.isNotBlank(previousMarker))
+					history.addAll(Arrays.asList(previousMarker.split(",")));
+				history.add(marker);
+				int maxlength = 5;
+				if (history.size() > maxlength) {
+					history = history.subList(history.size() - maxlength, history.size());
+				}
+				url += '&' + PREVIOUSMARKER_PARAM_NAME + '=' + URLEncoder.encode(String.join(",", history), "UTF-8");
+			}
+		} else {
+			if (StringUtils.isNotBlank(previousMarker)) {
+				int index = previousMarker.lastIndexOf(',');
+				if (index > 0) {
+					url = doRenderUrl(MARKER_PARAM_NAME, previousMarker.substring(index + 1));
+					url += '&' + PREVIOUSMARKER_PARAM_NAME + '='
+							+ URLEncoder.encode(previousMarker.substring(0, index), "UTF-8");
+				} else {
+					url = doRenderUrl(MARKER_PARAM_NAME, previousMarker);
+				}
+			} else {
+				url = doRenderUrl(MARKER_PARAM_NAME, "");
+			}
+		}
 		return url;
 	}
 
-	private String doRenderUrl(String name, String value) {
+	private String doRenderUrl(String name, String value) throws UnsupportedEncodingException {
 		HttpServletRequest request = RequestContext.getRequest();
 		String requestURI = (String) request.getAttribute("struts.request_uri");
 		if (requestURI == null)
@@ -188,7 +216,7 @@ public class ResultPage<T> implements Serializable {
 
 	private String _parameterString;
 
-	private String _getParameterString() {
+	private String _getParameterString() throws UnsupportedEncodingException {
 		if (_parameterString == null) {
 			StringBuilder sb = new StringBuilder();
 			Map<String, String[]> map = RequestContext.getRequest().getParameterMap();
@@ -200,14 +228,10 @@ public class ResultPage<T> implements Serializable {
 						|| name.equals(PREVIOUSMARKER_PARAM_NAME)
 						|| name.startsWith(StringUtils.uncapitalize(ResultPage.class.getSimpleName()) + '.'))
 					continue;
-				try {
-					for (String value : values)
-						sb.append(name).append('=').append(
-								URLEncoder.encode(value.length() > 256 ? value.substring(0, 256) : value, "UTF-8"))
-								.append('&');
-				} catch (UnsupportedEncodingException e) {
-					e.printStackTrace();
-				}
+				for (String value : values)
+					sb.append(name).append('=')
+							.append(URLEncoder.encode(value.length() > 256 ? value.substring(0, 256) : value, "UTF-8"))
+							.append('&');
 			}
 			if (sb.length() > 0)
 				sb.deleteCharAt(sb.length() - 1);
