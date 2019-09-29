@@ -164,7 +164,6 @@ public class ApplicationContextConsole {
 				value = value.substring(1, value.length() - 1);
 			}
 			Object v = ApplicationContextUtils.getBean(ConversionService.class).convert(value, f.getType());
-			f.setAccessible(true);
 			f.set(bean, v);
 		}
 		ReflectionUtils.processCallback(bean, PostPropertiesReset.class);
@@ -179,7 +178,6 @@ public class ApplicationContextConsole {
 		bean = ReflectionUtils.getTargetObject(bean);
 		String fieldName = expression.substring(expression.indexOf('.') + 1).trim();
 		Field f = ReflectionUtils.getField(bean.getClass(), fieldName);
-		f.setAccessible(true);
 		return f.get(bean);
 	}
 
