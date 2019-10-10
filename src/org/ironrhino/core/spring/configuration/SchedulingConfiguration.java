@@ -81,8 +81,8 @@ public class SchedulingConfiguration implements SchedulingConfigurer, AsyncConfi
 	@Bean
 	public AsyncTaskExecutor taskExecutor() {
 		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-		executor.setCorePoolSize(taskExecutorCorePoolSize);
 		executor.setMaxPoolSize(taskExecutorMaxPoolSize);
+		executor.setCorePoolSize(taskExecutorCorePoolSize);
 		executor.setQueueCapacity(taskExecutorQueueCapacity);
 		executor.setThreadNamePrefix("taskExecutor-");
 		executor.setAllowCoreThreadTimeOut(true);
