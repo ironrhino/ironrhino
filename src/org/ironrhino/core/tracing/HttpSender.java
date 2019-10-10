@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.NoHttpResponseException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
@@ -42,9 +43,12 @@ public class HttpSender extends ThriftSender {
 		if (endpoint == null)
 			throw new IllegalArgumentException("endpoint should'nt be null");
 		collectorUrl = String.format("%s?%s", endpoint, HTTP_COLLECTOR_JAEGER_THRIFT_FORMAT_PARAM);
-		this.httpClient = HttpClients.custom().disableAuthCaching().disableAutomaticRetries().disableConnectionState()
+		this.httpClient = HttpClients.custom().useSystemProperties().disableAuthCaching().disableConnectionState()
 				.disableCookieManagement().setConnectionTimeToLive(CONNECTION_TIME_TO_LIVE, TimeUnit.SECONDS)
-				.setDefaultRequestConfig(RequestConfig.custom().setConnectTimeout(CONNECTION_TIMEOUT).build()).build();
+				.setDefaultRequestConfig(RequestConfig.custom().setConnectTimeout(CONNECTION_TIMEOUT).build())
+				.setRetryHandler(
+						(e, executionCount, httpCtx) -> executionCount < 3 && e instanceof NoHttpResponseException)
+				.build();
 	}
 
 	@Override
