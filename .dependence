@@ -29,6 +29,8 @@
 -ironrhino-redis-config
 +byte-buddy
 +mockito-core
+-hamcrest-core
++hamcrest
 -struts2-spring-plugin
 -struts2-jasperreports-plugin
 -struts2-sitemesh-plugin

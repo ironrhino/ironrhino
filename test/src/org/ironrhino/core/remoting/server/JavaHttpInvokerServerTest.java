@@ -337,8 +337,8 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 	@Test
 	public void testCallable() throws Exception {
 		Callable<User> callable = testService.loadCallableUserByUsername("username");
-		then(mockHttpInvokerRequestExecutor).shouldHaveZeroInteractions();
-		then(mockTestService).shouldHaveZeroInteractions();
+		then(mockHttpInvokerRequestExecutor).shouldHaveNoMoreInteractions();
+		then(mockTestService).shouldHaveNoMoreInteractions();
 
 		assertThat(callable.call().getUsername(), is("username"));
 		then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(TestService.class)),
@@ -352,8 +352,8 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 	@Test
 	public void testNonConcreteCallable() throws Exception {
 		Callable<? extends UserDetails> callable = testService.loadCallableUserDetailsByUsername("username");
-		then(mockHttpInvokerRequestExecutor).shouldHaveZeroInteractions();
-		then(mockTestService).shouldHaveZeroInteractions();
+		then(mockHttpInvokerRequestExecutor).shouldHaveNoMoreInteractions();
+		then(mockTestService).shouldHaveNoMoreInteractions();
 
 		UserDetails userDetails = callable.call();
 		assertThat(userDetails.getUsername(), is("username"));
