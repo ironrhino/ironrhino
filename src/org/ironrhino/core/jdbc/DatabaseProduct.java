@@ -80,11 +80,10 @@ public enum DatabaseProduct {
 		@Override
 		public String getJdbcUrl(String host, int port, String databaseName, String params) {
 			StringBuilder sb = new StringBuilder(getJdbcUrlPrefix());
-			sb.append(":thin:@//");
+			sb.append(":thin:@");
 			sb.append(StringUtils.isNotBlank(host) ? host : "localhost");
-			if (port > 0 && port != getDefaultPort())
-				sb.append(":").append(port);
-			sb.append("/").append(databaseName);
+			sb.append(":").append(port > 0 ? port : getDefaultPort());
+			sb.append(":").append(databaseName);
 			return sb.toString();
 		}
 
