@@ -2,6 +2,7 @@ package org.ironrhino.core.servlet;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -89,6 +90,38 @@ public class MainContextLoaderListener extends ContextLoaderListener {
 				Object executor = f.get(null);
 				if (executor != null)
 					executor.getClass().getMethod("shutdown").invoke(executor);
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		try {
+			String className = "oracle.jdbc.driver.BlockSource.ThreadedCachingBlockSource";
+			if (ClassUtils.isPresent(className, cl)) {
+				Method m = ClassUtils.forName(className, cl).getDeclaredMethod("stopBlockReleaserThread");
+				m.setAccessible(true);
+				m.invoke(null);
+			}
+			className = "oracle.net.nt.TimeoutInterruptHandler";
+			if (ClassUtils.isPresent(className, cl)) {
+				Field f = ClassUtils.forName(className, cl).getDeclaredField("interruptTimer");
+				f.setAccessible(true);
+				Object interruptTimer = f.get(null);
+				if (interruptTimer != null)
+					interruptTimer.getClass().getMethod("cancel").invoke(interruptTimer);
+			}
+			className = "oracle.jdbc.driver.NoSupportHAManager";
+			if (ClassUtils.isPresent(className, cl)) {
+				Field f = ClassUtils.forName(className, cl).getDeclaredField("noSupportHAManager");
+				f.setAccessible(true);
+				Object noSupportHAManager = f.get(null);
+				if (noSupportHAManager != null) {
+//	java.lang.NoClassDefFoundError: Loracle/simplefan/FanManager;
+//					f = ClassUtils.forName("oracle.jdbc.driver.HAManager", cl).getDeclaredField("timer");
+//					f.setAccessible(true);
+//					Object timer = f.get(noSupportHAManager);
+//					if (timer != null)
+//						timer.getClass().getMethod("cancel").invoke(timer);
+				}
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
