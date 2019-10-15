@@ -66,6 +66,15 @@ public class MainContextLoaderListener extends ContextLoaderListener {
 			e.printStackTrace();
 		}
 		try {
+			String className = "com.mysql.jdbc.AbandonedConnectionCleanupThread";
+			String methodName = "checkedShutdown";
+			if (ClassUtils.isPresent(className, cl)) {
+				ClassUtils.forName(className, cl).getMethod(methodName).invoke(null);
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		try {
 			String className = "org.mariadb.jdbc.internal.protocol.AbstractQueryProtocol";
 			if (ClassUtils.isPresent(className, cl)) {
 				Field f = ClassUtils.forName(className, cl).getDeclaredField("readScheduler");
