@@ -3,7 +3,6 @@ package org.ironrhino.core.servlet;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -70,23 +69,6 @@ public class MainContextLoaderListener extends ContextLoaderListener {
 			String methodName = "checkedShutdown";
 			if (ClassUtils.isPresent(className, cl)) {
 				ClassUtils.forName(className, cl).getMethod(methodName).invoke(null);
-			}
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-		try {
-			String className = "org.mariadb.jdbc.internal.protocol.AbstractQueryProtocol";
-			if (ClassUtils.isPresent(className, cl)) {
-				Field f = ClassUtils.forName(className, cl).getDeclaredField("readScheduler");
-				if (Modifier.isStatic(f.getModifiers())) {
-					f.setAccessible(true);
-					Object executor = f.get(null);
-					if (executor != null)
-						executor.getClass().getMethod("shutdown").invoke(executor);
-				} else {
-					// ignore this
-					// https://github.com/MariaDB/mariadb-connector-j/commit/0831106bb9d8a8204e4a36f400d4079990af7ed6
-				}
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
