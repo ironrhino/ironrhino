@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceConfigurationError;
 import java.util.TimeZone;
 
 import javax.persistence.Lob;
@@ -15,6 +16,7 @@ import javax.persistence.Lob;
 import org.ironrhino.common.model.Coordinate;
 import org.ironrhino.core.model.Displayable;
 import org.ironrhino.core.util.AppInfo.Stage;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.jackson2.SimpleGrantedAuthorityMixin;
@@ -125,7 +127,11 @@ public class JsonUtils {
 		objectMapper.addMixIn(GrantedAuthority.class, SimpleGrantedAuthorityMixin.class)
 				.addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityMixin.class);
 		objectMapper.registerModule(MODULE_COMMON);
-		objectMapper.findAndRegisterModules();
+		try {
+			objectMapper.findAndRegisterModules();
+		} catch (ServiceConfigurationError e) {
+			LoggerFactory.getLogger(JsonUtils.class).error(e.getMessage());
+		}
 		if (AppInfo.getStage() == Stage.DEVELOPMENT)
 			objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 		return objectMapper;
