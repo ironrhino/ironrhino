@@ -64,8 +64,7 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 		if (!orig.getSecret().equals(client.getSecret()))
 			throw new OAuthError(OAuthError.UNAUTHORIZED_CLIENT, "client_secret_mismatch");
 		Authorization auth = new Authorization();
-		if (authorizationLifetime > 0)
-			auth.setLifetime(authorizationLifetime);
+		auth.setLifetime(authorizationLifetime > 0 ? authorizationLifetime : DEFAULT_LIFE_TIME);
 		auth.setId(CodecUtils.nextId());
 		auth.setClient(client.getId());
 		auth.setRefreshToken(CodecUtils.nextId());
@@ -107,8 +106,7 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 			}
 		}
 		Authorization auth = new Authorization();
-		if (authorizationLifetime > 0)
-			auth.setLifetime(authorizationLifetime);
+		auth.setLifetime(authorizationLifetime > 0 ? authorizationLifetime : DEFAULT_LIFE_TIME);
 		auth.setId(CodecUtils.nextId());
 		auth.setClient(client.getId());
 		auth.setGrantor(grantor);
@@ -142,8 +140,7 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 		if (!client.supportsRedirectUri(redirectUri))
 			throw new OAuthError(OAuthError.INVALID_GRANT, "redirect_uri_mismatch");
 		Authorization auth = new Authorization();
-		if (authorizationLifetime > 0)
-			auth.setLifetime(authorizationLifetime);
+		auth.setLifetime(authorizationLifetime > 0 ? authorizationLifetime : DEFAULT_LIFE_TIME);
 		auth.setId(CodecUtils.nextId());
 		auth.setClient(client.getId());
 		if (StringUtils.isNotBlank(scope))
@@ -159,7 +156,7 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 	public Authorization reuse(Authorization auth) {
 		auth.setCode(CodecUtils.nextId(32));
 		auth.setModifyDate(new Date());
-		auth.setLifetime(Authorization.DEFAULT_LIFETIME);
+		auth.setLifetime(authorizationLifetime > 0 ? authorizationLifetime : DEFAULT_LIFE_TIME);
 		stringRedisTemplate.execute((SessionCallback) redisOperations -> {
 			redisOperations.multi();
 			redisOperations.opsForValue().set(NAMESPACE_AUTHORIZATION + auth.getId(), JsonUtils.toJson(auth),
@@ -246,6 +243,7 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 				Optional<String> grantor = authorizationCodeResolver.resolver(code);
 				if (grantor.isPresent()) {
 					auth = new Authorization();
+					auth.setLifetime(authorizationLifetime > 0 ? authorizationLifetime : DEFAULT_LIFE_TIME);
 					auth.setClient(client.getClientId());
 					auth.setRefreshToken(CodecUtils.nextId(32));
 					auth.setGrantor(grantor.get());
@@ -283,10 +281,11 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 		if (!orig.supportsRedirectUri(client.getRedirectUri()))
 			throw new OAuthError(OAuthError.INVALID_GRANT, "redirect_uri_mismatch");
 		if (exclusive)
-			deleteAuthorizationsByGrantor(auth.getGrantor(), client.getId(), GrantType.authorization_code);
+			kickoutAuthorizations(auth.getGrantor(), client.getId(), GrantType.authorization_code);
 		auth.setCode(null);
 		auth.setRefreshToken(CodecUtils.nextId(32));
 		auth.setGrantType(GrantType.authorization_code);
+		auth.setLifetime(authorizationLifetime > 0 ? authorizationLifetime : DEFAULT_LIFE_TIME);
 		auth.setModifyDate(new Date());
 		Authorization auth2 = auth;
 		stringRedisTemplate.execute((SessionCallback) redisOperations -> {
@@ -346,6 +345,8 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 			redisOperations.delete(NAMESPACE_AUTHORIZATION + auth2.getAccessToken());
 			auth2.setAccessToken(CodecUtils.nextId(32));
 			auth2.setRefreshToken(CodecUtils.nextId(32));
+			if (auth2.isKicked())
+				auth2.setLifetime(authorizationLifetime > 0 ? authorizationLifetime : DEFAULT_LIFE_TIME);
 			auth2.setModifyDate(new Date());
 			redisOperations.opsForValue().set(NAMESPACE_AUTHORIZATION + auth2.getAccessToken(), auth2.getId(),
 					auth2.getExpiresIn(), TimeUnit.SECONDS);
@@ -423,20 +424,18 @@ public class RedisOAuthManager extends AbstractOAuthManager {
 	}
 
 	@Override
-	public void deleteAuthorizationsByGrantor(String grantor, String client, GrantType grantType) {
+	public void kickoutAuthorizations(String grantor, String client, GrantType grantType) {
 		List<Authorization> list = findAuthorizationsByGrantor(grantor);
 		for (Authorization authorization : list)
 			if ((client == null || client.equals(authorization.getClient()))
 					&& (grantType == null || grantType == authorization.getGrantType())) {
-				stringRedisTemplate.execute((SessionCallback) redisOperations -> {
-					redisOperations.multi();
-					redisOperations.delete(NAMESPACE_AUTHORIZATION + authorization.getId());
-					redisOperations.delete(NAMESPACE_AUTHORIZATION + authorization.getAccessToken());
-					redisOperations.delete(NAMESPACE_AUTHORIZATION + authorization.getRefreshToken());
-					redisOperations.opsForList().remove(NAMESPACE_AUTHORIZATION_GRANTOR + grantor, 0,
-							authorization.getId());
-					return redisOperations.exec();
-				});
+				String key = NAMESPACE_AUTHORIZATION + authorization.getId();
+				Long ttl = stringRedisTemplate.getExpire(key, TimeUnit.MILLISECONDS);
+				if (ttl != null && ttl > 0) {
+					authorization.markAsKicked();
+					stringRedisTemplate.opsForValue().set(key, JsonUtils.toJson(authorization), ttl,
+							TimeUnit.MILLISECONDS);
+				}
 			}
 	}
 

@@ -46,7 +46,7 @@ public interface OAuthManager {
 
 	List<Authorization> findAuthorizationsByGrantor(String grantor);
 
-	void deleteAuthorizationsByGrantor(String grantor, String client, GrantType grantType);
+	void kickoutAuthorizations(String grantor, String client, GrantType grantType);
 
 	Client findClientById(String clientId);
 

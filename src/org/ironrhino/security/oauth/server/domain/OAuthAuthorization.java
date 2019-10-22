@@ -39,4 +39,6 @@ public class OAuthAuthorization implements Serializable {
 
 	private String clientOwner;
 
+	private boolean kicked;
+
 }

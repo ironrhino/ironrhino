@@ -22,7 +22,7 @@ public abstract class AbstractOAuthManager implements OAuthManager {
 	@Override
 	public Authorization grant(Client client, String grantor, String deviceId, String deviceName) {
 		if (exclusive)
-			deleteAuthorizationsByGrantor(grantor, client.getId(), GrantType.password);
+			kickoutAuthorizations(grantor, client.getId(), GrantType.password);
 		return doGrant(client, grantor, deviceId, deviceName);
 	}
 

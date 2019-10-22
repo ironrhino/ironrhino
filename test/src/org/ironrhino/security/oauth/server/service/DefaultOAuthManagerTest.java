@@ -137,7 +137,7 @@ public class DefaultOAuthManagerTest {
 		oauthManager.reuse(authorization);
 		then(authorization).should().setCode(anyString());
 		then(authorization).should().setModifyDate(any(Date.class));
-		then(authorization).should().setLifetime(Authorization.DEFAULT_LIFETIME);
+		then(authorization).should().setLifetime(OAuthManager.DEFAULT_LIFE_TIME);
 		then(authorizationManager).should().save(authorization);
 	}
 

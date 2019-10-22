@@ -120,6 +120,11 @@ public class OAuthHandler extends AccessHandler {
 			return true;
 		}
 
+		if (authorization.isKicked()) {
+			oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.INVALID_TOKEN, "kicked_token"));
+			return true;
+		}
+
 		if (authorization.getExpiresIn() < 0) {
 			oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.INVALID_TOKEN, "expired_token"));
 			return true;
