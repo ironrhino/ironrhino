@@ -49,8 +49,7 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 		if (!orig.getSecret().equals(client.getSecret()))
 			throw new OAuthError(OAuthError.UNAUTHORIZED_CLIENT, "client_secret_mismatch");
 		Authorization auth = new Authorization();
-		if (authorizationLifetime > 0)
-			auth.setLifetime(authorizationLifetime);
+		auth.setLifetime(authorizationLifetime > 0 ? authorizationLifetime : DEFAULT_LIFE_TIME);
 		auth.setClient(client.getId());
 		auth.setResponseType(ResponseType.token);
 		auth.setGrantType(GrantType.client_credentials);
@@ -78,6 +77,7 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 			if (auth != null) {
 				auth.setAccessToken(CodecUtils.nextId(32));
 				auth.setRefreshToken(CodecUtils.nextId(32));
+				auth.setLifetime(authorizationLifetime > 0 ? authorizationLifetime : DEFAULT_LIFE_TIME);
 				auth.setModifyDate(new Date());
 				authorizationManager.save(auth);
 				return auth;
@@ -91,8 +91,7 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 			}
 		}
 		Authorization auth = new Authorization();
-		if (authorizationLifetime > 0)
-			auth.setLifetime(authorizationLifetime);
+		auth.setLifetime(authorizationLifetime > 0 ? authorizationLifetime : DEFAULT_LIFE_TIME);
 		auth.setClient(client.getId());
 		auth.setGrantor(grantor);
 		auth.setRefreshToken(CodecUtils.nextId());
@@ -115,8 +114,7 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 		if (!client.supportsRedirectUri(redirectUri))
 			throw new OAuthError(OAuthError.INVALID_GRANT, "redirect_uri_mismatch");
 		Authorization auth = new Authorization();
-		if (authorizationLifetime > 0)
-			auth.setLifetime(authorizationLifetime);
+		auth.setLifetime(authorizationLifetime > 0 ? authorizationLifetime : DEFAULT_LIFE_TIME);
 		auth.setClient(client.getId());
 		if (StringUtils.isNotBlank(scope))
 			auth.setScope(scope);
@@ -129,8 +127,8 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 	@Override
 	public Authorization reuse(Authorization auth) {
 		auth.setCode(CodecUtils.nextId(32));
+		auth.setLifetime(authorizationLifetime > 0 ? authorizationLifetime : DEFAULT_LIFE_TIME);
 		auth.setModifyDate(new Date());
-		auth.setLifetime(Authorization.DEFAULT_LIFETIME);
 		authorizationManager.save(auth);
 		return auth;
 	}
@@ -174,6 +172,7 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 				Optional<String> grantor = authorizationCodeResolver.resolver(code);
 				if (grantor.isPresent()) {
 					auth = new Authorization();
+					auth.setLifetime(authorizationLifetime > 0 ? authorizationLifetime : DEFAULT_LIFE_TIME);
 					auth.setClient(client.getClientId());
 					auth.setRefreshToken(CodecUtils.nextId(32));
 					auth.setGrantor(grantor.get());
@@ -202,10 +201,11 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 		if (!orig.supportsRedirectUri(client.getRedirectUri()))
 			throw new OAuthError(OAuthError.INVALID_GRANT, "redirect_uri_mismatch");
 		if (exclusive)
-			deleteAuthorizationsByGrantor(auth.getGrantor(), client.getId(), GrantType.authorization_code);
+			kickoutAuthorizations(auth.getGrantor(), client.getId(), GrantType.authorization_code);
 		auth.setCode(null);
 		auth.setRefreshToken(CodecUtils.nextId(32));
 		auth.setGrantType(GrantType.authorization_code);
+		auth.setLifetime(authorizationLifetime > 0 ? authorizationLifetime : DEFAULT_LIFE_TIME);
 		auth.setModifyDate(new Date());
 		authorizationManager.save(auth);
 		return auth;
@@ -227,6 +227,8 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 		Authorization auth = authorizationManager.findOne("refreshToken", refreshToken);
 		if (auth == null)
 			throw new OAuthError(OAuthError.INVALID_GRANT);
+		if (auth.isKicked())
+			throw new OAuthError(OAuthError.INVALID_TOKEN, "kicked_token");
 		auth.setAccessToken(CodecUtils.nextId(32));
 		auth.setRefreshToken(CodecUtils.nextId(32));
 		auth.setModifyDate(new Date());
@@ -258,7 +260,7 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 	}
 
 	@Override
-	public void deleteAuthorizationsByGrantor(String grantor, String client, GrantType grantType) {
+	public void kickoutAuthorizations(String grantor, String client, GrantType grantType) {
 		DetachedCriteria dc = authorizationManager.detachedCriteria();
 		dc.add(Restrictions.eq("grantor", grantor));
 		if (client != null)
@@ -266,8 +268,10 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 		if (grantType != null)
 			dc.add(Restrictions.eq("grantType", grantType));
 		List<Authorization> list = authorizationManager.findListByCriteria(dc);
-		for (Authorization authorization : list)
-			authorizationManager.delete(authorization);
+		for (Authorization authorization : list) {
+			authorization.markAsKicked();
+			authorizationManager.save(authorization);
+		}
 	}
 
 	@Trigger
@@ -276,8 +280,9 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 	public void removeExpired() {
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.SECOND, (int) (-expireTime));
-		authorizationManager.executeUpdate("delete from Authorization a where lifetime >0 and a.modifyDate < ?1",
-				cal.getTime());
+		authorizationManager.executeUpdate("delete from Authorization a where a.lifetime > 0 and a.modifyDate < ?1",
+				cal.getTime()); // expired
+		authorizationManager.executeUpdate("delete from Authorization a where a.lifetime = -1"); // kicked
 	}
 
 	@Override

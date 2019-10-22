@@ -39,7 +39,9 @@ import lombok.Setter;
 @Setter
 public class Authorization extends BaseEntity {
 
-	public static final int DEFAULT_LIFETIME = 3600;
+	public static final int LIFETIME_FOR_KICKED = -1;
+
+	public static final int LIFETIME_FOR_PERMANENT = 0;
 
 	private static final long serialVersionUID = -559379341059695550L;
 
@@ -62,7 +64,7 @@ public class Authorization extends BaseEntity {
 	private String code;
 
 	@UiConfig(width = "60px")
-	private int lifetime = DEFAULT_LIFETIME;
+	private int lifetime;
 
 	@UiConfig(hiddenInList = @Hidden(true), alias = "refresh_token")
 	@Column(unique = true)
@@ -98,13 +100,24 @@ public class Authorization extends BaseEntity {
 	private Date modifyDate = new Date();
 
 	public int getExpiresIn() {
-		return lifetime > 0 ? lifetime - (int) ((System.currentTimeMillis() - modifyDate.getTime()) / 1000)
-				: Integer.MAX_VALUE;
+		if (lifetime == LIFETIME_FOR_KICKED)
+			return 0;
+		if (lifetime == LIFETIME_FOR_PERMANENT)
+			return Integer.MAX_VALUE;
+		return lifetime - (int) ((System.currentTimeMillis() - modifyDate.getTime()) / 1000);
 	}
 
 	@JsonIgnore
 	public boolean isClientSide() {
 		return ResponseType.token == responseType;
+	}
+
+	public boolean isKicked() {
+		return lifetime == LIFETIME_FOR_KICKED;
+	}
+
+	public void markAsKicked() {
+		lifetime = LIFETIME_FOR_KICKED;
 	}
 
 }
