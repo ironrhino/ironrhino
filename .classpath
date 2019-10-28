@@ -60,7 +60,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mysql-connector-java-8.0.18.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/netty-all-4.1.32.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/objenesis-3.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/ognl-3.1.17.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/ognl-3.1.26.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/persistence-api-2.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/pinyin4j-2.5.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/reactive-streams-1.0.2.jar"/>
