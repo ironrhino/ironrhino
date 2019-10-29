@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <Configuration shutdownHook="disable" packages="org.ironrhino.core.log4j">
 	<Properties>
-		<Property name="app.home">/tmp/app</Property>
 		<Property name="port.http"></Property>
 		<Property name="root.logger.level">INFO</Property>
 		<Property name="console.logger.level">INFO</Property>
