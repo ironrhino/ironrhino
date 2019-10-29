@@ -162,10 +162,23 @@ class MyBeanPropertyRowMapper<T> implements RowMapper<T> {
 								+ ClassUtils.getQualifiedName(pd.getPropertyType()) + "'");
 					}
 					try {
-						if (fromFind)
+						if (fromFind) {
 							bw.setPropertyValue(column, value);
-						else
-							bw.setPropertyValue(pd.getName(), value);
+						} else {
+							if (value == null || pd.getPropertyType().isAssignableFrom(value.getClass())) {
+								try {
+									// https://github.com/spring-projects/spring-framework/blob/098ac0bbb88cd178e85b7dc31642bed091560316/spring-core/src/main/java/org/springframework/core/convert/TypeDescriptor.java#L501
+									// Annotation.equals is expensive cause bw.setPropertyValue() is costly
+									// if ConversionService is present for massive fields with heavy annotation
+									// use reflection directly
+									pd.getWriteMethod().invoke(mappedObject, value);
+								} catch (Exception e) {
+									bw.setPropertyValue(pd.getName(), value);
+								}
+							} else {
+								bw.setPropertyValue(pd.getName(), value);
+							}
+						}
 					} catch (TypeMismatchException ex) {
 						if ((value == null) && (primitivesDefaultedForNullValue)) {
 							if (logger.isDebugEnabled()) {
