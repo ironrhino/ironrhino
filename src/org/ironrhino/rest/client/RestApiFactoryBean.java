@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -49,6 +50,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
@@ -449,22 +451,27 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 	private Object exchange(Method method, RequestEntity<Object> requestEntity) throws Exception {
 		try {
 			Type type = method.getGenericReturnType();
-			if (type == InputStream.class) {
-				Resource resource = restTemplate.exchange(requestEntity, Resource.class).getBody();
-				if (resource == null)
-					return null;
-				return resource.getInputStream();
-			} else if (type == Void.TYPE) {
-				restTemplate.exchange(requestEntity, Resource.class);
-				return null;
-			} else {
-				JsonPointer pointer = method.getAnnotation(JsonPointer.class);
-				if (pointer == null) {
-					return restTemplate.exchange(requestEntity, ParameterizedTypeReference.forType(type)).getBody();
+			if (method.getReturnType() == ResponseEntity.class) {
+				type = ((ParameterizedType) type).getActualTypeArguments()[0];
+				if (type == InputStream.class) {
+					// no InputStreamHttpMessageConverter use ResourceHttpMessageConverter instead
+					ResponseEntity<Resource> response = restTemplate.exchange(requestEntity, Resource.class);
+					Resource resource = response.getBody();
+					return ResponseEntity.status(response.getStatusCode()).headers(response.getHeaders())
+							.body(resource != null ? resource.getInputStream() : null);
 				} else {
-					return exchangeWithJsonPointer(type, requestEntity, pointer);
+					return exchange(requestEntity, type, method.getAnnotation(JsonPointer.class));
 				}
 			}
+			if (type == Void.TYPE) {
+				restTemplate.exchange(requestEntity, Resource.class);
+				return null;
+			}
+			if (type == InputStream.class) {
+				Resource resource = restTemplate.exchange(requestEntity, Resource.class).getBody();
+				return resource != null ? resource.getInputStream() : null;
+			}
+			return exchange(requestEntity, type, method.getAnnotation(JsonPointer.class)).getBody();
 		} catch (HttpStatusCodeException e) {
 			try {
 				JsonNode tree = objectMapper.readTree(e.getResponseBodyAsString());
@@ -479,9 +486,14 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 		}
 	}
 
-	private Object exchangeWithJsonPointer(Type type, RequestEntity<Object> requestEntity, JsonPointer pointer)
+	private ResponseEntity<Object> exchange(RequestEntity<Object> requestEntity, Type type, JsonPointer pointer)
 			throws Exception {
-		JsonNode tree = restTemplate.exchange(requestEntity, JsonNode.class).getBody();
+		if (pointer == null)
+			return restTemplate.exchange(requestEntity, ParameterizedTypeReference.forType(type));
+		ResponseEntity<JsonNode> response = restTemplate.exchange(requestEntity, JsonNode.class);
+		ResponseEntity.BodyBuilder builder = ResponseEntity.status(response.getStatusCode())
+				.headers(response.getHeaders());
+		JsonNode tree = response.getBody();
 		Class<? extends JsonValidator> validatorClass = pointer.validator();
 		if (validatorClass != JsonValidator.class) {
 			JsonValidator validator = null;
@@ -498,9 +510,12 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 		}
 		if (!pointer.value().isEmpty())
 			tree = tree.at(pointer.value());
+		Object body;
 		if (type instanceof Class && ((Class<?>) type).isAssignableFrom(JsonNode.class))
-			return tree;
-		return objectMapper.readValue(objectMapper.treeAsTokens(tree), objectMapper.constructType(type));
+			body = tree;
+		else
+			body = objectMapper.readValue(objectMapper.treeAsTokens(tree), objectMapper.constructType(type));
+		return builder.body(body);
 	}
 
 	@SuppressWarnings("unchecked")

@@ -1,5 +1,6 @@
 package org.ironrhino.rest.client;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -23,6 +24,9 @@ import org.ironrhino.security.domain.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.HttpClientErrorException;
@@ -38,6 +42,9 @@ public class RestApiTests {
 
 	@Autowired
 	private UploadClient uploadClient;
+
+	@Autowired
+	private DownloadClient downloadClient;
 
 	@Autowired
 	private ArticleClient articleClient;
@@ -56,6 +63,22 @@ public class RestApiTests {
 		u.setName(newName);
 		userClient.patch(u);
 		assertThat(userClient.self().getName(), is(newName));
+	}
+
+	@Test
+	public void testPaged() {
+		ResultPage<User> resultPage = userClient.paged(1, 1);
+		assertThat(resultPage.getPageNo(), is(1));
+		assertThat(resultPage.getPageSize(), is(1));
+		assertThat(resultPage.getResult().size(), is(1));
+		resultPage = userClient.pagedRestResult(1, 1);
+		assertThat(resultPage.getPageNo(), is(1));
+		assertThat(resultPage.getPageSize(), is(1));
+		assertThat(resultPage.getResult().size(), is(1));
+		resultPage = userClient.pagedRestResultWithResponseEntity(1, 1).getBody();
+		assertThat(resultPage.getPageNo(), is(1));
+		assertThat(resultPage.getPageSize(), is(1));
+		assertThat(resultPage.getResult().size(), is(1));
 	}
 
 	@Test
@@ -136,6 +159,37 @@ public class RestApiTests {
 		assertThat(filename.asText(), is("file"));
 		assertThat(originalFilename, notNullValue());
 		assertThat(originalFilename.asText(), is("build.xml"));
+	}
+
+	@Test
+	public void testDownload() throws IOException {
+		String filename = "build.xml";
+
+		ResponseEntity<Resource> response = downloadClient.download(filename);
+		assertThat(response.getStatusCode(), is(HttpStatus.OK));
+		assertThat(response.getHeaders().getContentDisposition().getFilename(), containsString(filename));
+		Resource resource = response.getBody();
+		assertThat(resource.isReadable(), is(true));
+		assertStreamMatchesContent(resource.getInputStream(), filename);
+
+		ResponseEntity<InputStream> response2 = downloadClient.downloadStream(filename);
+		assertThat(response2.getStatusCode(), is(HttpStatus.OK));
+		assertThat(response2.getHeaders().getContentDisposition().getFilename(), containsString(filename));
+		assertStreamMatchesContent(response2.getBody(), filename);
+
+		resource = downloadClient.downloadDirectResource(filename);
+		assertThat(resource.isReadable(), is(true));
+		assertStreamMatchesContent(resource.getInputStream(), filename);
+
+		InputStream stream = downloadClient.downloadDirectStream(filename);
+		assertThat(stream, notNullValue());
+		assertStreamMatchesContent(stream, filename);
+	}
+
+	private void assertStreamMatchesContent(InputStream stream, String content) throws IOException {
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+			assertThat(br.lines().collect(Collectors.joining("\n")), is(content));
+		}
 	}
 
 }

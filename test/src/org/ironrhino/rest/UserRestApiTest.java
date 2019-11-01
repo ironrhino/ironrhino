@@ -189,6 +189,10 @@ public class UserRestApiTest {
 		assertThat(resultPage.getPageNo(), is(1));
 		assertThat(resultPage.getPageSize(), is(1));
 		assertThat(resultPage.getResult().size(), is(1));
+		resultPage = userClient.pagedRestResultWithResponseEntity(1, 1).getBody();
+		assertThat(resultPage.getPageNo(), is(1));
+		assertThat(resultPage.getPageSize(), is(1));
+		assertThat(resultPage.getResult().size(), is(1));
 	}
 
 	@Test

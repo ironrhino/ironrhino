@@ -7,6 +7,7 @@ import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.rest.RestStatus;
 import org.ironrhino.rest.client.RestClientConfiguration.MyJsonValidator;
 import org.ironrhino.security.domain.User;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -31,6 +32,11 @@ public interface UserClient {
 	@RequestMapping(value = "/@pagedRestResult", method = RequestMethod.GET)
 	@JsonPointer("/data")
 	ResultPage<User> pagedRestResult(@RequestParam(defaultValue = "1") Integer pageNo,
+			@RequestParam(defaultValue = "10") Integer pageSize);
+
+	@RequestMapping(value = "/@pagedRestResult", method = RequestMethod.GET)
+	@JsonPointer("/data")
+	ResponseEntity<ResultPage<User>> pagedRestResultWithResponseEntity(@RequestParam(defaultValue = "1") Integer pageNo,
 			@RequestParam(defaultValue = "10") Integer pageSize);
 
 	@JsonPointer("/result")
