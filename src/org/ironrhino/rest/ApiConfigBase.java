@@ -57,6 +57,7 @@ import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
@@ -116,6 +117,12 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 	public ObjectMapper objectMapper() {
 		ObjectMapper objectMapper = JsonUtils.createNewObjectMapper();
 		return objectMapper;
+	}
+
+	@Override
+	protected void configurePathMatch(PathMatchConfigurer configurer) {
+		configurer.setUseSuffixPatternMatch(false);
+		configurer.setUseTrailingSlashMatch(false);
 	}
 
 	@Override
