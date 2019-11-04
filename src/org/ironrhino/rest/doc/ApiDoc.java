@@ -265,7 +265,7 @@ public class ApiDoc implements Serializable {
 			}
 		}
 
-		if (!download)
+		if (!download && !BeanUtils.isSimpleValueType(responseBodyClass))
 			responseBody = FieldObject.createList(responseBodyClass, responseFields, view, false);
 
 		Class<?>[] parameterTypes = method.getParameterTypes();

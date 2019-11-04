@@ -27,14 +27,14 @@ public class CollectionController {
 	@Order(2)
 	@Api("set")
 	@RequestMapping(value = "/set", method = RequestMethod.POST)
-	public Set<String> list(@RequestBody Set<String> set) {
+	public Set<Integer> list(@RequestBody Set<Integer> set) {
 		return set;
 	}
 
 	@Order(3)
 	@Api("map")
 	@RequestMapping(value = "/map", method = RequestMethod.POST)
-	public Map<String, String> map(@RequestBody Map<String, String> map) {
+	public Map<String, Long> map(@RequestBody Map<String, Long> map) {
 		return map;
 	}
 
