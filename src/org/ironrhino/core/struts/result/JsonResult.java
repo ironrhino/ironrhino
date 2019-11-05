@@ -14,11 +14,13 @@ import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Component;
 
 import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.Result;
 import com.opensymphony.xwork2.ValidationAware;
 
+@Component("org.ironrhino.core.struts.result.JsonResult")
 public class JsonResult implements Result {
 
 	private static final long serialVersionUID = 5984356746581381755L;
