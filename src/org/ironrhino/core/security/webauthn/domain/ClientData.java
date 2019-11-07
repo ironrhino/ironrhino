@@ -1,0 +1,52 @@
+package org.ironrhino.core.security.webauthn.domain;
+
+import static org.ironrhino.core.security.webauthn.internal.Utils.JSON_OBJECTMAPPER;
+
+import java.io.IOException;
+import java.net.URL;
+
+import org.ironrhino.core.security.webauthn.internal.Utils;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import lombok.Data;
+
+@Data
+public class ClientData {
+
+	private String type;
+
+	private String challenge;
+
+	private String origin;
+
+	private TokenBinding tokenBinding;
+
+	@JsonIgnore
+	private byte[] rawData;
+
+	@JsonCreator
+	public static ClientData valueOf(String input) throws IOException {
+		byte[] rawData = Utils.BASE64_DECODER.decode(input);
+		ClientData cd = JSON_OBJECTMAPPER.readValue(rawData, ClientData.class);
+		cd.rawData = rawData;
+		return cd;
+	}
+
+	public void verify(boolean create, String rpId, String challenge) throws Exception {
+		if (!type.equals("webauthn." + (create ? "create" : "get")))
+			throw new RuntimeException("Invalid type: " + type);
+		if (!this.challenge.equals(challenge))
+			throw new RuntimeException("Challenge failed");
+		URL url = new URL(origin);
+		if (!url.getHost().equals(rpId))
+			throw new RuntimeException("Mismatched origin");
+		if (tokenBinding != null && tokenBinding.getStatus() == TokenBindingStatus.present) {
+			if (tokenBinding.getId() == null)
+				throw new RuntimeException("Missing id for TokenBinding");
+			// TODO verify token bing id
+		}
+	}
+
+}
