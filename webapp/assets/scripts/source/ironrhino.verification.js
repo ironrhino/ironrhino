@@ -63,6 +63,9 @@
 				var url = btn.data('url');
 				if (!url) {
 					url = f.formAction();
+					var i = url.indexOf('?');
+					if(i > 0)
+						url = url.substring(0, i);
 					url += url.endsWith('/') ? '' : '/';
 					url += 'sendVerificationCode';
 				}
