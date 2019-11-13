@@ -22,7 +22,7 @@ public class AuthenticatorData {
 
 	private final int signCount;
 
-	private final AttestedCredentialData attestedCredentialData;
+	private final AttestedCredential attestedCredential;
 
 	private final Map<String, String> extensions;
 
@@ -48,19 +48,19 @@ public class AuthenticatorData {
 		signCount = (int) (((count[0] & 0xFF) << 24) | ((count[1] & 0xFF) << 16) | ((count[2] & 0xFF) << 8)
 				| (count[3] & 0xFF));
 
-		AttestedCredentialData attestedCredentialData = null;
+		AttestedCredential attestedCredential = null;
 		Map<String, String> extensions = null;
 		if (input.length > 37) {
 			byte[] data = new byte[input.length - 37];
 			System.arraycopy(input, 37, data, 0, data.length);
 			if (hasAttestedcredentialData()) {
-				attestedCredentialData = new AttestedCredentialData(data);
+				attestedCredential = new AttestedCredential(data);
 			} else if (hasExtensionData()) {
 				extensions = Utils.CBOR_OBJECTMAPPER.readValue(data, new TypeReference<Map<String, String>>() {
 				});
 			}
 		}
-		this.attestedCredentialData = attestedCredentialData;
+		this.attestedCredential = attestedCredential;
 		this.extensions = extensions;
 	}
 

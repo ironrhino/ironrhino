@@ -2,16 +2,12 @@ package org.ironrhino.core.security.webauthn;
 
 import java.util.List;
 
-import org.ironrhino.core.security.webauthn.domain.AttestedCredentialData;
+import org.ironrhino.core.security.webauthn.domain.AttestedCredential;
 
 public interface WebAuthnCredentialService {
 
-	public void putChallenge(String username, String challenge, int timeToLive);
+	public void addCredentials(String username, AttestedCredential credential);
 
-	public String getChallenge(String username);
-
-	public void addCredentials(String username, AttestedCredentialData credential);
-
-	public List<AttestedCredentialData> getCredentials(String username);
+	public List<AttestedCredential> getCredentials(String username);
 
 }

@@ -3,13 +3,15 @@ package org.ironrhino.core.security.webauthn;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.security.webauthn.domain.Attestation;
 import org.ironrhino.core.security.webauthn.domain.AttestationConveyancePreference;
 import org.ironrhino.core.security.webauthn.domain.AttestationStatement;
 import org.ironrhino.core.security.webauthn.domain.AttestationType;
-import org.ironrhino.core.security.webauthn.domain.AttestedCredentialData;
+import org.ironrhino.core.security.webauthn.domain.AttestedCredential;
 import org.ironrhino.core.security.webauthn.domain.AuthenticatorAssertionResponse;
 import org.ironrhino.core.security.webauthn.domain.AuthenticatorAttachment;
 import org.ironrhino.core.security.webauthn.domain.AuthenticatorAttestationResponse;
@@ -66,6 +68,21 @@ public class WebAuthnService {
 	@Autowired
 	private WebAuthnCredentialService credentialService;
 
+	@Autowired
+	private CacheManager cacheManager;
+
+	private static final String CACHE_NAMESPACE = "wa_cha"; // WebAuthn_Challenge
+
+	protected void putChallenge(String username, String challenge, int timeToLive) {
+		cacheManager.put(username, challenge, timeToLive, TimeUnit.MILLISECONDS, CACHE_NAMESPACE);
+	}
+
+	protected String getChallenge(String username) {
+		String challenge = (String) cacheManager.get(username, CACHE_NAMESPACE);
+		cacheManager.delete(username, CACHE_NAMESPACE);
+		return challenge;
+	}
+
 	public PublicKeyCredentialCreationOptions buildCreationOptions(String id, String username, String name) {
 		PublicKeyCredentialCreationOptions options = new PublicKeyCredentialCreationOptions();
 
@@ -79,7 +96,7 @@ public class WebAuthnService {
 		options.setUser(user);
 
 		String challenge = Utils.generateChallenge(challengeLength);
-		credentialService.putChallenge(username, challenge, (int) timeout);
+		putChallenge(username, challenge, (int) timeout);
 		options.setChallenge(challenge);
 
 		options.setPubKeyCredParams(
@@ -103,7 +120,7 @@ public class WebAuthnService {
 			throws Exception {
 		// https://www.w3.org/TR/webauthn/#registering-a-new-credential
 		ClientData clientData = credential.getResponse().getClientData();
-		String challenge = credentialService.getChallenge(username);
+		String challenge = getChallenge(username);
 		clientData.verify(PublicKeyCredentialOperationType.CREATE, rpId, challenge);
 
 		Attestation attestation = credential.getResponse().getAttestation();
@@ -115,7 +132,7 @@ public class WebAuthnService {
 		AttestationType attestationType = attestation.getFmt().verify(attStmt, authData, clientData);
 		assessTrustworthiness(attestation, attestationType);
 
-		credentialService.addCredentials(username, authData.getAttestedCredentialData());
+		credentialService.addCredentials(username, authData.getAttestedCredential());
 
 	}
 
@@ -138,7 +155,7 @@ public class WebAuthnService {
 	public PublicKeyCredentialRequestOptions buildRequestOptions(String username) {
 		PublicKeyCredentialRequestOptions options = new PublicKeyCredentialRequestOptions();
 		String challenge = Utils.generateChallenge(challengeLength);
-		credentialService.putChallenge(username, challenge, (int) timeout);
+		putChallenge(username, challenge, (int) timeout);
 		options.setChallenge(challenge);
 		options.setTimeout(timeout);
 		options.setRpId(rpId);
@@ -165,13 +182,13 @@ public class WebAuthnService {
 			throw new IllegalArgumentException("username should be present");
 		}
 
-		Optional<AttestedCredentialData> publicKey = credentialService.getCredentials(username).stream()
+		Optional<AttestedCredential> publicKey = credentialService.getCredentials(username).stream()
 				.filter(pk -> Arrays.equals(pk.getCredentialId(), Utils.decodeBase64url(credential.getId()))).findAny();
 		if (!publicKey.isPresent())
 			throw new RuntimeException("Unregistered credential");
 
 		ClientData clientData = credential.getResponse().getClientData();
-		String challenge = credentialService.getChallenge(username);
+		String challenge = getChallenge(username);
 		clientData.verify(PublicKeyCredentialOperationType.GET, rpId, challenge);
 
 		AuthenticatorData authData = credential.getResponse().getAuthenticatorData();

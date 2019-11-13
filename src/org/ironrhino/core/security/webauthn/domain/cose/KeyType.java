@@ -10,7 +10,7 @@ public enum KeyType {
 
 	private final int value;
 
-	KeyType(int value) {
+	private KeyType(int value) {
 		this.value = value;
 	}
 

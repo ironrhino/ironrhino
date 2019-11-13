@@ -9,7 +9,7 @@ public enum KeyOperation {
 
 	private int value;
 
-	KeyOperation(int value) {
+	private KeyOperation(int value) {
 		this.value = value;
 	}
 

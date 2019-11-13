@@ -33,7 +33,7 @@ public enum AttestationStatementFormat {
 				return AttestationType.Basic; // or AttestationType.AttCA
 			} else {
 				// self attestation
-				Key credentialPublicKey = authData.getAttestedCredentialData().getCredentialPublicKey();
+				Key credentialPublicKey = authData.getAttestedCredential().getCredentialPublicKey();
 
 				if (attStmt.getAlg() == null || attStmt.getAlg() != credentialPublicKey.getAlgorithm())
 					throw new RuntimeException("Wrong alg");
@@ -54,8 +54,8 @@ public enum AttestationStatementFormat {
 			if (x5c == null || x5c.size() != 1)
 				throw new RuntimeException("x5c should be only one");
 			byte[] rpIdHash = authData.getRpIdHash();
-			byte[] credentialId = authData.getAttestedCredentialData().getCredentialId();
-			EC2Key credentialPublicKey = (EC2Key) authData.getAttestedCredentialData().getCredentialPublicKey();
+			byte[] credentialId = authData.getAttestedCredential().getCredentialId();
+			EC2Key credentialPublicKey = (EC2Key) authData.getAttestedCredential().getCredentialPublicKey();
 			byte[] x = (byte[]) credentialPublicKey.getX();
 			if (x.length != 32)
 				throw new RuntimeException("Wrong x coordinate: " + x.length);

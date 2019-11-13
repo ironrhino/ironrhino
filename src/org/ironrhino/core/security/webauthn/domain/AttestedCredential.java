@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Data;
 
 @Data
-public class AttestedCredentialData {
+public class AttestedCredential {
 
 	private final byte[] aaguid;
 
@@ -20,7 +20,7 @@ public class AttestedCredentialData {
 	private final Key credentialPublicKey; // https://www.w3.org/TR/webauthn/#sctn-encoded-credPubKey-examples
 
 	@JsonCreator
-	public AttestedCredentialData(byte[] input) throws Exception {
+	public AttestedCredential(byte[] input) throws Exception {
 		aaguid = new byte[16];
 		System.arraycopy(input, 0, aaguid, 0, aaguid.length);
 
