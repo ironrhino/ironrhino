@@ -53,9 +53,9 @@ public class AuthenticatorData {
 		if (input.length > 37) {
 			byte[] data = new byte[input.length - 37];
 			System.arraycopy(input, 37, data, 0, data.length);
-			if (flags.get("AT")) {
+			if (hasAttestedcredentialData()) {
 				attestedCredentialData = new AttestedCredentialData(data);
-			} else if (flags.get("ED")) {
+			} else if (hasExtensionData()) {
 				extensions = Utils.CBOR_OBJECTMAPPER.readValue(data, new TypeReference<Map<String, String>>() {
 				});
 			}
@@ -64,14 +64,34 @@ public class AuthenticatorData {
 		this.extensions = extensions;
 	}
 
+	@JsonIgnore
+	public boolean isUserPresent() {
+		Boolean b = flags.get("UP");
+		return b != null && b;
+	}
+
+	@JsonIgnore
+	public boolean isUserVerified() {
+		Boolean b = flags.get("UV");
+		return b != null && b;
+	}
+
+	public boolean hasAttestedcredentialData() {
+		Boolean b = flags.get("AT");
+		return b != null && b;
+	}
+
+	public boolean hasExtensionData() {
+		Boolean b = flags.get("ED");
+		return b != null && b;
+	}
+
 	public void verify(String rpId, UserVerificationRequirement userVerification) {
 		if (!Arrays.equals(rpIdHash, CodecUtils.sha256(rpId)))
 			throw new RuntimeException("Mismatched rpIdHash");
-		Boolean up = flags.get("UP");
-		if (up == null || !up)
+		if (!isUserPresent())
 			throw new RuntimeException("User not present");
-		Boolean uv = flags.get("UV");
-		if (userVerification == UserVerificationRequirement.required && (uv == null || !uv))
+		if (userVerification == UserVerificationRequirement.required && !isUserVerified())
 			throw new RuntimeException("User verification required");
 	}
 
