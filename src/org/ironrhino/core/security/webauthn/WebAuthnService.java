@@ -2,10 +2,7 @@ package org.ironrhino.core.security.webauthn;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.ironrhino.core.security.webauthn.domain.Attestation;
@@ -18,8 +15,6 @@ import org.ironrhino.core.security.webauthn.domain.AuthenticatorAttachment;
 import org.ironrhino.core.security.webauthn.domain.AuthenticatorAttestationResponse;
 import org.ironrhino.core.security.webauthn.domain.AuthenticatorData;
 import org.ironrhino.core.security.webauthn.domain.AuthenticatorSelectionCriteria;
-import org.ironrhino.core.security.webauthn.domain.ClientAssertionExtensionOutputs;
-import org.ironrhino.core.security.webauthn.domain.ClientAttestationExtensionOutputs;
 import org.ironrhino.core.security.webauthn.domain.ClientData;
 import org.ironrhino.core.security.webauthn.domain.PublicKeyCredential;
 import org.ironrhino.core.security.webauthn.domain.PublicKeyCredentialCreationOptions;
@@ -104,9 +99,8 @@ public class WebAuthnService {
 		return options;
 	}
 
-	public void verifyAttestation(
-			PublicKeyCredential<AuthenticatorAttestationResponse, ClientAttestationExtensionOutputs> credential,
-			String username, Set<String> extensionIds) throws Exception {
+	public void verifyAttestation(PublicKeyCredential<AuthenticatorAttestationResponse> credential, String username)
+			throws Exception {
 		// https://www.w3.org/TR/webauthn/#registering-a-new-credential
 		ClientData clientData = credential.getResponse().getClientData();
 		String challenge = credentialService.getChallenge(username);
@@ -116,15 +110,6 @@ public class WebAuthnService {
 
 		AuthenticatorData authData = attestation.getAuthData();
 		authData.verify(rpId, userVerification);
-
-		if (extensionIds == null)
-			extensionIds = Collections.emptySet();
-		ClientAttestationExtensionOutputs clientExtensionResults = credential.getClientExtensionResults();
-		if (clientExtensionResults != null && !extensionIds.containsAll(clientExtensionResults.getExtensionIds()))
-			throw new RuntimeException("Client extension results not matched");
-		Map<String, String> authExtensionResults = authData.getExtensions();
-		if (authExtensionResults != null && !extensionIds.containsAll(authExtensionResults.keySet()))
-			throw new RuntimeException("Authenticator extension results not matched");
 
 		AttestationStatement attStmt = attestation.getAttStmt();
 		AttestationType attestationType = attestation.getFmt().verify(attStmt, authData, clientData);
@@ -164,9 +149,8 @@ public class WebAuthnService {
 		return options;
 	}
 
-	public void verifyAssertion(
-			PublicKeyCredential<AuthenticatorAssertionResponse, ClientAssertionExtensionOutputs> credential,
-			String username, Set<String> extensionIds) throws Exception {
+	public void verifyAssertion(PublicKeyCredential<AuthenticatorAssertionResponse> credential, String username)
+			throws Exception {
 		// https://www.w3.org/TR/webauthn/#verifying-assertion
 
 		byte[] userHandle = credential.getResponse().getUserHandle();
@@ -192,15 +176,6 @@ public class WebAuthnService {
 
 		AuthenticatorData authData = credential.getResponse().getAuthenticatorData();
 		authData.verify(rpId, userVerification);
-
-		if (extensionIds == null)
-			extensionIds = Collections.emptySet();
-		ClientAssertionExtensionOutputs clientExtensionResults = credential.getClientExtensionResults();
-		if (clientExtensionResults != null && !extensionIds.containsAll(clientExtensionResults.getExtensionIds()))
-			throw new RuntimeException("Client extension results not matched");
-		Map<String, String> authExtensionResults = authData.getExtensions();
-		if (authExtensionResults != null && !extensionIds.containsAll(authExtensionResults.keySet()))
-			throw new RuntimeException("Authenticator extension results not matched");
 
 		publicKey.get().verifySignature(authData, clientData, credential.getResponse().getSignature());
 

@@ -2,7 +2,6 @@ package org.ironrhino.core.security.webauthn.domain;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import lombok.Data;
 
@@ -25,7 +24,5 @@ public class PublicKeyCredentialCreationOptions {
 	private AuthenticatorSelectionCriteria authenticatorSelection;
 
 	private AttestationConveyancePreference attestation = AttestationConveyancePreference.none;
-
-	private Map<String, Object> extensions;
 
 }

@@ -24,8 +24,7 @@ $('#register').click(function(){
 				response: {
 					attestationObject: attestationObject,
 					clientDataJSON: clientDataJSON
-				},
-				clientExtensionResults: credential.getClientExtensionResults()
+				}
 			};
 			
 			$.ajax({
@@ -64,8 +63,7 @@ $('#request').click(function(){
 					clientDataJSON: clientDataJSON,
 					signature: signature,
 					userHandle: userHandle
-				},
-				clientExtensionResults: credential.getClientExtensionResults()
+				}
 			};
 			
 			$.ajax({

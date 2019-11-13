@@ -5,8 +5,6 @@ import org.ironrhino.core.metadata.JsonConfig;
 import org.ironrhino.core.security.webauthn.WebAuthnService;
 import org.ironrhino.core.security.webauthn.domain.AuthenticatorAssertionResponse;
 import org.ironrhino.core.security.webauthn.domain.AuthenticatorAttestationResponse;
-import org.ironrhino.core.security.webauthn.domain.ClientAssertionExtensionOutputs;
-import org.ironrhino.core.security.webauthn.domain.ClientAttestationExtensionOutputs;
 import org.ironrhino.core.security.webauthn.domain.PublicKeyCredential;
 import org.ironrhino.core.security.webauthn.domain.PublicKeyCredentialCreationOptions;
 import org.ironrhino.core.security.webauthn.domain.PublicKeyCredentialRequestOptions;
@@ -42,13 +40,12 @@ public class WebAuthnAction extends BaseAction {
 	}
 
 	public String register() throws Exception {
-		PublicKeyCredential<AuthenticatorAttestationResponse, ClientAttestationExtensionOutputs> credential = JsonUtils
-				.fromJson(requestBody,
-						new TypeReference<PublicKeyCredential<AuthenticatorAttestationResponse, ClientAttestationExtensionOutputs>>() {
-						});
+		PublicKeyCredential<AuthenticatorAttestationResponse> credential = JsonUtils.fromJson(requestBody,
+				new TypeReference<PublicKeyCredential<AuthenticatorAttestationResponse>>() {
+				});
 
 		System.out.println(JsonUtils.toJson(credential));
-		webAuthnService.verifyAttestation(credential, AuthzUtils.getUsername(), null);
+		webAuthnService.verifyAttestation(credential, AuthzUtils.getUsername());
 		return NONE;
 	}
 
@@ -59,13 +56,12 @@ public class WebAuthnAction extends BaseAction {
 	}
 
 	public String authenticate() throws Exception {
-		PublicKeyCredential<AuthenticatorAssertionResponse, ClientAssertionExtensionOutputs> credential = JsonUtils
-				.fromJson(requestBody,
-						new TypeReference<PublicKeyCredential<AuthenticatorAssertionResponse, ClientAssertionExtensionOutputs>>() {
-						});
+		PublicKeyCredential<AuthenticatorAssertionResponse> credential = JsonUtils.fromJson(requestBody,
+				new TypeReference<PublicKeyCredential<AuthenticatorAssertionResponse>>() {
+				});
 
 		System.out.println(JsonUtils.toJson(credential));
-		webAuthnService.verifyAssertion(credential, AuthzUtils.getUsername(), null);
+		webAuthnService.verifyAssertion(credential, AuthzUtils.getUsername());
 		return NONE;
 	}
 
