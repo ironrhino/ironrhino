@@ -182,8 +182,7 @@ public class WebAuthnService {
 		}
 
 		Optional<AttestedCredentialData> publicKey = credentialService.getCredentials(username).stream()
-				.filter(pk -> Arrays.equals(pk.getCredentialId(), Utils.BASE64_URL_DECODER.decode(credential.getId())))
-				.findAny();
+				.filter(pk -> Arrays.equals(pk.getCredentialId(), Utils.decodeBase64url(credential.getId()))).findAny();
 		if (!publicKey.isPresent())
 			throw new RuntimeException("Unregistered credential");
 

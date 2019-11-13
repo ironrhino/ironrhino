@@ -28,7 +28,7 @@ public class ClientData {
 
 	@JsonCreator
 	public static ClientData valueOf(String input) throws IOException {
-		byte[] rawData = Utils.BASE64_URL_DECODER.decode(input);
+		byte[] rawData = Utils.decodeBase64url(input);
 		ClientData cd = JSON_OBJECTMAPPER.readValue(rawData, ClientData.class);
 		cd.rawData = rawData;
 		return cd;

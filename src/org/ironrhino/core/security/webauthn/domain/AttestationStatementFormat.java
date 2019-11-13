@@ -1,6 +1,5 @@
 package org.ironrhino.core.security.webauthn.domain;
 
-import java.io.ByteArrayInputStream;
 import java.security.Signature;
 import java.util.List;
 
@@ -67,8 +66,7 @@ public enum AttestationStatementFormat {
 			byte[] verificationData = Utils.concatByteArray(new byte[] { 0x00 }, rpIdHash,
 					CodecUtils.sha256(clientData.getRawData()), credentialId, publicKeyU2F);
 			Signature verifier = Signature.getInstance(credentialPublicKey.getAlgorithm().getAlgorithmName());
-			verifier.initVerify(
-					Utils.X509_CERTIFICATE_FACTORY.generateCertificate(new ByteArrayInputStream(x5c.get(0))));
+			verifier.initVerify(Utils.generateCertificate(x5c.get(0)));
 			verifier.update(verificationData);
 			if (!verifier.verify(attStmt.getSig()))
 				throw new RuntimeException("Wrong signature");

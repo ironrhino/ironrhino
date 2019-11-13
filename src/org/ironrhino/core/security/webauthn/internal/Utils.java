@@ -1,6 +1,9 @@
 package org.ironrhino.core.security.webauthn.internal;
 
+import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.Base64;
 
@@ -21,11 +24,11 @@ public class Utils {
 	public static final ObjectMapper CBOR_OBJECTMAPPER = new ObjectMapper(new CBORFactory())
 			.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
-	public static final Base64.Encoder BASE64_URL_ENCODER = Base64.getUrlEncoder().withoutPadding();
+	private static final Base64.Encoder BASE64_URL_ENCODER = Base64.getUrlEncoder().withoutPadding();
 
-	public static final Base64.Decoder BASE64_URL_DECODER = Base64.getUrlDecoder();
+	private static final Base64.Decoder BASE64_URL_DECODER = Base64.getUrlDecoder();
 
-	public static final CertificateFactory X509_CERTIFICATE_FACTORY;
+	private static final CertificateFactory X509_CERTIFICATE_FACTORY;
 	static {
 		try {
 			X509_CERTIFICATE_FACTORY = CertificateFactory.getInstance("X.509");
@@ -33,6 +36,14 @@ public class Utils {
 			throw new RuntimeException(e);
 		}
 	};
+
+	public static String encodeBase64url(byte[] input) {
+		return BASE64_URL_ENCODER.encodeToString(input);
+	}
+
+	public static byte[] decodeBase64url(String input) {
+		return BASE64_URL_DECODER.decode(input);
+	}
 
 	public static String generateChallenge(int length) {
 		return BASE64_URL_ENCODER.encodeToString(CodecUtils.nextId(length).getBytes(StandardCharsets.UTF_8));
@@ -50,6 +61,10 @@ public class Utils {
 			currentIndex += arrays[i].length;
 		}
 		return result;
+	}
+
+	public static Certificate generateCertificate(byte[] input) throws CertificateException {
+		return X509_CERTIFICATE_FACTORY.generateCertificate(new ByteArrayInputStream(input));
 	}
 
 }
