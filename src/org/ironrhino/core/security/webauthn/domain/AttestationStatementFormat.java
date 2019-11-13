@@ -1,6 +1,9 @@
 package org.ironrhino.core.security.webauthn.domain;
 
 import java.security.Signature;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.util.Base64;
 import java.util.List;
 
 import org.ironrhino.core.security.webauthn.domain.cose.EC2Key;
@@ -83,6 +86,21 @@ public enum AttestationStatementFormat {
 	android_key {
 		public AttestationType verify(AttestationStatement attStmt, AuthenticatorData authData, ClientData clientData)
 				throws Exception {
+			byte[] clientDataHash = CodecUtils.sha256(clientData.getRawData());
+			byte[] verificationData = Utils.concatByteArray(authData.getRawData(), clientDataHash);
+			Signature verifier = Signature.getInstance(attStmt.getAlg().getAlgorithmName());
+			Certificate cert = Utils.generateCertificate(attStmt.getX5c().get(0));
+			if (!cert.getPublicKey().equals(authData.getAttestedCredential().getCredentialPublicKey().getPublicKey()))
+				throw new RuntimeException("Public key not matched");
+			verifier.initVerify(cert);
+			verifier.update(verificationData);
+			if (!verifier.verify(attStmt.getSig()))
+				throw new RuntimeException("Wrong signature");
+			// TODO verify extension
+			// byte[] attestationChallenge = (byte[])
+			// authData.getExtensions().get("1.3.6.1.4.1.11129.2.1.17");
+			// if (!Arrays.equals(attestationChallenge, clientDataHash))
+			// throw new RuntimeException("Wrong attestationChallenge");
 			// return AttestationType.Basic;
 			throw new UnsupportedOperationException("Not implemented for fmt: " + name());
 		}
@@ -91,8 +109,19 @@ public enum AttestationStatementFormat {
 	android_safetynet {
 		public AttestationType verify(AttestationStatement attStmt, AuthenticatorData authData, ClientData clientData)
 				throws Exception {
-			// return AttestationType.Basic;
-			throw new UnsupportedOperationException("Not implemented for fmt: " + name());
+			SafetyNetResponse response = Utils.JSON_OBJECTMAPPER.readValue(attStmt.getResponse(),
+					SafetyNetResponse.class);
+			byte[] clientDataHash = CodecUtils.sha256(clientData.getRawData());
+			String nonce = Base64.getEncoder()
+					.encodeToString(CodecUtils.sha256(Utils.concatByteArray(authData.getRawData(), clientDataHash)));
+			if (!nonce.equals(response.getNonce()))
+				throw new RuntimeException("Wrong nonce");
+			X509Certificate cert = Utils.generateCertificate(attStmt.getAttestnCert());
+			if (!cert.getIssuerDN().getName().equals("attest.android.com"))
+				throw new RuntimeException("Wrong issuer of attestationCert");
+			if (!response.isCtsProfileMatch())
+				throw new RuntimeException("Cts profile is not matched");
+			return AttestationType.Basic;
 		}
 	},
 	tpm {

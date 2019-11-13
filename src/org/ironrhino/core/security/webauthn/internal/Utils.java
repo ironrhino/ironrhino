@@ -2,9 +2,9 @@ package org.ironrhino.core.security.webauthn.internal;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.Base64;
 
 import org.ironrhino.core.util.CodecUtils;
@@ -63,8 +63,8 @@ public class Utils {
 		return result;
 	}
 
-	public static Certificate generateCertificate(byte[] input) throws CertificateException {
-		return X509_CERTIFICATE_FACTORY.generateCertificate(new ByteArrayInputStream(input));
+	public static X509Certificate generateCertificate(byte[] input) throws CertificateException {
+		return (X509Certificate) X509_CERTIFICATE_FACTORY.generateCertificate(new ByteArrayInputStream(input));
 	}
 
 }

@@ -24,7 +24,7 @@ public class AuthenticatorData {
 
 	private final AttestedCredential attestedCredential;
 
-	private final Map<String, String> extensions;
+	private final Map<String, Object> extensions;
 
 	@JsonIgnore
 	private final byte[] rawData;
@@ -49,14 +49,14 @@ public class AuthenticatorData {
 				| (count[3] & 0xFF));
 
 		AttestedCredential attestedCredential = null;
-		Map<String, String> extensions = null;
+		Map<String, Object> extensions = null;
 		if (input.length > 37) {
 			byte[] data = new byte[input.length - 37];
 			System.arraycopy(input, 37, data, 0, data.length);
 			if (hasAttestedcredentialData()) {
 				attestedCredential = new AttestedCredential(data);
 			} else if (hasExtensionData()) {
-				extensions = Utils.CBOR_OBJECTMAPPER.readValue(data, new TypeReference<Map<String, String>>() {
+				extensions = Utils.CBOR_OBJECTMAPPER.readValue(data, new TypeReference<Map<String, Object>>() {
 				});
 			}
 		}
