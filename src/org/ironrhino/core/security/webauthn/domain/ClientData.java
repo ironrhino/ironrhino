@@ -15,7 +15,7 @@ import lombok.Data;
 @Data
 public class ClientData {
 
-	private String type;
+	private PublicKeyCredentialOperationType type;
 
 	private String challenge;
 
@@ -34,8 +34,8 @@ public class ClientData {
 		return cd;
 	}
 
-	public void verify(boolean create, String rpId, String challenge) throws Exception {
-		if (!type.equals("webauthn." + (create ? "create" : "get")))
+	public void verify(PublicKeyCredentialOperationType type, String rpId, String challenge) throws Exception {
+		if (this.type != type)
 			throw new RuntimeException("Invalid type: " + type);
 		if (!this.challenge.equals(challenge))
 			throw new RuntimeException("Challenge failed");

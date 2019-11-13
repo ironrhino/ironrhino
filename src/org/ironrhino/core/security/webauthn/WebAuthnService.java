@@ -24,6 +24,7 @@ import org.ironrhino.core.security.webauthn.domain.ClientData;
 import org.ironrhino.core.security.webauthn.domain.PublicKeyCredential;
 import org.ironrhino.core.security.webauthn.domain.PublicKeyCredentialCreationOptions;
 import org.ironrhino.core.security.webauthn.domain.PublicKeyCredentialDescriptor;
+import org.ironrhino.core.security.webauthn.domain.PublicKeyCredentialOperationType;
 import org.ironrhino.core.security.webauthn.domain.PublicKeyCredentialParameters;
 import org.ironrhino.core.security.webauthn.domain.PublicKeyCredentialRequestOptions;
 import org.ironrhino.core.security.webauthn.domain.PublicKeyCredentialRpEntity;
@@ -109,7 +110,7 @@ public class WebAuthnService {
 		// https://www.w3.org/TR/webauthn/#registering-a-new-credential
 		ClientData clientData = credential.getResponse().getClientData();
 		String challenge = credentialService.getChallenge(username);
-		clientData.verify(true, rpId, challenge);
+		clientData.verify(PublicKeyCredentialOperationType.CREATE, rpId, challenge);
 
 		Attestation attestation = credential.getResponse().getAttestation();
 
@@ -188,7 +189,7 @@ public class WebAuthnService {
 
 		ClientData clientData = credential.getResponse().getClientData();
 		String challenge = credentialService.getChallenge(username);
-		clientData.verify(false, rpId, challenge);
+		clientData.verify(PublicKeyCredentialOperationType.GET, rpId, challenge);
 
 		AuthenticatorData authData = credential.getResponse().getAuthenticatorData();
 		authData.verify(rpId, userVerification);
