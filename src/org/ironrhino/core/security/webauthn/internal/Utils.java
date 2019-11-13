@@ -21,9 +21,9 @@ public class Utils {
 	public static final ObjectMapper CBOR_OBJECTMAPPER = new ObjectMapper(new CBORFactory())
 			.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
-	public static final Base64.Encoder BASE64_ENCODER = Base64.getUrlEncoder().withoutPadding();
+	public static final Base64.Encoder BASE64_URL_ENCODER = Base64.getUrlEncoder().withoutPadding();
 
-	public static final Base64.Decoder BASE64_DECODER = Base64.getUrlDecoder();
+	public static final Base64.Decoder BASE64_URL_DECODER = Base64.getUrlDecoder();
 
 	public static final CertificateFactory X509_CERTIFICATE_FACTORY;
 	static {
@@ -35,7 +35,7 @@ public class Utils {
 	};
 
 	public static String generateChallenge(int length) {
-		return BASE64_ENCODER.encodeToString(CodecUtils.nextId(length).getBytes(StandardCharsets.UTF_8));
+		return BASE64_URL_ENCODER.encodeToString(CodecUtils.nextId(length).getBytes(StandardCharsets.UTF_8));
 	}
 
 	public static byte[] concatByteArray(byte[]... arrays) {
