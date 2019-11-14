@@ -54,7 +54,7 @@ public class AuthenticatorData {
 			byte[] data = new byte[input.length - 37];
 			System.arraycopy(input, 37, data, 0, data.length);
 			if (hasAttestedcredentialData()) {
-				attestedCredential = new AttestedCredential(data);
+				attestedCredential = AttestedCredential.valueOf(data);
 			} else if (hasExtensionData()) {
 				extensions = Utils.CBOR_OBJECTMAPPER.readValue(data, new TypeReference<Map<String, Object>>() {
 				});

@@ -9,6 +9,7 @@ import java.util.Base64;
 
 import org.ironrhino.core.util.CodecUtils;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
@@ -19,7 +20,8 @@ import lombok.experimental.UtilityClass;
 public class Utils {
 
 	public static final ObjectMapper JSON_OBJECTMAPPER = new ObjectMapper()
-			.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+			.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+			.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
 	public static final ObjectMapper CBOR_OBJECTMAPPER = new ObjectMapper(new CBORFactory())
 			.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);

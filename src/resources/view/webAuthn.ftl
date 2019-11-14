@@ -13,17 +13,12 @@ $('#register').click(function(){
 			this.id = Uint8Array.from(window.atob(this.id), function(s){return s.charCodeAt(0)});
 		});
 		navigator.credentials.create({'publicKey':options}).then(function(credential){
-			var clientDataJSON = credential.response.clientDataJSON;
-			clientDataJSON = window.btoa(String.fromCharCode.apply(null, new Uint8Array(clientDataJSON)));
-			var attestationObject = credential.response.attestationObject;
-			attestationObject = window.btoa(String.fromCharCode.apply(null, new Uint8Array(attestationObject)));
-
 			var data = {
-				id: credential.id,
+				id: window.btoa(String.fromCharCode.apply(null, new Uint8Array(credential.rawId))),
 				type: credential.type,
 				response: {
-					attestationObject: attestationObject,
-					clientDataJSON: clientDataJSON
+					attestationObject: window.btoa(String.fromCharCode.apply(null, new Uint8Array(credential.response.attestationObject))),
+					clientDataJSON: window.btoa(String.fromCharCode.apply(null, new Uint8Array(credential.response.clientDataJSON)))
 				}
 			};
 			
@@ -46,22 +41,16 @@ $('#request').click(function(){
 			this.id = Uint8Array.from(window.atob(this.id), function(s){return s.charCodeAt(0)});
 		});
 		navigator.credentials.get({'publicKey':options}).then(function(credential){
-			var clientDataJSON = credential.response.clientDataJSON;
-			clientDataJSON = window.btoa(String.fromCharCode.apply(null, new Uint8Array(clientDataJSON)));
-			var authenticatorData = credential.response.authenticatorData;
-			authenticatorData = window.btoa(String.fromCharCode.apply(null, new Uint8Array(authenticatorData)));
-			var signature = credential.response.signature;
-			signature = window.btoa(String.fromCharCode.apply(null, new Uint8Array(signature)));
 			var userHandle = credential.response.userHandle;
 			if(userHandle)
 				userHandle = window.btoa(String.fromCharCode.apply(null, new Uint8Array(userHandle)));
 			
 			var data = {
-				id: credential.id,
+				id: window.btoa(String.fromCharCode.apply(null, new Uint8Array(credential.rawId))),
 				response: {
-					authenticatorData: authenticatorData,
-					clientDataJSON: clientDataJSON,
-					signature: signature,
+					authenticatorData: window.btoa(String.fromCharCode.apply(null, new Uint8Array(credential.response.authenticatorData))),
+					clientDataJSON: window.btoa(String.fromCharCode.apply(null, new Uint8Array(credential.response.clientDataJSON))),
+					signature: window.btoa(String.fromCharCode.apply(null, new Uint8Array(credential.response.signature))),
 					userHandle: userHandle
 				}
 			};

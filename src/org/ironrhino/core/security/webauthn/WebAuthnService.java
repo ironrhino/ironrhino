@@ -2,7 +2,6 @@ package org.ironrhino.core.security.webauthn;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -27,6 +26,7 @@ import org.ironrhino.core.security.webauthn.domain.PublicKeyCredentialRequestOpt
 import org.ironrhino.core.security.webauthn.domain.PublicKeyCredentialRpEntity;
 import org.ironrhino.core.security.webauthn.domain.PublicKeyCredentialType;
 import org.ironrhino.core.security.webauthn.domain.PublicKeyCredentialUserEntity;
+import org.ironrhino.core.security.webauthn.domain.StoredCredential;
 import org.ironrhino.core.security.webauthn.domain.UserVerificationRequirement;
 import org.ironrhino.core.security.webauthn.domain.cose.Algorithm;
 import org.ironrhino.core.security.webauthn.internal.Utils;
@@ -66,7 +66,7 @@ public class WebAuthnService {
 	private AttestationConveyancePreference attestation;
 
 	@Autowired
-	private WebAuthnCredentialService credentialService;
+	private StoredCredentialService credentialService;
 
 	@Autowired
 	private CacheManager cacheManager;
@@ -132,7 +132,12 @@ public class WebAuthnService {
 			AttestationType attestationType = attestation.getFmt().verify(attStmt, authData, clientData);
 			assessTrustworthiness(attestation, attestationType);
 
-			credentialService.addCredentials(username, authData.getAttestedCredential());
+			if (credentialService.getCredentialById(credential.getId()).isPresent())
+				throw new IllegalStateException("Credential already registered");
+
+			AttestedCredential ac = authData.getAttestedCredential();
+			credentialService.addCredentials(new StoredCredential(ac.getCredentialId(), ac.getAaguid(),
+					ac.getCredentialPublicKey(), username, authData.getSignCount()));
 		} catch (Exception e) {
 			throw new AttestationFailedException(e.getMessage(), e);
 		}
@@ -184,12 +189,6 @@ public class WebAuthnService {
 				throw new AssertionFailedException("username should be present");
 			}
 
-			Optional<AttestedCredential> publicKey = credentialService.getCredentials(username).stream()
-					.filter(pk -> Arrays.equals(pk.getCredentialId(), Utils.decodeBase64url(credential.getId())))
-					.findAny();
-			if (!publicKey.isPresent())
-				throw new AssertionFailedException("Unregistered credential");
-
 			ClientData clientData = credential.getResponse().getClientData();
 			String challenge = getChallenge(username);
 			clientData.verify(PublicKeyCredentialOperationType.GET, rpId, challenge);
@@ -197,12 +196,17 @@ public class WebAuthnService {
 			AuthenticatorData authData = credential.getResponse().getAuthenticatorData();
 			authData.verify(rpId, userVerification);
 
-			publicKey.get().verifySignature(authData, clientData, credential.getResponse().getSignature());
+			byte[] credentialId = credential.getId();
 
-			int signCount = authData.getSignCount();
-			if (signCount > 0) {
-				// TODO check signCount++
-			}
+			StoredCredential storedCredential = credentialService.getCredentialById(credentialId)
+					.orElseThrow(() -> new AssertionFailedException("Unregistered credential"));
+			if (!storedCredential.getUsername().equals(username))
+				throw new IllegalArgumentException("username not matched");
+
+			storedCredential.verifySignature(authData, clientData, credential.getResponse().getSignature());
+
+			if (authData.getSignCount() > 0)
+				credentialService.updateSignCount(credentialId, authData.getSignCount());
 		} catch (Exception e) {
 			throw new AssertionFailedException(e.getMessage(), e);
 		}

@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class PublicKeyCredential<R extends AuthenticatorResponse> {
 
-	private String id;
+	private byte[] id;
 
 	private String type;
 
