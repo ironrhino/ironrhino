@@ -116,23 +116,26 @@ public class WebAuthnService {
 		return options;
 	}
 
-	public void verifyAttestation(PublicKeyCredential<AuthenticatorAttestationResponse> credential, String username)
-			throws Exception {
+	public void verifyAttestation(PublicKeyCredential<AuthenticatorAttestationResponse> credential, String username) {
 		// https://www.w3.org/TR/webauthn/#registering-a-new-credential
-		ClientData clientData = credential.getResponse().getClientData();
-		String challenge = getChallenge(username);
-		clientData.verify(PublicKeyCredentialOperationType.CREATE, rpId, challenge);
+		try {
+			ClientData clientData = credential.getResponse().getClientData();
+			String challenge = getChallenge(username);
+			clientData.verify(PublicKeyCredentialOperationType.CREATE, rpId, challenge);
 
-		Attestation attestation = credential.getResponse().getAttestation();
+			Attestation attestation = credential.getResponse().getAttestation();
 
-		AuthenticatorData authData = attestation.getAuthData();
-		authData.verify(rpId, userVerification);
+			AuthenticatorData authData = attestation.getAuthData();
+			authData.verify(rpId, userVerification);
 
-		AttestationStatement attStmt = attestation.getAttStmt();
-		AttestationType attestationType = attestation.getFmt().verify(attStmt, authData, clientData);
-		assessTrustworthiness(attestation, attestationType);
+			AttestationStatement attStmt = attestation.getAttStmt();
+			AttestationType attestationType = attestation.getFmt().verify(attStmt, authData, clientData);
+			assessTrustworthiness(attestation, attestationType);
 
-		credentialService.addCredentials(username, authData.getAttestedCredential());
+			credentialService.addCredentials(username, authData.getAttestedCredential());
+		} catch (Exception e) {
+			throw new AttestationFailedException(e.getMessage(), e);
+		}
 
 	}
 
@@ -148,7 +151,7 @@ public class WebAuthnService {
 		case ECDAA:
 			break;
 		default:
-			throw new RuntimeException("Untrusted AttestationType: " + attestationType);
+			throw new IllegalArgumentException("Untrusted AttestationType: " + attestationType);
 		}
 	}
 
@@ -166,41 +169,43 @@ public class WebAuthnService {
 		return options;
 	}
 
-	public void verifyAssertion(PublicKeyCredential<AuthenticatorAssertionResponse> credential, String username)
-			throws Exception {
+	public void verifyAssertion(PublicKeyCredential<AuthenticatorAssertionResponse> credential, String username) {
 		// https://www.w3.org/TR/webauthn/#verifying-assertion
-
-		byte[] userHandle = credential.getResponse().getUserHandle();
-		if (userHandle != null) {
-			String user = new String(userHandle); // TODO id -> username;
-			if (username == null) {
-				username = user;
-			} else if (!username.equals(user)) {
-				throw new RuntimeException("userHandle not matches");
+		try {
+			byte[] userHandle = credential.getResponse().getUserHandle();
+			if (userHandle != null) {
+				String user = new String(userHandle); // TODO id -> username;
+				if (username == null) {
+					username = user;
+				} else if (!username.equals(user)) {
+					throw new AssertionFailedException("userHandle not matches");
+				}
+			} else if (username == null) {
+				throw new AssertionFailedException("username should be present");
 			}
-		} else if (username == null) {
-			throw new IllegalArgumentException("username should be present");
+
+			Optional<AttestedCredential> publicKey = credentialService.getCredentials(username).stream()
+					.filter(pk -> Arrays.equals(pk.getCredentialId(), Utils.decodeBase64url(credential.getId())))
+					.findAny();
+			if (!publicKey.isPresent())
+				throw new AssertionFailedException("Unregistered credential");
+
+			ClientData clientData = credential.getResponse().getClientData();
+			String challenge = getChallenge(username);
+			clientData.verify(PublicKeyCredentialOperationType.GET, rpId, challenge);
+
+			AuthenticatorData authData = credential.getResponse().getAuthenticatorData();
+			authData.verify(rpId, userVerification);
+
+			publicKey.get().verifySignature(authData, clientData, credential.getResponse().getSignature());
+
+			int signCount = authData.getSignCount();
+			if (signCount > 0) {
+				// TODO check signCount++
+			}
+		} catch (Exception e) {
+			throw new AssertionFailedException(e.getMessage(), e);
 		}
-
-		Optional<AttestedCredential> publicKey = credentialService.getCredentials(username).stream()
-				.filter(pk -> Arrays.equals(pk.getCredentialId(), Utils.decodeBase64url(credential.getId()))).findAny();
-		if (!publicKey.isPresent())
-			throw new RuntimeException("Unregistered credential");
-
-		ClientData clientData = credential.getResponse().getClientData();
-		String challenge = getChallenge(username);
-		clientData.verify(PublicKeyCredentialOperationType.GET, rpId, challenge);
-
-		AuthenticatorData authData = credential.getResponse().getAuthenticatorData();
-		authData.verify(rpId, userVerification);
-
-		publicKey.get().verifySignature(authData, clientData, credential.getResponse().getSignature());
-
-		int signCount = authData.getSignCount();
-		if (signCount > 0) {
-			// TODO check signCount++
-		}
-
 	}
 
 }

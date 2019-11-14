@@ -88,11 +88,11 @@ public class AuthenticatorData {
 
 	public void verify(String rpId, UserVerificationRequirement userVerification) {
 		if (!Arrays.equals(rpIdHash, CodecUtils.sha256(rpId)))
-			throw new RuntimeException("Mismatched rpIdHash");
+			throw new IllegalArgumentException("Mismatched rpIdHash");
 		if (!isUserPresent())
-			throw new RuntimeException("User not present");
+			throw new IllegalArgumentException("User not present");
 		if (userVerification == UserVerificationRequirement.required && !isUserVerified())
-			throw new RuntimeException("User verification required");
+			throw new IllegalArgumentException("User verification required");
 	}
 
 }

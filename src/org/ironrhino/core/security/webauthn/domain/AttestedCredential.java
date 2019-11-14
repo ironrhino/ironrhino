@@ -43,7 +43,7 @@ public class AttestedCredential {
 		verifier.initVerify(credentialPublicKey.getPublicKey());
 		verifier.update(verificationData);
 		if (!verifier.verify(signature))
-			throw new RuntimeException("Wrong signature");
+			throw new IllegalArgumentException("Wrong signature");
 	}
 
 }

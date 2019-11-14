@@ -36,15 +36,15 @@ public class ClientData {
 
 	public void verify(PublicKeyCredentialOperationType type, String rpId, String challenge) throws Exception {
 		if (this.type != type)
-			throw new RuntimeException("Invalid type: " + type);
+			throw new IllegalArgumentException("Invalid type: " + type);
 		if (!this.challenge.equals(challenge))
-			throw new RuntimeException("Challenge failed");
+			throw new IllegalArgumentException("Challenge failed");
 		URL url = new URL(origin);
 		if (!url.getHost().equals(rpId))
-			throw new RuntimeException("Mismatched origin");
+			throw new IllegalArgumentException("Mismatched origin");
 		if (tokenBinding != null && tokenBinding.getStatus() == TokenBindingStatus.present) {
 			if (tokenBinding.getId() == null)
-				throw new RuntimeException("Missing id for TokenBinding");
+				throw new IllegalArgumentException("Missing id for TokenBinding");
 			// TODO verify token bing id
 		}
 	}

@@ -39,7 +39,7 @@ public enum AttestationStatementFormat {
 				Key credentialPublicKey = authData.getAttestedCredential().getCredentialPublicKey();
 
 				if (attStmt.getAlg() == null || attStmt.getAlg() != credentialPublicKey.getAlgorithm())
-					throw new RuntimeException("Wrong alg");
+					throw new IllegalArgumentException("Wrong alg");
 
 				return AttestationType.Self;
 
@@ -55,16 +55,16 @@ public enum AttestationStatementFormat {
 			// https://www.w3.org/TR/webauthn/#fido-u2f-attestation
 			List<byte[]> x5c = attStmt.getX5c();
 			if (x5c == null || x5c.size() != 1)
-				throw new RuntimeException("x5c should be only one");
+				throw new IllegalArgumentException("x5c should be only one");
 			byte[] rpIdHash = authData.getRpIdHash();
 			byte[] credentialId = authData.getAttestedCredential().getCredentialId();
 			EC2Key credentialPublicKey = (EC2Key) authData.getAttestedCredential().getCredentialPublicKey();
 			byte[] x = (byte[]) credentialPublicKey.getX();
 			if (x.length != 32)
-				throw new RuntimeException("Wrong x coordinate: " + x.length);
+				throw new IllegalArgumentException("Wrong x coordinate: " + x.length);
 			byte[] y = (byte[]) credentialPublicKey.getY();
 			if (y.length != 32)
-				throw new RuntimeException("Wrong x coordinate: " + x.length);
+				throw new IllegalArgumentException("Wrong x coordinate: " + x.length);
 			byte[] publicKeyU2F = Utils.concatByteArray(new byte[] { 0x04 }, x, y);
 			byte[] verificationData = Utils.concatByteArray(new byte[] { 0x00 }, rpIdHash,
 					CodecUtils.sha256(clientData.getRawData()), credentialId, publicKeyU2F);
@@ -72,7 +72,7 @@ public enum AttestationStatementFormat {
 			verifier.initVerify(Utils.generateCertificate(x5c.get(0)));
 			verifier.update(verificationData);
 			if (!verifier.verify(attStmt.getSig()))
-				throw new RuntimeException("Wrong signature");
+				throw new IllegalArgumentException("Wrong signature");
 			return AttestationType.Basic; // or AttestationType.AttCA
 		}
 	},
@@ -91,16 +91,16 @@ public enum AttestationStatementFormat {
 			Signature verifier = Signature.getInstance(attStmt.getAlg().getAlgorithmName());
 			Certificate cert = Utils.generateCertificate(attStmt.getX5c().get(0));
 			if (!cert.getPublicKey().equals(authData.getAttestedCredential().getCredentialPublicKey().getPublicKey()))
-				throw new RuntimeException("Public key not matched");
+				throw new IllegalArgumentException("Public key not matched");
 			verifier.initVerify(cert);
 			verifier.update(verificationData);
 			if (!verifier.verify(attStmt.getSig()))
-				throw new RuntimeException("Wrong signature");
+				throw new IllegalArgumentException("Wrong signature");
 			// TODO verify extension
 			// byte[] attestationChallenge = (byte[])
 			// authData.getExtensions().get("1.3.6.1.4.1.11129.2.1.17");
 			// if (!Arrays.equals(attestationChallenge, clientDataHash))
-			// throw new RuntimeException("Wrong attestationChallenge");
+			// throw new IllegalArgumentException("Wrong attestationChallenge");
 			// return AttestationType.Basic;
 			throw new UnsupportedOperationException("Not implemented for fmt: " + name());
 		}
@@ -115,12 +115,12 @@ public enum AttestationStatementFormat {
 			String nonce = Base64.getEncoder()
 					.encodeToString(CodecUtils.sha256(Utils.concatByteArray(authData.getRawData(), clientDataHash)));
 			if (!nonce.equals(response.getNonce()))
-				throw new RuntimeException("Wrong nonce");
+				throw new IllegalArgumentException("Wrong nonce");
 			X509Certificate cert = Utils.generateCertificate(attStmt.getX5c().get(0));
 			if (!cert.getSubjectX500Principal().getName().equals("attest.android.com"))
-				throw new RuntimeException("Wrong issuer of attestationCert");
+				throw new IllegalArgumentException("Wrong issuer of attestationCert");
 			if (!response.isCtsProfileMatch())
-				throw new RuntimeException("Cts profile is not matched");
+				throw new IllegalArgumentException("Cts profile is not matched");
 			return AttestationType.Basic;
 		}
 	},
