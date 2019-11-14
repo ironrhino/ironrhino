@@ -2,9 +2,9 @@ package org.ironrhino.core.security.webauthn.domain;
 
 import java.util.List;
 
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 public class SafetyNetResponse {
 
 	private long timestampMs;

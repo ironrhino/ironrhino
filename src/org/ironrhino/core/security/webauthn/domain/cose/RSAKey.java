@@ -11,36 +11,36 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Value;
 
-@Data
+@Value
 @EqualsAndHashCode(callSuper = true)
 public class RSAKey extends Key {
 
 	@JsonProperty("-1")
-	private final byte[] n;
+	private byte[] n;
 
 	@JsonProperty("-2")
-	private final byte[] e;
+	private byte[] e;
 
 	@JsonProperty("-3")
-	private final byte[] d;
+	private byte[] d;
 
 	@JsonProperty("-4")
-	private final byte[] p;
+	private byte[] p;
 
 	@JsonProperty("-5")
-	private final byte[] q;
+	private byte[] q;
 
 	@JsonProperty("-6")
-	private final byte[] dP;
+	private byte[] dP;
 
 	@JsonProperty("-7")
-	private final byte[] dQ;
+	private byte[] dQ;
 
 	@JsonProperty("-8")
-	private final byte[] qInv;
+	private byte[] qInv;
 
 	@JsonCreator
 	public RSAKey(@JsonProperty("2") byte[] keyId, @JsonProperty("3") Algorithm algorithm,

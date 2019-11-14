@@ -1,12 +1,8 @@
 package org.ironrhino.core.security.webauthn.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Value
 public class PublicKeyCredentialUserEntity {
 
 	private byte[] id;

@@ -1,7 +1,5 @@
 package org.ironrhino.core.security.webauthn.domain;
 
-import static org.ironrhino.core.security.webauthn.internal.Utils.JSON_OBJECTMAPPER;
-
 import java.io.IOException;
 import java.net.URL;
 
@@ -10,26 +8,29 @@ import org.ironrhino.core.security.webauthn.internal.Utils;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Setter;
 
 @Data
 public class ClientData {
 
-	private PublicKeyCredentialOperationType type;
+	private final PublicKeyCredentialOperationType type;
 
-	private String challenge;
+	private final String challenge;
 
-	private String origin;
+	private final String origin;
 
-	private TokenBinding tokenBinding;
+	private final TokenBinding tokenBinding;
 
 	@JsonIgnore
+	@Setter(AccessLevel.PRIVATE)
 	private byte[] rawData;
 
 	@JsonCreator
 	public static ClientData valueOf(String input) throws IOException {
 		byte[] rawData = Utils.decodeBase64url(input);
-		ClientData cd = JSON_OBJECTMAPPER.readValue(rawData, ClientData.class);
+		ClientData cd = Utils.JSON_OBJECTMAPPER_WITH_PNM.readValue(rawData, ClientData.class);
 		cd.rawData = rawData;
 		return cd;
 	}

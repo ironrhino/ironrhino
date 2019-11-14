@@ -2,12 +2,14 @@ package org.ironrhino.core.security.webauthn.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class AuthenticatorResponse {
 
 	@JsonProperty("clientDataJSON")
-	private ClientData clientData;
+	private final ClientData clientData;
 
 }

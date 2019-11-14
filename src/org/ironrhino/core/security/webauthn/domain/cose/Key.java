@@ -8,13 +8,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "1", include = JsonTypeInfo.As.EXISTING_PROPERTY)
 @JsonSubTypes({ @JsonSubTypes.Type(value = EC2Key.class, name = "2"),
 		@JsonSubTypes.Type(value = RSAKey.class, name = "3") })
 @Data
+@AllArgsConstructor
 public abstract class Key {
+
+	@JsonProperty("1")
+	public abstract KeyType getKeyType();
 
 	@JsonProperty("2")
 	private final byte[] keyId;
@@ -28,17 +33,7 @@ public abstract class Key {
 	@JsonProperty("5")
 	private final byte[] baseIV;
 
-	@JsonProperty("1")
-	public abstract KeyType getKeyType();
-
 	@JsonIgnore
 	public abstract PublicKey getPublicKey();
-
-	public Key(byte[] keyId, Algorithm algorithm, List<KeyOperation> keyOps, byte[] baseIV) {
-		this.keyId = keyId;
-		this.algorithm = algorithm;
-		this.keyOps = keyOps;
-		this.baseIV = baseIV;
-	}
 
 }

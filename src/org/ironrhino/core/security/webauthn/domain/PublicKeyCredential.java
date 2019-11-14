@@ -1,8 +1,8 @@
 package org.ironrhino.core.security.webauthn.domain;
 
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 public class PublicKeyCredential<R extends AuthenticatorResponse> {
 
 	private byte[] id;

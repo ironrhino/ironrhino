@@ -12,24 +12,20 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Value;
 
-@Data
+@Value
 @EqualsAndHashCode(callSuper = true)
 public class EC2Key extends Key {
 
-	@JsonProperty("-1")
-	private final EllipticCurve curve;
+	private EllipticCurve curve;
 
-	@JsonProperty("-2")
-	private final byte[] x;
+	private byte[] x;
 
-	@JsonProperty("-3")
-	private final byte[] y;
+	private byte[] y;
 
-	@JsonProperty("-4")
-	private final byte[] d;
+	private byte[] d;
 
 	@JsonCreator
 	public EC2Key(@JsonProperty("2") byte[] keyId, @JsonProperty("3") Algorithm algorithm,

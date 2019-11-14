@@ -11,23 +11,23 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.type.TypeReference;
 
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 public class AuthenticatorData {
 
-	private final byte[] rpIdHash;
+	private byte[] rpIdHash;
 
-	private final Map<String, Boolean> flags;
+	private Map<String, Boolean> flags;
 
-	private final int signCount;
+	private int signCount;
 
-	private final AttestedCredential attestedCredential;
+	private AttestedCredential attestedCredential;
 
-	private final Map<String, Object> extensions;
+	private Map<String, Object> extensions;
 
 	@JsonIgnore
-	private final byte[] rawData;
+	private byte[] rawData;
 
 	@JsonCreator
 	public AuthenticatorData(byte[] input) throws Exception {

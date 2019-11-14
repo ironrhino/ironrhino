@@ -123,7 +123,7 @@ public class WebAuthnService {
 			String challenge = getChallenge(username);
 			clientData.verify(PublicKeyCredentialOperationType.CREATE, rpId, challenge);
 
-			Attestation attestation = credential.getResponse().getAttestation();
+			Attestation attestation = credential.getResponse().getAttestationObject();
 
 			AuthenticatorData authData = attestation.getAuthData();
 			authData.verify(rpId, userVerification);

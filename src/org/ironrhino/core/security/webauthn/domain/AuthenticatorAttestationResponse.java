@@ -1,16 +1,17 @@
 package org.ironrhino.core.security.webauthn.domain;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Value;
 
-@Data
+@Value
 @EqualsAndHashCode(callSuper = true)
 public class AuthenticatorAttestationResponse extends AuthenticatorResponse {
 
-	private Attestation attestation;
+	private final Attestation attestationObject;
 
-	public void setAttestationObject(Attestation attestation) {
-		this.attestation = attestation;
+	public AuthenticatorAttestationResponse(ClientData clientData, Attestation attestationObject) {
+		super(clientData);
+		this.attestationObject = attestationObject;
 	}
 
 }

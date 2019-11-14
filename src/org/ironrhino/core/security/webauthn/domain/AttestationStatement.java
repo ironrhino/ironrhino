@@ -4,18 +4,18 @@ import java.util.List;
 
 import org.ironrhino.core.security.webauthn.domain.cose.Algorithm;
 
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 public class AttestationStatement {
-
-	private Algorithm alg;
 
 	private byte[] sig;
 
 	private List<byte[]> x5c;
 
-	private byte[] attestnCert;
+	// for packed
+
+	private Algorithm alg;
 
 	private byte[] ecdaaKeyId;
 

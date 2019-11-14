@@ -1,8 +1,8 @@
 package org.ironrhino.core.security.webauthn.domain;
 
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 public class TokenBinding {
 
 	private String id;

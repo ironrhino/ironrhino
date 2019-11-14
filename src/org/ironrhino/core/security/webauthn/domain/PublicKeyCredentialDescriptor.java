@@ -2,11 +2,11 @@ package org.ironrhino.core.security.webauthn.domain;
 
 import java.util.List;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Value;
 
-@Data
-@NoArgsConstructor
+@Value
+@AllArgsConstructor
 public class PublicKeyCredentialDescriptor {
 
 	private byte[] id;
@@ -17,6 +17,7 @@ public class PublicKeyCredentialDescriptor {
 
 	public PublicKeyCredentialDescriptor(byte[] id) {
 		this.id = id;
+		this.transports = null;
 	}
 
 }
