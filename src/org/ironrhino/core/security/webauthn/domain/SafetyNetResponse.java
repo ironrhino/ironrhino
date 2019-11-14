@@ -1,5 +1,7 @@
 package org.ironrhino.core.security.webauthn.domain;
 
+import java.util.List;
+
 import lombok.Data;
 
 @Data
@@ -11,7 +13,9 @@ public class SafetyNetResponse {
 
 	private String apkPackageName;
 
-	private byte[] apkCertificateDigestSha256;
+	private byte[] apkDigestSha256;
+
+	private List<byte[]> apkCertificateDigestSha256;
 
 	private boolean ctsProfileMatch;
 

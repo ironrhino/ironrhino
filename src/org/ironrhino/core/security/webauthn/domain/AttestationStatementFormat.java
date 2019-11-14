@@ -116,8 +116,8 @@ public enum AttestationStatementFormat {
 					.encodeToString(CodecUtils.sha256(Utils.concatByteArray(authData.getRawData(), clientDataHash)));
 			if (!nonce.equals(response.getNonce()))
 				throw new RuntimeException("Wrong nonce");
-			X509Certificate cert = Utils.generateCertificate(attStmt.getAttestnCert());
-			if (!cert.getIssuerDN().getName().equals("attest.android.com"))
+			X509Certificate cert = Utils.generateCertificate(attStmt.getX5c().get(0));
+			if (!cert.getSubjectX500Principal().getName().equals("attest.android.com"))
 				throw new RuntimeException("Wrong issuer of attestationCert");
 			if (!response.isCtsProfileMatch())
 				throw new RuntimeException("Cts profile is not matched");
