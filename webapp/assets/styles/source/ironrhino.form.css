@@ -78,6 +78,7 @@ select.input-xxlarge {
 
 .form-horizontal label , .form-horizontal .controls {
 	line-height: 30px;
+	word-break: break-all;
 }
 
 .form-horizontal .control-label {
