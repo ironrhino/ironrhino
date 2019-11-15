@@ -27,4 +27,7 @@ public class EntityOperationEvent<T extends Persistable<?>> extends BaseEvent<T>
 		return ResolvableType.forClassWithGenerics(getClass(), ResolvableType.forInstance(getSource()));
 	}
 
+	public String toString() {
+		return getClass().getName() + "[type=" + type + ", source=" + source.getClass().getName() + "(" + source + ")]";
+	}
 }
