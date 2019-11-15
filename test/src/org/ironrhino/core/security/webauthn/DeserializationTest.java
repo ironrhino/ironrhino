@@ -30,8 +30,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class DeserializationTest {
 
 	private static final String KEY_JSON = "{\"3\":-7,\"-1\":1,\"-2\":\"KAdACr2BYzM22clwTv3d/jS4SqV3BEwSu6SSkcu9kqQ=\",\"-3\":\"zBh9ZybYDt8uzI1KA5juXxQ4Rn5gB0DAmDtg//e2F2s=\",\"1\":2}";
-	private static final String ATTESTATION_JSON = "{\"id\":\"8YcOfl/M8dYmDpssEotuF+fOHVUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==\",\"type\":\"public-key\",\"response\":{\"attestationObject\":\"o2NmbXRoZmlkby11MmZnYXR0U3RtdKJjc2lnWEgwRgIhAMHWwOVg6mYMRdAQlSy4nTRUClD104ig7EwFJUEocgrCAiEAlI1vI49ivjqyBlV9HymdqDw+MYiy5gjdElPa5svSzqxjeDVjgVkBgjCCAX4wggEkoAMCAQICAQEwCgYIKoZIzj0EAwIwPDERMA8GA1UEAwwIU29mdCBVMkYxFDASBgNVBAoMC0dpdEh1YiBJbmMuMREwDwYDVQQLDAhTZWN1cml0eTAeFw0xNzA3MjYyMDA5MDhaFw0yNzA3MjQyMDA5MDhaMDwxETAPBgNVBAMMCFNvZnQgVTJGMRQwEgYDVQQKDAtHaXRIdWIgSW5jLjERMA8GA1UECwwIU2VjdXJpdHkwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAT2nKskFEu074f3DyMcXNT1eASs+ODGsrPjUhg9gDkfa9J50mpMg2R05sLaI5P/rB1QNGxcI5BlV5M+y5P/bt7RoxcwFTATBgsrBgEEAYLlHAIBAQQEAwIDCDAKBggqhkjOPQQDAgNIADBFAiEA/iIdl7jq6hK7n0IUhQ9IF2W14JWTXqGj1m0PsW859yICIGTX3C9cbDgq92X1eGo5sLFKl0Uo733fIQIVG4hK1EF6aGF1dGhEYXRhWMpJlg3liA6MaHQ0Fw9kdmBbj+SuuaKGMseZXPO6gx2XY0EAAAAAAAAAAAAAAAAAAAAAAAAAAABG8YcOfl/M8dYmDpssEotuF+fOHVUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKUBAgMmIAEhWCAoB0AKvYFjMzbZyXBO/d3+NLhKpXcETBK7pJKRy72SpCJYIMwYfWcm2A7fLsyNSgOY7l8UOEZ+YAdAwJg7YP/3thdr\",\"clientDataJSON\":\"eyJjaGFsbGVuZ2UiOiJlVWR5ZGpsMWFGUkRaVzl0VlV4cGVHNHlSWE5zT1dGMGFGUjRlRzFXYWpVIiwiZXh0cmFfa2V5c19tYXlfYmVfYWRkZWRfaGVyZSI6ImRvIG5vdCBjb21wYXJlIGNsaWVudERhdGFKU09OIGFnYWluc3QgYSB0ZW1wbGF0ZS4gU2VlIGh0dHBzOi8vZ29vLmdsL3lhYlBleCIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MCIsInR5cGUiOiJ3ZWJhdXRobi5jcmVhdGUifQ==\"}}";
-	private static final String ASSERTION_JSON = "{\"id\":\"6s1/7mPR0C6ruk0uszQPPbFG74AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==\",\"response\":{\"authenticatorData\":\"SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAAaA==\",\"clientDataJSON\":\"eyJjaGFsbGVuZ2UiOiJUMHRPTlRaNFpGVnlUazVNTnpBMU9YTjBRVEowTW5sdmNEUTFNRmRUVERJIiwib3JpZ2luIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwIiwidHlwZSI6IndlYmF1dGhuLmdldCJ9\",\"signature\":\"MEQCIBVF6MRCjeMhXF5m+PhbtPUFt5LgPg+w465LsTEeQ9dFAiAbOiZA8gbHKH4pVbdat0tVulx50CZW2XY5+EziXJvSdQ==\"}}";
+	public static final String ATTESTATION_JSON = "{\"id\":\"VwFB9K0r2NntrHoFSnscGh7wX2gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==\",\"type\":\"public-key\",\"response\":{\"attestationObject\":\"o2NmbXRoZmlkby11MmZnYXR0U3RtdKJjc2lnWEYwRAIgGVDLDEKzWA+oRRvQ0Hn610ROOO5WMvblcDVsDyPp7M0CIBWJ1pXufZU+nfzVTLP5dPU7IyuowC2wf36T4bSGHHETY3g1Y4FZAYIwggF+MIIBJKADAgECAgEBMAoGCCqGSM49BAMCMDwxETAPBgNVBAMMCFNvZnQgVTJGMRQwEgYDVQQKDAtHaXRIdWIgSW5jLjERMA8GA1UECwwIU2VjdXJpdHkwHhcNMTcwNzI2MjAwOTA4WhcNMjcwNzI0MjAwOTA4WjA8MREwDwYDVQQDDAhTb2Z0IFUyRjEUMBIGA1UECgwLR2l0SHViIEluYy4xETAPBgNVBAsMCFNlY3VyaXR5MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE9pyrJBRLtO+H9w8jHFzU9XgErPjgxrKz41IYPYA5H2vSedJqTINkdObC2iOT/6wdUDRsXCOQZVeTPsuT/27e0aMXMBUwEwYLKwYBBAGC5RwCAQEEBAMCAwgwCgYIKoZIzj0EAwIDSAAwRQIhAP4iHZe46uoSu59CFIUPSBdlteCVk16ho9ZtD7FvOfciAiBk19wvXGw4Kvdl9XhqObCxSpdFKO993yECFRuIStRBemhhdXRoRGF0YVjKSZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2NBAAAAAAAAAAAAAAAAAAAAAAAAAAAARlcBQfStK9jZ7ax6BUp7HBoe8F9oAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAClAQIDJiABIVggP28u5Kd+UD7B1nGFqih2Vs2oGgYumGPhlUEmZK88kxsiWCBXyPuTvQ3fdajIrynWKMIsd8FxeNJ5EdHP4xb9+MCm/A==\",\"clientDataJSON\":\"eyJjaGFsbGVuZ2UiOiJja0ozYW5aUGJIWkRlbTQzVEVJME9FaE1PVEZFYVhab2FHTlBTV0ZtVjI4IiwiZXh0cmFfa2V5c19tYXlfYmVfYWRkZWRfaGVyZSI6ImRvIG5vdCBjb21wYXJlIGNsaWVudERhdGFKU09OIGFnYWluc3QgYSB0ZW1wbGF0ZS4gU2VlIGh0dHBzOi8vZ29vLmdsL3lhYlBleCIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MCIsInR5cGUiOiJ3ZWJhdXRobi5jcmVhdGUifQ==\"}}";
+	public static final String ASSERTION_JSON = "{\"id\":\"VwFB9K0r2NntrHoFSnscGh7wX2gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==\",\"response\":{\"authenticatorData\":\"SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAAbA==\",\"clientDataJSON\":\"eyJjaGFsbGVuZ2UiOiJORWd3Vlc1S2IzTmxaR0psWnpGblJFTldlRzFITkVWb1VXdEZjRFZGUlRZIiwiZXh0cmFfa2V5c19tYXlfYmVfYWRkZWRfaGVyZSI6ImRvIG5vdCBjb21wYXJlIGNsaWVudERhdGFKU09OIGFnYWluc3QgYSB0ZW1wbGF0ZS4gU2VlIGh0dHBzOi8vZ29vLmdsL3lhYlBleCIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MCIsInR5cGUiOiJ3ZWJhdXRobi5nZXQifQ==\",\"signature\":\"MEUCIHxldwt/+ELzkLR5D/rBwP0tk0zZJK6h5PmlElXyODkyAiEAhP3j4r+3Y5XjbrPzFUW/Oj75uolsOxkFg21E3a5JADc=\"}}";
 
 	@Test
 	public void testKey() throws Exception {
@@ -51,7 +51,7 @@ public class DeserializationTest {
 		AuthenticatorAttestationResponse response = credential.getResponse();
 		ClientData cd = response.getClientData();
 		assertThat(cd.getType(), equalTo(PublicKeyCredentialOperationType.CREATE));
-		assertThat(cd.getChallenge(), equalTo("eUdydjl1aFRDZW9tVUxpeG4yRXNsOWF0aFR4eG1WajU"));
+		assertThat(cd.getChallenge(), equalTo("ckJ3anZPbHZDem43TEI0OEhMOTFEaXZoaGNPSWFmV28"));
 		assertThat(cd.getOrigin(), equalTo("http://localhost:8080"));
 
 		Attestation attestation = response.getAttestationObject();
@@ -69,7 +69,7 @@ public class DeserializationTest {
 		AttestedCredential attestedCredential = authData.getAttestedCredential();
 		assertThat(attestedCredential.getCredentialId(), equalTo(credential.getId()));
 		assertThat(attestedCredential.getCredentialId(), equalTo(Utils.decodeBase64url(
-				"8YcOfl_M8dYmDpssEotuF-fOHVUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")));
+				"VwFB9K0r2NntrHoFSnscGh7wX2gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")));
 		assertThat(attestedCredential.getAaguid(), equalTo(Base64.getDecoder().decode("AAAAAAAAAAAAAAAAAAAAAA")));
 		assertThat(attestedCredential.getCredentialPublicKey(), instanceOf(EC2Key.class));
 
@@ -77,12 +77,12 @@ public class DeserializationTest {
 		assertThat(key.getKeyType(), equalTo(KeyType.EC2));
 		assertThat(key.getAlgorithm(), equalTo(Algorithm.ES256));
 		assertThat(key.getCurve(), equalTo(Curve.secp256r1));
-		assertThat(key.getX(), equalTo(Base64.getDecoder().decode("KAdACr2BYzM22clwTv3d/jS4SqV3BEwSu6SSkcu9kqQ=")));
-		assertThat(key.getY(), equalTo(Base64.getDecoder().decode("zBh9ZybYDt8uzI1KA5juXxQ4Rn5gB0DAmDtg//e2F2s=")));
+		assertThat(key.getX(), equalTo(Base64.getDecoder().decode("P28u5Kd+UD7B1nGFqih2Vs2oGgYumGPhlUEmZK88kxs=")));
+		assertThat(key.getY(), equalTo(Base64.getDecoder().decode("V8j7k70N33WoyK8p1ijCLHfBcXjSeRHRz+MW/fjApvw=")));
 
 		AttestationStatement attStmt = attestation.getAttStmt();
 		assertThat(attStmt.getSig(), equalTo(Base64.getDecoder().decode(
-				"MEYCIQDB1sDlYOpmDEXQEJUsuJ00VApQ9dOIoOxMBSVBKHIKwgIhAJSNbyOPYr46sgZVfR8pnag8PjGIsuYI3RJT2ubL0s6s")));
+				"MEQCIBlQywxCs1gPqEUb0NB5+tdETjjuVjL25XA1bA8j6ezNAiAVidaV7n2VPp381Uyz+XT1OyMrqMAtsH9+k+G0hhxxEw==")));
 		assertThat(attStmt.getX5c().get(0), equalTo(Base64.getDecoder().decode(
 				"MIIBfjCCASSgAwIBAgIBATAKBggqhkjOPQQDAjA8MREwDwYDVQQDDAhTb2Z0IFUyRjEUMBIGA1UECgwLR2l0SHViIEluYy4xETAPBgNVBAsMCFNlY3VyaXR5MB4XDTE3MDcyNjIwMDkwOFoXDTI3MDcyNDIwMDkwOFowPDERMA8GA1UEAwwIU29mdCBVMkYxFDASBgNVBAoMC0dpdEh1YiBJbmMuMREwDwYDVQQLDAhTZWN1cml0eTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABPacqyQUS7Tvh/cPIxxc1PV4BKz44Mays+NSGD2AOR9r0nnSakyDZHTmwtojk/+sHVA0bFwjkGVXkz7Lk/9u3tGjFzAVMBMGCysGAQQBguUcAgEBBAQDAgMIMAoGCCqGSM49BAMCA0gAMEUCIQD+Ih2XuOrqErufQhSFD0gXZbXglZNeoaPWbQ+xbzn3IgIgZNfcL1xsOCr3ZfV4ajmwsUqXRSjvfd8hAhUbiErUQXo=")));
 
@@ -96,12 +96,12 @@ public class DeserializationTest {
 		AuthenticatorAssertionResponse response = credential.getResponse();
 		ClientData cd = response.getClientData();
 		assertThat(cd.getType(), equalTo(PublicKeyCredentialOperationType.GET));
-		assertThat(cd.getChallenge(), equalTo("T0tONTZ4ZFVyTk5MNzA1OXN0QTJ0MnlvcDQ1MFdTTDI"));
+		assertThat(cd.getChallenge(), equalTo("NEgwVW5Kb3NlZGJlZzFnRENWeG1HNEVoUWtFcDVFRTY"));
 		assertThat(cd.getOrigin(), equalTo("http://localhost:8080"));
 
 		AuthenticatorData authData = response.getAuthenticatorData();
 
-		assertThat(authData.getSignCount(), equalTo(104));
+		assertThat(authData.getSignCount(), equalTo(108));
 		assertThat(authData.isUserPresent(), equalTo(true));
 		assertThat(authData.isUserVerified(), equalTo(false));
 		assertThat(authData.hasAttestedcredentialData(), equalTo(false));
@@ -110,7 +110,7 @@ public class DeserializationTest {
 				equalTo(Utils.decodeBase64url("SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2M")));
 
 		assertThat(response.getSignature(), equalTo(Base64.getDecoder().decode(
-				"MEQCIBVF6MRCjeMhXF5m+PhbtPUFt5LgPg+w465LsTEeQ9dFAiAbOiZA8gbHKH4pVbdat0tVulx50CZW2XY5+EziXJvSdQ==")));
+				"MEUCIHxldwt/+ELzkLR5D/rBwP0tk0zZJK6h5PmlElXyODkyAiEAhP3j4r+3Y5XjbrPzFUW/Oj75uolsOxkFg21E3a5JADc=")));
 	}
 
 }
