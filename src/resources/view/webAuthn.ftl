@@ -41,19 +41,19 @@ $('#request').click(function(){
 			this.id = Uint8Array.from(window.atob(this.id), function(s){return s.charCodeAt(0)});
 		});
 		navigator.credentials.get({'publicKey':options}).then(function(credential){
-			var userHandle = credential.response.userHandle;
-			if(userHandle)
-				userHandle = window.btoa(String.fromCharCode.apply(null, new Uint8Array(userHandle)));
 			
 			var data = {
 				id: window.btoa(String.fromCharCode.apply(null, new Uint8Array(credential.rawId))),
 				response: {
 					authenticatorData: window.btoa(String.fromCharCode.apply(null, new Uint8Array(credential.response.authenticatorData))),
 					clientDataJSON: window.btoa(String.fromCharCode.apply(null, new Uint8Array(credential.response.clientDataJSON))),
-					signature: window.btoa(String.fromCharCode.apply(null, new Uint8Array(credential.response.signature))),
-					userHandle: userHandle
+					signature: window.btoa(String.fromCharCode.apply(null, new Uint8Array(credential.response.signature)))
 				}
 			};
+			
+			var userHandle = credential.response.userHandle;
+			if(userHandle)
+				data.userHandle = window.btoa(String.fromCharCode.apply(null, new Uint8Array(userHandle)));
 			
 			$.ajax({
 				url: '/webAuthn/authenticate',
