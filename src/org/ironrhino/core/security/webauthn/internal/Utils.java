@@ -22,16 +22,9 @@ public class Utils {
 
 	public static final ObjectMapper JSON_OBJECTMAPPER = new ObjectMapper()
 			.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-			.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-
-	public static final ObjectMapper JSON_OBJECTMAPPER_WITH_PNM = new ObjectMapper()
-			.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
 			.setSerializationInclusion(JsonInclude.Include.NON_NULL).registerModule(new ParameterNamesModule());
 
 	public static final ObjectMapper CBOR_OBJECTMAPPER = new ObjectMapper(new CBORFactory())
-			.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-
-	public static final ObjectMapper CBOR_OBJECTMAPPER_WITH_PNM = new ObjectMapper(new CBORFactory())
 			.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES).registerModule(new ParameterNamesModule());
 
 	private static final Base64.Encoder BASE64_URL_ENCODER = Base64.getUrlEncoder().withoutPadding();

@@ -18,7 +18,7 @@ import org.ironrhino.core.security.webauthn.domain.PublicKeyCredential;
 import org.ironrhino.core.security.webauthn.domain.PublicKeyCredentialOperationType;
 import org.ironrhino.core.security.webauthn.domain.cose.Algorithm;
 import org.ironrhino.core.security.webauthn.domain.cose.EC2Key;
-import org.ironrhino.core.security.webauthn.domain.cose.EllipticCurve;
+import org.ironrhino.core.security.webauthn.domain.cose.Curve;
 import org.ironrhino.core.security.webauthn.domain.cose.Key;
 import org.ironrhino.core.security.webauthn.domain.cose.KeyType;
 import org.ironrhino.core.security.webauthn.internal.Utils;
@@ -38,14 +38,14 @@ public class DeserializationTest {
 		EC2Key key = (EC2Key) new ObjectMapper().readValue(KEY_JSON, Key.class);
 		assertThat(key.getKeyType(), equalTo(KeyType.EC2));
 		assertThat(key.getAlgorithm(), equalTo(Algorithm.ES256));
-		assertThat(key.getCurve(), equalTo(EllipticCurve.secp256r1));
+		assertThat(key.getCurve(), equalTo(Curve.secp256r1));
 		assertThat(key.getX(), equalTo(Base64.getDecoder().decode("KAdACr2BYzM22clwTv3d/jS4SqV3BEwSu6SSkcu9kqQ=")));
 		assertThat(key.getY(), equalTo(Base64.getDecoder().decode("zBh9ZybYDt8uzI1KA5juXxQ4Rn5gB0DAmDtg//e2F2s=")));
 	}
 
 	@Test
 	public void testAuthenticatorAttestationResponse() throws Exception {
-		PublicKeyCredential<AuthenticatorAttestationResponse> credential = Utils.JSON_OBJECTMAPPER_WITH_PNM.readValue(
+		PublicKeyCredential<AuthenticatorAttestationResponse> credential = Utils.JSON_OBJECTMAPPER.readValue(
 				ATTESTATION_JSON, new TypeReference<PublicKeyCredential<AuthenticatorAttestationResponse>>() {
 				});
 		AuthenticatorAttestationResponse response = credential.getResponse();
@@ -76,7 +76,7 @@ public class DeserializationTest {
 		EC2Key key = (EC2Key) attestedCredential.getCredentialPublicKey();
 		assertThat(key.getKeyType(), equalTo(KeyType.EC2));
 		assertThat(key.getAlgorithm(), equalTo(Algorithm.ES256));
-		assertThat(key.getCurve(), equalTo(EllipticCurve.secp256r1));
+		assertThat(key.getCurve(), equalTo(Curve.secp256r1));
 		assertThat(key.getX(), equalTo(Base64.getDecoder().decode("KAdACr2BYzM22clwTv3d/jS4SqV3BEwSu6SSkcu9kqQ=")));
 		assertThat(key.getY(), equalTo(Base64.getDecoder().decode("zBh9ZybYDt8uzI1KA5juXxQ4Rn5gB0DAmDtg//e2F2s=")));
 
@@ -90,7 +90,7 @@ public class DeserializationTest {
 
 	@Test
 	public void testAuthenticatorAssertionResponse() throws Exception {
-		PublicKeyCredential<AuthenticatorAssertionResponse> credential = Utils.JSON_OBJECTMAPPER_WITH_PNM
+		PublicKeyCredential<AuthenticatorAssertionResponse> credential = Utils.JSON_OBJECTMAPPER
 				.readValue(ASSERTION_JSON, new TypeReference<PublicKeyCredential<AuthenticatorAssertionResponse>>() {
 				});
 		AuthenticatorAssertionResponse response = credential.getResponse();

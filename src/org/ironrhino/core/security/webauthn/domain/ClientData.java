@@ -30,7 +30,7 @@ public class ClientData {
 	@JsonCreator
 	public static ClientData valueOf(String input) throws IOException {
 		byte[] rawData = Utils.decodeBase64url(input);
-		ClientData cd = Utils.JSON_OBJECTMAPPER_WITH_PNM.readValue(rawData, ClientData.class);
+		ClientData cd = Utils.JSON_OBJECTMAPPER.readValue(rawData, ClientData.class);
 		cd.rawData = rawData;
 		return cd;
 	}

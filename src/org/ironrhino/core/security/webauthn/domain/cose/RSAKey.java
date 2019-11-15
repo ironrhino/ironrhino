@@ -44,10 +44,11 @@ public class RSAKey extends Key {
 
 	@JsonCreator
 	public RSAKey(@JsonProperty("2") byte[] keyId, @JsonProperty("3") Algorithm algorithm,
-			@JsonProperty("4") List<KeyOperation> keyOps, @JsonProperty("-1") byte[] n, @JsonProperty("-2") byte[] e,
-			@JsonProperty("-3") byte[] d, @JsonProperty("-4") byte[] p, @JsonProperty("-5") byte[] q,
-			@JsonProperty("-6") byte[] dP, @JsonProperty("-7") byte[] dQ, @JsonProperty("-8") byte[] qInv) {
-		super(keyId, algorithm, keyOps, null);
+			@JsonProperty("4") List<KeyOperation> keyOps, @JsonProperty("5") byte[] baseIV,
+			@JsonProperty("-1") byte[] n, @JsonProperty("-2") byte[] e, @JsonProperty("-3") byte[] d,
+			@JsonProperty("-4") byte[] p, @JsonProperty("-5") byte[] q, @JsonProperty("-6") byte[] dP,
+			@JsonProperty("-7") byte[] dQ, @JsonProperty("-8") byte[] qInv) {
+		super(keyId, algorithm, keyOps, baseIV);
 		this.n = n;
 		this.e = e;
 		this.d = d;

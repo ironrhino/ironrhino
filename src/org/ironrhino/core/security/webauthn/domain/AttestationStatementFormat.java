@@ -109,7 +109,7 @@ public enum AttestationStatementFormat {
 	android_safetynet {
 		public AttestationType verify(AttestationStatement attStmt, AuthenticatorData authData, ClientData clientData)
 				throws Exception {
-			SafetyNetResponse response = Utils.JSON_OBJECTMAPPER_WITH_PNM.readValue(attStmt.getResponse(),
+			SafetyNetResponse response = Utils.JSON_OBJECTMAPPER.readValue(attStmt.getResponse(),
 					SafetyNetResponse.class);
 			byte[] clientDataHash = CodecUtils.sha256(clientData.getRawData());
 			String nonce = Base64.getEncoder()

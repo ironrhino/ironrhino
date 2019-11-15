@@ -19,7 +19,7 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = true)
 public class EC2Key extends Key {
 
-	private EllipticCurve curve;
+	private Curve curve;
 
 	private byte[] x;
 
@@ -29,9 +29,10 @@ public class EC2Key extends Key {
 
 	@JsonCreator
 	public EC2Key(@JsonProperty("2") byte[] keyId, @JsonProperty("3") Algorithm algorithm,
-			@JsonProperty("4") List<KeyOperation> keyOps, @JsonProperty("-1") EllipticCurve curve,
-			@JsonProperty("-2") byte[] x, @JsonProperty("-3") byte[] y, @JsonProperty("-4") byte[] d) {
-		super(keyId, algorithm, keyOps, null);
+			@JsonProperty("4") List<KeyOperation> keyOps, @JsonProperty("5") byte[] baseIV,
+			@JsonProperty("-1") Curve curve, @JsonProperty("-2") byte[] x, @JsonProperty("-3") byte[] y,
+			@JsonProperty("-4") byte[] d) {
+		super(keyId, algorithm, keyOps, baseIV);
 		this.curve = curve;
 		this.x = x;
 		this.y = y;

@@ -20,7 +20,7 @@ public class Attestation {
 
 	@JsonCreator
 	public static Attestation valueOf(String input) throws IOException {
-		return Utils.CBOR_OBJECTMAPPER_WITH_PNM.readValue(Base64.getDecoder().decode(input), Attestation.class);
+		return Utils.CBOR_OBJECTMAPPER.readValue(Base64.getDecoder().decode(input), Attestation.class);
 	}
 
 }

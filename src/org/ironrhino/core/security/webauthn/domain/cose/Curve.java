@@ -9,16 +9,16 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import lombok.Getter;
 
-@Getter
-public enum EllipticCurve {
+public enum Curve {
 
 	secp256r1(1), secp384r1(2), secp521r1(3);
 
 	private final int value;
 
+	@Getter
 	private final ECParameterSpec parameterSpec;
 
-	private EllipticCurve(int value) {
+	private Curve(int value) {
 		this.value = value;
 		this.parameterSpec = createECParameterSpec(name());
 	}
@@ -29,8 +29,8 @@ public enum EllipticCurve {
 	}
 
 	@JsonCreator
-	public static EllipticCurve fromValue(int value) {
-		for (EllipticCurve e : values())
+	public static Curve fromValue(int value) {
+		for (Curve e : values())
 			if (e.value == value)
 				return e;
 		return null;
