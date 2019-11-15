@@ -70,7 +70,9 @@ public abstract class RedisTopic<T extends Serializable> implements org.ironrhin
 	private void doSubscribe(RedisMessageListenerContainer container, RedisTemplate template, Topic... topics) {
 		container.addMessageListener((message, pattern) -> {
 			try {
-				subscribe((T) template.getValueSerializer().deserialize(message.getBody()));
+				T msg = (T) template.getValueSerializer().deserialize(message.getBody());
+				log.info("Receive published message: {}", msg);
+				subscribe(msg);
 			} catch (SerializationException e) {
 				// message from other app
 				if (ExceptionUtils.getRootCause(e) instanceof ClassNotFoundException) {
@@ -95,6 +97,7 @@ public abstract class RedisTopic<T extends Serializable> implements org.ironrhin
 	public void publish(T message, Scope scope) {
 		if (scope == null)
 			scope = Scope.GLOBAL;
+		log.info("Publish {} message: {}", scope.name(), message);
 		if (scope == Scope.LOCAL) {
 			Runnable task = () -> subscribe(message);
 			if (executorService != null)

@@ -24,4 +24,10 @@ public class BaseEvent<T> extends ApplicationEvent {
 		return getInstanceId().equals(AppInfo.getInstanceId());
 	}
 
+	public String toString() {
+		if ("".equals(source))
+			return getClass().getName();
+		return getClass().getName() + "[source=" + source + "]";
+	}
+
 }
