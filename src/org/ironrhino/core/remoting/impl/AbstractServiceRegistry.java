@@ -194,12 +194,13 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 		if (CollectionUtils.isEmpty(candidates))
 			throw new ServiceNotFoundException(serviceName);
 		List<String> list = distanceMeasurer.findNearest(getLocalHost(), candidates);
+		int size = list.size();
 		AtomicInteger counter = counters.computeIfAbsent(serviceName,
-				s -> new AtomicInteger(ThreadLocalRandom.current().nextInt(list.size())));
-		int current, next, size = list.size();
+				s -> new AtomicInteger(ThreadLocalRandom.current().nextInt(size)));
+		int current, next;
 		do {
 			current = counter.get();
-			next = (current + 1) % list.size();
+			next = ((current != Integer.MAX_VALUE ? current : -1) + 1) % size;
 		} while (!counter.compareAndSet(current, next));
 		String host = list.get((next - 1 + size) % size); // list.get(next);
 		return normalizeHost(host);
