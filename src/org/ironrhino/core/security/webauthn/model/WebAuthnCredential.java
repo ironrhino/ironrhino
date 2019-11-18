@@ -27,7 +27,7 @@ import lombok.Setter;
 @AutoConfig
 @Entity
 @Table(name = "webauthn_credential", indexes = @Index(columnList = "username"))
-@Richtable(order = "createDate desc", readonly = @Readonly(value = true), showQueryForm = true)
+@Richtable(order = "createDate desc", readonly = @Readonly(value = true, deletable = true), showQueryForm = true, bottomButtons = "<@btn view='create' windowoptions='{\"iframe\":true}'/> <@btn action='delete' confirm=true/> <@btn class='reload'/> <@btn class='filter'/>")
 @Getter
 @Setter
 @NoArgsConstructor

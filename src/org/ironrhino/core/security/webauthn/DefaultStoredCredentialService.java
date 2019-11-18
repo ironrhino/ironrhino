@@ -20,7 +20,7 @@ public class DefaultStoredCredentialService implements StoredCredentialService {
 	private EntityManager<WebAuthnCredential> entityManager;
 
 	@Override
-	public void addCredentials(StoredCredential credential) {
+	public void addCredential(StoredCredential credential) {
 		entityManager.setEntityClass(WebAuthnCredential.class);
 		WebAuthnCredential wac = new WebAuthnCredential(credential);
 		entityManager.save(wac);

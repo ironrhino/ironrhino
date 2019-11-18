@@ -13,7 +13,7 @@ import org.ironrhino.core.security.webauthn.domain.StoredCredential;
 public class InMemoryStoredCredentialService implements StoredCredentialService {
 
 	@Override
-	public void addCredentials(StoredCredential credential) {
+	public void addCredential(StoredCredential credential) {
 		List<StoredCredential> list = credentials.computeIfAbsent(credential.getUsername(), k -> new ArrayList<>());
 		list.add(credential);
 	}

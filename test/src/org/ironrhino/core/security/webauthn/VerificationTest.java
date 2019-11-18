@@ -56,7 +56,7 @@ public class VerificationTest {
 				.willReturn(attestationCredential.getResponse().getClientData().getChallenge());
 		webAuthnService.verifyAttestation(attestationCredential, "admin");
 		ArgumentCaptor<StoredCredential> argument = ArgumentCaptor.forClass(StoredCredential.class);
-		then(storedCredentialService).should(times(1)).addCredentials(argument.capture());
+		then(storedCredentialService).should(times(1)).addCredential(argument.capture());
 		assertThat(argument.getValue().getCredentialId(), equalTo(attestationCredential.getId()));
 		then(storedCredentialService).should(times(1)).getCredentialById(attestationCredential.getId());
 

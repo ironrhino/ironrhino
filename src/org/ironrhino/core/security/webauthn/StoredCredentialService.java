@@ -7,7 +7,7 @@ import org.ironrhino.core.security.webauthn.domain.StoredCredential;
 
 public interface StoredCredentialService {
 
-	public void addCredentials(StoredCredential credential);
+	public void addCredential(StoredCredential credential);
 
 	public void updateSignCount(byte[] credentialId, int signCount);
 

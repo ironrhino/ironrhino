@@ -136,7 +136,7 @@ public class WebAuthnService {
 				throw new IllegalStateException("Credential already registered");
 
 			AttestedCredential ac = authData.getAttestedCredential();
-			credentialService.addCredentials(new StoredCredential(ac.getCredentialId(), ac.getAaguid(),
+			credentialService.addCredential(new StoredCredential(ac.getCredentialId(), ac.getAaguid(),
 					ac.getCredentialPublicKey(), username, authData.getSignCount()));
 		} catch (Exception e) {
 			throw new AttestationFailedException(e.getMessage(), e);
