@@ -177,18 +177,6 @@ public class WebAuthnService {
 	public void verifyAssertion(PublicKeyCredential<AuthenticatorAssertionResponse> credential, String username) {
 		// https://www.w3.org/TR/webauthn/#verifying-assertion
 		try {
-			byte[] userHandle = credential.getResponse().getUserHandle();
-			if (userHandle != null) {
-				String user = new String(userHandle); // TODO id -> username;
-				if (username == null) {
-					username = user;
-				} else if (!username.equals(user)) {
-					throw new AssertionFailedException("userHandle not matches");
-				}
-			} else if (username == null) {
-				throw new AssertionFailedException("username should be present");
-			}
-
 			ClientData clientData = credential.getResponse().getClientData();
 			String challenge = getChallenge(username);
 			clientData.verify(PublicKeyCredentialOperationType.GET, rpId, challenge);
