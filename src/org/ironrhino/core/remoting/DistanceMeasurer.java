@@ -1,5 +1,6 @@
 package org.ironrhino.core.remoting;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -35,7 +36,7 @@ public interface DistanceMeasurer {
 
 	default List<String> findNearest(String origin, List<String> candidates) {
 		if (candidates.size() < 2)
-			return candidates;
+			return new ArrayList<>(candidates);
 		return candidates.stream()
 				.collect(Collectors.groupingBy(s -> measureDistance(origin, s), TreeMap::new, Collectors.toList()))
 				.entrySet().iterator().next().getValue();
