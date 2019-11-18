@@ -19,6 +19,7 @@
 	<div class="span6 offset3">
 	<h2 class="caption">${getText('login')}</h2>
 	<div class="hero-unit">
+	<#assign webAuthnEnabled = (properties['webAuthn.enabled']!)=='true'>
 	<#assign verificationCodeEnabled = (properties['verification.code.enabled']!)=='true'>
 	<#assign verificationCodeRequired = false>
 	<#assign passwordRequired = true>
@@ -32,7 +33,7 @@
 		<#if verificationCodeEnabled>
 		<#assign dynamicAttributes+={'data-replacement':'verification'}>
 		</#if>
-		<@s.textfield name="username" class="required span2${verificationCodeEnabled?then(' conjunct','')}" dynamicAttributes=dynamicAttributes/>
+		<@s.textfield name="username" class="required span2${verificationCodeEnabled?then(' conjunct','')}${webAuthnEnabled?then(' webAuthn','')}" dynamicAttributes=dynamicAttributes/>
 		<#if verificationCodeEnabled><div id="verification"></#if>
 		<#if passwordRequired>
 		<@s.password name="password" class="required span2 input-pattern submit sha"/>

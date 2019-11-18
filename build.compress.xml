@@ -79,6 +79,7 @@
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.pattern.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.patterninput.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.verification.js" />
+				<file name="${webapp.dir}/assets/scripts/source/ironrhino.webauthn.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.doublecheck.js" />
 				<file name="${webapp.dir}/assets/scripts/source/ironrhino.apiplayground.js" />
 			</filelist>

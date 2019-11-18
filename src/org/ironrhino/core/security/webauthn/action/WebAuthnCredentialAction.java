@@ -10,6 +10,7 @@ import org.ironrhino.core.security.webauthn.domain.PublicKeyCredential;
 import org.ironrhino.core.security.webauthn.domain.PublicKeyCredentialCreationOptions;
 import org.ironrhino.core.security.webauthn.internal.Utils;
 import org.ironrhino.core.security.webauthn.model.WebAuthnCredential;
+import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
 import org.ironrhino.core.struts.EntityAction;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.NotReadablePropertyException;
@@ -23,6 +24,7 @@ import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 import lombok.Getter;
 import lombok.Setter;
 
+@ApplicationContextPropertiesConditional(key = "webAuthn.enabled", value = "true")
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 public class WebAuthnCredentialAction extends EntityAction<WebAuthnCredential> {
@@ -53,7 +55,7 @@ public class WebAuthnCredentialAction extends EntityAction<WebAuthnCredential> {
 				});
 		webAuthnService.verifyAttestation(cred, username);
 		notify("operate.success");
-		return JSON;
+		return SUCCESS;
 	}
 
 	@JsonConfig(root = "options")

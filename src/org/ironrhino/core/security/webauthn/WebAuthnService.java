@@ -31,10 +31,12 @@ import org.ironrhino.core.security.webauthn.domain.UserVerificationRequirement;
 import org.ironrhino.core.security.webauthn.domain.cose.Algorithm;
 import org.ironrhino.core.security.webauthn.internal.Utils;
 import org.ironrhino.core.servlet.RequestContext;
+import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+@ApplicationContextPropertiesConditional(key = "webAuthn.enabled", value = "true")
 @Component
 public class WebAuthnService {
 

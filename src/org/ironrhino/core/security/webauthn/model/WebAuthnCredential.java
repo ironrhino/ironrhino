@@ -17,6 +17,7 @@ import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.security.webauthn.domain.StoredCredential;
 import org.ironrhino.core.security.webauthn.domain.cose.Key;
 import org.ironrhino.core.security.webauthn.internal.Utils;
+import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -24,10 +25,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@ApplicationContextPropertiesConditional(key = "webAuthn.enabled", value = "true")
 @AutoConfig
 @Entity
 @Table(name = "webauthn_credential", indexes = @Index(columnList = "username"))
-@Richtable(order = "createDate desc", readonly = @Readonly(value = true, deletable = true), showQueryForm = true, bottomButtons = "<@btn view='create' windowoptions='{\"iframe\":true}'/> <@btn action='delete' confirm=true/> <@btn class='reload'/> <@btn class='filter'/>")
+@Richtable(order = "createDate desc", readonly = @Readonly(value = true, deletable = true), showQueryForm = true, bottomButtons = "<@btn view='create'/> <@btn action='delete' confirm=true/> <@btn class='reload'/> <@btn class='filter'/>")
 @Getter
 @Setter
 @NoArgsConstructor
