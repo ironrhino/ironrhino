@@ -23,6 +23,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -144,6 +145,27 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 			}
 		});
 		super.save(u);
+	}
+
+	@Override
+	@Transactional
+	@EvictCache(namespace = DEFAULT_CACHE_NAMESPACE, key = "${user.username}")
+	public T updatePassword(UserDetails user, String encodedPassword) {
+		T u = doLoadUserByUsername(user.getUsername());
+		u.setPassword(encodedPassword);
+		u.setPasswordModifyDate(new Date());
+		// copy state to origin object to avoid re-login
+		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+			@Override
+			public void afterCommit() {
+				@SuppressWarnings("unchecked")
+				T u2 = (T) user;
+				u2.setPassword(u.getPassword());
+				u2.setPasswordModifyDate(u.getPasswordModifyDate());
+			}
+		});
+		super.save(u);
+		return u;
 	}
 
 	@Override

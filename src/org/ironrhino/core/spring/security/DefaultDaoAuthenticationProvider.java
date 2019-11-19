@@ -11,6 +11,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsChecker;
+import org.springframework.security.core.userdetails.UserDetailsPasswordService;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -23,9 +24,10 @@ public class DefaultDaoAuthenticationProvider extends DaoAuthenticationProvider 
 	@Autowired(required = false)
 	private List<VerificationCodeChecker> verificationCodeCheckers = Collections.emptyList();
 
-	public DefaultDaoAuthenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+	public DefaultDaoAuthenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder, UserDetailsPasswordService userDetailsPasswordService) {
 		setUserDetailsService(userDetailsService);
 		setPasswordEncoder(passwordEncoder);
+		setUserDetailsPasswordService(userDetailsPasswordService);
 	}
 
 	@Override

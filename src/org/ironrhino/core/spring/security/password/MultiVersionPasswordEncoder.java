@@ -68,4 +68,9 @@ public class MultiVersionPasswordEncoder implements PasswordEncoder {
 		return version == lastVersion;
 	}
 
+	@Override
+	public boolean upgradeEncoding(String encodedPassword) {
+		return !isLastVersion(encodedPassword);
+	}
+
 }

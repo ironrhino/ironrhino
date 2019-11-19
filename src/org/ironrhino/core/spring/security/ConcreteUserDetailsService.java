@@ -10,4 +10,8 @@ public interface ConcreteUserDetailsService<T extends UserDetails> {
 
 	T loadUserByUsername(String username);
 
+	default T updatePassword(UserDetails user, String encodedPassword) {
+		throw new UnsupportedOperationException();
+	}
+
 }

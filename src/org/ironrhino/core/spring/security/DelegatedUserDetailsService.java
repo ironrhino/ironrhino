@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsPasswordService;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Component;
 @Component("userDetailsService")
 @Primary
 @ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
-public class DelegatedUserDetailsService implements UserDetailsService {
+public class DelegatedUserDetailsService implements UserDetailsService, UserDetailsPasswordService {
 
 	@Autowired(required = false)
 	private List<ConcreteUserDetailsService<? extends UserDetails>> userDetailsServices;
@@ -74,5 +75,19 @@ public class DelegatedUserDetailsService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		return loadUserByUsername(username, false);
+	}
+
+	@Override
+	public UserDetails updatePassword(UserDetails ud, String encodedPassword) {
+		if (userDetailsServices != null) {
+			for (ConcreteUserDetailsService<?> uds : userDetailsServices)
+				if (uds.accepts(ud.getUsername()))
+					try {
+						return uds.updatePassword(ud, encodedPassword);
+					} catch (UsernameNotFoundException unfe) {
+						continue;
+					}
+		}
+		throw new UsernameNotFoundException("No such Username : " + ud.getUsername());
 	}
 }
