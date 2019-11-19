@@ -9,7 +9,6 @@ import java.security.spec.ECPublicKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.EqualsAndHashCode;
@@ -19,19 +18,20 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = true)
 public class EC2Key extends Key {
 
+	@JsonProperty("-1")
 	private Curve curve;
 
+	@JsonProperty("-2")
 	private byte[] x;
 
+	@JsonProperty("-3")
 	private byte[] y;
 
+	@JsonProperty("-4")
 	private byte[] d;
 
-	@JsonCreator
-	public EC2Key(@JsonProperty("2") byte[] keyId, @JsonProperty("3") Algorithm algorithm,
-			@JsonProperty("4") List<KeyOperation> keyOps, @JsonProperty("5") byte[] baseIV,
-			@JsonProperty("-1") Curve curve, @JsonProperty("-2") byte[] x, @JsonProperty("-3") byte[] y,
-			@JsonProperty("-4") byte[] d) {
+	public EC2Key(byte[] keyId, Algorithm algorithm, List<KeyOperation> keyOps, byte[] baseIV, Curve curve, byte[] x,
+			byte[] y, byte[] d) {
 		super(keyId, algorithm, keyOps, baseIV);
 		this.curve = curve;
 		this.x = x;

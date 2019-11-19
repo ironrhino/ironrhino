@@ -17,15 +17,14 @@ import org.ironrhino.core.security.webauthn.domain.ClientData;
 import org.ironrhino.core.security.webauthn.domain.PublicKeyCredential;
 import org.ironrhino.core.security.webauthn.domain.PublicKeyCredentialOperationType;
 import org.ironrhino.core.security.webauthn.domain.cose.Algorithm;
-import org.ironrhino.core.security.webauthn.domain.cose.EC2Key;
 import org.ironrhino.core.security.webauthn.domain.cose.Curve;
+import org.ironrhino.core.security.webauthn.domain.cose.EC2Key;
 import org.ironrhino.core.security.webauthn.domain.cose.Key;
 import org.ironrhino.core.security.webauthn.domain.cose.KeyType;
 import org.ironrhino.core.security.webauthn.internal.Utils;
 import org.junit.Test;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class DeserializationTest {
 
@@ -37,12 +36,13 @@ public class DeserializationTest {
 
 	@Test
 	public void testKey() throws Exception {
-		EC2Key key = (EC2Key) new ObjectMapper().readValue(KEY_JSON, Key.class);
+		EC2Key key = (EC2Key) Utils.JSON_OBJECTMAPPER.readValue(KEY_JSON, Key.class);
 		assertThat(key.getKeyType(), equalTo(KeyType.EC2));
 		assertThat(key.getAlgorithm(), equalTo(Algorithm.ES256));
 		assertThat(key.getCurve(), equalTo(Curve.secp256r1));
 		assertThat(key.getX(), equalTo(Base64.getDecoder().decode("KAdACr2BYzM22clwTv3d/jS4SqV3BEwSu6SSkcu9kqQ=")));
 		assertThat(key.getY(), equalTo(Base64.getDecoder().decode("zBh9ZybYDt8uzI1KA5juXxQ4Rn5gB0DAmDtg//e2F2s=")));
+		System.out.println(Utils.JSON_OBJECTMAPPER.writeValueAsString(key));
 	}
 
 	@Test
