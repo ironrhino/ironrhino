@@ -30,6 +30,11 @@ public class InMemoryStoredCredentialService implements StoredCredentialService 
 	}
 
 	@Override
+	public boolean hasCredentials(String username) {
+		return credentials.containsKey(username);
+	}
+
+	@Override
 	public List<StoredCredential> getCredentials(String username) {
 		return credentials.getOrDefault(username, Collections.emptyList());
 	}

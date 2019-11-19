@@ -13,6 +13,8 @@ public interface StoredCredentialService {
 
 	public Optional<StoredCredential> getCredentialById(byte[] credentialId);
 
+	public boolean hasCredentials(String username);
+
 	public List<StoredCredential> getCredentials(String username);
 
 }

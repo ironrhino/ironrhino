@@ -42,6 +42,14 @@ public class DefaultStoredCredentialService implements StoredCredentialService {
 	}
 
 	@Override
+	public boolean hasCredentials(String username) {
+		entityManager.setEntityClass(WebAuthnCredential.class);
+		DetachedCriteria dc = entityManager.detachedCriteria();
+		dc.add(Restrictions.eq("username", username));
+		return entityManager.countByCriteria(dc) > 0;
+	}
+
+	@Override
 	public List<StoredCredential> getCredentials(String username) {
 		entityManager.setEntityClass(WebAuthnCredential.class);
 		DetachedCriteria dc = entityManager.detachedCriteria();
