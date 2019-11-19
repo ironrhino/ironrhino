@@ -20,7 +20,8 @@ public class InMemoryStoredCredentialService implements StoredCredentialService 
 
 	@Override
 	public void updateSignCount(byte[] credentialId, int signCount) {
-		getCredentialById(credentialId).ifPresent(c -> c.setSignCount(signCount));
+		credentials.values().stream().flatMap(List::stream)
+				.filter(c -> Arrays.equals(c.getCredentialId(), credentialId)).forEach(c -> c.setSignCount(signCount));
 	}
 
 	@Override
