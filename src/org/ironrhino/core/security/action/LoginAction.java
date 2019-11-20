@@ -21,9 +21,9 @@ import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.security.event.LoginEvent;
 import org.ironrhino.core.security.verfication.ReceiverNotFoundException;
 import org.ironrhino.core.security.verfication.VerificationManager;
-import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.spring.security.DefaultAuthenticationSuccessHandler;
 import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationFilter;
+import org.ironrhino.core.spring.security.SpringSecurityEnabled;
 import org.ironrhino.core.spring.security.WrongVerificationCodeException;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
@@ -54,7 +54,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @AutoConfig
-@ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
+@SpringSecurityEnabled
 @Slf4j
 public class LoginAction extends BaseAction {
 

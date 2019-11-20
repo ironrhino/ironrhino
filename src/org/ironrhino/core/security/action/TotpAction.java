@@ -7,9 +7,9 @@ import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Captcha;
 import org.ironrhino.core.metadata.Redirect;
+import org.ironrhino.core.security.otp.TotpEnabled;
 import org.ironrhino.core.security.otp.TotpVerificationCodeChecker;
 import org.ironrhino.core.security.role.UserRole;
-import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AppInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ import lombok.Setter;
 
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 @AutoConfig
-@ApplicationContextPropertiesConditional(key = "totp.enabled", value = "true")
+@TotpEnabled
 public class TotpAction extends BaseAction {
 
 	private static final long serialVersionUID = 1440897497588169105L;

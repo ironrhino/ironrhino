@@ -6,7 +6,6 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.coordination.LockService;
-import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
 import org.ironrhino.core.spring.security.VerificationCodeChecker;
 import org.ironrhino.core.spring.security.WrongVerificationCodeException;
 import org.ironrhino.core.throttle.ThrottleService;
@@ -18,7 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-@ApplicationContextPropertiesConditional(key = "totp.enabled", value = "true")
+@TotpEnabled
 @Component
 public class TotpVerificationCodeChecker implements VerificationCodeChecker {
 

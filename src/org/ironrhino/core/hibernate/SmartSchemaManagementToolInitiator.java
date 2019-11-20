@@ -34,14 +34,13 @@ import org.hibernate.tool.schema.spi.SchemaCreator;
 import org.hibernate.tool.schema.spi.SchemaManagementTool;
 import org.hibernate.tool.schema.spi.SchemaMigrator;
 import org.ironrhino.core.jdbc.DatabaseProduct;
-import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @SuppressWarnings("rawtypes")
 @Component
-@ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
+@HibernateEnabled
 public class SmartSchemaManagementToolInitiator implements StandardServiceInitiator<SchemaManagementTool> {
 
 	@Autowired

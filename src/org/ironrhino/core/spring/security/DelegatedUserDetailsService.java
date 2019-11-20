@@ -6,7 +6,6 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 
 import org.ironrhino.core.spring.RemotingClientProxy;
-import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.Ordered;
@@ -18,7 +17,7 @@ import org.springframework.stereotype.Component;
 
 @Component("userDetailsService")
 @Primary
-@ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
+@SpringSecurityEnabled
 public class DelegatedUserDetailsService implements UserDetailsService {
 
 	@Autowired(required = false)

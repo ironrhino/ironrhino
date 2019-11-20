@@ -6,7 +6,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -14,7 +13,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 @Component
-@ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
+@SpringSecurityEnabled
 public class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
 	public final static String COOKIE_NAME_LOGIN_USER = "U";

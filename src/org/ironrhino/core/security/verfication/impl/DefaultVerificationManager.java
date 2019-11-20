@@ -2,9 +2,9 @@ package org.ironrhino.core.security.verfication.impl;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.security.verfication.ReceiverNotFoundException;
+import org.ironrhino.core.security.verfication.VerificationCodeEnabled;
 import org.ironrhino.core.security.verfication.VerificationManager;
 import org.ironrhino.core.security.verfication.VerificationService;
-import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 
-@ApplicationContextPropertiesConditional(key = "verification.code.enabled", value = "true")
+@VerificationCodeEnabled
 @Component("verificationManager")
 @Slf4j
 public class DefaultVerificationManager implements VerificationManager {

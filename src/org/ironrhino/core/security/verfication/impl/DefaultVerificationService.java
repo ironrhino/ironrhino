@@ -5,10 +5,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.security.verfication.ReceiverNotFoundException;
+import org.ironrhino.core.security.verfication.VerificationCodeEnabled;
 import org.ironrhino.core.security.verfication.VerificationCodeGenerator;
 import org.ironrhino.core.security.verfication.VerificationCodeNotifier;
 import org.ironrhino.core.security.verfication.VerificationService;
-import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-@ApplicationContextPropertiesConditional(key = "verification.code.enabled", value = "true")
+@VerificationCodeEnabled
 @Component("verificationService")
 @Slf4j
 public class DefaultVerificationService implements VerificationService {

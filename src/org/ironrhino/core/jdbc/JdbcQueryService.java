@@ -20,8 +20,8 @@ import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.hibernate.HibernateEnabled;
 import org.ironrhino.core.model.ResultPage;
-import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.ErrorMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +43,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
-@ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
+@HibernateEnabled
 @Slf4j
 public class JdbcQueryService {
 

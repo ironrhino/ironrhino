@@ -3,7 +3,6 @@ package org.ironrhino.core.spring.security;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -13,7 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 @Component("rememberMeServices")
-@ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
+@SpringSecurityEnabled
 public class DefaultTokenBasedRememberMeServices extends TokenBasedRememberMeServices {
 
 	@Value("${rememberMe.disabled:false}")
