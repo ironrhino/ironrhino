@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.security.event.LogoutEvent;
-import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +24,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Component("logoutSuccessHandler")
-@ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
+@SpringSecurityEnabled
 public class DefaultLogoutSuccessHandler extends AbstractAuthenticationTargetUrlRequestHandler
 		implements LogoutSuccessHandler {
 

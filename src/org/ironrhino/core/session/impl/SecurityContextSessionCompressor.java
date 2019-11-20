@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.session.SessionCompressor;
-import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
+import org.ironrhino.core.spring.security.SpringSecurityEnabled;
 import org.ironrhino.core.util.CodecUtils;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
-@ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
+@SpringSecurityEnabled
 @Slf4j
 public class SecurityContextSessionCompressor implements SessionCompressor<SecurityContext> {
 

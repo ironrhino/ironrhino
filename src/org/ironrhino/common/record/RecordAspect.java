@@ -26,8 +26,8 @@ import org.hibernate.type.BagType;
 import org.hibernate.type.Type;
 import org.ironrhino.core.aop.AopContext;
 import org.ironrhino.core.event.EntityOperationType;
+import org.ironrhino.core.hibernate.HibernateEnabled;
 import org.ironrhino.core.model.Persistable;
-import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.core.util.StringUtils;
@@ -45,7 +45,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Aspect
 @Component
-@ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
+@HibernateEnabled
 @Slf4j
 public class RecordAspect implements TransactionSynchronization, Ordered {
 

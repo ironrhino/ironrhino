@@ -6,6 +6,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flywaydb.core.Flyway;
+import org.ironrhino.core.hibernate.HibernateEnabled;
 import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.ironrhino.core.tracing.Tracing;
 import org.ironrhino.core.util.AppInfo;
@@ -32,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @Order(0)
 @Configuration
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-@ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
+@HibernateEnabled
 @Slf4j
 public class DataSourceConfiguration {
 

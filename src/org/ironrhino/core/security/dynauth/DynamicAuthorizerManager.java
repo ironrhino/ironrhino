@@ -2,7 +2,7 @@ package org.ironrhino.core.security.dynauth;
 
 import java.util.List;
 
-import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
+import org.ironrhino.core.spring.security.SpringSecurityEnabled;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
-@ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
+@SpringSecurityEnabled
 @Slf4j
 public class DynamicAuthorizerManager {
 

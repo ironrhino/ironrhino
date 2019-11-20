@@ -1,13 +1,13 @@
 package org.ironrhino.core.security.event;
 
-import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
+import org.ironrhino.core.spring.security.SpringSecurityEnabled;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Component
-@ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
+@SpringSecurityEnabled
 @Slf4j
 public class SimpleLogoutEventListener {
 

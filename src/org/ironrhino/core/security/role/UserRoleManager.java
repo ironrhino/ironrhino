@@ -14,7 +14,7 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
+import org.ironrhino.core.spring.security.SpringSecurityEnabled;
 import org.ironrhino.core.struts.I18N;
 import org.ironrhino.core.util.ClassScanner;
 import org.ironrhino.core.util.ErrorMessage;
@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-@ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
+@SpringSecurityEnabled
 public class UserRoleManager {
 
 	@Autowired(required = false)

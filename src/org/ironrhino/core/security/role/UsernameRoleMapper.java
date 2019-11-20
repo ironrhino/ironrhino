@@ -1,6 +1,6 @@
 package org.ironrhino.core.security.role;
 
-import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
+import org.ironrhino.core.spring.security.SpringSecurityEnabled;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @Component
-@ResourcePresentConditional("classpath*:resources/spring/applicationContext-security*.xml")
+@SpringSecurityEnabled
 public class UsernameRoleMapper implements UserRoleMapper {
 
 	@Override

@@ -5,13 +5,12 @@ import java.util.Map;
 import org.hibernate.boot.registry.StandardServiceInitiator;
 import org.hibernate.id.factory.spi.MutableIdentifierGeneratorFactory;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
-import org.ironrhino.core.spring.configuration.ResourcePresentConditional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @SuppressWarnings("rawtypes")
 @Component
-@ResourcePresentConditional("resources/spring/applicationContext-hibernate.xml")
+@HibernateEnabled
 public class SpringIdentifierGeneratorFactoryInitiator
 		implements StandardServiceInitiator<MutableIdentifierGeneratorFactory> {
 
