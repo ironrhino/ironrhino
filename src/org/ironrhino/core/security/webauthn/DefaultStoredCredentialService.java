@@ -10,11 +10,10 @@ import org.ironrhino.core.security.webauthn.domain.StoredCredential;
 import org.ironrhino.core.security.webauthn.internal.Utils;
 import org.ironrhino.core.security.webauthn.model.WebAuthnCredential;
 import org.ironrhino.core.service.EntityManager;
-import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@ApplicationContextPropertiesConditional(key = "webAuthn.enabled", value = "true")
+@WebAuthnEnabled
 @Component
 public class DefaultStoredCredentialService implements StoredCredentialService {
 

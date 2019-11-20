@@ -10,16 +10,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.security.webauthn.WebAuthnEnabled;
 import org.ironrhino.core.security.webauthn.WebAuthnService;
 import org.ironrhino.core.security.webauthn.internal.Utils;
 import org.ironrhino.core.servlet.AccessHandler;
-import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
-@ApplicationContextPropertiesConditional(key = "webAuthn.enabled", value = "true")
+@WebAuthnEnabled
 @Component
 @Order(0)
 public class WebAuthnOptionsHandler extends AccessHandler {

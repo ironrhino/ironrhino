@@ -3,7 +3,6 @@ package org.ironrhino.core.security.webauthn;
 import org.ironrhino.core.security.webauthn.domain.AuthenticatorAssertionResponse;
 import org.ironrhino.core.security.webauthn.domain.PublicKeyCredential;
 import org.ironrhino.core.security.webauthn.internal.Utils;
-import org.ironrhino.core.spring.configuration.ApplicationContextPropertiesConditional;
 import org.ironrhino.core.spring.security.DefaultDaoAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
@@ -21,7 +20,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 
-@ApplicationContextPropertiesConditional(key = "webAuthn.enabled", value = "true")
+@WebAuthnEnabled
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 1)
 public class WebAuthnAuthenticationProvider implements AuthenticationProvider {
