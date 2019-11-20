@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="byName"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/batch
+	http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<context:annotation-config />
+
+	<bean id="userReader" scope="step"
+		class="org.springframework.batch.item.database.JdbcPagingItemReader">
+		<property name="queryProvider">
+			<bean
+				class="org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean">
+				<property name="dataSource" ref="dataSource" />
+				<property name="selectClause" value="select *" />
+				<property name="fromClause" value="from user" />
+				<property name="whereClause"
+					value="where date(createDate)=:workdate" />
+				<property name="sortKey" value="username" />
+			</bean>
+		</property>
+		<property name="parameterValues">
+			<map>
+				<entry key="workdate" value="#{jobParameters['workdate']}" />
+			</map>
+		</property>
+		<property name="pageSize" value="2" />
+		<property name="rowMapper">
+			<bean
+				class="org.springframework.jdbc.core.BeanPropertyRowMapper"
+				p:mappedClass="org.ironrhino.security.model.User" />
+		</property>
+	</bean>
+
+	<bean id="userWriter" scope="step"
+		class="org.springframework.batch.item.file.FlatFileItemWriter"
+		p:resource="file:${app.home}/target/parallelOutput.txt.#{T(org.ironrhino.core.util.DateUtils).formatDate10(jobParameters[workdate])}">
+		<property name="lineAggregator">
+			<bean
+				class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+				<property name="fieldExtractor">
+					<bean
+						class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+						<property name="names" value="username,name,phone" />
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="jobParametersValidator"
+		class="org.ironrhino.batch.job.SimpleJobParametersValidator">
+		<property name="requiredKeys">
+			<map>
+				<entry key="workdate" value="DATE" />
+			</map>
+		</property>
+	</bean>
+
+	<job id="parallelExportUserJob"
+		xmlns="http://www.springframework.org/schema/batch">
+		<validator ref="jobParametersValidator" />
+		<step id="exportToFile">
+			<tasklet task-executor="taskExecutor" throttle-limit="8">
+				<chunk reader="userReader" writer="userWriter"
+					commit-interval="${exportUserJob.exportToFile.commit.interval:2}" />
+			</tasklet>
+		</step>
+	</job>
+
+</beans>
