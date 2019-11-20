@@ -1,4 +1,4 @@
-package org.ironrhino.core.security.webauthn;
+package org.ironrhino.core.security.webauthn.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.ironrhino.core.security.webauthn.StoredCredentialService;
 import org.ironrhino.core.security.webauthn.domain.StoredCredential;
 
 public class InMemoryStoredCredentialService implements StoredCredentialService {

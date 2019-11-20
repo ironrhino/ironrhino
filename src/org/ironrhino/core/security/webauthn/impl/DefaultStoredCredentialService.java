@@ -1,4 +1,4 @@
-package org.ironrhino.core.security.webauthn;
+package org.ironrhino.core.security.webauthn.impl;
 
 import java.util.List;
 import java.util.Optional;
@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
+import org.ironrhino.core.security.webauthn.StoredCredentialService;
+import org.ironrhino.core.security.webauthn.WebAuthnEnabled;
 import org.ironrhino.core.security.webauthn.domain.StoredCredential;
 import org.ironrhino.core.security.webauthn.internal.Utils;
 import org.ironrhino.core.security.webauthn.model.WebAuthnCredential;

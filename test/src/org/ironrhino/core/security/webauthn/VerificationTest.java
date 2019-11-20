@@ -13,6 +13,8 @@ import org.ironrhino.core.security.webauthn.domain.AuthenticatorAssertionRespons
 import org.ironrhino.core.security.webauthn.domain.AuthenticatorAttestationResponse;
 import org.ironrhino.core.security.webauthn.domain.PublicKeyCredential;
 import org.ironrhino.core.security.webauthn.domain.StoredCredential;
+import org.ironrhino.core.security.webauthn.impl.DefaultStoredCredentialService;
+import org.ironrhino.core.security.webauthn.impl.DefaultWebAuthnService;
 import org.ironrhino.core.security.webauthn.internal.Utils;
 import org.ironrhino.core.service.HibernateConfiguration;
 import org.junit.Test;
@@ -35,7 +37,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 public class VerificationTest {
 
 	@Autowired
-	private WebAuthnService webAuthnService;
+	private DefaultWebAuthnService webAuthnService;
 
 	@Autowired
 	private StoredCredentialService storedCredentialService;
@@ -72,8 +74,8 @@ public class VerificationTest {
 	static class WebAuthnConfiguration {
 
 		@Bean
-		public WebAuthnService webAuthnService() {
-			return Mockito.spy(new WebAuthnService());
+		public DefaultWebAuthnService webAuthnService() {
+			return Mockito.spy(new DefaultWebAuthnService());
 		}
 
 		@Bean

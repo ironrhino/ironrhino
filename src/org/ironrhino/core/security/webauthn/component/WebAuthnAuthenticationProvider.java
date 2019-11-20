@@ -1,5 +1,7 @@
-package org.ironrhino.core.security.webauthn;
+package org.ironrhino.core.security.webauthn.component;
 
+import org.ironrhino.core.security.webauthn.WebAuthnEnabled;
+import org.ironrhino.core.security.webauthn.WebAuthnService;
 import org.ironrhino.core.security.webauthn.domain.AuthenticatorAssertionResponse;
 import org.ironrhino.core.security.webauthn.domain.PublicKeyCredential;
 import org.ironrhino.core.security.webauthn.internal.Utils;
