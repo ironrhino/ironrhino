@@ -1,31 +1,37 @@
 (function($) {
 	$(function() {
 		var username = $('#login [name="username"]');
-		if (username.hasClass('webAuthn')) {
+		if (username.hasClass('webAuthn') && navigator.credentials) {
+			var password = $('#login [name="password"]');
 			username.wrap('<div class="input-append"></div>').after('<span class="add-on clickable" title="U-Key"><i class="glyphicon glyphicon-log-in"></i></span></div>').next().click(function(e) {
 				ajax({
 					url: '/webAuthnOptions',
 					data: { username: username.val() },
 					onsuccess: function(options) {
-						options.challenge = Uint8Array.from(window.atob(options.challenge), function(s) { return s.charCodeAt(0) });
+						options.challenge = _atob(options.challenge);
 						$.each(options.allowCredentials, function() {
-							this.id = Uint8Array.from(window.atob(this.id), function(s) { return s.charCodeAt(0) });
+							this.id = _atob(this.id);
 						});
 						navigator.credentials.get({ 'publicKey': options }).then(function(credential) {
 							var data = {
-								id: window.btoa(String.fromCharCode.apply(null, new Uint8Array(credential.rawId))),
+								id: _btoa(credential.rawId),
 								response: {
-									authenticatorData: window.btoa(String.fromCharCode.apply(null, new Uint8Array(credential.response.authenticatorData))),
-									clientDataJSON: window.btoa(String.fromCharCode.apply(null, new Uint8Array(credential.response.clientDataJSON))),
-									signature: window.btoa(String.fromCharCode.apply(null, new Uint8Array(credential.response.signature)))
+									authenticatorData: _btoa(credential.response.authenticatorData),
+									clientDataJSON: _btoa(credential.response.clientDataJSON),
+									signature: _btoa(credential.response.signature)
 								}
 							};
 							var userHandle = credential.response.userHandle;
 							if (userHandle)
-								data.userHandle = window.btoa(String.fromCharCode.apply(null, new Uint8Array(userHandle)));
-							$('[name="password"]').removeClass('sha').val(JSON.stringify(data));
-							$($(e.target).closest('form')).submit();
+								data.userHandle = _btoa(userHandle);
+							password.removeClass('sha').val(JSON.stringify(data));
+							var form = $(e.target).closest('form');
+							form[0].onerror = function() {
+								password.addClass('sha').val('');
+							};
+							form.submit();
 						}).catch(function(error) {
+							password.addClass('sha').val('');
 							Message.showActionError(error.message);
 						});
 					}
@@ -35,7 +41,7 @@
 
 		$(document).on('click', '#create-webauthn-credential button', function(e) {
 			var form = $(e.target).closest('form');
-			if(!Form.validate(form))
+			if (!Form.validate(form))
 				return;
 			var username = form.find('[name="username"]').val();
 			var url = form.attr('action');
@@ -43,18 +49,18 @@
 				url: url.substring(0, url.lastIndexOf('/')) + '/options',
 				data: { username: username },
 				onsuccess: function(options) {
-					options.user.id = Uint8Array.from(window.atob(options.user.id), function(s) { return s.charCodeAt(0) });
-					options.challenge = Uint8Array.from(window.atob(options.challenge), function(s) { return s.charCodeAt(0) });
+					options.user.id = _atob(options.user.id);
+					options.challenge = _atob(options.challenge);
 					$.each(options.excludeCredentials, function() {
-						this.id = Uint8Array.from(window.atob(this.id), function(s) { return s.charCodeAt(0) });
+						this.id = _atob(this.id);
 					});
 					navigator.credentials.create({ 'publicKey': options }).then(function(credential) {
 						var data = {
-							id: window.btoa(String.fromCharCode.apply(null, new Uint8Array(credential.rawId))),
+							id: _btoa(credential.rawId),
 							type: credential.type,
 							response: {
-								attestationObject: window.btoa(String.fromCharCode.apply(null, new Uint8Array(credential.response.attestationObject))),
-								clientDataJSON: window.btoa(String.fromCharCode.apply(null, new Uint8Array(credential.response.clientDataJSON)))
+								attestationObject: _btoa(credential.response.attestationObject),
+								clientDataJSON: _btoa(credential.response.clientDataJSON)
 							}
 						};
 						form.find('[name="credential"]').val(JSON.stringify(data));
@@ -67,4 +73,14 @@
 
 		});
 	});
+
+
+	function _atob(input) {
+		return Uint8Array.from(window.atob(input), function(s) { return s.charCodeAt(0) });
+	}
+
+	function _btoa(input) {
+		return window.btoa(String.fromCharCode.apply(null, new Uint8Array(input)))
+	}
+
 })(jQuery);
