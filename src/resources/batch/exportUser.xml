@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans default-autowire="byName" xmlns="http://www.springframework.org/schema/beans"
+<beans default-autowire="byName"
+	xmlns="http://www.springframework.org/schema/beans"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:batch="http://www.springframework.org/schema/batch"
@@ -10,16 +11,21 @@
 	http://www.springframework.org/schema/context/spring-context.xsd
 	http://www.springframework.org/schema/batch
 	http://www.springframework.org/schema/batch/spring-batch.xsd">
-	
+
 	<context:annotation-config />
-	
-	<bean id="userReader" scope="job" class="org.springframework.batch.item.database.JdbcCursorItemReader">
-		<property name="sql" value="select * from user where date(createDate)=?"/>
+
+	<bean id="userReader" scope="job"
+		class="org.springframework.batch.item.database.JdbcCursorItemReader">
+		<property name="sql"
+			value="select * from user where date(createDate)=?" />
 		<property name="rowMapper">
-			<bean class="org.springframework.jdbc.core.BeanPropertyRowMapper" p:mappedClass="org.ironrhino.security.model.User"/>
+			<bean
+				class="org.springframework.jdbc.core.BeanPropertyRowMapper"
+				p:mappedClass="org.ironrhino.security.model.User" />
 		</property>
 		<property name="preparedStatementSetter">
-			<bean class="org.springframework.jdbc.core.ArgumentPreparedStatementSetter">
+			<bean
+				class="org.springframework.jdbc.core.ArgumentPreparedStatementSetter">
 				<constructor-arg>
 					<array>
 						<value>#{jobParameters[workdate]}</value>
@@ -28,34 +34,54 @@
 			</bean>
 		</property>
 	</bean>
-	
-	<bean id="userWriter" scope="job" class="org.springframework.batch.item.file.FlatFileItemWriter" p:resource="file:${app.home}/target/output.txt.#{T(org.ironrhino.core.util.DateUtils).formatDate10(jobParameters[workdate])}">
+
+	<bean id="userWriter" scope="job"
+		class="org.springframework.batch.item.file.FlatFileItemWriter"
+		p:resource="file:${app.home}/target/output.txt.#{T(org.ironrhino.core.util.DateUtils).formatDate10(jobParameters[workdate])}">
 		<property name="lineAggregator">
-			<bean class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
+			<bean
+				class="org.springframework.batch.item.file.transform.DelimitedLineAggregator">
 				<property name="fieldExtractor">
-					<bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
-						<property name="names" value="username,name,phone"/>
+					<bean
+						class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+						<property name="names" value="username,name,phone" />
 					</bean>
 				</property>
 			</bean>
 		</property>
+		<property name="headerCallback">
+			<bean
+				class="org.ironrhino.batch.item.file.FieldNamesHeaderCallback">
+				<property name="names" value="Username,Name,Phone" />
+			</bean>
+		</property>
+		<property name="footerCallback" ref="summaryFooterCallback" />
 	</bean>
-	
-	<bean id="jobParametersValidator" class="org.ironrhino.batch.job.SimpleJobParametersValidator">
+
+	<bean id="summaryFooterCallback" scope="step"
+		class="org.ironrhino.batch.item.file.SummaryFooterCallback" />
+
+	<bean id="jobParametersValidator"
+		class="org.ironrhino.batch.job.SimpleJobParametersValidator">
 		<property name="requiredKeys">
 			<map>
-				<entry key="workdate" value="DATE"/>
+				<entry key="workdate" value="DATE" />
 			</map>
 		</property>
-	</bean>	
-	
-	<job id="exportUserJob" xmlns="http://www.springframework.org/schema/batch">
-		<validator ref="jobParametersValidator"/>
+	</bean>
+
+	<job id="exportUserJob"
+		xmlns="http://www.springframework.org/schema/batch">
+		<validator ref="jobParametersValidator" />
 		<step id="exportToFile">
 			<tasklet>
-				<chunk reader="userReader" writer="userWriter" commit-interval="${exportUserJob.exportToFile.commit.interval:2}"/>
+				<chunk reader="userReader" writer="userWriter"
+					commit-interval="${exportUserJob.exportToFile.commit.interval:2}" />
 			</tasklet>
+			<listeners>
+				<listener ref="summaryFooterCallback" />
+			</listeners>
 		</step>
 	</job>
-	
+
 </beans>
