@@ -54,7 +54,19 @@
 				</property>
 			</bean>
 		</property>
+		<property name="headerCallback">
+			<bean
+				class="org.ironrhino.batch.item.file.FieldNamesHeaderCallback">
+				<property name="names" value="Username,Name,Phone" />
+			</bean>
+		</property>
+		<property name="footerCallback" ref="summaryFooterCallback" />
 	</bean>
+
+	<bean id="summaryFooterCallback" scope="step"
+		class="org.ironrhino.batch.item.file.SummaryFooterCallback" />
+
+
 
 	<bean id="jobParametersValidator"
 		class="org.ironrhino.batch.job.SimpleJobParametersValidator">
@@ -73,6 +85,9 @@
 				<chunk reader="userReader" writer="userWriter"
 					commit-interval="${exportUserJob.exportToFile.commit.interval:2}" />
 			</tasklet>
+			<listeners>
+				<listener ref="summaryFooterCallback" />
+			</listeners>
 		</step>
 	</job>
 
