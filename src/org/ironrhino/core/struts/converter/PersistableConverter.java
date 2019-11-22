@@ -13,7 +13,7 @@ public class PersistableConverter extends StrutsTypeConverter {
 
 	@Override
 	public Object convertFromString(Map context, String[] values, Class toClass) {
-		if (values[0] == null || values[0].trim().equals(""))
+		if (values[0] == null || values[0].trim().isEmpty())
 			return null;
 		try {
 			Persistable<?> persistable = (Persistable<?>) BeanUtils.instantiateClass(toClass);

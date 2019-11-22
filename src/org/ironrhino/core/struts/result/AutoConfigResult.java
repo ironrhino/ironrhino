@@ -45,7 +45,7 @@ public class AutoConfigResult extends FreemarkerResult {
 		ActionContext ctx = invocation.getInvocationContext();
 		HttpServletRequest request = (HttpServletRequest) ctx.get(StrutsStatics.HTTP_REQUEST);
 		HttpServletResponse response = (HttpServletResponse) ctx.get(StrutsStatics.HTTP_RESPONSE);
-		if (Action.SUCCESS.equals(resultCode) && !invocation.getProxy().getMethod().equals("")
+		if (Action.SUCCESS.equals(resultCode) && !invocation.getProxy().getMethod().isEmpty()
 				&& !invocation.getProxy().getMethod().equals("execute")) {
 			String namespace = invocation.getProxy().getNamespace();
 			String url = namespace + (namespace.endsWith("/") ? "" : "/") + invocation.getProxy().getActionName();

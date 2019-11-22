@@ -276,7 +276,7 @@ public class BaseAction extends ActionSupport {
 		InputConfig inputConfig = getAnnotation(InputConfig.class);
 		if (inputConfig != null && !postMethodLike) {
 			returnInput = true;
-			if (!inputConfig.methodName().equals("")) {
+			if (!inputConfig.methodName().isEmpty()) {
 				ActionInvocation ai = ActionContext.getContext().getActionInvocation();
 				originalActionName = ai.getProxy().getActionName();
 				originalMethod = ai.getProxy().getMethod();

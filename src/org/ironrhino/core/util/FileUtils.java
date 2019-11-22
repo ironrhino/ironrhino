@@ -110,7 +110,7 @@ public class FileUtils {
 			File[] fl = file.listFiles();
 			if (fl == null)
 				return;
-			if (!base.equals(""))
+			if (!base.isEmpty())
 				out.putNextEntry(new ZipEntry(base + "/"));
 			base = base.length() == 0 ? "" : base + "/";
 			for (int i = 0; i < fl.length; i++) {
