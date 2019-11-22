@@ -24,6 +24,7 @@ public class BaseEvent<T> extends ApplicationEvent {
 		return getInstanceId().equals(AppInfo.getInstanceId());
 	}
 
+	@Override
 	public String toString() {
 		if ("".equals(source))
 			return getClass().getName();
