@@ -166,12 +166,12 @@ public class JsonUtils {
 
 	public static <T> T fromJson(String json, TypeReference<T> type)
 			throws JsonParseException, JsonMappingException, IOException {
-		return (T) sharedObjectMapper.readValue(json, type);
+		return sharedObjectMapper.readValue(json, type);
 	}
 
 	public static <T> T fromJson(JsonNode json, TypeReference<T> type)
 			throws JsonParseException, JsonMappingException, IOException {
-		return (T) sharedObjectMapper.readValue(sharedObjectMapper.treeAsTokens(json), type);
+		return sharedObjectMapper.readValue(sharedObjectMapper.treeAsTokens(json), type);
 	}
 
 	public static <T> T fromJson(String json, Class<T> cls)

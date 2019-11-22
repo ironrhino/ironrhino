@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public enum AttestationStatementFormat {
 
 	packed {
+		@Override
 		@SuppressWarnings("unused")
 		public AttestationType verify(AttestationStatement attStmt, AuthenticatorData authData, ClientData clientData)
 				throws Exception {
@@ -50,6 +51,7 @@ public enum AttestationStatementFormat {
 
 	@JsonProperty("fido-u2f")
 	fido_u2f {
+		@Override
 		public AttestationType verify(AttestationStatement attStmt, AuthenticatorData authData, ClientData clientData)
 				throws Exception {
 			// https://www.w3.org/TR/webauthn/#fido-u2f-attestation
@@ -59,10 +61,10 @@ public enum AttestationStatementFormat {
 			byte[] rpIdHash = authData.getRpIdHash();
 			byte[] credentialId = authData.getAttestedCredential().getCredentialId();
 			EC2Key credentialPublicKey = (EC2Key) authData.getAttestedCredential().getCredentialPublicKey();
-			byte[] x = (byte[]) credentialPublicKey.getX();
+			byte[] x = credentialPublicKey.getX();
 			if (x.length != 32)
 				throw new IllegalArgumentException("Wrong x coordinate: " + x.length);
-			byte[] y = (byte[]) credentialPublicKey.getY();
+			byte[] y = credentialPublicKey.getY();
 			if (y.length != 32)
 				throw new IllegalArgumentException("Wrong x coordinate: " + x.length);
 			byte[] publicKeyU2F = Utils.concatByteArray(new byte[] { 0x04 }, x, y);
@@ -77,6 +79,7 @@ public enum AttestationStatementFormat {
 		}
 	},
 	none {
+		@Override
 		public AttestationType verify(AttestationStatement attStmt, AuthenticatorData authData, ClientData clientData)
 				throws Exception {
 			return AttestationType.None;
@@ -84,6 +87,7 @@ public enum AttestationStatementFormat {
 	},
 	@JsonProperty("android-key")
 	android_key {
+		@Override
 		public AttestationType verify(AttestationStatement attStmt, AuthenticatorData authData, ClientData clientData)
 				throws Exception {
 			byte[] clientDataHash = CodecUtils.sha256(clientData.getRawData());
@@ -107,6 +111,7 @@ public enum AttestationStatementFormat {
 	},
 	@JsonProperty("android-safetynet")
 	android_safetynet {
+		@Override
 		public AttestationType verify(AttestationStatement attStmt, AuthenticatorData authData, ClientData clientData)
 				throws Exception {
 			SafetyNetResponse response = Utils.JSON_OBJECTMAPPER.readValue(attStmt.getResponse(),
@@ -125,6 +130,7 @@ public enum AttestationStatementFormat {
 		}
 	},
 	tpm {
+		@Override
 		public AttestationType verify(AttestationStatement attStmt, AuthenticatorData authData, ClientData clientData)
 				throws Exception {
 

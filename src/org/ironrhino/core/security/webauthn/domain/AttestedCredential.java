@@ -20,7 +20,7 @@ public class AttestedCredential {
 
 		byte[] length = new byte[2];
 		System.arraycopy(input, 16, length, 0, length.length);
-		int credentialIdLength = (int) (((length[0] & 0xFF) << 8) | (length[1] & 0xFF));
+		int credentialIdLength = ((length[0] & 0xFF) << 8) | (length[1] & 0xFF);
 		byte[] credentialId = new byte[credentialIdLength];
 		System.arraycopy(input, 18, credentialId, 0, credentialId.length);
 

@@ -6,6 +6,7 @@ import java.util.Collection;
 import org.ironrhino.core.struts.result.AutoConfigResult;
 import org.ironrhino.core.util.ClassScanner;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -24,7 +25,7 @@ public class StrutsBeanDefinitionRegistryPostProcessor implements BeanDefinition
 		for (Class<?> actionClass : actionClasses) {
 			if (isQualified(actionClass)) {
 				RootBeanDefinition beanDefinition = new RootBeanDefinition(actionClass);
-				beanDefinition.setScope(AbstractBeanDefinition.SCOPE_PROTOTYPE);
+				beanDefinition.setScope(BeanDefinition.SCOPE_PROTOTYPE);
 				beanDefinition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_NAME);
 				registry.registerBeanDefinition(actionClass.getName(), beanDefinition);
 			}

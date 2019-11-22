@@ -45,8 +45,8 @@ public class AuthenticatorData {
 
 		byte[] count = new byte[4];
 		System.arraycopy(input, 33, count, 0, count.length);
-		signCount = (int) (((count[0] & 0xFF) << 24) | ((count[1] & 0xFF) << 16) | ((count[2] & 0xFF) << 8)
-				| (count[3] & 0xFF));
+		signCount = ((count[0] & 0xFF) << 24) | ((count[1] & 0xFF) << 16) | ((count[2] & 0xFF) << 8)
+				| (count[3] & 0xFF);
 
 		AttestedCredential attestedCredential = null;
 		Map<String, Object> extensions = null;
