@@ -223,7 +223,7 @@ public class ResultPage<T> implements Serializable {
 			for (Map.Entry<String, String[]> entry : map.entrySet()) {
 				String name = entry.getKey();
 				String[] values = entry.getValue();
-				if (values.length == 1 && values[0].equals("") || name.equals("_") || name.equals(PAGENO_PARAM_NAME)
+				if (values.length == 1 && values[0].isEmpty() || name.equals("_") || name.equals(PAGENO_PARAM_NAME)
 						|| name.equals(PAGESIZE_PARAM_NAME) || name.equals(MARKER_PARAM_NAME)
 						|| name.equals(PREVIOUSMARKER_PARAM_NAME)
 						|| name.startsWith(StringUtils.uncapitalize(ResultPage.class.getSimpleName()) + '.'))

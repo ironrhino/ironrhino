@@ -351,7 +351,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 
 	@Override
 	public boolean isDirectory(String path) {
-		if (path.equals("") || path.equals("/"))
+		if (path.isEmpty() || path.equals("/"))
 			return true;
 		return executeWrapped(ftpClient -> {
 			ftpClient.changeWorkingDirectory(getPathname(path, ftpClient));

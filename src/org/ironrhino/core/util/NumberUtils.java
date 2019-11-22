@@ -121,7 +121,7 @@ public class NumberUtils {
 			integer = input;
 			decimal = "";
 		}
-		if (!integer.equals("")) {
+		if (!integer.isEmpty()) {
 			integer = Long.toString(Long.parseLong(integer));
 			if (integer.equals("0")) {
 				integer = "";

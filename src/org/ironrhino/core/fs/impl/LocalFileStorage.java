@@ -108,7 +108,7 @@ public class LocalFileStorage extends AbstractFileStorage {
 
 	@Override
 	public boolean isDirectory(String path) {
-		if (path.equals("") || path.equals("/"))
+		if (path.isEmpty() || path.equals("/"))
 			return true;
 		path = normalizePath(path);
 		return new File(directory, path).isDirectory();

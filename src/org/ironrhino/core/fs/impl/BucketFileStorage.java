@@ -42,7 +42,7 @@ public abstract class BucketFileStorage extends AbstractFileStorage {
 
 	@Override
 	public boolean mkdir(String path) {
-		if (path.equals("") || path.equals("/"))
+		if (path.isEmpty() || path.equals("/"))
 			return true;
 		path = normalizePath(path);
 		int lastIndex = path.lastIndexOf('/');
@@ -63,7 +63,7 @@ public abstract class BucketFileStorage extends AbstractFileStorage {
 
 	@Override
 	public void write(InputStream is, String path, long contentLength, String contentType) throws IOException {
-		if (path.equals("") || path.endsWith("/"))
+		if (path.isEmpty() || path.endsWith("/"))
 			throw new ErrorMessage("path " + path + " is directory");
 		path = normalizePath(path);
 		int lastIndex = path.lastIndexOf('/');

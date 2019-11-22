@@ -142,7 +142,7 @@ public class DefaultActionMapper extends AbstractActionMapper {
 		}
 
 		String str = uri.substring(namespace.length());
-		if (!str.equals("") && !str.equals("/")) {
+		if (!str.isEmpty() && !str.equals("/")) {
 			String[] arr = StringUtils.split(str, "/", 2);
 			if (arr.length > 1)
 				methodAndUid = arr[1];

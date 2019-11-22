@@ -83,7 +83,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 			if (ac != null) {
 				log.info("Loading autoconfig from " + name);
 				String defaultNamespace = ac.namespace();
-				if (defaultNamespace.equals(""))
+				if (defaultNamespace.isEmpty())
 					defaultNamespace = '/' + packageName.substring(packageName.lastIndexOf('.') + 1);
 				Set<String> set = packages.get(ac.namespace());
 				if (set == null) {
@@ -369,7 +369,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 		}
 		if (namespace == null)
 			namespace = "";
-		if (!ac.actionName().equals(""))
+		if (!ac.actionName().isEmpty())
 			actionName = ac.actionName();
 		return new String[] { namespace, actionName, actionClass };
 	}
