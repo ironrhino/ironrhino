@@ -1,14 +1,24 @@
 package org.ironrhino.core.util;
 
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class MathUtils {
+
+	static final Map<String, Method> mathMethods = new HashMap<>();
+
+	static {
+		for (Method m : MathUtils.class.getMethods())
+			mathMethods.put(m.getName(), m);
+	}
 
 	@SafeVarargs
 	public static <T extends Number> T max(T... numbers) {

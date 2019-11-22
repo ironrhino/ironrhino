@@ -3,58 +3,24 @@ package org.ironrhino.core.util;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringUtils;
-import org.mvel2.MVEL;
-import org.mvel2.ParserContext;
-import org.mvel2.compiler.CompiledExpression;
-import org.mvel2.compiler.ExpressionCompiler;
-import org.mvel2.templates.CompiledTemplate;
-import org.mvel2.templates.TemplateCompiler;
-import org.mvel2.templates.TemplateRuntime;
 
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class ExpressionUtils {
 
-	private static Map<String, CompiledTemplate> templateCache = new ConcurrentHashMap<>();
-
-	private static Map<String, CompiledExpression> expressionCache = new ConcurrentHashMap<>();
-
-	private static ParserContext parserContext = new ParserContext();
-	static {
-		try {
-			parserContext.addImport("max", MathUtils.class.getMethod("max", Number[].class));
-			parserContext.addImport("min", MathUtils.class.getMethod("min", Number[].class));
-			parserContext.addImport("sum", MathUtils.class.getMethod("sum", Number[].class));
-			parserContext.addImport("avg", MathUtils.class.getMethod("avg", Number[].class));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		parserContext.addImport("java.lang.System", Object.class);
-		parserContext.addImport("System", Object.class);
-		parserContext.addImport("Runtime", Object.class);
-		parserContext.addImport("Class", Object.class);
-	}
-
 	public static Object evalExpression(String expression, Map<String, ?> context) {
 		if (StringUtils.isBlank(expression))
 			return expression;
-		if (expression.contains("java.") || expression.contains("javax."))
-			throw new IllegalArgumentException("Illegal expression: " + expression);
-		CompiledExpression ce = expressionCache.computeIfAbsent(expression,
-				key -> new ExpressionCompiler(key, parserContext).compile());
-		return MVEL.executeExpression(ce, context);
+		return ExpressionEngine.getDefault().evalExpression(expression, context);
 	}
 
 	public static Object eval(String template, Map<String, ?> context) {
 		if (StringUtils.isBlank(template))
 			return template;
-		CompiledTemplate ct = templateCache.computeIfAbsent(template,
-				key -> new TemplateCompiler(key, false, parserContext).compile());
-		return TemplateRuntime.execute(ct, context);
+		return ExpressionEngine.getDefault().eval(template, context);
 	}
 
 	public static String evalString(String template, Map<String, ?> context) {

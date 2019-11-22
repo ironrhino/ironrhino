@@ -74,7 +74,14 @@ public class ExpressionUtilsTest {
 		assertThat(result, equalTo("2412"));
 		result = ExpressionUtils.evalString("${null}", context);
 		assertThat(result, nullValue());
-		result = ExpressionUtils.evalString("iam@if{integer > 10}large@else{}small@end{}", context);
+	}
+
+	@Test
+	public void testEvalConditionalString() {
+		Map<String, Object> context = new HashMap<>();
+		context.put("string", "IAMSTRING");
+		context.put("integer", 12);
+		Object result = ExpressionUtils.evalString("iam@if{integer > 10}large@else{}small@end{}", context);
 		assertThat(result, equalTo("iamlarge"));
 	}
 
