@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.expression.ExpressionException;
 
 import lombok.experimental.UtilityClass;
 
@@ -14,13 +15,23 @@ public class ExpressionUtils {
 	public static Object evalExpression(String expression, Map<String, ?> context) {
 		if (StringUtils.isBlank(expression))
 			return expression;
-		return ExpressionEngine.getDefault().evalExpression(expression, context);
+		try {
+			return ExpressionEngine.SPEL.evalExpression(expression, context);
+		} catch (ExpressionException e) {
+			return ExpressionEngine.MVEL.evalExpression(expression, context);
+		}
 	}
 
 	public static Object eval(String template, Map<String, ?> context) {
 		if (StringUtils.isBlank(template))
 			return template;
-		return ExpressionEngine.getDefault().eval(template, context);
+		if (template.contains("@{") || template.contains("@if{"))
+			return ExpressionEngine.MVEL.eval(template, context);
+		try {
+			return ExpressionEngine.SPEL.eval(template, context);
+		} catch (ExpressionException e) {
+			return ExpressionEngine.MVEL.eval(template, context);
+		}
 	}
 
 	public static String evalString(String template, Map<String, ?> context) {

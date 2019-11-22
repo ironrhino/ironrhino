@@ -105,11 +105,4 @@ public enum ExpressionEngine {
 
 	public abstract Object eval(String template, Map<String, ?> context);
 
-	public static ExpressionEngine getDefault() {
-		String value = System.getProperty(KEY);
-		return value != null && value.equalsIgnoreCase("SPEL") ? ExpressionEngine.SPEL : ExpressionEngine.MVEL;
-	}
-
-	public static final String KEY = "org.ironrhino.core.util.ExpressionEngine.default";
-
 }
