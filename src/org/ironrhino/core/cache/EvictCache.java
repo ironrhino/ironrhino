@@ -10,19 +10,19 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface EvictCache {
 
-	// mvel expression
+	// mvel or spel expression
 	String key();
 
-	// mvel expression
+	// mvel or spel expression
 	String namespace() default "";
 
-	// mvel expression
+	// mvel or spel expression
 	String onEvict() default "";
 
-	// mvel expression
+	// mvel or spel expression
 	String renew() default "";
 
-	// mvel expression
+	// mvel or spel expression
 	String renewTimeToLive() default "3600";
 
 }

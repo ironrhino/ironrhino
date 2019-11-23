@@ -77,8 +77,8 @@ public enum ExpressionEngine {
 
 		@Override
 		public Object eval(String template, Map<String, ?> context) {
-			Expression ex = templateCache.computeIfAbsent(template,
-					key -> parser.parseExpression(template, new TemplateParserContext("${", "}")));
+			Expression ex = templateCache.computeIfAbsent(template, key -> parser.parseExpression(template,
+					template.contains("${") ? new TemplateParserContext("${", "}") : new TemplateParserContext()));
 			return ex.getValue(build(context));
 		}
 

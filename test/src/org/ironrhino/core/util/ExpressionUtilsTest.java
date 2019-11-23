@@ -62,6 +62,28 @@ public class ExpressionUtilsTest {
 		result = ExpressionUtils.eval("${!bool}12", context);
 		assertThat(result, equalTo("false12"));
 	}
+	
+	
+	@Test
+	public void testEvalHashtag() {
+		Map<String, Object> context = new HashMap<>();
+		context.put("string", "IAMSTRING");
+		context.put("integer", 12);
+		context.put("bool", true);
+		Object result = ExpressionUtils.eval("#{string+12}", context);
+		assertThat(result, equalTo("IAMSTRING12"));
+		result = ExpressionUtils.eval("#{string+12}12", context);
+		assertThat(result, equalTo("IAMSTRING1212"));
+		result = ExpressionUtils.eval("#{integer+12}", context);
+		assertThat(result, equalTo(24));
+		result = ExpressionUtils.eval("#{integer+12}12", context);
+		assertThat(result, equalTo("2412"));
+		result = ExpressionUtils.eval("#{!bool}", context);
+		assertThat(result, equalTo(false));
+		result = ExpressionUtils.eval("#{!bool}12", context);
+		assertThat(result, equalTo("false12"));
+	}
+
 
 	@Test
 	public void testEvalString() {

@@ -10,19 +10,19 @@ import java.util.concurrent.TimeUnit;
 @Target(METHOD)
 @Retention(RUNTIME)
 public @interface CheckCache {
-	// mvel expression
+	// mvel or spel expression
 	String key();
 
-	// mvel expression
+	// mvel or spel expression
 	String namespace() default "";
 
-	// mvel expression
+	// mvel or spel expression
 	String when() default "true";
 
-	// mvel expression
+	// mvel or spel expression
 	String timeToLive() default "3600";
 
-	// mvel expression
+	// mvel or spel expression
 	String timeToIdle() default "-1";
 
 	TimeUnit timeUnit() default TimeUnit.SECONDS;
@@ -36,13 +36,13 @@ public @interface CheckCache {
 	// TimeUnit.MILLISECONDS
 	int waitTimeout() default 200;
 
-	// mvel expression
+	// mvel or spel expression
 	String onHit() default "";
 
-	// mvel expression
+	// mvel or spel expression
 	String onMiss() default "";
 
-	// mvel expression
+	// mvel or spel expression
 	String onPut() default "";
 
 }
