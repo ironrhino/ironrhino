@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="no"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/batch
+	http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<context:annotation-config />
+
+	<bean id="reader" scope="step"
+		class="org.ironrhino.sample.batch.MessageReader" />
+
+	<bean id="processor" scope="step"
+		class="org.ironrhino.sample.batch.MessageProcessor" />
+
+	<bean id="writer"
+		class="org.springframework.batch.item.database.JdbcBatchItemWriter">
+		<property name="dataSource" ref="dataSource" />
+		<property name="sql"
+			value="insert into sample_message(id,title,content,createDate) values (:id,:title,:content,:createDate)" />
+		<property name="itemSqlParameterSourceProvider">
+			<bean
+				class="org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider" />
+		</property>
+	</bean>
+
+	<bean id="jobParametersValidator"
+		class="org.ironrhino.batch.job.SimpleJobParametersValidator">
+		<property name="requiredKeys">
+			<map>
+				<entry key="createDate" value="DATE" />
+				<entry key="count" value="LONG" />
+			</map>
+		</property>
+	</bean>
+
+	<job id="importMessageJob"
+		xmlns="http://www.springframework.org/schema/batch">
+		<validator ref="jobParametersValidator" />
+		<step id="importMessage">
+			<tasklet task-executor="taskExecutor" throttle-limit="50">
+				<chunk reader="reader" processor="processor" writer="writer"
+					commit-interval="100" />
+			</tasklet>
+		</step>
+	</job>
+
+</beans>
