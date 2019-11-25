@@ -4,7 +4,7 @@ import org.ironrhino.core.util.Snowflake;
 import org.ironrhino.sample.crud.Message;
 import org.springframework.batch.item.ItemProcessor;
 
-public class MessageProcessor implements ItemProcessor<Message, Message> {
+public class ImportMessageProcessor implements ItemProcessor<Message, Message> {
 
 	private final Snowflake snowflake = new Snowflake(0);
 
