@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans default-autowire="byName"
+<beans default-autowire="no"
 	xmlns="http://www.springframework.org/schema/beans"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:context="http://www.springframework.org/schema/context"
@@ -14,8 +14,9 @@
 
 	<context:annotation-config />
 
-	<bean id="userReader" scope="job"
+	<bean id="reader" scope="job"
 		class="org.springframework.batch.item.database.JdbcCursorItemReader">
+		<property name="dataSource" ref="dataSource" />
 		<property name="sql"
 			value="select * from user where date(createDate)=?" />
 		<property name="rowMapper">
@@ -35,7 +36,7 @@
 		</property>
 	</bean>
 
-	<bean id="userWriter" scope="job"
+	<bean id="writer" scope="job"
 		class="org.springframework.batch.item.file.FlatFileItemWriter"
 		p:resource="file:${app.home}/target/output.txt.#{T(org.ironrhino.core.util.DateUtils).formatDate10(jobParameters[workdate])}">
 		<property name="lineAggregator">
@@ -75,7 +76,7 @@
 		<validator ref="jobParametersValidator" />
 		<step id="exportToFile">
 			<tasklet>
-				<chunk reader="userReader" writer="userWriter"
+				<chunk reader="reader" writer="writer"
 					commit-interval="${exportUserJob.exportToFile.commit.interval:2}" />
 			</tasklet>
 			<listeners>
