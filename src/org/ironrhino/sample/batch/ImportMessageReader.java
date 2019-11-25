@@ -8,7 +8,7 @@ import org.ironrhino.sample.crud.Message;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Value;
 
-public class MessageReader implements ItemReader<Message> {
+public class ImportMessageReader implements ItemReader<Message> {
 
 	private final AtomicInteger counter = new AtomicInteger();
 

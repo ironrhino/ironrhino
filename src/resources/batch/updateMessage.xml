@@ -15,16 +15,41 @@
 	<context:annotation-config />
 
 	<bean id="reader" scope="step"
-		class="org.ironrhino.sample.batch.ImportMessageReader" />
+		class="org.springframework.batch.item.database.JdbcPagingItemReader">
+		<property name="dataSource" ref="dataSource" />
+		<property name="queryProvider">
+			<bean
+				class="org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean">
+				<property name="dataSource" ref="dataSource" />
+				<property name="selectClause" value="select *" />
+				<property name="fromClause" value="from sample_message" />
+				<property name="whereClause"
+					value="where date(createDate)=:createDate" />
+				<property name="sortKey" value="id" />
+			</bean>
+		</property>
+		<property name="parameterValues">
+			<map>
+				<entry key="createDate" value="#{jobParameters['createDate']}" />
+			</map>
+		</property>
+		<property name="pageSize" value="100" />
+		<property name="rowMapper">
+			<bean
+				class="org.springframework.jdbc.core.BeanPropertyRowMapper"
+				p:mappedClass="org.ironrhino.sample.crud.Message" />
+		</property>
+	</bean>
+
 
 	<bean id="processor" scope="step"
-		class="org.ironrhino.sample.batch.ImportMessageProcessor" />
+		class="org.ironrhino.sample.batch.UpdateMessageProcessor" />
 
 	<bean id="writer"
 		class="org.springframework.batch.item.database.JdbcBatchItemWriter">
 		<property name="dataSource" ref="dataSource" />
 		<property name="sql"
-			value="insert into sample_message(id,title,content,createDate) values (:id,:title,:content,:createDate)" />
+			value="update sample_message set content=:content,modifyDate=:modifyDate where id=:id" />
 		<property name="itemSqlParameterSourceProvider">
 			<bean
 				class="org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider" />
@@ -36,15 +61,14 @@
 		<property name="requiredKeys">
 			<map>
 				<entry key="createDate" value="DATE" />
-				<entry key="count" value="LONG" />
 			</map>
 		</property>
 	</bean>
 
-	<job id="importMessageJob"
+	<job id="updateMessageJob"
 		xmlns="http://www.springframework.org/schema/batch">
 		<validator ref="jobParametersValidator" />
-		<step id="importMessage">
+		<step id="updateMessage">
 			<tasklet task-executor="taskExecutor" throttle-limit="50">
 				<chunk reader="reader" processor="processor" writer="writer"
 					commit-interval="100" />
