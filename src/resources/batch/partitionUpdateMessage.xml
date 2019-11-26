@@ -15,32 +15,27 @@
 	<context:annotation-config />
 
 	<bean id="reader" scope="step"
-		class="org.springframework.batch.item.database.JdbcPagingItemReader">
+		class="org.springframework.batch.item.database.JdbcCursorItemReader">
 		<property name="dataSource" ref="dataSource" />
-		<property name="queryProvider">
-			<bean
-				class="org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean">
-				<property name="dataSource" ref="dataSource" />
-				<property name="selectClause" value="select *" />
-				<property name="fromClause" value="from sample_message" />
-				<property name="whereClause"
-					value="where date(createDate)=:createDate" />
-				<property name="sortKey" value="id" />
-			</bean>
-		</property>
-		<property name="parameterValues">
-			<map>
-				<entry key="createDate" value="#{jobParameters['createDate']}" />
-			</map>
-		</property>
-		<property name="pageSize" value="100" />
+		<property name="sql"
+			value="select * from sample_message where date(createDate)=? and id%${batch.updateMessage.partitions:10}=?" />
 		<property name="rowMapper">
 			<bean
 				class="org.springframework.jdbc.core.BeanPropertyRowMapper"
 				p:mappedClass="org.ironrhino.sample.crud.Message" />
 		</property>
+		<property name="preparedStatementSetter">
+			<bean
+				class="org.springframework.jdbc.core.ArgumentPreparedStatementSetter">
+				<constructor-arg>
+					<array>
+						<value>#{jobParameters[createDate]}</value>
+						<value>#{stepExecutionContext[mod]}</value>
+					</array>
+				</constructor-arg>
+			</bean>
+		</property>
 	</bean>
-
 
 	<bean id="processor" scope="step"
 		class="org.ironrhino.sample.batch.UpdateMessageProcessor" />
@@ -65,15 +60,25 @@
 		</property>
 	</bean>
 
-	<job id="updateMessageJob"
+	<bean id="partitioner" scope="step"
+		class="org.ironrhino.sample.batch.MessagePartitioner" />
+
+	<job id="partitionUpdateMessageJob"
 		xmlns="http://www.springframework.org/schema/batch">
 		<validator ref="jobParametersValidator" />
-		<step id="updateMessage">
-			<tasklet task-executor="taskExecutor" throttle-limit="${batch.updateMessage.parallelism:50}">
-				<chunk reader="reader" processor="processor" writer="writer"
-					commit-interval="100" />
-			</tasklet>
+		<step id="updateMessage.manager">
+			<partition step="updateMessage" partitioner="partitioner">
+				<handler grid-size="${batch.updateMessage.partitions:10}" task-executor="taskExecutor" />
+			</partition>
 		</step>
 	</job>
+
+	<step id="updateMessage"
+		xmlns="http://www.springframework.org/schema/batch">
+		<tasklet>
+			<chunk reader="reader" processor="processor" writer="writer"
+				commit-interval="100" />
+		</tasklet>
+	</step>
 
 </beans>
