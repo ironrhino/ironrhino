@@ -18,7 +18,7 @@
 		class="org.springframework.batch.item.database.JdbcCursorItemReader">
 		<property name="dataSource" ref="dataSource" />
 		<property name="sql"
-			value="select * from sample_message where date(createDate)=? and id%${batch.updateMessage.partitions:10}=?" />
+			value="select * from sample_message where (createDate between ? and ?) and id%${batch.updateMessage.partitions:10}=?" />
 		<property name="rowMapper">
 			<bean
 				class="org.springframework.jdbc.core.BeanPropertyRowMapper"
@@ -29,7 +29,8 @@
 				class="org.springframework.jdbc.core.ArgumentPreparedStatementSetter">
 				<constructor-arg>
 					<array>
-						<value>#{jobParameters[createDate]}</value>
+						<value>#{T(org.ironrhino.core.util.DateUtils).beginOfDay(jobParameters[createDate])}</value>
+						<value>#{T(org.ironrhino.core.util.DateUtils).endOfDay(jobParameters[createDate])}</value>
 						<value>#{stepExecutionContext[mod]}</value>
 					</array>
 				</constructor-arg>
@@ -68,7 +69,8 @@
 		<validator ref="jobParametersValidator" />
 		<step id="updateMessage.manager">
 			<partition step="updateMessage" partitioner="partitioner">
-				<handler grid-size="${batch.updateMessage.partitions:10}" task-executor="taskExecutor" />
+				<handler grid-size="${batch.updateMessage.partitions:10}"
+					task-executor="taskExecutor" />
 			</partition>
 		</step>
 	</job>
