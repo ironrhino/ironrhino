@@ -62,8 +62,7 @@ public class ExpressionUtilsTest {
 		result = ExpressionUtils.eval("${!bool}12", context);
 		assertThat(result, equalTo("false12"));
 	}
-	
-	
+
 	@Test
 	public void testEvalHashtag() {
 		Map<String, Object> context = new HashMap<>();
@@ -83,7 +82,6 @@ public class ExpressionUtilsTest {
 		result = ExpressionUtils.eval("#{!bool}12", context);
 		assertThat(result, equalTo("false12"));
 	}
-
 
 	@Test
 	public void testEvalString() {
@@ -149,9 +147,14 @@ public class ExpressionUtilsTest {
 	public void testEvalList() {
 		Map<String, Object> context = new HashMap<>();
 		context.put("string", "STRING");
-		List<String> result = ExpressionUtils.evalList("${[string]}", context);
-		assertThat(result.size(), equalTo(1));
+		List<String> result = ExpressionUtils.evalList("${[string,'STRING2']}", context);
+		assertThat(result.size(), equalTo(2));
 		assertThat(result.get(0), equalTo("STRING"));
+		assertThat(result.get(1), equalTo("STRING2"));
+		result = ExpressionUtils.evalList("${import java.util.Arrays;['STRING2']+Arrays.asList(string)}", context);
+		assertThat(result.size(), equalTo(2));
+		assertThat(result.get(0), equalTo("STRING2"));
+		assertThat(result.get(1), equalTo("STRING"));
 		result = ExpressionUtils.evalList("${string}", context);
 		assertThat(result.size(), equalTo(1));
 		assertThat(result.get(0), equalTo("STRING"));
