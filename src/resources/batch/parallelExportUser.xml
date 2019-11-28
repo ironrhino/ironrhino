@@ -24,13 +24,16 @@
 				<property name="selectClause" value="select *" />
 				<property name="fromClause" value="from user" />
 				<property name="whereClause"
-					value="where date(createDate)=:workdate" />
+					value="where createDate between :beginDate and :endDate" />
 				<property name="sortKey" value="username" />
 			</bean>
 		</property>
 		<property name="parameterValues">
 			<map>
-				<entry key="workdate" value="#{jobParameters['workdate']}" />
+				<entry key="beginDate"
+					value="#{T(org.ironrhino.core.util.DateUtils).beginOfDay(jobParameters[workdate])}" />
+				<entry key="endDate"
+					value="#{T(org.ironrhino.core.util.DateUtils).endOfDay(jobParameters[workdate])}" />
 			</map>
 		</property>
 		<property name="pageSize" value="2" />
