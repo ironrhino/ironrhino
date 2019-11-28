@@ -28,7 +28,7 @@
 		</property>
 	</bean>
 	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry"/>
-	<bean class="org.springframework.batch.core.configuration.support.AutomaticJobRegistrar">
+	<bean id="automaticJobRegistrar" class="org.springframework.batch.core.configuration.support.AutomaticJobRegistrar">
 		<property name="applicationContextFactories">
 			<bean class="org.springframework.batch.core.configuration.support.ClasspathXmlApplicationContextsFactoryBean">
 				<property name="resources" value="${jobRegistrar.resources:classpath*:resources/batch/*.xml}" />
