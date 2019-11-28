@@ -24,13 +24,16 @@
 				<property name="selectClause" value="select *" />
 				<property name="fromClause" value="from sample_message" />
 				<property name="whereClause"
-					value="where date(createDate)=:createDate" />
+					value="where createDate between :beginDate and :endDate" />
 				<property name="sortKey" value="id" />
 			</bean>
 		</property>
 		<property name="parameterValues">
 			<map>
-				<entry key="createDate" value="#{jobParameters['createDate']}" />
+				<entry key="beginDate"
+					value="#{T(org.ironrhino.core.util.DateUtils).beginOfDay(jobParameters[createDate])}" />
+				<entry key="endDate"
+					value="#{T(org.ironrhino.core.util.DateUtils).endOfDay(jobParameters[createDate])}" />
 			</map>
 		</property>
 		<property name="pageSize" value="100" />
@@ -69,7 +72,8 @@
 		xmlns="http://www.springframework.org/schema/batch">
 		<validator ref="jobParametersValidator" />
 		<step id="updateMessage">
-			<tasklet task-executor="taskExecutor" throttle-limit="${batch.updateMessage.parallelism:50}">
+			<tasklet task-executor="taskExecutor"
+				throttle-limit="${batch.updateMessage.parallelism:50}">
 				<chunk reader="reader" processor="processor" writer="writer"
 					commit-interval="100" />
 			</tasklet>
