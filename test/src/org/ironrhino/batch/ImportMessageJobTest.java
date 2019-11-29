@@ -46,8 +46,8 @@ public class ImportMessageJobTest {
 		JobExecution jobExecution = jobLauncherTestUtils.launchJob(
 				new JobParametersBuilder().addDate("createDate", createDate).addLong("count", count).toJobParameters());
 		assertThat(jobExecution.getExitStatus().getExitCode(), is("COMPLETED"));
-		long actualCount = jdbcTemplate.queryForObject("select count(*) from sample_message where createDate=?",
-				long.class, createDate);
+		Long actualCount = jdbcTemplate.queryForObject("select count(*) from sample_message where createDate=?",
+				Long.class, createDate);
 		assertThat(actualCount, is(count));
 	}
 

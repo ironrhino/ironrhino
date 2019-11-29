@@ -76,6 +76,7 @@ public class RestApiTests {
 		assertThat(resultPage.getPageSize(), is(1));
 		assertThat(resultPage.getResult().size(), is(1));
 		resultPage = userClient.pagedRestResultWithResponseEntity(1, 1).getBody();
+		assertThat(resultPage, notNullValue());
 		assertThat(resultPage.getPageNo(), is(1));
 		assertThat(resultPage.getPageSize(), is(1));
 		assertThat(resultPage.getResult().size(), is(1));
@@ -169,6 +170,7 @@ public class RestApiTests {
 		assertThat(response.getStatusCode(), is(HttpStatus.OK));
 		assertThat(response.getHeaders().getContentDisposition().getFilename(), containsString(filename));
 		Resource resource = response.getBody();
+		assertThat(resource, notNullValue());
 		assertThat(resource.isReadable(), is(true));
 		assertStreamMatchesContent(resource.getInputStream(), filename);
 

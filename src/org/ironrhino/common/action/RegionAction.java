@@ -41,9 +41,6 @@ public class RegionAction extends EntityAction<Region> {
 	@Getter
 	@Setter
 	private Region region;
-	
-	@Getter
-	protected Region parentEntity;
 
 	@Getter
 	private Collection list;

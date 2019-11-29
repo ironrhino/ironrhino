@@ -175,6 +175,7 @@ public class RestApiTest {
 		assertThat(response.getStatusCode(), is(HttpStatus.OK));
 		assertThat(response.getHeaders().getContentDisposition().getFilename(), containsString(filename));
 		Resource resource = response.getBody();
+		assertThat(resource, notNullValue());
 		assertThat(resource.isReadable(), is(true));
 		assertStreamMatchesContent(resource.getInputStream(), filename);
 

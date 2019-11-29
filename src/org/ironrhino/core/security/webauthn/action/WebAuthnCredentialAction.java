@@ -64,7 +64,7 @@ public class WebAuthnCredentialAction extends EntityAction<WebAuthnCredential> {
 		BeanWrapperImpl bw = new BeanWrapperImpl(user);
 		String id;
 		try {
-			id = bw.getPropertyValue("id").toString();
+			id = String.valueOf(bw.getPropertyValue("id"));
 		} catch (NotReadablePropertyException e) {
 			id = user.getUsername();
 		}
