@@ -42,8 +42,8 @@ public abstract class UpdateMessageJobTestBase {
 
 	@Test
 	public void test() throws Exception {
-		long actualCount = jdbcTemplate.queryForObject("select count(*) from sample_message where createDate=?",
-				long.class, createDate);
+		Long actualCount = jdbcTemplate.queryForObject("select count(*) from sample_message where createDate=?",
+				Long.class, createDate);
 		assertThat(actualCount, is(count));
 		JobExecution jobExecution = jobLauncherTestUtils
 				.launchJob(new JobParametersBuilder().addDate("createDate", createDate).toJobParameters());

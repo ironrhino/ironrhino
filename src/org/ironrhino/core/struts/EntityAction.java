@@ -133,7 +133,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	protected Long parent;
 
 	@Getter
-	protected BaseTreeableEntity parentEntity;
+	protected EN parentEntity;
 
 	@Autowired
 	protected SessionFactory sessionFactory;
@@ -460,7 +460,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				else
 					dc.add(Restrictions.isNull("parent"));
 			} else {
-				parentEntity = (BaseTreeableEntity) entityManager.get(parent);
+				parentEntity = (EN) entityManager.get(parent);
 				String alias = criteriaState.getAliases().get("parent");
 				if (alias == null) {
 					alias = "parent_";
