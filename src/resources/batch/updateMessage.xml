@@ -16,6 +16,7 @@
 
 	<bean id="reader" scope="step"
 		class="org.springframework.batch.item.database.JdbcPagingItemReader">
+		<property name="saveState" value="false" />
 		<property name="dataSource" ref="dataSource" />
 		<property name="queryProvider">
 			<bean
