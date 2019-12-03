@@ -32,7 +32,6 @@ import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AccountExpiredException;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.DisabledException;
@@ -44,7 +43,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
@@ -86,12 +84,6 @@ public class LoginAction extends BaseAction {
 
 	@Autowired
 	protected DefaultUsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter;
-
-	@Autowired
-	private AuthenticationManager authenticationManager;
-
-	@Autowired
-	private WebAuthenticationDetailsSource authenticationDetailsSource;
 
 	@Autowired
 	protected SessionAuthenticationStrategy sessionAuthenticationStrategy;

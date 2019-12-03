@@ -27,15 +27,21 @@ import org.ironrhino.core.security.dynauth.DynamicAuthorizerManager;
 import org.ironrhino.core.security.verfication.ReceiverNotFoundException;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.CodecUtils;
+import org.ironrhino.core.util.ExceptionUtils;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AccountExpiredException;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.LockedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
@@ -107,6 +113,12 @@ public class BaseAction extends ActionSupport {
 
 	@Autowired(required = false)
 	protected DynamicAuthorizerManager dynamicAuthorizerManager;
+
+	@Autowired(required = false)
+	protected AuthenticationManager authenticationManager;
+
+	@Autowired(required = false)
+	protected WebAuthenticationDetailsSource authenticationDetailsSource;
 
 	@Getter
 	private String actionWarning;
@@ -331,6 +343,9 @@ public class BaseAction extends ActionSupport {
 	private void validateDoubleCheck(HttpServletRequest request, HttpServletResponse response) {
 		DoubleChecker doubleCheck = findDoubleChecker();
 		if (doubleCheck != null) {
+			if (authenticationManager == null) {
+				throw new UnsupportedOperationException("AuthenticationManager is required");
+			}
 			String username = request.getParameter(DoubleChecker.PARAMETER_NAME_USERNAME);
 			String password = request.getParameter(DoubleChecker.PARAMETER_NAME_PASSWORD);
 			if (username == null) {
@@ -347,18 +362,23 @@ public class BaseAction extends ActionSupport {
 				return;
 			}
 			try {
-				UserDetails doubleChecker = AuthzUtils.getUserDetails(username, password);
-				if (!AuthzUtils.authorizeUserDetails(doubleChecker, null, doubleCheck.value(), null)) {
+				UsernamePasswordAuthenticationToken attempt = new UsernamePasswordAuthenticationToken(username,
+						password);
+				attempt.setDetails(authenticationDetailsSource.buildDetails(request));
+				Authentication authResult = authenticationManager.authenticate(attempt);
+				if (!AuthzUtils.authorizeUserDetails((UserDetails) authResult.getPrincipal(), null, doubleCheck.value(),
+						null)) {
 					addFieldError(DoubleChecker.PARAMETER_NAME_USERNAME, getText("access.denied"));
 					return;
 				}
-				AuthzUtils.DOUBLE_CHCKER_HOLDER.set(doubleChecker);
-			} catch (BadCredentialsException e) {
-				addFieldError(DoubleChecker.PARAMETER_NAME_PASSWORD, getText(e.getClass().getName()));
-				return;
+			} catch (InternalAuthenticationServiceException failed) {
+				log.error(failed.getMessage(), failed);
+				addActionError(ExceptionUtils.getRootMessage(failed));
 			} catch (UsernameNotFoundException | DisabledException | LockedException | AccountExpiredException
 					| ReceiverNotFoundException failed) {
 				addFieldError(DoubleChecker.PARAMETER_NAME_USERNAME, getText(failed.getClass().getName()));
+			} catch (BadCredentialsException failed) {
+				addFieldError(DoubleChecker.PARAMETER_NAME_PASSWORD, getText(failed.getClass().getName()));
 			}
 		}
 	}
