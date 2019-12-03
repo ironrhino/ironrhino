@@ -24,23 +24,20 @@ import org.ironrhino.core.security.captcha.CaptchaManager;
 import org.ironrhino.core.security.captcha.CaptchaStatus;
 import org.ironrhino.core.security.dynauth.DynamicAuthorizer;
 import org.ironrhino.core.security.dynauth.DynamicAuthorizerManager;
-import org.ironrhino.core.security.verfication.ReceiverNotFoundException;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.ExceptionUtils;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
-import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 
 import com.opensymphony.xwork2.ActionContext;
@@ -374,11 +371,10 @@ public class BaseAction extends ActionSupport {
 			} catch (InternalAuthenticationServiceException failed) {
 				log.error(failed.getMessage(), failed);
 				addActionError(ExceptionUtils.getRootMessage(failed));
-			} catch (UsernameNotFoundException | DisabledException | LockedException | AccountExpiredException
-					| ReceiverNotFoundException failed) {
-				addFieldError(DoubleChecker.PARAMETER_NAME_USERNAME, getText(failed.getClass().getName()));
-			} catch (BadCredentialsException failed) {
+			} catch (BadCredentialsException | CredentialsExpiredException failed) {
 				addFieldError(DoubleChecker.PARAMETER_NAME_PASSWORD, getText(failed.getClass().getName()));
+			} catch (AuthenticationException failed) {
+				addFieldError(DoubleChecker.PARAMETER_NAME_USERNAME, getText(failed.getClass().getName()));
 			}
 		}
 	}
