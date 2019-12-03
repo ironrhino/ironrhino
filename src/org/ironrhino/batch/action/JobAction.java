@@ -47,6 +47,7 @@ public class JobAction extends BaseAction {
 	private static final long serialVersionUID = 3379095323379034989L;
 
 	@Autowired
+	@Getter
 	private JobRegistry jobRegistry;
 
 	@Autowired
@@ -253,7 +254,8 @@ public class JobAction extends BaseAction {
 	public String restart() throws Exception {
 		Long executionId = Long.valueOf(getUid());
 		jobOperator.restart(executionId);
-		return abandon();
+		notify("operate.success");
+		return SUCCESS;
 	}
 
 	public String abandon() throws Exception {
