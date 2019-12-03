@@ -7,7 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.model.Secured;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.servlet.RequestContext;
-import org.ironrhino.core.spring.security.DefaultDaoAuthenticationProvider;
 import org.slf4j.MDC;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
@@ -17,7 +16,6 @@ import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.TestingAuthenticationToken;
@@ -27,7 +25,6 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.IpAddressMatcher;
 
@@ -243,23 +240,6 @@ public class AuthzUtils {
 	public static boolean isPasswordValid(String password) {
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return principal instanceof UserDetails && isPasswordValid((UserDetails) principal, password);
-	}
-
-	public static UserDetails getUserDetails(String username, String password) {
-		UserDetailsService uds = ApplicationContextUtils.getBean(UserDetailsService.class);
-		if (uds == null)
-			return null;
-		UserDetails ud = uds.loadUserByUsername(username);
-		DefaultDaoAuthenticationProvider ddap = ApplicationContextUtils.getBean(DefaultDaoAuthenticationProvider.class);
-		if (ddap != null) {
-			ddap.getPreAuthenticationChecks().check(ud);
-		}
-		if (!isPasswordValid(ud, password))
-			throw new BadCredentialsException(username);
-		if (ddap != null) {
-			ddap.getPostAuthenticationChecks().check(ud);
-		}
-		return ud;
 	}
 
 	@SuppressWarnings("unchecked")
