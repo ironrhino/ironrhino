@@ -130,7 +130,7 @@ public class OAuth2Controller {
 			result.put("expires_in", authorization.getExpiresIn());
 			eventPublisher.publish(new AuthorizeEvent(authorization.getGrantor(), request.getRemoteAddr(),
 					client.getName(), grant_type.name()), Scope.LOCAL);
-		} else if (grant_type == GrantType.client_credential || grant_type == GrantType.client_credentials) {
+		} else if (grant_type == GrantType.client_credentials) {
 			client = new Client();
 			client.setId(client_id);
 			client.setSecret(client_secret);

@@ -162,8 +162,7 @@ public class OAuthHandler extends AccessHandler {
 		}
 
 		UserDetails ud = null;
-		if (authorization.getGrantType() == GrantType.client_credential
-				|| authorization.getGrantType() == GrantType.client_credentials) {
+		if (authorization.getGrantType() == GrantType.client_credentials) {
 			try {
 				ud = userDetailsService.loadUserByUsername(authorization.getClientOwner());
 			} catch (UsernameNotFoundException unf) {
