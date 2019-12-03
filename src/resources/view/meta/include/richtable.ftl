@@ -59,9 +59,9 @@
 	<#if config['readonlyExpression']?has_content && config['readonlyExpression']?eval>
 		<#local dynamicAttributes+={'data-readonly':'true'}/>
 	</#if>
-	<@rttbodytd entity=entity value=value celleditable=celleditable&&config['cellEdit']?? template=config['template']! cellDynamicAttributes=config['dynamicAttributes'] dynamicAttributes=dynamicAttributes/>
+	<@rttbodytd entity=entity entity_index=entity?index value=value celleditable=celleditable&&config['cellEdit']?? template=config['template']! cellDynamicAttributes=config['dynamicAttributes'] dynamicAttributes=dynamicAttributes/>
 </#list>
-<@rttbodytrend entity=entity showActionColumn=showActionColumn buttons=actionColumnButtons editable=!readonly viewable=viewable entityReadonly=entityReadonly/>
+<@rttbodytrend entity=entity entity_index=entity?index showActionColumn=showActionColumn buttons=actionColumnButtons editable=!readonly viewable=viewable entityReadonly=entityReadonly/>
 </#list>
 <@rtend columns=columns?keys sumColumns=sumColumns showCheckColumn=showCheckColumn showActionColumn=showActionColumn showBottomButtons=showBottomButtons buttons=bottomButtons readonly=readonly creatable=creatable celleditable=celleditable deletable=deletable enableable=enableable searchable=searchable filterable=filterable downloadable=downloadable searchButtons=searchButtons showPageSize=showPageSize formFooter=formFooter/>
 </#macro>
@@ -133,7 +133,7 @@ ${formHeader!}
 <#if showCheckColumn><td class="<#if multipleCheck>checkbox<#else>radio</#if>"><input type="<#if multipleCheck>checkbox<#else>radio</#if>"<#if id?has_content> value="${id}"</#if>/></td></#if>
 </#macro>
 
-<#macro rttbodytd value,entity,celleditable=true,template='',cellDynamicAttributes='',dynamicAttributes...>
+<#macro rttbodytd value,entity,entity_index,celleditable=true,template='',cellDynamicAttributes='',dynamicAttributes...>
 <#if cellDynamicAttributes?is_string>
 	<#local _cellDynamicAttributes={}>
 	<#if cellDynamicAttributes?has_content>
@@ -170,7 +170,7 @@ ${formHeader!}
 </td>
 </#macro>
 
-<#macro rttbodytrend entity showActionColumn=true buttons='' editable=true viewable=false entityReadonly=false inputWindowOptions='' viewWindowOptions=''>
+<#macro rttbodytrend entity entity_index showActionColumn=true buttons='' editable=true viewable=false entityReadonly=false inputWindowOptions='' viewWindowOptions=''>
 <#if showActionColumn>
 <td class="action">
 <#if buttons?has_content>
