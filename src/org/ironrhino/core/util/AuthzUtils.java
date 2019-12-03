@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.model.Secured;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.servlet.RequestContext;
+import org.ironrhino.core.spring.security.DefaultDaoAuthenticationProvider;
 import org.slf4j.MDC;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
@@ -249,8 +250,15 @@ public class AuthzUtils {
 		if (uds == null)
 			return null;
 		UserDetails ud = uds.loadUserByUsername(username);
+		DefaultDaoAuthenticationProvider ddap = ApplicationContextUtils.getBean(DefaultDaoAuthenticationProvider.class);
+		if (ddap != null) {
+			ddap.getPreAuthenticationChecks().check(ud);
+		}
 		if (!isPasswordValid(ud, password))
 			throw new BadCredentialsException(username);
+		if (ddap != null) {
+			ddap.getPostAuthenticationChecks().check(ud);
+		}
 		return ud;
 	}
 

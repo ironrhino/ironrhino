@@ -24,12 +24,16 @@ import org.ironrhino.core.security.captcha.CaptchaManager;
 import org.ironrhino.core.security.captcha.CaptchaStatus;
 import org.ironrhino.core.security.dynauth.DynamicAuthorizer;
 import org.ironrhino.core.security.dynauth.DynamicAuthorizerManager;
+import org.ironrhino.core.security.verfication.ReceiverNotFoundException;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -349,12 +353,12 @@ public class BaseAction extends ActionSupport {
 					return;
 				}
 				AuthzUtils.DOUBLE_CHCKER_HOLDER.set(doubleChecker);
-			} catch (UsernameNotFoundException e) {
-				addFieldError(DoubleChecker.PARAMETER_NAME_USERNAME, getText(e.getClass().getName()));
-				return;
 			} catch (BadCredentialsException e) {
 				addFieldError(DoubleChecker.PARAMETER_NAME_PASSWORD, getText(e.getClass().getName()));
 				return;
+			} catch (UsernameNotFoundException | DisabledException | LockedException | AccountExpiredException
+					| ReceiverNotFoundException failed) {
+				addFieldError(DoubleChecker.PARAMETER_NAME_USERNAME, getText(failed.getClass().getName()));
 			}
 		}
 	}
