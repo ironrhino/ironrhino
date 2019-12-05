@@ -3,6 +3,7 @@
 		var username = $('#login [name="username"]');
 		if (username.hasClass('webAuthn') && navigator.credentials) {
 			var password = $('#login [name="password"]');
+			var verificationCode = $('#login [name="verificationCode"]');
 			username.wrap('<div class="input-append"></div>').after('<span class="add-on clickable" title="U-Key"><i class="glyphicon glyphicon-log-in"></i></span></div>').next().click(function(e) {
 				ajax({
 					url: '/webAuthnOptions',
@@ -25,13 +26,16 @@
 							if (userHandle)
 								data.userHandle = _btoa(userHandle);
 							password.removeClass('sha').val(JSON.stringify(data));
+							verificationCode.removeClass('required');
 							var form = $(e.target).closest('form');
 							form[0].onerror = function() {
 								password.addClass('sha').val('');
+								verificationCode.addClass('required');
 							};
 							form.submit();
 						}).catch(function(error) {
 							password.addClass('sha').val('');
+							verificationCode.addClass('required');
 							Message.showActionError(error.message);
 						});
 					}
