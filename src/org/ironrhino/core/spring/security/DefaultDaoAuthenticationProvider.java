@@ -23,7 +23,8 @@ public class DefaultDaoAuthenticationProvider extends DaoAuthenticationProvider 
 	@Autowired(required = false)
 	private List<VerificationCodeChecker> verificationCodeCheckers = Collections.emptyList();
 
-	public DefaultDaoAuthenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder, UserDetailsPasswordService userDetailsPasswordService) {
+	public DefaultDaoAuthenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder,
+			UserDetailsPasswordService userDetailsPasswordService) {
 		setUserDetailsService(userDetailsService);
 		setPasswordEncoder(passwordEncoder);
 		setUserDetailsPasswordService(userDetailsPasswordService);
@@ -46,15 +47,17 @@ public class DefaultDaoAuthenticationProvider extends DaoAuthenticationProvider 
 		boolean skipPasswordCheck = false;
 		AuthenticationException ex = null;
 		for (VerificationCodeChecker checker : verificationCodeCheckers) {
-			try {
-				checker.verify(userDetails, authentication, verificationCode);
-				if (checker.skipPasswordCheck(userDetails))
-					skipPasswordCheck = true;
-				ex = null;
-				break;
-			} catch (AuthenticationException e) {
-				ex = e;
-				continue;
+			if (!checker.skip(userDetails)) {
+				try {
+					checker.verify(userDetails, authentication, verificationCode);
+					if (checker.skipPasswordCheck(userDetails))
+						skipPasswordCheck = true;
+					ex = null;
+					break;
+				} catch (AuthenticationException e) {
+					ex = e;
+					continue;
+				}
 			}
 		}
 		if (ex != null)

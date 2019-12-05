@@ -9,6 +9,7 @@ import org.ironrhino.core.security.verfication.VerificationCodeEnabled;
 import org.ironrhino.core.security.verfication.VerificationCodeGenerator;
 import org.ironrhino.core.security.verfication.VerificationCodeNotifier;
 import org.ironrhino.core.security.verfication.VerificationService;
+import org.ironrhino.core.spring.security.VerificationCodeRequirementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -34,12 +35,8 @@ public class DefaultVerificationService implements VerificationService {
 	@Autowired
 	private VerificationCodeNotifier verificationCodeNotifier;
 
-	@Value("${verification.code.length:6}")
-	private int length = 6;
-
-	@Getter
-	@Value("${verification.code.resend.interval:60}")
-	private int resendInterval = 60;
+	@Autowired
+	VerificationCodeRequirementService verificationCodeRequirementService;
 
 	@Value("${verification.code.verify.interval:5}")
 	private int verifyInterval = 5;
@@ -68,11 +65,14 @@ public class DefaultVerificationService implements VerificationService {
 			cacheManager.put(receiver, codeToSend, expiry, TimeUnit.SECONDS, CACHE_NAMESPACE);
 		}
 		if (codeToSend == null || !reuse) {
-			codeToSend = verficationCodeGenerator.generator(receiver, length);
+			codeToSend = verficationCodeGenerator.generator(receiver,
+					verificationCodeRequirementService.getLength());
 			cacheManager.put(receiver, codeToSend, expiry, TimeUnit.SECONDS, CACHE_NAMESPACE);
 		}
 		verificationCodeNotifier.send(receiver, codeToSend);
-		cacheManager.put(receiver + SUFFIX_RESEND, "", resendInterval, TimeUnit.SECONDS, CACHE_NAMESPACE);
+		cacheManager.put(receiver + SUFFIX_RESEND, "",
+				verificationCodeRequirementService.getResendInterval(), TimeUnit.SECONDS,
+				CACHE_NAMESPACE);
 	}
 
 	@Override
