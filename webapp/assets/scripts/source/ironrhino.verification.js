@@ -58,7 +58,7 @@
 			var userparam = btn.data('username') || 'username';
 			var userinput = f.find('[name="' + userparam + '"]');
 			var data = {};
-			data[userparam] = userinput.val();
+			data['username'] = userinput.val();
 			if (Form.validate(userinput)) {
 				var url = btn.data('url');
 				if (!url) {
