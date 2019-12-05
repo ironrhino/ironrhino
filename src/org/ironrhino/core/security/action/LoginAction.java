@@ -15,6 +15,7 @@ import org.apache.struts2.ServletActionContext;
 import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Captcha;
+import org.ironrhino.core.metadata.JsonConfig;
 import org.ironrhino.core.metadata.Redirect;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.model.Persistable;
@@ -24,6 +25,8 @@ import org.ironrhino.core.security.verfication.VerificationManager;
 import org.ironrhino.core.spring.security.DefaultAuthenticationSuccessHandler;
 import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationFilter;
 import org.ironrhino.core.spring.security.SpringSecurityEnabled;
+import org.ironrhino.core.spring.security.VerificationCodeRequirement;
+import org.ironrhino.core.spring.security.VerificationCodeRequirementService;
 import org.ironrhino.core.spring.security.WrongVerificationCodeException;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
@@ -73,6 +76,9 @@ public class LoginAction extends BaseAction {
 	@NotBlank
 	protected String username;
 
+	@Getter
+	protected VerificationCodeRequirement verificationCodeRequirement;
+
 	@Value("${" + KEY_LOGIN_DEFAULT_TARGET_URL + ":" + DEFAULT_VALUE_LOGIN_DEFAULT_TARGET_URL + "}")
 	protected String defaultTargetUrl;
 
@@ -94,6 +100,9 @@ public class LoginAction extends BaseAction {
 	@Autowired(required = false)
 	@Getter
 	protected VerificationManager verificationManager;
+
+	@Autowired
+	protected VerificationCodeRequirementService verificationCodeRequirementService;
 
 	@Override
 	@Valid
@@ -196,6 +205,14 @@ public class LoginAction extends BaseAction {
 				addFieldError("username", getText(e.getClass().getName()));
 			}
 		}
+		return JSON;
+	}
+
+	@JsonConfig(root = "verificationCodeRequirement")
+	public String verificationCodeRequirement() {
+		if (StringUtils.isBlank(username))
+			username = AuthzUtils.getUsername();
+		verificationCodeRequirement = verificationCodeRequirementService.getVerificationRequirement(username);
 		return JSON;
 	}
 

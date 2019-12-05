@@ -24,6 +24,7 @@ import org.ironrhino.core.security.captcha.CaptchaManager;
 import org.ironrhino.core.security.captcha.CaptchaStatus;
 import org.ironrhino.core.security.dynauth.DynamicAuthorizer;
 import org.ironrhino.core.security.dynauth.DynamicAuthorizerManager;
+import org.ironrhino.core.spring.security.WrongVerificationCodeException;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.ExceptionUtils;
@@ -373,6 +374,8 @@ public class BaseAction extends ActionSupport {
 				addActionError(ExceptionUtils.getRootMessage(failed));
 			} catch (BadCredentialsException | CredentialsExpiredException failed) {
 				addFieldError(DoubleChecker.PARAMETER_NAME_PASSWORD, getText(failed.getClass().getName()));
+			} catch (WrongVerificationCodeException failed) {
+				addFieldError("verificationCode", getText(failed.getClass().getName()));
 			} catch (AuthenticationException failed) {
 				addFieldError(DoubleChecker.PARAMETER_NAME_USERNAME, getText(failed.getClass().getName()));
 			}
