@@ -21,21 +21,40 @@ public class DefaultVerificationCodeChecker implements VerificationCodeChecker {
 	private boolean verificationCodeQualified = true;
 
 	@Override
+	public boolean skip(String username) {
+		return !verificationManager.isVerificationRequired(username);
+	}
+
+	@Override
+	public boolean skip(UserDetails userDetails) {
+		return !verificationManager.isVerificationRequired(userDetails);
+	}
+
+	@Override
+	public boolean skipSend() {
+		return false;
+	}
+
+	@Override
 	public void verify(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication,
 			String verificationCode) {
-		if (verificationManager.isVerificationRequired(userDetails)) {
-			if (verificationCode == null && skipPasswordCheck(userDetails))
-				// use password parameter instead for exchange access token
-				verificationCode = String.valueOf(authentication.getCredentials());
-			if (!verificationManager.verify(userDetails, verificationCode))
-				throw new WrongVerificationCodeException("Wrong verification code: " + verificationCode);
-		}
+		if (verificationCode == null && skipPasswordCheck(userDetails))
+			// use password parameter instead for exchange access token
+			verificationCode = String.valueOf(authentication.getCredentials());
+		if (!verificationManager.verify(userDetails, verificationCode))
+			throw new WrongVerificationCodeException("Wrong verification code: " + verificationCode);
 	}
 
 	@Override
 	public boolean skipPasswordCheck(UserDetails userDetails) {
 		return verificationCodeQualified && verificationManager.isVerificationRequired(userDetails)
 				&& !verificationManager.isPasswordRequired(userDetails);
+	}
+
+	@Override
+	public boolean skipPasswordCheck(String username) {
+		return verificationCodeQualified && verificationManager.isVerificationRequired(username)
+				&& !verificationManager.isPasswordRequired(username);
 	}
 
 }

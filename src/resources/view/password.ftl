@@ -11,12 +11,7 @@
 ${getText('org.springframework.security.authentication.CredentialsExpiredException')}
 </div>
 </#if>
-<#assign verificationCodeEnabled = (properties['verification.code.enabled']!)=='true'>
-<#assign verificationCodeRequired = false>
-<#if verificationCodeEnabled>
-	<#assign verificationCodeRequired = verificationManager.isVerificationRequired(authentication('name'))>
-</#if>
-<#assign totpEnabled = (properties['totp.enabled']!)=='true'>
+<#assign verificationCodeRequirement = beans['verificationCodeRequirementService'].getVerificationRequirement(authentication('name'))!>
 <@s.form action=request.requestURI+request.queryString???then('?'+request.queryString,'') method="post" class="form-horizontal ajax focus reset">
 	<#if userCurrentPasswordNeeded!true>
 	<#assign userProfileReadonly=userProfileReadonly!false>
@@ -24,9 +19,9 @@ ${getText('org.springframework.security.authentication.CredentialsExpiredExcepti
 	</#if>
 	<@s.password name="password" class="required input-pattern" readonly=userProfileReadonly/>
 	<@s.password name="confirmPassword" class="required repeat input-pattern submit" data\-repeatwith="password" readonly=userProfileReadonly/>
-	<#if verificationCodeRequired || totpEnabled>
+	<#if (verificationCodeRequirement.required)!false>
 	<@s.textfield name="verificationCode" class="required input-small" maxlength="${properties['verification.code.length']!'6'}">
-		<#if verificationCodeRequired>
+		<#if verificationCodeRequirement.sendingRequired>
 		<@s.param name="after"> <button type="button" class="btn input-mini sendVerificationCode" data-url="<@url value='/login/sendVerificationCode'/>" data-interval="${properties['verification.code.resend.interval']!'60'}">${getText('send')}</button></@s.param>
 		</#if>
 	</@s.textfield>

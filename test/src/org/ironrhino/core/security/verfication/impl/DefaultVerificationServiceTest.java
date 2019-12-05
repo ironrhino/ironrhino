@@ -18,6 +18,7 @@ import org.ironrhino.core.security.verfication.VerificationCodeGenerator;
 import org.ironrhino.core.security.verfication.VerificationCodeNotifier;
 import org.ironrhino.core.security.verfication.VerificationService;
 import org.ironrhino.core.security.verfication.impl.DefaultVerificationServiceTest.VerificationConfig;
+import org.ironrhino.core.spring.security.VerificationCodeRequirementService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,8 @@ public class DefaultVerificationServiceTest {
 	private DefaultVerificationService verificationService;
 	@Autowired
 	private VerificationCodeNotifier verificationCodeNotifier;
+	@Autowired
+	private VerificationCodeRequirementService verificationCodeRequirementService;
 
 	@Test
 	public void testSend() {
@@ -54,7 +57,7 @@ public class DefaultVerificationServiceTest {
 	@Test
 	public void testResendOverResendInterval() throws InterruptedException {
 		verificationService.send("testResend2");
-		TimeUnit.MILLISECONDS.sleep(verificationService.getResendInterval() * 1000 + 100);
+		TimeUnit.MILLISECONDS.sleep(verificationCodeRequirementService.getResendInterval() * 1000 + 100);
 		verificationService.send("testResend2");
 		then(verificationCodeNotifier).should(times(2)).send(eq("testResend2"), eq("testResend2"));
 	}
@@ -104,6 +107,11 @@ public class DefaultVerificationServiceTest {
 		@Bean
 		public VerificationCodeNotifier verificationCodeNotifier() {
 			return mock(VerificationCodeNotifier.class);
+		}
+		
+		@Bean
+		public VerificationCodeRequirementService verificationCodeRequirementService() {
+			return new VerificationCodeRequirementService();
 		}
 	}
 }

@@ -21,8 +21,10 @@ import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.freemarker.FreemarkerConfigurer;
 import org.ironrhino.core.security.action.LoginActionTest.LoginActionConfig;
 import org.ironrhino.core.security.verfication.VerificationManager;
+import org.ironrhino.core.security.verfication.impl.DefaultVerificationCodeChecker;
 import org.ironrhino.core.spring.configuration.CommonConfiguration;
 import org.ironrhino.core.spring.security.DefaultUsernamePasswordAuthenticationFilter;
+import org.ironrhino.core.spring.security.VerificationCodeRequirementService;
 import org.ironrhino.core.spring.security.WrongVerificationCodeException;
 import org.ironrhino.core.util.JsonUtils;
 import org.jsoup.Jsoup;
@@ -122,7 +124,7 @@ public class LoginActionTest extends StrutsSpringJUnit4TestCase<LoginAction> {
 		assertThat(usernameInput.tagName(), is("input"));
 		assertThat(usernameInput.attr("value"), is("test"));
 
-		if (!verificationCodeEnabled || passwordRequired) {
+		if (!verificationCodeEnabled || passwordRequired || !passwordRequired && !verificationCodeRequired) {
 			Element passwordInput = loginForm.getElementById("login-password");
 			assertThat(passwordInput, is(notNullValue()));
 			assertThat(passwordInput.attr("name"), is("password"));
@@ -310,6 +312,16 @@ public class LoginActionTest extends StrutsSpringJUnit4TestCase<LoginAction> {
 		@Bean
 		public VerificationManager verificationManager() {
 			return mock(VerificationManager.class);
+		}
+
+		@Bean
+		public DefaultVerificationCodeChecker verificationCodeChecker() {
+			return new DefaultVerificationCodeChecker();
+		}
+
+		@Bean
+		public VerificationCodeRequirementService verificationCodeRequirementService() {
+			return new VerificationCodeRequirementService();
 		}
 	}
 }

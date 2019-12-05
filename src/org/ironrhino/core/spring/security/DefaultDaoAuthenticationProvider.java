@@ -44,15 +44,17 @@ public class DefaultDaoAuthenticationProvider extends DaoAuthenticationProvider 
 		boolean skipPasswordCheck = false;
 		AuthenticationException ex = null;
 		for (VerificationCodeChecker checker : verificationCodeCheckers) {
-			try {
-				checker.verify(userDetails, authentication, verificationCode);
-				if (checker.skipPasswordCheck(userDetails))
-					skipPasswordCheck = true;
-				ex = null;
-				break;
-			} catch (AuthenticationException e) {
-				ex = e;
-				continue;
+			if (!checker.skip(userDetails)) {
+				try {
+					checker.verify(userDetails, authentication, verificationCode);
+					if (checker.skipPasswordCheck(userDetails))
+						skipPasswordCheck = true;
+					ex = null;
+					break;
+				} catch (AuthenticationException e) {
+					ex = e;
+					continue;
+				}
 			}
 		}
 		if (ex != null)
