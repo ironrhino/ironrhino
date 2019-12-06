@@ -342,6 +342,10 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	@Transactional(readOnly = true)
 	public List<T> findBetweenListByCriteria(DetachedCriteria dc, int start, int end) {
+		if (start < 0)
+			throw new IllegalArgumentException("start should be greater than or equal to 0");
+		if (end <= start)
+			throw new IllegalArgumentException("end should greater than start");
 		Criteria c = dc.getExecutableCriteria(sessionFactory.getCurrentSession());
 		if (!(start == 0 && end == Integer.MAX_VALUE)) {
 			int firstResult = start;
@@ -358,6 +362,10 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	@Transactional(readOnly = true)
 	public List<T> findListByCriteria(DetachedCriteria dc, int pageNo, int pageSize) {
+		if (pageNo <= 0)
+			throw new IllegalArgumentException("pageNo should be greater than 0");
+		if (pageSize <= 0)
+			throw new IllegalArgumentException("pageSize should be greater than 0");
 		return findBetweenListByCriteria(dc, (pageNo - 1) * pageSize, pageNo * pageSize);
 	}
 
