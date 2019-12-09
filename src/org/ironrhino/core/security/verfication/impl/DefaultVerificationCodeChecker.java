@@ -6,12 +6,14 @@ import org.ironrhino.core.spring.security.VerificationCodeChecker;
 import org.ironrhino.core.spring.security.WrongVerificationCodeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @VerificationCodeEnabled
 @Component
+@Order(0)
 public class DefaultVerificationCodeChecker implements VerificationCodeChecker {
 
 	@Autowired

@@ -14,12 +14,15 @@ import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.CodecUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @TotpEnabled
 @Component
+@Order(Ordered.LOWEST_PRECEDENCE)
 public class TotpVerificationCodeChecker implements VerificationCodeChecker {
 
 	@Value("${totp.key:}")
