@@ -37,7 +37,6 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-dataformat-cbor-2.10.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-dataformat-smile-2.10.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-datatype-jsr310-2.10.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-module-jaxb-annotations-2.10.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-module-mrbean-2.10.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-module-parameter-names-2.10.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jaeger-all-1.0.0.jar"/>

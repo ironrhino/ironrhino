@@ -11,6 +11,7 @@ import org.ironrhino.core.model.NullObject;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.jackson2.SimpleGrantedAuthorityMixin;
+import org.springframework.util.ClassUtils;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -98,7 +99,18 @@ public class JsonSerializationUtils {
 							}
 						}))
 				.setAnnotationIntrospector(SmartJacksonAnnotationIntrospector.INSTANCE);
-		objectMapper.findAndRegisterModules();
+		if (ClassUtils.isPresent("com.fasterxml.jackson.datatype.jsr310.JavaTimeModule",
+				JsonUtils.class.getClassLoader())) {
+			objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+		}
+		if (ClassUtils.isPresent("com.fasterxml.jackson.module.paramnames.ParameterNamesModule",
+				JsonUtils.class.getClassLoader())) {
+			objectMapper.registerModule(new com.fasterxml.jackson.module.paramnames.ParameterNamesModule());
+		}
+		if (ClassUtils.isPresent("com.fasterxml.jackson.module.mrbean.MrBeanModule",
+				JsonUtils.class.getClassLoader())) {
+			objectMapper.registerModule(new com.fasterxml.jackson.module.mrbean.MrBeanModule());
+		}
 		return objectMapper;
 	}
 
