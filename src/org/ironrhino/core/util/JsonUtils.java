@@ -8,7 +8,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.ServiceConfigurationError;
 import java.util.TimeZone;
 
 import javax.persistence.Lob;
@@ -16,10 +15,10 @@ import javax.persistence.Lob;
 import org.ironrhino.common.model.Coordinate;
 import org.ironrhino.core.model.Displayable;
 import org.ironrhino.core.util.AppInfo.Stage;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.jackson2.SimpleGrantedAuthorityMixin;
+import org.springframework.util.ClassUtils;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -127,10 +126,17 @@ public class JsonUtils {
 		objectMapper.addMixIn(GrantedAuthority.class, SimpleGrantedAuthorityMixin.class)
 				.addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityMixin.class);
 		objectMapper.registerModule(MODULE_COMMON);
-		try {
-			objectMapper.findAndRegisterModules();
-		} catch (ServiceConfigurationError e) {
-			LoggerFactory.getLogger(JsonUtils.class).error(e.getMessage());
+		if (ClassUtils.isPresent("com.fasterxml.jackson.datatype.jsr310.JavaTimeModule",
+				JsonUtils.class.getClassLoader())) {
+			objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+		}
+		if (ClassUtils.isPresent("com.fasterxml.jackson.module.paramnames.ParameterNamesModule",
+				JsonUtils.class.getClassLoader())) {
+			objectMapper.registerModule(new com.fasterxml.jackson.module.paramnames.ParameterNamesModule());
+		}
+		if (ClassUtils.isPresent("com.fasterxml.jackson.module.mrbean.MrBeanModule",
+				JsonUtils.class.getClassLoader())) {
+			objectMapper.registerModule(new com.fasterxml.jackson.module.mrbean.MrBeanModule());
 		}
 		if (AppInfo.getStage() == Stage.DEVELOPMENT)
 			objectMapper.enable(SerializationFeature.INDENT_OUTPUT);

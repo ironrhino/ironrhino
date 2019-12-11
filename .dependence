@@ -44,7 +44,7 @@
 +jackson-datatype-jsr310
 +jackson-module-parameter-names
 +jackson-module-mrbean
-+jackson-module-jaxb-annotations
+-jackson-module-jaxb-annotations
 +jackson-dataformat-smile
 +resilience4j-all
 -resilience4j-core
