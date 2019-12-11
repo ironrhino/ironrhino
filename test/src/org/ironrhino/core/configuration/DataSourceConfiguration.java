@@ -13,7 +13,7 @@ public class DataSourceConfiguration {
 	@Bean
 	public DataSource dataSource() {
 		HikariDataSource ds = new HikariDataSource();
-		ds.setJdbcUrl("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1");
+		ds.setJdbcUrl("jdbc:h2:mem:test;");
 		ds.setAutoCommit(false);
 		return ds;
 	}
