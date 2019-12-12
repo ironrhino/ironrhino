@@ -35,9 +35,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -57,7 +57,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -252,17 +251,8 @@ public class LoginActionTest extends StrutsSpringJUnit4TestCase<LoginAction> {
 	}
 
 	@Configuration
+	@Import(CommonConfiguration.class)
 	static class LoginActionConfig {
-
-		@Bean
-		public LocalValidatorFactoryBean validatorFactory() {
-			return new CommonConfiguration().validatorFactory();
-		}
-
-		@Bean
-		public MessageSource messageSource() {
-			return new CommonConfiguration().messageSource();
-		}
 
 		@Bean
 		public FreemarkerConfigurer freemarkerConfigurer() {
