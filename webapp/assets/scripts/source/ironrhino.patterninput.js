@@ -22,7 +22,15 @@
 					if (coords.length >= options.minCoords
 							&& coords.length <= options.maxCoords) {
 						modal.remove();
-						t.val(JSON.stringify(coords)).trigger('validate');
+						var value = JSON.stringify(coords);
+						if (!t.hasClass('sha') && typeof sha1 != 'undefined'){
+							try {
+								value = sha1(value);
+							} catch (e) {
+								console.log(e);
+							}
+						}
+						t.val(value).trigger('validate');
 						if (t.hasClass('submit')) {
 							var f = t.closest('form');
 							var inputed = true;
