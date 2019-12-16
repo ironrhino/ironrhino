@@ -6,7 +6,7 @@ import java.util.Map;
 import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.batch.item.ExecutionContext;
 
-public class MessagePartitioner implements Partitioner {
+public class UpdateMessagePartitioner implements Partitioner {
 
 	private static final String PARTITION_KEY = "partition";
 
