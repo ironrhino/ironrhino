@@ -12,59 +12,10 @@
 	http://www.springframework.org/schema/batch
 	http://www.springframework.org/schema/batch/spring-batch.xsd">
 
-	<context:annotation-config />
+	<import resource="include/abstractPartitionUpdateMessage.xml" />
 
-	<bean id="reader" scope="step"
-		class="org.springframework.batch.item.database.JdbcCursorItemReader">
-		<property name="dataSource" ref="dataSource" />
-		<property name="sql"
-			value="select * from sample_message where (createDate between ? and ?) and id%${batch.updateMessage.partitions:10}=?" />
-		<property name="rowMapper">
-			<bean
-				class="org.springframework.jdbc.core.BeanPropertyRowMapper"
-				p:mappedClass="org.ironrhino.sample.crud.Message" />
-		</property>
-		<property name="preparedStatementSetter">
-			<bean
-				class="org.springframework.jdbc.core.ArgumentPreparedStatementSetter">
-				<constructor-arg>
-					<array>
-						<value>#{T(org.ironrhino.core.util.DateUtils).beginOfDay(jobParameters[createDate])}</value>
-						<value>#{T(org.ironrhino.core.util.DateUtils).endOfDay(jobParameters[createDate])}</value>
-						<value>#{stepExecutionContext[mod]}</value>
-					</array>
-				</constructor-arg>
-			</bean>
-		</property>
-	</bean>
-
-	<bean id="processor" scope="step"
-		class="org.ironrhino.sample.batch.UpdateMessageProcessor" />
-
-	<bean id="writer"
-		class="org.springframework.batch.item.database.JdbcBatchItemWriter">
-		<property name="dataSource" ref="dataSource" />
-		<property name="sql"
-			value="update sample_message set content=:content,modifyDate=:modifyDate where id=:id" />
-		<property name="itemSqlParameterSourceProvider">
-			<bean
-				class="org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider" />
-		</property>
-	</bean>
-
-	<bean id="jobParametersValidator"
-		class="org.ironrhino.batch.job.SimpleJobParametersValidator">
-		<property name="requiredKeys">
-			<map>
-				<entry key="createDate" value="DATE" />
-			</map>
-		</property>
-	</bean>
-
-	<bean id="partitioner" scope="step"
-		class="org.ironrhino.sample.batch.UpdateMessagePartitioner" />
-
-	<bean id="partitionHandler" class="org.ironrhino.sample.batch.UpdateMessagePartitionHandler">
+	<bean id="partitionHandler"
+		class="org.ironrhino.sample.batch.UpdateMessagePartitionHandler">
 		<property name="step" ref="updateMessage" />
 		<property name="gridSize" value="10" />
 	</bean>
@@ -73,16 +24,9 @@
 		xmlns="http://www.springframework.org/schema/batch">
 		<validator ref="jobParametersValidator" />
 		<step id="updateMessage.manager">
-			<partition partitioner="partitioner" handler="partitionHandler"/>
+			<partition partitioner="partitioner"
+				handler="partitionHandler" />
 		</step>
 	</job>
-
-	<step id="updateMessage"
-		xmlns="http://www.springframework.org/schema/batch">
-		<tasklet>
-			<chunk reader="reader" processor="processor" writer="writer"
-				commit-interval="100" />
-		</tasklet>
-	</step>
 
 </beans>
