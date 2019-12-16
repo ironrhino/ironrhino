@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="no"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/batch
+	http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<context:annotation-config />
+
+	<bean id="processor" scope="step"
+		class="org.ironrhino.sample.batch.UpdateMessageProcessor" />
+
+	<bean id="writer"
+		class="org.springframework.batch.item.database.JdbcBatchItemWriter">
+		<property name="dataSource" ref="dataSource" />
+		<property name="sql"
+			value="update sample_message set content=:content,modifyDate=:modifyDate where id=:id" />
+		<property name="itemSqlParameterSourceProvider">
+			<bean
+				class="org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider" />
+		</property>
+	</bean>
+
+	<bean id="jobParametersValidator"
+		class="org.ironrhino.batch.job.SimpleJobParametersValidator">
+		<property name="requiredKeys">
+			<map>
+				<entry key="createDate" value="DATE" />
+			</map>
+		</property>
+	</bean>
+
+</beans>

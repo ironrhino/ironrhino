@@ -12,7 +12,7 @@
 	http://www.springframework.org/schema/batch
 	http://www.springframework.org/schema/batch/spring-batch.xsd">
 
-	<context:annotation-config />
+	<import resource="include/abstractUpdateMessage.xml" />
 
 	<bean id="reader" scope="step"
 		class="org.springframework.batch.item.database.JdbcPagingItemReader">
@@ -45,31 +45,7 @@
 		</property>
 	</bean>
 
-
-	<bean id="processor" scope="step"
-		class="org.ironrhino.sample.batch.UpdateMessageProcessor" />
-
-	<bean id="writer"
-		class="org.springframework.batch.item.database.JdbcBatchItemWriter">
-		<property name="dataSource" ref="dataSource" />
-		<property name="sql"
-			value="update sample_message set content=:content,modifyDate=:modifyDate where id=:id" />
-		<property name="itemSqlParameterSourceProvider">
-			<bean
-				class="org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider" />
-		</property>
-	</bean>
-
-	<bean id="jobParametersValidator"
-		class="org.ironrhino.batch.job.SimpleJobParametersValidator">
-		<property name="requiredKeys">
-			<map>
-				<entry key="createDate" value="DATE" />
-			</map>
-		</property>
-	</bean>
-
-	<job id="updateMessageJob"
+	<job id="parallelUpdateMessageJob"
 		xmlns="http://www.springframework.org/schema/batch">
 		<validator ref="jobParametersValidator" />
 		<step id="updateMessage">
