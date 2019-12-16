@@ -160,19 +160,7 @@ public class TestServiceImpl implements TestService {
 	public Future<User> loadFutureUserByUsername(String username, FutureType futureType) {
 		if (username == null)
 			throw new IllegalArgumentException("username shouldn't be null");
-		Supplier<User> sup = () -> {
-			if (StringUtils.isBlank(username))
-				throw new IllegalArgumentException("username shouldn't be blank");
-			try {
-				Thread.sleep(50);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			User user = new User();
-			user.setUsername(username);
-			user.setAuthorities(AuthorityUtils.createAuthorityList("test"));
-			return user;
-		};
+		Supplier<User> sup = supplier(username);
 		switch (futureType) {
 		case COMPLETABLE:
 			return CompletableFuture.supplyAsync(sup);
@@ -195,19 +183,7 @@ public class TestServiceImpl implements TestService {
 
 	@Override
 	public ListenableFuture<User> loadListenableFutureUserByUsername(String username) {
-		Supplier<User> sup = () -> {
-			if (StringUtils.isBlank(username))
-				throw new IllegalArgumentException("username shouldn't be blank");
-			try {
-				Thread.sleep(50);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			User user = new User();
-			user.setUsername(username);
-			user.setAuthorities(AuthorityUtils.createAuthorityList("test"));
-			return user;
-		};
+		Supplier<User> sup = supplier(username);
 		SettableListenableFuture<User> future = new SettableListenableFuture<>();
 		if (StringUtils.isBlank(username))
 			future.setException(new IllegalArgumentException("username shouldn't be blank"));
@@ -219,6 +195,16 @@ public class TestServiceImpl implements TestService {
 	@Override
 	public ListenableFuture<? extends UserDetails> loadListenableFutureUserDetailsByUsername(String username) {
 		return loadListenableFutureUserByUsername(username);
+	}
+
+	@Override
+	public CompletableFuture<User> loadCompletableFutureUserByUsername(String username) {
+		return CompletableFuture.supplyAsync(supplier(username));
+	}
+
+	@Override
+	public CompletableFuture<? extends UserDetails> loadCompletableFutureUserDetailsByUsername(String username) {
+		return loadCompletableFutureUserByUsername(username);
 	}
 
 	@Override
@@ -248,6 +234,22 @@ public class TestServiceImpl implements TestService {
 	@PreDestroy
 	private void destroy() {
 		es.shutdown();
+	}
+
+	private static Supplier<User> supplier(String username) {
+		return () -> {
+			if (StringUtils.isBlank(username))
+				throw new IllegalArgumentException("username shouldn't be blank");
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			User user = new User();
+			user.setUsername(username);
+			user.setAuthorities(AuthorityUtils.createAuthorityList("test"));
+			return user;
+		};
 	}
 
 }

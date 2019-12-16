@@ -7,6 +7,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -245,6 +246,19 @@ public class JavaRemotingServiceTests {
 		Thread.sleep(1000);
 		assertThat(b1.get(), is(true));
 		assertThat(b2.get(), is(false));
+		assertThat(future.get().getUsername(), is("username"));
+	}
+
+	@Test
+	public void testConcreteCompletableFuture() throws Exception {
+		CompletableFuture<User> future = testService.loadCompletableFutureUserByUsername("username");
+		assertThat(future.get().getUsername(), is("username"));
+	}
+
+	@Test
+	public void testNonConcreteCompletableFuture() throws Exception {
+		CompletableFuture<? extends UserDetails> future = testService
+				.loadCompletableFutureUserDetailsByUsername("username");
 		assertThat(future.get().getUsername(), is("username"));
 	}
 
