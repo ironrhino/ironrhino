@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -481,6 +482,31 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 		then(mockHttpServletRequest).should().startAsync();
 		then(mockAsyncContext).should().complete();
 		then(mockTestService).should().loadListenableFutureUserDetailsByUsername("username");
+	}
+
+	@Test
+	public void testCompletableFuture() throws Exception {
+		CompletableFuture<User> completableFuture = testService.loadCompletableFutureUserByUsername("username");
+		assertThat(completableFuture.get().getUsername(), is("username"));
+		then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(TestService.class)),
+				argThat(ri -> "loadCompletableFutureUserByUsername".equals(ri.getMethodName())),
+				any(MethodInvocation.class));
+		then(mockHttpServletRequest).should().startAsync();
+		then(mockAsyncContext).should().complete();
+		then(mockTestService).should().loadCompletableFutureUserByUsername("username");
+	}
+
+	@Test
+	public void testNonConcreteCompletableFuture() throws Exception {
+		CompletableFuture<? extends UserDetails> completableFuture = testService
+				.loadCompletableFutureUserDetailsByUsername("username");
+		assertThat(completableFuture.get().getUsername(), is("username"));
+		then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(TestService.class)),
+				argThat(ri -> "loadCompletableFutureUserDetailsByUsername".equals(ri.getMethodName())),
+				any(MethodInvocation.class));
+		then(mockHttpServletRequest).should().startAsync();
+		then(mockAsyncContext).should().complete();
+		then(mockTestService).should().loadCompletableFutureUserDetailsByUsername("username");
 	}
 
 	@Test

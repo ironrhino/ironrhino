@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 import javax.validation.Valid;
@@ -87,6 +88,10 @@ public interface TestService {
 	ListenableFuture<User> loadListenableFutureUserByUsername(String username);
 
 	ListenableFuture<? extends UserDetails> loadListenableFutureUserDetailsByUsername(String username);
+
+	CompletableFuture<User> loadCompletableFutureUserByUsername(String username);
+
+	CompletableFuture<? extends UserDetails> loadCompletableFutureUserDetailsByUsername(String username);
 
 	Callable<User> loadCallableUserByUsername(String username);
 

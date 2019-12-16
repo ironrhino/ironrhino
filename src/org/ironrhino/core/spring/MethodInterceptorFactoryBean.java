@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -77,7 +78,8 @@ public abstract class MethodInterceptorFactoryBean implements MethodInterceptor,
 		if (method.isDefault())
 			return ReflectionUtils.invokeDefaultMethod(bean, method, methodInvocation.getArguments());
 		Class<?> returnType = method.getReturnType();
-		if (returnType == Callable.class || returnType == ListenableFuture.class || returnType == Future.class) {
+		if (returnType == Callable.class || returnType == ListenableFuture.class
+				|| returnType == CompletableFuture.class || returnType == Future.class) {
 			Callable<Object> callable = new Callable<Object>() {
 				@Override
 				public Object call() throws Exception {
@@ -97,6 +99,15 @@ public abstract class MethodInterceptorFactoryBean implements MethodInterceptor,
 				ListenableFutureTask<Object> future = new ListenableFutureTask<>(callable);
 				getExecutorService().execute(future);
 				return future;
+			}
+			if (returnType == CompletableFuture.class) {
+				return CompletableFuture.supplyAsync(() -> {
+					try {
+						return callable.call();
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}, getExecutorService());
 			}
 			if (returnType == Future.class) {
 				return getExecutorService().submit(callable);
