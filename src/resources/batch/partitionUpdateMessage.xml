@@ -62,7 +62,7 @@
 	</bean>
 
 	<bean id="partitioner" scope="step"
-		class="org.ironrhino.sample.batch.MessagePartitioner" />
+		class="org.ironrhino.sample.batch.UpdateMessagePartitioner" />
 
 	<job id="partitionUpdateMessageJob"
 		xmlns="http://www.springframework.org/schema/batch">
