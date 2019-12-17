@@ -3,7 +3,7 @@ package org.ironrhino.sample.batch;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
-import org.ironrhino.batch.component.JobStepExecutor;
+import org.ironrhino.batch.JobStepExecutor;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler;
