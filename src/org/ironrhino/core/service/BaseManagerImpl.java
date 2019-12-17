@@ -349,8 +349,6 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 		Criteria c = dc.getExecutableCriteria(sessionFactory.getCurrentSession());
 		if (!(start == 0 && end == Integer.MAX_VALUE)) {
 			int firstResult = start;
-			if (firstResult < 0)
-				firstResult = 0;
 			c.setFirstResult(firstResult);
 			int maxResults = end - firstResult;
 			if (maxResults > 0)
