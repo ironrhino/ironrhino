@@ -23,7 +23,7 @@ import org.springframework.util.StringUtils;
 import lombok.Getter;
 import lombok.Setter;
 
-@Component("logoutSuccessHandler")
+@Component
 @SpringSecurityEnabled
 public class DefaultLogoutSuccessHandler extends AbstractAuthenticationTargetUrlRequestHandler
 		implements LogoutSuccessHandler {

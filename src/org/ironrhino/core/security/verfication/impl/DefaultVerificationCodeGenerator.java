@@ -9,7 +9,7 @@ import org.ironrhino.core.util.CodecUtils;
 import org.springframework.stereotype.Component;
 
 @VerificationCodeEnabled
-@Component("verificationCodeGenerator")
+@Component
 public class DefaultVerificationCodeGenerator implements VerificationCodeGenerator {
 
 	@Override

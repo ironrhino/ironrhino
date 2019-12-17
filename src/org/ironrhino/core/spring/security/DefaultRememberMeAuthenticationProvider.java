@@ -7,7 +7,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.RememberMeAuthenticationProvider;
 import org.springframework.stereotype.Component;
 
-@Component("rememberMeAuthenticationProvider")
+@Component
 @Order(Ordered.LOWEST_PRECEDENCE)
 @ApplicationContextPropertiesConditional(key = "rememberMe.disabled", value = "true", negated = true)
 @SpringSecurityEnabled

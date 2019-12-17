@@ -18,7 +18,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @VerificationCodeEnabled
-@Component("verificationService")
+@Component
 @Slf4j
 public class DefaultVerificationService implements VerificationService {
 
@@ -65,14 +65,12 @@ public class DefaultVerificationService implements VerificationService {
 			cacheManager.put(receiver, codeToSend, expiry, TimeUnit.SECONDS, CACHE_NAMESPACE);
 		}
 		if (codeToSend == null || !reuse) {
-			codeToSend = verficationCodeGenerator.generator(receiver,
-					verificationCodeRequirementService.getLength());
+			codeToSend = verficationCodeGenerator.generator(receiver, verificationCodeRequirementService.getLength());
 			cacheManager.put(receiver, codeToSend, expiry, TimeUnit.SECONDS, CACHE_NAMESPACE);
 		}
 		verificationCodeNotifier.send(receiver, codeToSend);
-		cacheManager.put(receiver + SUFFIX_RESEND, "",
-				verificationCodeRequirementService.getResendInterval(), TimeUnit.SECONDS,
-				CACHE_NAMESPACE);
+		cacheManager.put(receiver + SUFFIX_RESEND, "", verificationCodeRequirementService.getResendInterval(),
+				TimeUnit.SECONDS, CACHE_NAMESPACE);
 	}
 
 	@Override

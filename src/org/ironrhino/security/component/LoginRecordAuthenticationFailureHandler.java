@@ -6,10 +6,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.ironrhino.core.service.EntityManager;
 import org.ironrhino.core.spring.security.DefaultAuthenticationFailureHandler;
 import org.ironrhino.core.struts.I18N;
 import org.ironrhino.security.model.LoginRecord;
-import org.ironrhino.security.service.UserManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.AuthenticationException;
@@ -18,13 +18,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Primary
-public class AuthenticationFailureHandler extends DefaultAuthenticationFailureHandler {
+public class LoginRecordAuthenticationFailureHandler extends DefaultAuthenticationFailureHandler {
 
 	@Autowired
 	private UsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter;
 
 	@Autowired
-	private UserManager userManager;
+	private EntityManager<LoginRecord> entityManager;
 
 	@Override
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
@@ -36,10 +36,7 @@ public class AuthenticationFailureHandler extends DefaultAuthenticationFailureHa
 		loginRecord.setFailed(true);
 		loginRecord.setCause(I18N.getText(e.getClass().getName()));
 		if (loginRecord.getUsername() != null)
-			save(loginRecord);
+			entityManager.save(loginRecord);
 	}
 
-	private void save(LoginRecord loginRecord) {
-		userManager.execute(session -> session.save(loginRecord));
-	}
 }

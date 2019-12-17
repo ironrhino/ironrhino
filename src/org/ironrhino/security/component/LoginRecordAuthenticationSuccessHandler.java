@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Primary
-public class AuthenticationSuccessHandler extends DefaultAuthenticationSuccessHandler {
+public class LoginRecordAuthenticationSuccessHandler extends DefaultAuthenticationSuccessHandler {
 
 	@Autowired
 	private UserManager userManager;
@@ -50,10 +50,7 @@ public class AuthenticationSuccessHandler extends DefaultAuthenticationSuccessHa
 		LoginRecord loginRecord = new LoginRecord();
 		loginRecord.setUsername(username);
 		loginRecord.setAddress(request.getRemoteAddr());
-		save(loginRecord);
-	}
-
-	private void save(LoginRecord loginRecord) {
 		userManager.execute(session -> session.save(loginRecord));
 	}
+
 }
