@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
 
 @VerificationCodeEnabled
-@Component("verificationManager")
+@Component
 @Slf4j
 public class DefaultVerificationManager implements VerificationManager {
 

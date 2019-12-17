@@ -15,7 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-@Component("daoAuthenticationProvider")
+@Component
 @Order(0)
 @SpringSecurityEnabled
 public class DefaultDaoAuthenticationProvider extends DaoAuthenticationProvider {
