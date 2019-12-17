@@ -22,7 +22,7 @@
 		class="org.springframework.core.task.SyncTaskExecutor" />
 	<bean class="org.ironrhino.batch.component.BatchSchemaSetup"
 		init-method="setup" />
-	<bean class="org.ironrhino.batch.component.JobStepExecutor" />
+	<bean class="org.ironrhino.batch.DefaultJobStepExecutor" />
 	<import
 		resource="classpath:resources/spring/applicationContext-batch.xml" />
 	<alias name="taskExecutor" alias="batchTaskExecutor" />

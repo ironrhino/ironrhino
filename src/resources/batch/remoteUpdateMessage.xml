@@ -15,10 +15,12 @@
 	<import resource="include/abstractPartitionUpdateMessage.xml" />
 
 	<bean id="partitionHandler"
-		class="org.ironrhino.sample.batch.UpdateMessagePartitionHandler">
+		class="org.ironrhino.batch.partition.RemoteInvocationPartitionHandler">
 		<property name="taskExecutor" ref="taskExecutor" />
 		<property name="step" ref="updateMessage" />
 		<property name="gridSize" value="10" />
+		<property name="connectTimeout" value="5000" />
+		<property name="readTimeout" value="3600000" />
 	</bean>
 
 	<job id="remoteUpdateMessageJob"
