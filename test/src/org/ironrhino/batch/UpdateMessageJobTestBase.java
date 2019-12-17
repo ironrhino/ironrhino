@@ -14,10 +14,12 @@ import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @SpringBatchTest
 @RunWith(SpringRunner.class)
+@ContextConfiguration(locations = "ctx.xml")
 public abstract class UpdateMessageJobTestBase {
 
 	static final String SQL_CREATE_TABLE = ImportMessageJobTest.SQL_CREATE_TABLE;
