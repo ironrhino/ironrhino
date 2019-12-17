@@ -16,6 +16,7 @@
 
 	<bean id="partitionHandler"
 		class="org.ironrhino.sample.batch.UpdateMessagePartitionHandler">
+		<property name="taskExecutor" ref="taskExecutor" />
 		<property name="step" ref="updateMessage" />
 		<property name="gridSize" value="10" />
 	</bean>
