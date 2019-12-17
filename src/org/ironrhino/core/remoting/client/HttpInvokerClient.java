@@ -130,18 +130,20 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 		Remoting anno = serviceInterface.getAnnotation(Remoting.class);
 		if (anno != null && StringUtils.isNotBlank(anno.serializationType()))
 			this.serializationType = anno.serializationType();
-		Environment env = getApplicationContext().getEnvironment();
-		this.serializationType = env.getProperty(serviceInterface.getName() + SERIALIZATION_TYPE_SUFFIX,
-				this.serializationType);
-		httpInvokerRequestExecutor.setSerializer(HttpInvokerSerializers.ofSerializationType(serializationType));
-		httpInvokerRequestExecutor.setConnectTimeout(connectTimeout);
-		httpInvokerRequestExecutor.setReadTimeout(readTimeout);
-		if (StringUtils.isBlank(baseUrl)) {
-			baseUrl = env.getProperty(serviceInterface.getName() + BASE_URL_SUFFIX);
-			if (StringUtils.isNotBlank(baseUrl)) {
-				baseUrl = env.resolvePlaceholders(baseUrl);
-				log.info("Discover baseUrl \"{}\" for service {} from environment", baseUrl,
-						serviceInterface.getName());
+		if (getApplicationContext() != null) {
+			Environment env = getApplicationContext().getEnvironment();
+			this.serializationType = env.getProperty(serviceInterface.getName() + SERIALIZATION_TYPE_SUFFIX,
+					this.serializationType);
+			httpInvokerRequestExecutor.setSerializer(HttpInvokerSerializers.ofSerializationType(serializationType));
+			httpInvokerRequestExecutor.setConnectTimeout(connectTimeout);
+			httpInvokerRequestExecutor.setReadTimeout(readTimeout);
+			if (StringUtils.isBlank(baseUrl)) {
+				baseUrl = env.getProperty(serviceInterface.getName() + BASE_URL_SUFFIX);
+				if (StringUtils.isNotBlank(baseUrl)) {
+					baseUrl = env.resolvePlaceholders(baseUrl);
+					log.info("Discover baseUrl \"{}\" for service {} from environment", baseUrl,
+							serviceInterface.getName());
+				}
 			}
 		}
 		if (StringUtils.isBlank(baseUrl)) {
