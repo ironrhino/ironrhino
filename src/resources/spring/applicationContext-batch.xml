@@ -28,6 +28,7 @@
 		</property>
 	</bean>
 	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry"/>
+	<bean id="stepRegistry" class="org.springframework.batch.core.configuration.support.MapStepRegistry"/>
 	<bean id="jobLoader" class="org.springframework.batch.core.configuration.support.DefaultJobLoader"/>
 	<bean id="automaticJobRegistrar" class="org.springframework.batch.core.configuration.support.AutomaticJobRegistrar">
 		<property name="applicationContextFactories">
@@ -35,6 +36,5 @@
 				<property name="resources" value="${jobRegistrar.resources:classpath*:resources/batch/*.xml}" />
 			</bean>
 		</property>
-		<property name="jobLoader" ref="jobLoader"/>
 	</bean>
 </beans>
