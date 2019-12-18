@@ -6,6 +6,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.ironrhino.core.spring.security.DefaultAuthenticationSuccessHandler;
 import org.ironrhino.core.spring.security.password.MultiVersionPasswordEncoder;
 import org.ironrhino.security.model.LoginRecord;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Primary
+@ClassPresentConditional("org.ironrhino.security.model.LoginRecord")
 public class LoginRecordAuthenticationSuccessHandler extends DefaultAuthenticationSuccessHandler {
 
 	@Autowired
