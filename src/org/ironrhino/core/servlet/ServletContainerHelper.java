@@ -41,20 +41,21 @@ public class ServletContainerHelper {
 		} else if (serverInfo.startsWith("WildFly ")) {
 			// WildFly Servlet 14.0.1.Final (WildFly Core 6.0.2.Final) - 2.0.13.Final
 			// WildFly Full 14.0.1.Final (WildFly Core 6.0.2.Final) - 2.0.13.Final
-			String[] arr = serverInfo.split("\\s");
+			String[] arr = serverInfo.split("\\s+");
 			String version = arr[2];
 			if (version.endsWith(".Final"))
 				version = version.substring(0, version.lastIndexOf('.'));
 			serverInfo = arr[0] + '/' + version;
 		} else if (serverInfo.startsWith("GlassFish ")) {
 			// GlassFish Server Open Source Edition 5.0.1
-			String[] arr = serverInfo.split("\\s");
+			String[] arr = serverInfo.split("\\s+");
 			serverInfo = arr[0] + '/' + arr[arr.length - 1];
 		} else if (serverInfo.startsWith("Resin/")) {
 			// Resin/4.0.55
-		} else if (serverInfo.startsWith("WebLogic ")) {
+		} else if (serverInfo.startsWith("WebLogic ") || serverInfo.startsWith("Payara ")) {
 			// WebLogic Server 12.2.1.2.0 Mon Oct 3 04:35:36 PDT 2016 1827450
-			String[] arr = serverInfo.split("\\s");
+			// Payara Server 5.194 #badassfish
+			String[] arr = serverInfo.split("\\s+");
 			serverInfo = arr[0] + '/' + arr[2];
 		} else if (serverInfo.startsWith("IBM WebSphere")) {
 			// IBM WebSphere Liberty/18.0.0.2
