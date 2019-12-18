@@ -5,7 +5,7 @@
 <title>${getText('job')}${getText('list')}</title>
 </head>
 <body>
-<#assign actionColumnButtons='<@btn view="instances" windowoptions="{\'width\':\'95%\',\'reloadonclose\':false}"/> <#if entity.launchable><@btn view="launch"/></#if>'>
+<#assign actionColumnButtons='<@btn view="instances" windowoptions="{\'width\':\'95%\',\'reloadonclose\':false}"/> <#if entity.launchable><@btn class="btn-primary" view="launch"/></#if>'>
 <#assign bottomButtons='<@btn class="reload"/>'>
 <#assign columns={"name":{"width":"200px","template":r"${getText(value)}","dynamicAttributes" : r"<#if entity.description?has_content>{'data-tooltip':'${entity.description}'}</#if>"},
 "lastExecution.jobParameters":{"alias":"lastJobParameters","template":r"<#if value?has_content>${statics['org.ironrhino.batch.job.JobParameterHelper'].toString(value)}</#if>"},
