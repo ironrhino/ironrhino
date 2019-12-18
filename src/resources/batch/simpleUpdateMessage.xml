@@ -43,7 +43,7 @@
 		<step id="updateMessage">
 			<tasklet>
 				<chunk reader="reader" processor="processor" writer="writer"
-					commit-interval="100" />
+					commit-interval="${batch.updateMessage.commit.interval:100}" />
 			</tasklet>
 		</step>
 	</job>

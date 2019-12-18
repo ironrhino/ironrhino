@@ -78,7 +78,7 @@
 		<step id="exportToFile">
 			<tasklet>
 				<chunk reader="reader" writer="writer"
-					commit-interval="${exportUserJob.exportToFile.commit.interval:2}" />
+					commit-interval="${batch.exportUser.commitInterval:2}" />
 			</tasklet>
 			<listeners>
 				<listener ref="summaryFooterCallback" />

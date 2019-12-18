@@ -37,7 +37,7 @@
 					value="#{T(org.ironrhino.core.util.DateUtils).endOfDay(jobParameters[createDate])}" />
 			</map>
 		</property>
-		<property name="pageSize" value="100" />
+		<property name="pageSize" value="${batch.updateMessage.commitInterval:100}" />
 		<property name="rowMapper">
 			<bean
 				class="org.springframework.jdbc.core.BeanPropertyRowMapper"
@@ -52,7 +52,7 @@
 			<tasklet task-executor="taskExecutor"
 				throttle-limit="${batch.updateMessage.parallelism:50}">
 				<chunk reader="reader" processor="processor" writer="writer"
-					commit-interval="100" />
+					commit-interval="${batch.updateMessage.commitInterval:100}" />
 			</tasklet>
 		</step>
 	</job>

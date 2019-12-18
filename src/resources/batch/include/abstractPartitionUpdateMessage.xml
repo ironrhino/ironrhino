@@ -45,7 +45,7 @@
 		xmlns="http://www.springframework.org/schema/batch">
 		<tasklet>
 			<chunk reader="reader" processor="processor" writer="writer"
-				commit-interval="100" />
+				commit-interval="${batch.updateMessage.commitInterval:100}" />
 		</tasklet>
 	</step>
 

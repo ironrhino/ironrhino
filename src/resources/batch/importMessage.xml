@@ -47,7 +47,7 @@
 		<step id="importMessage">
 			<tasklet task-executor="taskExecutor" throttle-limit="50">
 				<chunk reader="reader" processor="processor" writer="writer"
-					commit-interval="100" />
+					commit-interval="${batch.importMessage.commitInterval:100}" />
 			</tasklet>
 		</step>
 	</job>
