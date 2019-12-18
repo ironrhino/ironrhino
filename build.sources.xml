@@ -50,7 +50,7 @@
 	<property name="security-config-http-sources-jar.name" value="ironrhino-security-config-http-${version}-sources.jar" />
 	<property name="security-config-http-sources-jar.includes" value="resources/spring/applicationContext-security-http.xml" />
 	<property name="security-loginrecord-sources-jar.name" value="ironrhino-security-loginrecord-${version}-sources.jar" />
-	<property name="security-loginrecord-sources-jar.includes" value="org/ironrhino/security/model/LoginRecord.java,org/ironrhino/security/component/Authentication**" />
+	<property name="security-loginrecord-sources-jar.includes" value="org/ironrhino/security/**/LoginRecord*" />
 	<property name="security-oauth-client-sources-jar.name" value="ironrhino-security-oauth-client-${version}-sources.jar" />
 	<property name="security-oauth-client-sources-jar.includes" value="org/ironrhino/security/oauth/package-info.java,org/ironrhino/security/oauth/client/**,resources/view/oauth/connect.ftl" />
 	<property name="security-oauth-server-sources-jar.name" value="ironrhino-security-oauth-server-${version}-sources.jar" />
