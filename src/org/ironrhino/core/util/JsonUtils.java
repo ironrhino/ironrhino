@@ -42,9 +42,7 @@ import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @UtilityClass
 public class JsonUtils {
 
@@ -146,9 +144,8 @@ public class JsonUtils {
 	public static String toJson(Object object) {
 		try {
 			return sharedObjectMapper.writeValueAsString(object);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return null;
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -156,8 +153,7 @@ public class JsonUtils {
 		try {
 			return sharedObjectMapper.writerWithView(serializationView).writeValueAsString(object);
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return null;
+			throw new RuntimeException(e);
 		}
 	}
 
