@@ -7,7 +7,7 @@
 <body>
 <div class="accordion" id="steps">
 <#list jobExecution.stepExecutions as step>
-<div class="accordion-group" style="border-width:2px;border-color:#${step.status.name()?switch('COMPLETED','468847','FAILED','b94a48','STARTING','3a87ad','STARTED','3a87ad','fcf8e3')};">
+<div class="accordion-group" style="border-width:5px;border-color:#${step.status.name()?switch('COMPLETED','468847','FAILED','b94a48','STARTING','3a87ad','STARTED','3a87ad','fcf8e3')};">
 	<div class="accordion-heading">
 	<a class="accordion-toggle" data-toggle="collapse" data-parent="#steps" href="#step${step?index}">
 		<h4>${getText(step.stepName)}</h4>
