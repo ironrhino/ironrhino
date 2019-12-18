@@ -31,7 +31,7 @@
 					<array>
 						<value>#{T(org.ironrhino.core.util.DateUtils).beginOfDay(jobParameters[createDate])}</value>
 						<value>#{T(org.ironrhino.core.util.DateUtils).endOfDay(jobParameters[createDate])}</value>
-						<value>#{stepExecutionContext[mod]}</value>
+						<value>#{new Integer(stepName.substring(stepName.lastIndexOf(':')+10))}</value>
 					</array>
 				</constructor-arg>
 			</bean>
@@ -39,7 +39,7 @@
 	</bean>
 
 	<bean id="partitioner" scope="step"
-		class="org.ironrhino.sample.batch.UpdateMessagePartitioner" />
+		class="org.springframework.batch.core.partition.support.SimplePartitioner" />
 
 	<step id="updateMessage"
 		xmlns="http://www.springframework.org/schema/batch">
