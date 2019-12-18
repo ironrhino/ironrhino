@@ -37,7 +37,7 @@
 					value="#{T(org.ironrhino.core.util.DateUtils).endOfDay(jobParameters[workdate])}" />
 			</map>
 		</property>
-		<property name="pageSize" value="2" />
+		<property name="pageSize" value="${batch.exportUser.commitInterval:2}" />
 		<property name="rowMapper">
 			<bean
 				class="org.springframework.jdbc.core.BeanPropertyRowMapper"
@@ -86,9 +86,9 @@
 		xmlns="http://www.springframework.org/schema/batch">
 		<validator ref="jobParametersValidator" />
 		<step id="exportToFile">
-			<tasklet task-executor="taskExecutor" throttle-limit="8">
+			<tasklet task-executor="taskExecutor" throttle-limit="${batch.exportUser.throttleLimit:8}">
 				<chunk reader="reader" writer="writer"
-					commit-interval="${exportUserJob.exportToFile.commit.interval:2}" />
+					commit-interval="${batch.exportUser.commitInterval:2}" />
 			</tasklet>
 			<listeners>
 				<listener ref="summaryFooterCallback" />
