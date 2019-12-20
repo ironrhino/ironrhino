@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.ironrhino</groupId>
 	<artifactId>ironrhino-zookeeper</artifactId>
-	<version>4.0.0</version>
+	<version>4.0.8</version>
 	<packaging>jar</packaging>
 	<description>Zookeeper</description>
 	<dependencies>
@@ -17,7 +17,7 @@
 		<dependency>
 			<groupId>org.apache.curator</groupId>
 			<artifactId>curator-recipes</artifactId>
-			<version>4.0.0</version>
+			<version>4.0.8</version>
 		</dependency>
 	</dependencies>
 </project>

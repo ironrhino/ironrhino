@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.ironrhino</groupId>
 	<artifactId>ironrhino-core</artifactId>
-	<version>4.0.0</version>
+	<version>4.0.8</version>
 	<packaging>jar</packaging>
 	<description>Core</description>
 	<properties>
