@@ -21,7 +21,10 @@ public class CubridSimpleSequence extends AbstractSequenceSimpleSequence {
 
 	@Override
 	protected String getCreateSequenceStatement() {
-		return new StringBuilder("CREATE SERIAL ").append(getActualSequenceName()).toString();
+		StringBuilder sb = new StringBuilder("CREATE SERIAL ").append(getActualSequenceName());
+		if (getCacheSize() > 1)
+			sb.append(" CACHE ").append(getCacheSize());
+		return sb.toString();
 	}
 
 	@Override
