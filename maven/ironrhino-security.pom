@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.ironrhino</groupId>
 	<artifactId>ironrhino-security</artifactId>
-	<version>4.0.0</version>
+	<version>5.0.0</version>
 	<packaging>jar</packaging>
 	<description>Security</description>
 	<dependencies>
