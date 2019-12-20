@@ -10,6 +10,10 @@ import org.springframework.dao.DataAccessResourceFailureException;
 
 public class MySQLSimpleSequence extends AbstractDatabaseSimpleSequence {
 
+	private long nextId = 0;
+
+	private long maxId = 0;
+
 	@Override
 	public void afterPropertiesSet() {
 		try {
@@ -21,12 +25,28 @@ public class MySQLSimpleSequence extends AbstractDatabaseSimpleSequence {
 
 	@Override
 	public long nextLongValue() {
+		int cacheSize = getCacheSize();
+		if (cacheSize > 1) {
+			synchronized (this) {
+				if (maxId == nextId) {
+					maxId = incrementAndGet(cacheSize);
+					nextId = maxId - cacheSize + 1;
+				} else {
+					nextId++;
+				}
+				return nextId;
+			}
+		}
+		return incrementAndGet(1);
+	}
+
+	private long incrementAndGet(int increment) {
 		try (Connection con = getDataSource().getConnection()) {
 			con.setAutoCommit(true);
 			try (Statement stmt = con.createStatement()) {
 				String sequenceName = getSequenceName();
-				stmt.executeUpdate("UPDATE `" + getTableName() + "` SET VALUE = LAST_INSERT_ID(VALUE + 1) WHERE NAME='"
-						+ sequenceName + "'");
+				stmt.executeUpdate("UPDATE `" + getTableName() + "` SET VALUE = LAST_INSERT_ID(VALUE + " + increment
+						+ ") WHERE NAME='" + sequenceName + "'");
 				try (ResultSet rs = stmt.executeQuery("SELECT LAST_INSERT_ID()")) {
 					if (!rs.next()) {
 						throw new DataAccessResourceFailureException(
@@ -36,7 +56,7 @@ public class MySQLSimpleSequence extends AbstractDatabaseSimpleSequence {
 				}
 			}
 		} catch (SQLException ex) {
-			throw new DataAccessResourceFailureException("Could not obtain last_insert_id()", ex);
+			throw new DataAccessResourceFailureException("Could not obtain LAST_INSERT_ID()", ex);
 		}
 	}
 
@@ -47,6 +67,8 @@ public class MySQLSimpleSequence extends AbstractDatabaseSimpleSequence {
 			try (Statement stmt = con.createStatement()) {
 				String sequenceName = getSequenceName();
 				stmt.executeUpdate("UPDATE `" + getTableName() + "` SET VALUE = 0 WHERE NAME='" + sequenceName + "'");
+				nextId = 0;
+				maxId = 0;
 			}
 		} catch (SQLException ex) {
 			throw new DataAccessResourceFailureException(ex.getMessage(), ex);
