@@ -13,9 +13,8 @@ public class DB2CyclicSequence extends AbstractSequenceCyclicSequence {
 
 	@Override
 	protected String getQuerySequenceStatement() {
-		return new StringBuilder("SELECT NEXTVAL FOR ").append(getActualSequenceName()).append(",")
-				.append(getCurrentTimestamp()).append(",LAST_UPDATED FROM ").append(getTableName())
-				.append(" WHERE NAME='").append(getSequenceName()).append("'").toString();
+		return "SELECT NEXTVAL FOR " + getActualSequenceName() + "," + getCurrentTimestamp() + ",LAST_UPDATED FROM "
+				+ getTableName() + " WHERE NAME='" + getSequenceName() + "'";
 	}
 
 	@Override

@@ -571,7 +571,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 										.getUiConfigs(entry.getValue().getPropertyType()).get(s);
 								if (nestUci == null)
 									continue;
-								propertyNamesInLike.put(new StringBuilder(alias).append(".").append(s).toString(),
+								propertyNamesInLike.put(alias + "." + s,
 										nestUci.isExactMatch() ? MatchMode.EXACT : MatchMode.ANYWHERE);
 							}
 						}
@@ -582,8 +582,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 								UiConfigImpl nestUci = entry.getValue().getEmbeddedUiConfigs().get(s);
 								if (nestUci == null)
 									continue;
-								propertyNamesInLike.put(
-										new StringBuilder(entry.getKey()).append(".").append(s).toString(),
+								propertyNamesInLike.put(entry.getKey() + "." + s,
 										nestUci.isExactMatch() ? MatchMode.EXACT : MatchMode.ANYWHERE);
 							}
 						}
@@ -1809,10 +1808,9 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				|| !uic.isUnique() && !(getNaturalIds().size() == 1 && getNaturalIds().containsKey(propertyName)))
 			return NONE;
 		suggestions = getEntityManager(getEntityClass()).executeFind(session -> {
-			StringBuilder hql = new StringBuilder("select ").append(propertyName).append(" from ")
-					.append(getEntityClass().getSimpleName()).append(" where ").append(propertyName)
-					.append(" like :keyword");
-			Query<String> q = session.createQuery(hql.toString(), String.class);
+			String hql = "select " + propertyName + " from " + getEntityClass().getSimpleName() + " where "
+					+ propertyName + " like :keyword";
+			Query<String> q = session.createQuery(hql, String.class);
 			q.setParameter("keyword", keyword + "%");
 			q.setMaxResults(20);
 			return q.list();

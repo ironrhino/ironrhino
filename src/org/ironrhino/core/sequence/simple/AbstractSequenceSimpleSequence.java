@@ -24,8 +24,7 @@ public abstract class AbstractSequenceSimpleSequence extends AbstractDatabaseSim
 	}
 
 	protected String getRestartSequenceStatement() {
-		return new StringBuilder("ALTER SEQUENCE ").append(getActualSequenceName()).append(" RESTART WITH 1")
-				.toString();
+		return "ALTER SEQUENCE " + getActualSequenceName() + " RESTART WITH 1";
 	}
 
 	@Override

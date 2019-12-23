@@ -363,10 +363,7 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 					baseUrl = "http://" + baseUrl;
 			}
 		}
-		StringBuilder sb = new StringBuilder(baseUrl);
-		sb.append(pathFromClass);
-		sb.append(pathFromMethod);
-		return sb.toString().trim();
+		return (baseUrl + pathFromClass + pathFromMethod).trim();
 	}
 
 	private MultiValueMap<String, String> createHeaders(RequestMapping classRequestMapping,

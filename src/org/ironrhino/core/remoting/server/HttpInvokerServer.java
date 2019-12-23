@@ -101,8 +101,7 @@ public class HttpInvokerServer implements HttpRequestHandler {
 			List<String> parameterTypeList = new ArrayList<>(invocation.getParameterTypes().length);
 			for (Class<?> cl : invocation.getParameterTypes())
 				parameterTypeList.add(cl.getSimpleName());
-			String method = new StringBuilder(invocation.getMethodName()).append("(")
-					.append(String.join(",", parameterTypeList)).append(")").toString();
+			String method = invocation.getMethodName() + "(" + String.join(",", parameterTypeList) + ")";
 			MDC.put(MDC_KEY_ROLE, "SERVER");
 			MDC.put(MDC_KEY_SERVICE, MDC.get(MDC_KEY_INTERFACE_NAME) + '.' + method);
 			if (holder != null) {

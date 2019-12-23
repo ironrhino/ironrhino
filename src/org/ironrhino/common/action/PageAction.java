@@ -247,7 +247,7 @@ public class PageAction extends EntityAction<Page> {
 		for (Map.Entry<String, Integer> entry : map.entrySet()) {
 			LabelValue lv = new LabelValue();
 			lv.setValue(entry.getKey());
-			lv.setLabel(new StringBuilder(entry.getKey()).append("(").append(entry.getValue()).append(")").toString());
+			lv.setLabel(entry.getKey() + "(" + entry.getValue() + ")");
 			suggestions.add(lv);
 		}
 		return JSON;

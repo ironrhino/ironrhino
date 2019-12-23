@@ -303,8 +303,8 @@ public class RegionAction extends EntityAction<Region> {
 					if (pd.getReadMethod() != null && pd.getReadMethod().getReturnType().equals(Region.class)
 							&& pd.getWriteMethod() != null) {
 						String name = pd.getName();
-						String hql = new StringBuilder("update ").append(clz.getName()).append(" t set t.").append(name)
-								.append(".id=?1 where t.").append(name).append(".id=?2").toString();
+						String hql = "update " + clz.getName() + " t set t." + name + ".id=?1 where t." + name
+								+ ".id=?2";
 						entityManager.executeUpdate(hql, target.getId(), source.getId());
 					}
 				}

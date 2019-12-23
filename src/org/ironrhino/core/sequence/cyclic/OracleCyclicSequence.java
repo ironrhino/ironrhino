@@ -14,9 +14,8 @@ public class OracleCyclicSequence extends AbstractSequenceCyclicSequence {
 
 	@Override
 	protected String getQuerySequenceStatement() {
-		return new StringBuilder("SELECT ").append(getActualSequenceName()).append(".NEXTVAL,")
-				.append(getCurrentTimestamp()).append(",LAST_UPDATED FROM ").append(getTableName())
-				.append(" WHERE NAME='").append(getSequenceName()).append("'").toString();
+		return "SELECT " + getActualSequenceName() + ".NEXTVAL," + getCurrentTimestamp() + ",LAST_UPDATED FROM "
+				+ getTableName() + " WHERE NAME='" + getSequenceName() + "'";
 	}
 
 	@Override

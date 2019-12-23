@@ -40,14 +40,13 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 	}
 
 	protected String getCreateTableStatement() {
-		return new StringBuilder("CREATE TABLE ").append(getTableName()).append(" (NAME ").append(getNameColumnType())
-				.append(" NOT NULL PRIMARY KEY, LAST_UPDATED ").append(getTimestampColumnType()).append(" NOT NULL)")
-				.toString();
+		return "CREATE TABLE " + getTableName() + " (NAME " + getNameColumnType()
+				+ " NOT NULL PRIMARY KEY, LAST_UPDATED " + getTimestampColumnType() + " NOT NULL)";
 	}
 
 	protected String getInsertStatement() {
-		return new StringBuilder("INSERT INTO ").append(getTableName()).append(" VALUES(").append("'")
-				.append(getSequenceName()).append("',").append(getCurrentTimestamp()).append(")").toString();
+		return "INSERT INTO " + getTableName() + " VALUES(" + "'" + getSequenceName() + "'," + getCurrentTimestamp()
+				+ ")";
 	}
 
 	protected abstract String getQuerySequenceStatement();
@@ -60,19 +59,17 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 	}
 
 	protected String getRestartSequenceStatement() {
-		return new StringBuilder("ALTER SEQUENCE ").append(getActualSequenceName()).append(" RESTART WITH 1")
-				.toString();
+		return "ALTER SEQUENCE " + getActualSequenceName() + " RESTART WITH 1";
 	}
 
 	protected String getQueryTimestampForUpdateStatement() {
-		return new StringBuilder("SELECT ").append(getCurrentTimestamp()).append(",LAST_UPDATED").append(" FROM ")
-				.append(getTableName()).append(" WHERE NAME='").append(getSequenceName()).append("' FOR UPDATE")
-				.toString();
+		return "SELECT " + getCurrentTimestamp() + ",LAST_UPDATED" + " FROM " + getTableName() + " WHERE NAME='"
+				+ getSequenceName() + "' FOR UPDATE";
 	}
 
 	protected String getUpdateTimestampStatement() {
-		return new StringBuilder("UPDATE ").append(getTableName()).append(" SET LAST_UPDATED = ? WHERE NAME='")
-				.append(getSequenceName()).append("' AND LAST_UPDATED < ?").toString();
+		return "UPDATE " + getTableName() + " SET LAST_UPDATED = ? WHERE NAME='" + getSequenceName()
+				+ "' AND LAST_UPDATED < ?";
 	}
 
 	@Override

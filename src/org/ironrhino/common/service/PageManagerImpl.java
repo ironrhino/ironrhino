@@ -272,7 +272,7 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements PageManage
 			return Collections.EMPTY_MAP;
 		if (searchService != null) {
 			SearchCriteria cc = new SearchCriteria();
-			cc.setQuery(new StringBuilder("tags:").append(keyword).append("*").toString());
+			cc.setQuery("tags:" + keyword + "*");
 			cc.setTypes(new String[] { "page" });
 			Map<String, Integer> map = searchService.countTermsByField(cc, "tags");
 			Iterator<Map.Entry<String, Integer>> it = map.entrySet().iterator();

@@ -9,16 +9,14 @@ public class SqlServerCyclicSequence extends AbstractSequenceCyclicSequence {
 
 	@Override
 	protected String getQuerySequenceStatement() {
-		return new StringBuilder("SELECT NEXT VALUE FOR ").append(getActualSequenceName()).append(",")
-				.append(getCurrentTimestamp()).append(",LAST_UPDATED FROM ").append(getTableName())
-				.append(" WHERE NAME='").append(getSequenceName()).append("'").toString();
+		return "SELECT NEXT VALUE FOR " + getActualSequenceName() + "," + getCurrentTimestamp() + ",LAST_UPDATED FROM "
+				+ getTableName() + " WHERE NAME='" + getSequenceName() + "'";
 	}
 
 	@Override
 	protected String getQueryTimestampForUpdateStatement() {
-		return new StringBuilder("SELECT ").append(getCurrentTimestamp()).append(",LAST_UPDATED").append(" FROM ")
-				.append(getTableName()).append(" WITH(UPDLOCK,ROWLOCK) WHERE NAME='").append(getSequenceName())
-				.append("'").toString();
+		return "SELECT " + getCurrentTimestamp() + ",LAST_UPDATED" + " FROM " + getTableName()
+				+ " WITH(UPDLOCK,ROWLOCK) WHERE NAME='" + getSequenceName() + "'";
 	}
 
 }

@@ -4,9 +4,8 @@ public class MariaDBCyclicSequence extends AbstractSequenceCyclicSequence {
 
 	@Override
 	protected String getQuerySequenceStatement() {
-		return new StringBuilder("SELECT NEXTVAL(").append(getActualSequenceName()).append(")").append(",")
-				.append(getCurrentTimestamp()).append(",LAST_UPDATED FROM ").append(getTableName())
-				.append(" WHERE NAME='").append(getSequenceName()).append("'").toString();
+		return "SELECT NEXTVAL(" + getActualSequenceName() + ")" + "," + getCurrentTimestamp() + ",LAST_UPDATED FROM "
+				+ getTableName() + " WHERE NAME='" + getSequenceName() + "'";
 	}
 
 }

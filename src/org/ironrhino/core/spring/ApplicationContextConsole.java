@@ -90,9 +90,8 @@ public class ApplicationContextConsole {
 				Set<Method> methods = AnnotationUtils.getAnnotatedMethods(clz, Trigger.class);
 				for (Method m : methods) {
 					if (m.getParameterCount() == 0) {
-						StringBuilder expression = new StringBuilder(entry.getKey());
-						expression.append(".").append(m.getName()).append("()");
-						temp.put(expression.toString(), m.getAnnotation(Trigger.class).scope());
+						String expression = entry.getKey() + "." + m.getName() + "()";
+						temp.put(expression, m.getAnnotation(Trigger.class).scope());
 					}
 				}
 			}

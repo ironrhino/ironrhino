@@ -20,17 +20,15 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 
 	@Override
 	public void afterPropertiesSet() {
-		setVariableSql = new StringBuilder("SELECT @TIMESTAMP:=GREATEST(LAST_UPDATED,UNIX_TIMESTAMP()) FROM `")
-				.append(getTableName()).append("` WHERE NAME='").append(getSequenceName()).append("'").toString();
-		incrementSql = new StringBuilder("UPDATE `").append(getTableName())
-				.append("` SET VALUE=LAST_INSERT_ID(VALUE+1),LAST_UPDATED=@TIMESTAMP WHERE NAME='")
-				.append(getSequenceName()).append("' AND DATE_FORMAT(FROM_UNIXTIME(LAST_UPDATED),'")
-				.append(getDateFormat()).append("')=DATE_FORMAT(FROM_UNIXTIME(@TIMESTAMP),'").append(getDateFormat())
-				.append("')").toString();
-		restartSql = new StringBuilder("UPDATE `").append(getTableName())
-				.append("` SET VALUE=LAST_INSERT_ID(1),LAST_UPDATED=@TIMESTAMP WHERE NAME='").append(getSequenceName())
-				.append("' AND DATE_FORMAT(FROM_UNIXTIME(LAST_UPDATED),'").append(getDateFormat())
-				.append("')!=DATE_FORMAT(FROM_UNIXTIME(@TIMESTAMP),'").append(getDateFormat()).append("')").toString();
+		setVariableSql = "SELECT @TIMESTAMP:=GREATEST(LAST_UPDATED,UNIX_TIMESTAMP()) FROM `" + getTableName()
+				+ "` WHERE NAME='" + getSequenceName() + "'";
+		incrementSql = "UPDATE `" + getTableName()
+				+ "` SET VALUE=LAST_INSERT_ID(VALUE+1),LAST_UPDATED=@TIMESTAMP WHERE NAME='" + getSequenceName()
+				+ "' AND DATE_FORMAT(FROM_UNIXTIME(LAST_UPDATED),'" + getDateFormat()
+				+ "')=DATE_FORMAT(FROM_UNIXTIME(@TIMESTAMP),'" + getDateFormat() + "')";
+		restartSql = "UPDATE `" + getTableName() + "` SET VALUE=LAST_INSERT_ID(1),LAST_UPDATED=@TIMESTAMP WHERE NAME='"
+				+ getSequenceName() + "' AND DATE_FORMAT(FROM_UNIXTIME(LAST_UPDATED),'" + getDateFormat()
+				+ "')!=DATE_FORMAT(FROM_UNIXTIME(@TIMESTAMP),'" + getDateFormat() + "')";
 		try {
 			MySQLSequenceHelper.createOrUpgradeTable(getDataSource(), getTableName(), getSequenceName());
 		} catch (SQLException e) {

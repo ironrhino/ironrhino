@@ -26,14 +26,12 @@ public class ScheduledTaskCircuitBreakerAspect extends BaseAspect {
 	public Object control(ProceedingJoinPoint jp, Scheduled scheduled) throws Throwable {
 		if (circuitBreaker == null)
 			return jp.proceed();
-		StringBuilder sb = new StringBuilder();
 		Class<?> beanClass = jp.getTarget().getClass();
 		String beanName = NameGenerator.buildDefaultBeanName(beanClass.getName());
 		Component comp = AnnotatedElementUtils.getMergedAnnotation(beanClass, Component.class);
 		if (comp != null && StringUtils.isNotBlank(comp.value()))
 			beanName = comp.value();
-		String task = sb.append(beanName).append('.').append(jp.getSignature().getName()).append('(').append(')')
-				.toString();
+		String task = beanName + '.' + jp.getSignature().getName() + '(' + ')';
 		if (circuitBreaker.isShortCircuit(task)) {
 			throw new IllegalStateException("Execution[\"" + task + "\"] is short circuit");
 		} else {

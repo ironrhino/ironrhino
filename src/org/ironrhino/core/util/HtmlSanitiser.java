@@ -145,7 +145,7 @@ public class HtmlSanitiser {
 	}
 
 	private static String getEndTagHTML(String tagName) {
-		return new StringBuilder().append("</").append(tagName).append('>').toString();
+		return "</" + tagName + '>';
 	}
 
 }

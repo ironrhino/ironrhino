@@ -4,15 +4,13 @@ public class HSQLCyclicSequence extends AbstractSequenceCyclicSequence {
 
 	@Override
 	protected String getCreateSequenceStatement() {
-		return new StringBuilder("CREATE SEQUENCE ").append(getActualSequenceName()).append(" AS BIGINT START WITH 1")
-				.toString();
+		return "CREATE SEQUENCE " + getActualSequenceName() + " AS BIGINT START WITH 1";
 	}
 
 	@Override
 	protected String getQuerySequenceStatement() {
-		return new StringBuilder("SELECT NEXT VALUE FOR ").append(getActualSequenceName()).append(",")
-				.append(getCurrentTimestamp()).append(",LAST_UPDATED FROM ").append(getTableName())
-				.append(" WHERE NAME='").append(getSequenceName()).append("'").toString();
+		return "SELECT NEXT VALUE FOR " + getActualSequenceName() + "," + getCurrentTimestamp() + ",LAST_UPDATED FROM "
+				+ getTableName() + " WHERE NAME='" + getSequenceName() + "'";
 	}
 
 }

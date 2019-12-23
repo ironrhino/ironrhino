@@ -258,22 +258,18 @@ public class PageViewServiceImpl implements PageViewService {
 		cal.add(Calendar.DAY_OF_YEAR, -1);
 		Date yesterday = cal.getTime();
 		String day = DateUtils.formatDate8(yesterday);
-		pageViewStringRedisTemplate.delete(Arrays.asList(
-				new StringBuilder(KEY_PAGE_VIEW).append("uip:").append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString(),
-				new StringBuilder(KEY_PAGE_VIEW).append("usid:").append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString(),
-				new StringBuilder(KEY_PAGE_VIEW).append("uu:").append(day).append(KEY_HYPERLOGLOG_SUFFIX).toString()));
+		pageViewStringRedisTemplate.delete(Arrays.asList(KEY_PAGE_VIEW + "uip:" + day + KEY_HYPERLOGLOG_SUFFIX,
+				KEY_PAGE_VIEW + "usid:" + day + KEY_HYPERLOGLOG_SUFFIX,
+				KEY_PAGE_VIEW + "uu:" + day + KEY_HYPERLOGLOG_SUFFIX));
 		updateMax(day, "pv", null);
 		updateMax(day, "uip", null);
 		updateMax(day, "usid", null);
 		updateMax(day, "uu", null);
 		for (String domain : getDomains()) {
-			pageViewStringRedisTemplate.delete(Arrays.asList(
-					new StringBuilder(KEY_PAGE_VIEW).append(domain).append(":").append("uip:").append(day)
-							.append(KEY_HYPERLOGLOG_SUFFIX).toString(),
-					new StringBuilder(KEY_PAGE_VIEW).append(domain).append(":").append("usid:").append(day)
-							.append(KEY_HYPERLOGLOG_SUFFIX).toString(),
-					new StringBuilder(KEY_PAGE_VIEW).append(domain).append(":").append("uu:").append(day)
-							.append(KEY_HYPERLOGLOG_SUFFIX).toString()));
+			pageViewStringRedisTemplate
+					.delete(Arrays.asList(KEY_PAGE_VIEW + domain + ":" + "uip:" + day + KEY_HYPERLOGLOG_SUFFIX,
+							KEY_PAGE_VIEW + domain + ":" + "usid:" + day + KEY_HYPERLOGLOG_SUFFIX,
+							KEY_PAGE_VIEW + domain + ":" + "uu:" + day + KEY_HYPERLOGLOG_SUFFIX));
 			updateMax(day, "pv", domain);
 			updateMax(day, "uip", domain);
 			updateMax(day, "usid", domain);

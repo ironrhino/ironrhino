@@ -100,11 +100,7 @@ public class RecordAspect implements TransactionSynchronization, Ordered {
 						if (value == null || value instanceof Collection && ((Collection<?>) value).isEmpty()
 								|| value.getClass().isArray() && Array.getLength(value) == 0)
 							continue;
-						StringBuilder line = new StringBuilder();
-						line.append(propertyNames[i]);
-						line.append(": ");
-						line.append(StringUtils.toString(value));
-						sj.add(line);
+						sj.add(propertyNames[i] + ": " + StringUtils.toString(value));
 					}
 					payload = sj.toString();
 				} else if (event instanceof PostUpdateEvent) {
@@ -157,13 +153,8 @@ public class RecordAspect implements TransactionSynchronization, Ordered {
 								|| newValue instanceof Collection && ((Collection<?>) newValue).isEmpty()
 										&& oldValue == null)
 							continue;
-						StringBuilder line = new StringBuilder();
-						line.append(propertyName);
-						line.append(": ");
-						line.append(StringUtils.toString(oldValue));
-						line.append(" -> ");
-						line.append(StringUtils.toString(newValue));
-						sj.add(line);
+						sj.add(propertyName + ": " + StringUtils.toString(oldValue) + " -> "
+								+ StringUtils.toString(newValue));
 					}
 					payload = sj.toString();
 					if (payload.isEmpty())

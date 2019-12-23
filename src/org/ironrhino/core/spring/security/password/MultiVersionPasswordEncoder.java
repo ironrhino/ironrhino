@@ -38,7 +38,7 @@ public class MultiVersionPasswordEncoder implements PasswordEncoder {
 		if (rawPassword == null)
 			return null;
 		VersionedPasswordEncoder pd = map.get(map.lastKey());
-		return new StringBuilder(pd.encode(rawPassword)).append('#').append(pd.getVersion()).toString();
+		return pd.encode(rawPassword) + '#' + pd.getVersion();
 	}
 
 	@Override

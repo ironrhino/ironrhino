@@ -29,7 +29,7 @@ public class CubridSimpleSequence extends AbstractSequenceSimpleSequence {
 
 	@Override
 	protected String getQuerySequenceStatement() {
-		return new StringBuilder("SELECT ").append(getActualSequenceName()).append(".NEXT_VALUE").toString();
+		return "SELECT " + getActualSequenceName() + ".NEXT_VALUE";
 	}
 
 	@Override

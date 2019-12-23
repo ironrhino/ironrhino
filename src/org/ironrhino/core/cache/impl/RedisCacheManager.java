@@ -279,11 +279,7 @@ public class RedisCacheManager implements CacheManager {
 		if (key == null)
 			throw new IllegalArgumentException("key should not be null");
 		if (StringUtils.isNotBlank(namespace)) {
-			StringBuilder sb = new StringBuilder(namespace.length() + key.length() + 1);
-			sb.append(namespace);
-			sb.append(':');
-			sb.append(key);
-			return sb.toString();
+			return namespace + ':' + key;
 		} else {
 			return key;
 		}

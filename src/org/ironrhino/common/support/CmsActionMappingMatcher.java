@@ -83,8 +83,7 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 				return mapping;
 			}
 			for (String name : seriesesList) {
-				String pageurl = new StringBuilder("/").append(URLEncoder.encode(name, encoding)).append(pagePathPrefix)
-						.toString();
+				String pageurl = "/" + URLEncoder.encode(name, encoding) + pagePathPrefix;
 				if (uri.equals("/" + URLEncoder.encode(name, encoding)) || uri.startsWith(pageurl)) {
 					ActionMapping mapping = new ActionMapping();
 					mapping.setNamespace(SeriesPageAction.NAMESPACE);
@@ -105,10 +104,8 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 				}
 			}
 			for (String name : columnsList) {
-				String listurl = new StringBuilder("/").append(URLEncoder.encode(name, encoding)).append("/list/")
-						.toString();
-				String pageurl = new StringBuilder("/").append(URLEncoder.encode(name, encoding)).append(pagePathPrefix)
-						.toString();
+				String listurl = "/" + URLEncoder.encode(name, encoding) + "/list/";
+				String pageurl = "/" + URLEncoder.encode(name, encoding) + pagePathPrefix;
 				if (uri.equals("/" + URLEncoder.encode(name, encoding)) || uri.startsWith(listurl)
 						|| uri.startsWith(pageurl)) {
 					ActionMapping mapping = new ActionMapping();
@@ -144,10 +141,8 @@ public class CmsActionMappingMatcher implements ActionMappingMatcher {
 				}
 			}
 			for (String name : issuesList) {
-				String listurl = new StringBuilder("/").append(URLEncoder.encode(name, encoding)).append("/list/")
-						.toString();
-				String pageurl = new StringBuilder("/").append(URLEncoder.encode(name, encoding)).append(pagePathPrefix)
-						.toString();
+				String listurl = "/" + URLEncoder.encode(name, encoding) + "/list/";
+				String pageurl = "/" + URLEncoder.encode(name, encoding) + pagePathPrefix;
 				if (uri.equals("/" + URLEncoder.encode(name, encoding)) || uri.startsWith(listurl)
 						|| uri.startsWith(pageurl)) {
 					ActionMapping mapping = new ActionMapping();

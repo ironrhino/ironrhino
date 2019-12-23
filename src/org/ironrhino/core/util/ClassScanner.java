@@ -151,9 +151,8 @@ public class ClassScanner {
 		List<Class<?>> classes = new ArrayList<>();
 		Resource resource = null;
 		try {
-			String searchPath = new StringBuilder(ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX)
-					.append(org.springframework.util.ClassUtils.convertClassNameToResourcePath(basePackage))
-					.append(pattern).toString();
+			String searchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX
+					+ org.springframework.util.ClassUtils.convertClassNameToResourcePath(basePackage) + pattern;
 			Resource[] resources = this.resourcePatternResolver.getResources(searchPath);
 			for (int i = 0; i < resources.length; i++) {
 				resource = resources[i];

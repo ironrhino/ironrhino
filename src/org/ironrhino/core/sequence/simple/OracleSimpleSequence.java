@@ -9,7 +9,7 @@ public class OracleSimpleSequence extends AbstractSequenceSimpleSequence {
 
 	@Override
 	protected String getQuerySequenceStatement() {
-		return new StringBuilder("SELECT ").append(getActualSequenceName()).append(".NEXTVAL FROM DUAL").toString();
+		return "SELECT " + getActualSequenceName() + ".NEXTVAL FROM DUAL";
 	}
 
 	@Override

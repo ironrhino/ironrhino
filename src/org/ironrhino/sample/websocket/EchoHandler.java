@@ -18,7 +18,7 @@ public class EchoHandler extends AuthorizedWebSocketHandler {
 			return;
 		String username = principal.getName();
 		logger.info("received \"{}\" from {}", message.getPayload(), username);
-		String text = new StringBuilder(username).append(" send : ").append(message.getPayload()).toString();
+		String text = username + " send : " + message.getPayload();
 		session.sendMessage(new TextMessage(text));
 		broadcast("received \"" + message.getPayload() + "\" from " + username);
 	}

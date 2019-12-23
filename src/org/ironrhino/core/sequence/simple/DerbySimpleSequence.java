@@ -8,13 +8,12 @@ public class DerbySimpleSequence extends AbstractSequenceSimpleSequence {
 
 	@Override
 	protected String getCreateSequenceStatement() {
-		return new StringBuilder("CREATE SEQUENCE ").append(getActualSequenceName()).append(" AS BIGINT START WITH 1")
-				.toString();
+		return "CREATE SEQUENCE " + getActualSequenceName() + " AS BIGINT START WITH 1";
 	}
 
 	@Override
 	protected String getQuerySequenceStatement() {
-		return new StringBuilder("SELECT NEXT VALUE FOR ").append(getActualSequenceName()).toString();
+		return "SELECT NEXT VALUE FOR " + getActualSequenceName();
 	}
 
 	@Override

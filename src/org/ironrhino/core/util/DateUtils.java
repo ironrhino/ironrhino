@@ -283,8 +283,8 @@ public class DateUtils {
 		delta -= hours * 3600;
 		int minutes = delta / 60;
 		int seconds = delta - minutes * 60;
-		return new StringBuilder(NumberUtils.format(hours, 2)).append(":").append(NumberUtils.format(minutes, 2))
-				.append(":").append(NumberUtils.format(seconds, 2)).toString();
+		return NumberUtils.format(hours, 2) + ":" + NumberUtils.format(minutes, 2) + ":"
+				+ NumberUtils.format(seconds, 2);
 	}
 
 	public static String humanRead(Date date) {

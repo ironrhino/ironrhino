@@ -20,7 +20,7 @@ public abstract class AbstractDatabaseCyclicSequence extends AbstractCyclicSeque
 	private int cacheSize = 1;
 
 	protected String getActualSequenceName() {
-		return new StringBuilder(getSequenceName()).append("_SEQ").toString();
+		return getSequenceName() + "_SEQ";
 	}
 
 }
