@@ -7,11 +7,11 @@
 	xmlns:c="http://www.springframework.org/schema/c"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
-	http://www.springframework.org/schema/beans/spring-beans.xsd
+	https://www.springframework.org/schema/beans/spring-beans.xsd
 	http://www.springframework.org/schema/context 
-	http://www.springframework.org/schema/context/spring-context.xsd
+	https://www.springframework.org/schema/context/spring-context.xsd
 	http://www.springframework.org/schema/batch
-	http://www.springframework.org/schema/batch/spring-batch.xsd">
+	https://www.springframework.org/schema/batch/spring-batch.xsd">
 	<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource"
 		p:jdbcUrl="jdbc:h2:mem:test;DB_CLOSE_DELAY=-1" autowire="no" />
 	<bean id="jdbcTemplate"

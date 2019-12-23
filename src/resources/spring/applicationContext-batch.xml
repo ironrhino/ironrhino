@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans default-autowire="byName" xmlns="http://www.springframework.org/schema/beans"
+<beans default-autowire="byName"
+	xmlns="http://www.springframework.org/schema/beans"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:batch="http://www.springframework.org/schema/batch"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:c="http://www.springframework.org/schema/c"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
-	http://www.springframework.org/schema/beans/spring-beans.xsd
+	https://www.springframework.org/schema/beans/spring-beans.xsd
 	http://www.springframework.org/schema/context 
-	http://www.springframework.org/schema/context/spring-context.xsd
+	https://www.springframework.org/schema/context/spring-context.xsd
 	http://www.springframework.org/schema/batch
-	http://www.springframework.org/schema/batch/spring-batch.xsd">
+	https://www.springframework.org/schema/batch/spring-batch.xsd">
 	<bean id="batchTaskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor" c:threadNamePrefix="batch-"/>
 	<bean id="executionContextSerializer" class="org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializer"/>
 	<batch:job-repository serializer="executionContextSerializer" isolation-level-for-create="REPEATABLE_READ" table-prefix="${jobRepository.tablePrefix:BATCH_}" max-varchar-length="4000"/>
