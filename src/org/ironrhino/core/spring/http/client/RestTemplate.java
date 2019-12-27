@@ -1,6 +1,7 @@
 package org.ironrhino.core.spring.http.client;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -131,8 +132,8 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 		public TrustAllHostsClientHttpRequestFactory(boolean trustAllHosts) {
 			HttpClientBuilder builder = HttpClients.custom().useSystemProperties().disableAuthCaching()
 					.disableConnectionState().disableCookieManagement().setConnectionTimeToLive(60, TimeUnit.SECONDS)
-					.setRetryHandler(
-							(e, executionCount, httpCtx) -> executionCount < 3 && e instanceof NoHttpResponseException);
+					.setRetryHandler((e, executionCount, httpCtx) -> executionCount < 3
+							&& (e instanceof NoHttpResponseException || e instanceof UnknownHostException));
 			if (trustAllHosts) {
 				try {
 					SSLContextBuilder sbuilder = SSLContexts.custom().loadTrustMaterial(null, (chain, authType) -> {
