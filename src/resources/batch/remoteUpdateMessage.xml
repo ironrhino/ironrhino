@@ -9,8 +9,45 @@
 	http://www.springframework.org/schema/batch
 	https://www.springframework.org/schema/batch/spring-batch.xsd">
 
-	<import resource="include/abstractPartitionUpdateMessage.xml" />
+	<import resource="include/abstractUpdateMessage.xml" />
 
+	<bean id="reader" scope="step"
+		class="org.springframework.batch.item.database.JdbcPagingItemReader">
+		<property name="saveState" value="false" />
+		<property name="dataSource" ref="dataSource" />
+		<property name="queryProvider">
+			<bean
+				class="org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean">
+				<property name="dataSource" ref="dataSource" />
+				<property name="selectClause" value="select *" />
+				<property name="fromClause" value="from sample_message" />
+				<property name="whereClause"
+					value="where createDate between :beginDate and :endDate and id%${batch.updateMessage.partitions:10}=:mod" />
+				<property name="sortKey" value="id" />
+			</bean>
+		</property>
+		<property name="parameterValues">
+			<map>
+				<entry key="beginDate"
+					value="#{T(org.ironrhino.core.util.DateUtils).beginOfDay(jobParameters[createDate])}" />
+				<entry key="endDate"
+					value="#{T(org.ironrhino.core.util.DateUtils).endOfDay(jobParameters[createDate])}" />
+				<entry key="mod"
+					value="#{new Integer(stepName.substring(stepName.lastIndexOf(':')+10))}" />
+			</map>
+		</property>
+		<property name="pageSize"
+			value="${batch.updateMessage.commitInterval:100}" />
+		<property name="rowMapper">
+			<bean
+				class="org.springframework.jdbc.core.BeanPropertyRowMapper"
+				p:mappedClass="org.ironrhino.sample.crud.Message" />
+		</property>
+	</bean>
+
+	<bean id="partitioner" scope="step"
+		class="org.springframework.batch.core.partition.support.SimplePartitioner" />
+		
 	<bean id="partitionHandler"
 		class="org.ironrhino.batch.partition.RemoteInvocationPartitionHandler">
 		<property name="taskExecutor" ref="taskExecutor" />
@@ -19,6 +56,15 @@
 		<property name="connectTimeout" value="${batch.updateMessage.remoteInvocation.connectTimeout:5000}" />
 		<property name="readTimeout" value="${batch.updateMessage.remoteInvocation.readTimeout:3600000}" />
 	</bean>
+
+	<step id="updateMessage"
+		xmlns="http://www.springframework.org/schema/batch">
+		<tasklet task-executor="taskExecutor"
+			throttle-limit="${batch.updateMessage.parallelism:10}">
+			<chunk reader="reader" processor="processor" writer="writer"
+				commit-interval="${batch.updateMessage.commitInterval:100}" />
+		</tasklet>
+	</step>
 
 	<job id="remoteUpdateMessageJob"
 		xmlns="http://www.springframework.org/schema/batch">
