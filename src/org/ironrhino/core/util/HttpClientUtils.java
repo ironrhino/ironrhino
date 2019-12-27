@@ -2,6 +2,7 @@ package org.ironrhino.core.util;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -76,8 +77,9 @@ public class HttpClientUtils {
 		}
 		builder.disableAuthCaching().disableConnectionState().disableCookieManagement()
 				.setConnectionTimeToLive(60, TimeUnit.SECONDS).setDefaultRequestConfig(requestConfig)
-				.setDefaultHeaders(DEFAULT_HEADERS).useSystemProperties().setRetryHandler(
-						(e, executionCount, httpCtx) -> executionCount < 3 && e instanceof NoHttpResponseException);
+				.setDefaultHeaders(DEFAULT_HEADERS).useSystemProperties()
+				.setRetryHandler((e, executionCount, httpCtx) -> executionCount < 3
+						&& (e instanceof NoHttpResponseException || e instanceof UnknownHostException));
 		return builder.build();
 	}
 

@@ -1,6 +1,7 @@
 package org.ironrhino.core.tracing;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -46,8 +47,8 @@ public class HttpSender extends ThriftSender {
 		this.httpClient = HttpClients.custom().useSystemProperties().disableAuthCaching().disableConnectionState()
 				.disableCookieManagement().setConnectionTimeToLive(CONNECTION_TIME_TO_LIVE, TimeUnit.SECONDS)
 				.setDefaultRequestConfig(RequestConfig.custom().setConnectTimeout(CONNECTION_TIMEOUT).build())
-				.setRetryHandler(
-						(e, executionCount, httpCtx) -> executionCount < 3 && e instanceof NoHttpResponseException)
+				.setRetryHandler((e, executionCount, httpCtx) -> executionCount < 3
+						&& (e instanceof NoHttpResponseException || e instanceof UnknownHostException))
 				.build();
 	}
 
