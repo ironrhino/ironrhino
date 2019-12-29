@@ -16,6 +16,7 @@ import org.ironrhino.core.security.role.UserRoleMapper;
 import org.ironrhino.core.service.BaseManagerImpl;
 import org.ironrhino.core.spring.security.password.PasswordGenerator;
 import org.ironrhino.core.spring.security.password.PasswordNotifier;
+import org.ironrhino.core.spring.security.password.PasswordUsedException;
 import org.ironrhino.security.model.BaseUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,6 +48,9 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 
 	@Value("${user.password.expiresInDays:0}")
 	private int passwordExpiresInDays;
+
+	@Value("${user.password.maxRemembered:0}")
+	private int maxRememberedPasswords;
 
 	@Override
 	@Transactional
@@ -114,6 +118,7 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 	@EvictCache(namespace = DEFAULT_CACHE_NAMESPACE, key = "${user.username}")
 	public void changePassword(T user, String password) {
 		T u = get(user.getId());
+		checkUsedPassword(u, password);
 		u.setPassword(passwordEncoder.encode(password));
 		u.setPasswordModifyDate(new Date());
 		// copy state to origin object to avoid re-login
@@ -134,6 +139,7 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 		T u = get(user.getId());
 		if (!passwordEncoder.matches(currentPassword, u.getPassword()))
 			throw new BadCredentialsException("Bad credentials");
+		checkUsedPassword(u, password);
 		u.setPassword(passwordEncoder.encode(password));
 		u.setPasswordModifyDate(new Date());
 		// copy state to origin object to avoid re-login
@@ -212,6 +218,25 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 
 	protected Set<String> getBuiltInRoles() {
 		return Collections.emptySet();
+	}
+
+	protected void checkUsedPassword(T user, String password) {
+		List<String> rememberedPasswords = new ArrayList<>();
+		if (user.getRememberedPasswords() != null)
+			rememberedPasswords.addAll(user.getRememberedPasswords());
+		rememberedPasswords.add(user.getPassword());
+		for (String pw : rememberedPasswords) {
+			if (passwordEncoder.matches(password, pw))
+				throw new PasswordUsedException("Password recently used");
+		}
+		int tobeRemoved = rememberedPasswords.size() - maxRememberedPasswords;
+		if (tobeRemoved > 0) {
+			for (int i = 0; i < tobeRemoved; i++)
+				rememberedPasswords.remove(0);
+			if (rememberedPasswords.isEmpty())
+				rememberedPasswords = null;
+		}
+		user.setRememberedPasswords(rememberedPasswords);
 	}
 
 }

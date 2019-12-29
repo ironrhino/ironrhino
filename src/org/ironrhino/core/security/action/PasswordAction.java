@@ -20,6 +20,7 @@ import org.ironrhino.core.spring.security.VerificationCodeChecker;
 import org.ironrhino.core.spring.security.WrongVerificationCodeException;
 import org.ironrhino.core.spring.security.password.PasswordMutator;
 import org.ironrhino.core.spring.security.password.PasswordStrengthChecker;
+import org.ironrhino.core.spring.security.password.PasswordUsedException;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,6 +138,9 @@ public class PasswordAction extends BaseAction {
 			passwordMutator.changePassword(user, currentPassword, password);
 		} catch (BadCredentialsException e) {
 			addFieldError("currentPassword", getText("currentPassword.error"));
+			return SUCCESS;
+		} catch (PasswordUsedException e) {
+			addFieldError("password", getText(e.getClass().getName()));
 			return SUCCESS;
 		}
 		notify("save.success");
