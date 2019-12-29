@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -103,6 +104,11 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 	@JsonIgnore
 	@UiConfig(hidden = true)
 	private Date passwordModifyDate;
+
+	@NotInCopy
+	@JsonIgnore
+	@UiConfig(hidden = true, excludedFromLike = true, excludedFromCriteria = true)
+	private List<String> rememberedPasswords;
 
 	@NotInCopy
 	@JsonIgnore
