@@ -107,6 +107,10 @@ public class ResultPage<T> implements Serializable {
 		this.result = result;
 	}
 
+	public int getStart() {
+		return (pageNo - 1) * pageSize;
+	}
+
 	public int getTotalPage() {
 		totalPage = (int) (totalResults % pageSize == 0 ? totalResults / pageSize : totalResults / pageSize + 1);
 		return totalPage;
