@@ -1,6 +1,6 @@
 package org.ironrhino.batch;
 
-import org.springframework.batch.core.JobInterruptedException;
+import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.configuration.StepRegistry;
@@ -27,8 +27,7 @@ public class DefaultJobStepExecutor implements JobStepExecutor {
 	private StepRegistry stepRegistry;
 
 	@Override
-	public void execute(Long jobExecutionId, Long stepExecutionId, String stepName)
-			throws JobInterruptedException, NoSuchJobException, NoSuchStepException {
+	public void execute(Long jobExecutionId, Long stepExecutionId, String stepName) throws JobExecutionException {
 		StepExecution stepExecution = jobExplorer.getStepExecution(jobExecutionId, stepExecutionId);
 		if (stepExecution == null)
 			throw new NoSuchStepException("No such StepExecution: " + stepExecutionId);
