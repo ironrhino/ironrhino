@@ -1,13 +1,11 @@
 package org.ironrhino.batch;
 
 import org.ironrhino.core.remoting.Remoting;
-import org.springframework.batch.core.JobInterruptedException;
-import org.springframework.batch.core.launch.NoSuchJobException;
+import org.springframework.batch.core.JobExecutionException;
 
 @Remoting
 public interface JobStepExecutor {
 
-	public void execute(Long jobExecutionId, Long stepExecutionId, String stepName)
-			throws JobInterruptedException, NoSuchJobException;
+	public void execute(Long jobExecutionId, Long stepExecutionId, String stepName) throws JobExecutionException;
 
 }
