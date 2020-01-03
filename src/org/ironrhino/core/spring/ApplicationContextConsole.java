@@ -27,6 +27,7 @@ import org.springframework.context.Lifecycle;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Component;
+import org.springframework.util.function.SingletonSupplier;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -48,56 +49,49 @@ public class ApplicationContextConsole {
 	@Autowired
 	private EventPublisher eventPublisher;
 
-	private volatile Map<String, Object> beans;
+	private SingletonSupplier<Map<String, Object>> beansSupplier = SingletonSupplier.of(() -> {
+		Map<String, Object> beans = new HashMap<>();
+		String[] beanNames = ctx.getBeanDefinitionNames();
+		for (String beanName : beanNames) {
+			if (!ctx.isSingleton(beanName))
+				continue;
+			BeanDefinition bd = ctx.getBeanDefinition(beanName);
+			if (bd.isAbstract())
+				continue;
+			if (StringUtils.isAlphanumeric(beanName.replaceAll("_", "")))
+				beans.put(beanName, ctx.getBean(beanName));
+			String[] aliases = ctx.getAliases(beanName);
+			for (String alias : aliases)
+				if (StringUtils.isAlphanumeric(alias.replaceAll("_", "")))
+					beans.put(alias, ctx.getBean(beanName));
+			String factoryBeanName = "&" + beanName;
+			if (ctx.containsBean(factoryBeanName))
+				beans.put(factoryBeanName.replace('&', '$'), ctx.getBean(factoryBeanName));
+		}
+		return Collections.unmodifiableMap(beans);
+	});
 
-	private Map<String, Scope> triggers;
-
-	public Map<String, Object> getBeans() {
-		Map<String, Object> temp = beans;
-		if (temp == null) {
-			synchronized (this) {
-				if ((temp = beans) == null) {
-					temp = new HashMap<>();
-					String[] beanNames = ctx.getBeanDefinitionNames();
-					for (String beanName : beanNames) {
-						if (!ctx.isSingleton(beanName))
-							continue;
-						BeanDefinition bd = ctx.getBeanDefinition(beanName);
-						if (bd.isAbstract())
-							continue;
-						if (StringUtils.isAlphanumeric(beanName.replaceAll("_", "")))
-							temp.put(beanName, ctx.getBean(beanName));
-						String[] aliases = ctx.getAliases(beanName);
-						for (String alias : aliases)
-							if (StringUtils.isAlphanumeric(alias.replaceAll("_", "")))
-								temp.put(alias, ctx.getBean(beanName));
-						String factoryBeanName = "&" + beanName;
-						if (ctx.containsBean(factoryBeanName))
-							temp.put(factoryBeanName.replace('&', '$'), ctx.getBean(factoryBeanName));
-					}
-					beans = temp = Collections.unmodifiableMap(temp);
+	private SingletonSupplier<Map<String, Scope>> triggersSupplier = SingletonSupplier.of(() -> {
+		Map<String, Scope> triggers = new TreeMap<>();
+		for (Map.Entry<String, Object> entry : getBeans().entrySet()) {
+			Class<?> clz = ReflectionUtils.getTargetObject(entry.getValue()).getClass();
+			Set<Method> methods = AnnotationUtils.getAnnotatedMethods(clz, Trigger.class);
+			for (Method m : methods) {
+				if (m.getParameterCount() == 0) {
+					String expression = entry.getKey() + "." + m.getName() + "()";
+					triggers.put(expression, m.getAnnotation(Trigger.class).scope());
 				}
 			}
 		}
-		return temp;
+		return Collections.unmodifiableMap(triggers);
+	});
+
+	public Map<String, Object> getBeans() {
+		return beansSupplier.obtain();
 	}
 
 	public Map<String, Scope> getTriggers() {
-		if (triggers == null) {
-			Map<String, Scope> temp = new TreeMap<>();
-			for (Map.Entry<String, Object> entry : getBeans().entrySet()) {
-				Class<?> clz = ReflectionUtils.getTargetObject(entry.getValue()).getClass();
-				Set<Method> methods = AnnotationUtils.getAnnotatedMethods(clz, Trigger.class);
-				for (Method m : methods) {
-					if (m.getParameterCount() == 0) {
-						String expression = entry.getKey() + "." + m.getName() + "()";
-						temp.put(expression, m.getAnnotation(Trigger.class).scope());
-					}
-				}
-			}
-			triggers = Collections.unmodifiableMap(temp);
-		}
-		return triggers;
+		return triggersSupplier.obtain();
 	}
 
 	public Map<String, Lifecycle> getLifecycleBeans() {

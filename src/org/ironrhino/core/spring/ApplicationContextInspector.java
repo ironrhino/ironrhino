@@ -1,5 +1,6 @@
 package org.ironrhino.core.spring;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,6 +24,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.util.function.SingletonSupplier;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -44,24 +46,66 @@ public class ApplicationContextInspector {
 
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
-	private volatile Map<String, String> overridedProperties;
+	private SingletonSupplier<Map<String, String>> overridedPropertiesSupplier = SingletonSupplier.of(() -> {
+		Map<String, String> overridedProperties = new TreeMap<>();
+		for (PropertySource<?> ps : env.getPropertySources()) {
+			addOverridedProperties(overridedProperties, ps);
+		}
+		return Collections.unmodifiableMap(overridedProperties);
+	});
 
-	private volatile Map<String, String> defaultProperties;
-
-	public Map<String, String> getOverridedProperties() {
-		Map<String, String> temp = overridedProperties;
-		if (temp == null) {
-			synchronized (this) {
-				if ((temp = overridedProperties) == null) {
-					Map<String, String> map = new TreeMap<>();
-					for (PropertySource<?> ps : env.getPropertySources()) {
-						addOverridedProperties(map, ps);
-					}
-					overridedProperties = temp = Collections.unmodifiableMap(map);
-				}
+	private SingletonSupplier<Map<String, String>> defaultPropertiesSupplier = SingletonSupplier.of(() -> {
+		List<String> list = new ArrayList<>();
+		for (String s : ctx.getBeanDefinitionNames()) {
+			BeanDefinition bd = ctx.getBeanDefinition(s);
+			String clz = bd.getBeanClassName();
+			if (clz == null) {
+				continue;
+			}
+			try {
+				ReflectionUtils.doWithFields(Class.forName(clz), field -> {
+					list.add(field.getAnnotation(Value.class).value());
+				}, field -> {
+					return field.isAnnotationPresent(Value.class);
+				});
+			} catch (NoClassDefFoundError e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				throw new RuntimeException(e);
 			}
 		}
-		return temp;
+		try {
+			for (Resource resource : resourcePatternResolver
+					.getResources("classpath*:resources/spring/applicationContext-*.xml"))
+				add(resource, list);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		for (Class<?> clazz : ClassScanner.scanAssignable(ClassScanner.getAppPackages(), ActionSupport.class)) {
+			ReflectionUtils.doWithFields(clazz, field -> {
+				list.add(field.getAnnotation(Value.class).value());
+			}, field -> {
+				return field.isAnnotationPresent(Value.class);
+			});
+		}
+		Map<String, String> defaultProperties = new TreeMap<>();
+		for (String str : list) {
+			int start = str.indexOf("${");
+			int end = str.lastIndexOf("}");
+			if (start > -1 && end > start) {
+				str = str.substring(start + 2, end);
+				String[] arr = str.split(":", 2);
+				if (arr.length > 1)
+					defaultProperties.put(arr[0], arr[1]);
+			}
+		}
+		ctx.getBeanProvider(DefaultPropertiesProvider.class)
+				.forEach(p -> defaultProperties.putAll(p.getDefaultProperties()));
+		return Collections.unmodifiableMap(defaultProperties);
+	});
+
+	public Map<String, String> getOverridedProperties() {
+		return overridedPropertiesSupplier.obtain();
 	}
 
 	private static void addOverridedProperties(Map<String, String> properties, PropertySource<?> propertySource) {
@@ -78,73 +122,23 @@ public class ApplicationContextInspector {
 		}
 	}
 
-	public Map<String, String> getDefaultProperties() throws Exception {
-		Map<String, String> temp = defaultProperties;
-		if (temp == null) {
-			synchronized (this) {
-				if ((temp = defaultProperties) == null) {
-					List<String> list = new ArrayList<>();
-					for (String s : ctx.getBeanDefinitionNames()) {
-						BeanDefinition bd = ctx.getBeanDefinition(s);
-						String clz = bd.getBeanClassName();
-						if (clz == null) {
-							continue;
-						}
-						try {
-							ReflectionUtils.doWithFields(Class.forName(clz), field -> {
-								list.add(field.getAnnotation(Value.class).value());
-							}, field -> {
-								return field.isAnnotationPresent(Value.class);
-							});
-						} catch (NoClassDefFoundError e) {
-							e.printStackTrace();
-						}
-					}
-
-					for (Resource resource : resourcePatternResolver
-							.getResources("classpath*:resources/spring/applicationContext-*.xml"))
-						add(resource, list);
-
-					for (Class<?> clazz : ClassScanner.scanAssignable(ClassScanner.getAppPackages(),
-							ActionSupport.class)) {
-						ReflectionUtils.doWithFields(clazz, field -> {
-							list.add(field.getAnnotation(Value.class).value());
-						}, field -> {
-							return field.isAnnotationPresent(Value.class);
-						});
-					}
-
-					Map<String, String> map = new TreeMap<>();
-					for (String str : list) {
-						int start = str.indexOf("${");
-						int end = str.lastIndexOf("}");
-						if (start > -1 && end > start) {
-							str = str.substring(start + 2, end);
-							String[] arr = str.split(":", 2);
-							if (arr.length > 1)
-								map.put(arr[0], arr[1]);
-						}
-					}
-					ctx.getBeanProvider(DefaultPropertiesProvider.class)
-							.forEach(p -> map.putAll(p.getDefaultProperties()));
-					defaultProperties = temp = Collections.unmodifiableMap(map);
-				}
-			}
-		}
-		return temp;
+	public Map<String, String> getDefaultProperties() {
+		return defaultPropertiesSupplier.obtain();
 	}
 
 	DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
 
-	private void add(Resource resource, List<String> list) throws Exception {
+	private void add(Resource resource, List<String> list) {
 		if (resource.isReadable())
 			try (InputStream is = resource.getInputStream()) {
 				Document doc = builderFactory.newDocumentBuilder().parse(new InputSource(is));
 				add(doc.getDocumentElement(), list);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
 			}
 	}
 
-	private void add(Element element, List<String> list) throws Exception {
+	private void add(Element element, List<String> list) {
 		if (element.getTagName().equals("import")) {
 			add(resourcePatternResolver.getResource(element.getAttribute("resource")), list);
 			return;

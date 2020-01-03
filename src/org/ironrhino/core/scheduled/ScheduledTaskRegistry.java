@@ -16,13 +16,12 @@ import org.springframework.scheduling.config.ScheduledTaskHolder;
 import org.springframework.scheduling.config.TriggerTask;
 import org.springframework.scheduling.support.ScheduledMethodRunnable;
 import org.springframework.stereotype.Component;
+import org.springframework.util.function.SingletonSupplier;
 
 import lombok.Data;
 
 @Component
 public class ScheduledTaskRegistry {
-
-	private volatile List<ScheduledTask> tasks = null;
 
 	@Autowired(required = false)
 	private List<ScheduledTaskHolder> scheduledTaskHolders = Collections.emptyList();
@@ -30,19 +29,9 @@ public class ScheduledTaskRegistry {
 	@Autowired
 	private ApplicationContext ctx;
 
-	public List<ScheduledTask> getTasks() {
-		List<ScheduledTask> temp = tasks;
-		if (temp == null) {
-			synchronized (this) {
-				if ((temp = tasks) == null)
-					tasks = temp = doGetTasks();
-			}
-		}
-		return temp;
-	}
+	private SingletonSupplier<List<ScheduledTask>> tasksSupplier = SingletonSupplier.of(() -> {
 
-	private List<ScheduledTask> doGetTasks() {
-		List<ScheduledTask> list = new ArrayList<>();
+		List<ScheduledTask> tasks = new ArrayList<>();
 		for (ScheduledTaskHolder sth : scheduledTaskHolders) {
 			sth.getScheduledTasks().stream().map(st -> st.getTask()).forEach(task -> {
 				ScheduledTask st = new ScheduledTask();
@@ -68,11 +57,16 @@ public class ScheduledTaskRegistry {
 					TriggerTask triggerTask = (TriggerTask) task;
 					st.setTrigger(triggerTask.getTrigger().toString());
 				}
-				list.add(st);
+				tasks.add(st);
 			});
 		}
-		list.sort(Comparator.comparing(ScheduledTask::getName));
-		return list;
+		tasks.sort(Comparator.comparing(ScheduledTask::getName));
+		return tasks;
+
+	});
+
+	public List<ScheduledTask> getTasks() {
+		return tasksSupplier.obtain();
 	}
 
 	private String getName(Runnable runnable) {

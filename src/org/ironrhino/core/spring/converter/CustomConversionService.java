@@ -1,10 +1,12 @@
 package org.ironrhino.core.spring.converter;
 
 import org.springframework.core.convert.support.DefaultConversionService;
+import org.springframework.util.function.SingletonSupplier;
 
 public class CustomConversionService extends DefaultConversionService {
 
-	private static volatile CustomConversionService sharedInstance;
+	private static SingletonSupplier<CustomConversionService> singletonSupplier = SingletonSupplier
+			.of(CustomConversionService::new);
 
 	public CustomConversionService() {
 		super();
@@ -21,14 +23,7 @@ public class CustomConversionService extends DefaultConversionService {
 	}
 
 	public static CustomConversionService getSharedInstance() {
-		CustomConversionService cs = sharedInstance;
-		if (cs == null) {
-			synchronized (DefaultConversionService.class) {
-				if ((cs = sharedInstance) == null)
-					sharedInstance = cs = new CustomConversionService();
-			}
-		}
-		return cs;
+		return singletonSupplier.obtain();
 	}
 
 }

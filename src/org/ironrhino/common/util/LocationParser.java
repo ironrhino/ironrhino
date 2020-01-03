@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.ironrhino.core.util.AppInfo;
 import org.springframework.util.StreamUtils;
+import org.springframework.util.function.SingletonSupplier;
 
 public class LocationParser {
 
@@ -101,17 +102,10 @@ public class LocationParser {
 		return location;
 	}
 
-	private static volatile LocationParser sharedInstance;
+	private static SingletonSupplier<LocationParser> singletonSupplier = SingletonSupplier.of(LocationParser::new);
 
 	private static LocationParser getSharedInstance() {
-		LocationParser temp = sharedInstance;
-		if (temp == null) {
-			synchronized (LocationParser.class) {
-				if ((temp = sharedInstance) == null)
-					sharedInstance = temp = new LocationParser();
-			}
-		}
-		return temp;
+		return singletonSupplier.obtain();
 	}
 
 	private static long getIntLong(byte[] bytes, int offset) {

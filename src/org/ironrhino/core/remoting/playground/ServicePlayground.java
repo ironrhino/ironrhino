@@ -28,6 +28,7 @@ import org.ironrhino.core.util.SampleObjectCreator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.util.function.SingletonSupplier;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
@@ -44,7 +45,20 @@ public class ServicePlayground {
 	@Autowired
 	private ServiceRegistry serviceRegistry;
 
-	private volatile Map<String, Object> services;
+	private SingletonSupplier<Map<String, Object>> servicesSupplier = SingletonSupplier.of(() -> {
+		Map<String, Object> services = new TreeMap<>();
+		services.putAll(serviceRegistry.getExportedServices());
+		if (serviceRegistry instanceof AbstractServiceRegistry) {
+			for (String name : ((AbstractServiceRegistry) serviceRegistry).getImportedServiceCandidates().keySet()) {
+				try {
+					services.put(name, ctx.getBean(Class.forName(name)));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return services;
+	});
 
 	private Map<String, Collection<MethodInfo>> methods = new ConcurrentHashMap<>();
 
@@ -53,27 +67,7 @@ public class ServicePlayground {
 			.setDateFormat(new SimpleDateFormat(DateUtils.DATETIME));
 
 	public Collection<String> getServices() {
-		Map<String, Object> temp = services;
-		if (temp == null) {
-			synchronized (this) {
-				if ((temp = services) == null) {
-					temp = new TreeMap<>();
-					temp.putAll(serviceRegistry.getExportedServices());
-					if (serviceRegistry instanceof AbstractServiceRegistry) {
-						for (String name : ((AbstractServiceRegistry) serviceRegistry).getImportedServiceCandidates()
-								.keySet()) {
-							try {
-								temp.put(name, ctx.getBean(Class.forName(name)));
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-						}
-					}
-					services = temp;
-				}
-			}
-		}
-		return temp.keySet();
+		return servicesSupplier.obtain().keySet();
 	}
 
 	public Collection<MethodInfo> getMethods(String service) {
@@ -122,7 +116,8 @@ public class ServicePlayground {
 			throw new IllegalArgumentException("Unknown service: " + service);
 		MethodInfo mi = methods.stream().filter(m -> m.getSignature().equals(method)).findFirst()
 				.orElseThrow(() -> new IllegalArgumentException("Unknown method: " + method));
-		Object result = mi.getMethod().invoke(services.get(service), convert(mi.getParameters(), params));
+		Object result = mi.getMethod().invoke(servicesSupplier.obtain().get(service),
+				convert(mi.getParameters(), params));
 		if (result instanceof Optional)
 			result = ((Optional<?>) result).orElse(null);
 		else if (result instanceof Callable)
