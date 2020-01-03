@@ -61,9 +61,9 @@
 	</bean>
 
 	<bean id="assertionTask" scope="step"
-		class="org.ironrhino.batch.tasklet.CountAssertionTask">
+		class="org.ironrhino.batch.tasklet.database.RowsAssertionTask">
 		<property name="dataSource" ref="dataSource" />
-		<property name="countSql"
+		<property name="sql"
 			value="select count(*) from sample_message where createDate between :beginDate and :endDate and modifyDate is null" />
 		<property name="parameterValues">
 			<map>
@@ -73,7 +73,7 @@
 					value="#{T(org.ironrhino.core.util.DateUtils).endOfDay(jobParameters[createDate])}" />
 			</map>
 		</property>
-		<property name="expectedResult" value="0" />
+		<property name="expectedRows" value="0" />
 	</bean>
 
 	<step id="updateMessage"
