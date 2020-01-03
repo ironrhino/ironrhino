@@ -57,6 +57,22 @@
 		<property name="readTimeout" value="${batch.updateMessage.remoteInvocation.readTimeout:3600000}" />
 	</bean>
 
+	<bean id="assertionTask" scope="step"
+		class="org.ironrhino.batch.tasklet.CountAssertionTask">
+		<property name="dataSource" ref="dataSource" />
+		<property name="countSql"
+			value="select count(*) from sample_message where createDate between :beginDate and :endDate and modifyDate is null" />
+		<property name="parameterValues">
+			<map>
+				<entry key="beginDate"
+					value="#{T(org.ironrhino.core.util.DateUtils).beginOfDay(jobParameters[createDate])}" />
+				<entry key="endDate"
+					value="#{T(org.ironrhino.core.util.DateUtils).endOfDay(jobParameters[createDate])}" />
+			</map>
+		</property>
+		<property name="expectedResult" value="0" />
+	</bean>
+
 	<step id="updateMessage"
 		xmlns="http://www.springframework.org/schema/batch">
 		<tasklet task-executor="taskExecutor"
@@ -69,9 +85,12 @@
 	<job id="remoteUpdateMessageJob"
 		xmlns="http://www.springframework.org/schema/batch">
 		<validator ref="jobParametersValidator" />
-		<step id="updateMessage.manager">
+		<step id="updateMessage.manager" next="assertion">
 			<partition partitioner="partitioner"
 				handler="partitionHandler" />
+		</step>
+		<step id="assertion">
+			<tasklet ref="assertionTask" />
 		</step>
 	</job>
 
