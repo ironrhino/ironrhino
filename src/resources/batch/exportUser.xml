@@ -72,10 +72,17 @@
 		</property>
 	</bean>
 
+	<bean id="moveLastLinesToFirstTask" scope="job"
+		class="org.ironrhino.batch.tasklet.file.MoveLastLinesToFirstTask">
+		<property name="file"
+			value="file:${app.home}/target/output.txt.#{T(org.ironrhino.core.util.DateUtils).formatDate10(jobParameters[workdate])}" />
+		<property name="lines" value="1" />
+	</bean>
+
 	<job id="exportUserJob"
 		xmlns="http://www.springframework.org/schema/batch">
 		<validator ref="jobParametersValidator" />
-		<step id="exportToFile">
+		<step id="exportToFile" next="moveLastLinesToFirst">
 			<tasklet>
 				<chunk reader="reader" writer="writer"
 					commit-interval="${batch.exportUser.commitInterval:2}" />
@@ -83,6 +90,9 @@
 			<listeners>
 				<listener ref="summaryFooterCallback" />
 			</listeners>
+		</step>
+		<step id="moveLastLinesToFirst">
+			<tasklet ref="moveLastLinesToFirstTask" />
 		</step>
 	</job>
 
