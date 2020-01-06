@@ -35,7 +35,6 @@ public class MoveLastLinesToFirstTask implements Tasklet {
 	@Override
 	public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
 		File target = file.getFile();
-		Assert.state(target.isFile(), target.getAbsoluteFile() + " should be a file");
 
 		ReversedLinesFileReader rlfr = null;
 		List<String> block = new ArrayList<>();
