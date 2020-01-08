@@ -79,6 +79,15 @@
 		<property name="lines" value="1" />
 	</bean>
 
+	<bean id="notifyTask" scope="job"
+		class="org.ironrhino.batch.tasklet.http.WebhookTask">
+		<property name="url"
+			value="https://oapi.dingtalk.com/robot/send?access_token=${dingtalk.accessToken:}" />
+		<property name="body">
+			<value><![CDATA[{"msgtype":"text","text":{"content":"#{jobName} is finished with workdate: #{T(org.ironrhino.core.util.DateUtils).formatDate10(jobParameters[workdate])}"}}]]></value>
+		</property>
+	</bean>
+
 	<job id="exportUserJob"
 		xmlns="http://www.springframework.org/schema/batch">
 		<validator ref="jobParametersValidator" />
@@ -91,8 +100,11 @@
 				<listener ref="summaryFooterCallback" />
 			</listeners>
 		</step>
-		<step id="moveLastLinesToFirst">
+		<step id="moveLastLinesToFirst" next="notify">
 			<tasklet ref="moveLastLinesToFirstTask" />
+		</step>
+		<step id="notify">
+			<tasklet ref="notifyTask" />
 		</step>
 	</job>
 
