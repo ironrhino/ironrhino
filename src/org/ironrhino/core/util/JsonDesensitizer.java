@@ -40,12 +40,9 @@ public class JsonDesensitizer {
 	}
 
 	public JsonDesensitizer() {
-		this(new ConcurrentHashMap<BiPredicate<String, Object>, Function<String, String>>() {
-			private static final long serialVersionUID = 1L;
-			{
-				put((s, obj) -> s.equals("password") || s.endsWith("Password"), s -> "******");
-			}
-		});
+		this(new ConcurrentHashMap<>());
+		getMapping().put((s, obj) -> s.equals("password") || s.endsWith("Password") || s.endsWith("Passwords"),
+				s -> "******");
 	}
 
 	public JsonDesensitizer(Map<BiPredicate<String, Object>, Function<String, String>> mapping) {
