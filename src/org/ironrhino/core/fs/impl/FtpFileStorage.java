@@ -89,6 +89,11 @@ public class FtpFileStorage extends AbstractFileStorage {
 
 	@Getter
 	@Setter
+	@Value("${ftp.useLocaltime:false}")
+	protected boolean useLocaltime;
+
+	@Getter
+	@Setter
 	@Value("${ftp.pool.maxTotal:20}")
 	protected int maxTotal = 20;
 
@@ -315,7 +320,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 			if (modificationTime != null)
 				try {
 					Date d = DateUtils.parse(modificationTime, "yyyyMMddHHmmss");
-					return d.getTime() + TimeZone.getDefault().getRawOffset();
+					return d.getTime() + (useLocaltime ? 0 : TimeZone.getDefault().getRawOffset());
 				} catch (Exception e) {
 					log.error(e.getMessage(), e);
 				}
@@ -365,7 +370,8 @@ public class FtpFileStorage extends AbstractFileStorage {
 			List<FileInfo> list = new ArrayList<>();
 			for (FTPFile f : ftpClient.listFiles(getPathname(path, ftpClient))) {
 				if (f.isFile())
-					list.add(new FileInfo(f.getName(), true, f.getSize(), f.getTimestamp().getTimeInMillis()));
+					list.add(new FileInfo(f.getName(), true, f.getSize(), f.getTimestamp().getTimeInMillis()
+							+ (useLocaltime ? 0 : TimeZone.getDefault().getRawOffset())));
 				if (list.size() > MAX_PAGE_SIZE)
 					throw new LimitExceededException("Exceed max size:" + MAX_PAGE_SIZE);
 			}
@@ -380,7 +386,8 @@ public class FtpFileStorage extends AbstractFileStorage {
 		List<FileInfo> result = executeWrapped(ftpClient -> {
 			final List<FileInfo> list = new ArrayList<>();
 			for (FTPFile f : ftpClient.listFiles(getPathname(path, ftpClient)))
-				list.add(new FileInfo(f.getName(), f.isFile(), f.getSize(), f.getTimestamp().getTimeInMillis()));
+				list.add(new FileInfo(f.getName(), f.isFile(), f.getSize(), f.getTimestamp().getTimeInMillis()
+						+ (useLocaltime ? 0 : TimeZone.getDefault().getRawOffset())));
 			if (list.size() > MAX_PAGE_SIZE)
 				throw new LimitExceededException("Exceed max size:" + MAX_PAGE_SIZE);
 			return list;
