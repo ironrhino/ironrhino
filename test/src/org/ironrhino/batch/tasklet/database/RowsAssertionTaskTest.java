@@ -46,7 +46,8 @@ public class RowsAssertionTaskTest {
 		HikariDataSource ds = new HikariDataSource();
 		ds.setJdbcUrl("jdbc:h2:mem:test;");
 		try (Connection conn = ds.getConnection(); Statement stmt = conn.createStatement()) {
-			stmt.execute("create table test(value int)");
+			stmt.execute("drop table if exists test");
+			stmt.execute("create table if not exists test(value int)");
 			for (int i = 0; i < rows; i++) {
 				stmt.executeUpdate("insert into test values(" + i + ")");
 			}
