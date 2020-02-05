@@ -37,6 +37,7 @@ public class OAuthError extends RuntimeException {
 	private String errorUri;
 
 	public OAuthError(String error, String errorMessage) {
+		super(errorMessage == null ? error : error + ": " + errorMessage);
 		this.error = error;
 		this.errorMessage = errorMessage;
 	}
