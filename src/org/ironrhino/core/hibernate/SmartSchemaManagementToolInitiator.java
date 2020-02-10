@@ -5,11 +5,9 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -20,7 +18,6 @@ import javax.sql.DataSource;
 import org.hibernate.boot.model.relational.Database;
 import org.hibernate.boot.model.relational.Namespace;
 import org.hibernate.boot.registry.StandardServiceInitiator;
-import org.hibernate.dialect.Dialect;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.ForeignKey;
 import org.hibernate.mapping.Index;
@@ -77,34 +74,43 @@ public class SmartSchemaManagementToolInitiator implements StandardServiceInitia
 				}
 
 				private void convertForeignKeyToIndex(Database database) {
-					Dialect dialect = database.getJdbcEnvironment().getDialect();
 					try (Connection conn = dataSource.getConnection()) {
 						DatabaseMetaData dbmd = conn.getMetaData();
+						String catalog = conn.getCatalog();
+						String schema = null;
+						try {
+							schema = conn.getSchema();
+						} catch (Throwable t) {
+							schema = "%";
+						}
+						Set<String> existedTables = new HashSet<>();
+						try (ResultSet rs = dbmd.getTables(catalog, schema, "%", new String[] { "TABLE" })) {
+							while (rs.next())
+								existedTables.add(rs.getString(3));
+						}
 						for (Namespace namespace : database.getNamespaces()) {
 							for (Table table : namespace.getTables()) {
 								Set<String> existedIndexes = new HashSet<>();
 								String tableName = table.getName();
-								for (String name : new LinkedHashSet<>(Arrays.asList(tableName.toUpperCase(Locale.ROOT),
-										tableName, tableName.toLowerCase(Locale.ROOT)))) {
-									String schema = null;
-									try {
-										schema = conn.getSchema();
-									} catch (Throwable t) {
-										schema = "%";
+								String existedTableName = tableName;
+								for (String s : existedTables) {
+									if (s.equalsIgnoreCase(existedTableName)) {
+										existedTableName = s;
+										break;
 									}
-									try (ResultSet rs = dbmd.getIndexInfo(conn.getCatalog(), schema,
-											dialect.openQuote() + name + dialect.closeQuote(), false, false)) {
-										boolean tableFound = false;
-										while (rs.next()) {
-											tableFound = true;
-											String indexName = rs.getString("INDEX_NAME");
-											if (indexName != null)
-												existedIndexes.add(indexName);
-										}
-										if (tableFound)
-											break;
-									} catch (SQLException e) {
+								}
+								try (ResultSet rs = dbmd.getIndexInfo(catalog, schema, existedTableName, false,
+										false)) {
+									boolean tableFound = false;
+									while (rs.next()) {
+										tableFound = true;
+										String indexName = rs.getString("INDEX_NAME");
+										if (indexName != null)
+											existedIndexes.add(indexName);
 									}
+									if (tableFound)
+										break;
+								} catch (SQLException e) {
 								}
 								@SuppressWarnings("unchecked")
 								Iterator<ForeignKey> foreignKeys = table.getForeignKeyIterator();
