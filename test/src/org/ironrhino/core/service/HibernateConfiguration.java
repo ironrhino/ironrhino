@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @ComponentScan(basePackageClasses = { SessionFactoryBean.class, EntityManager.class })
-@EnableTransactionManagement(proxyTargetClass = true)
+@EnableTransactionManagement(proxyTargetClass = true, order = 0)
 @Import(DataSourceConfiguration.class)
 public class HibernateConfiguration extends CommonConfiguration {
 
