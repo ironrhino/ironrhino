@@ -2,10 +2,13 @@ package org.ironrhino.core.util;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
@@ -32,6 +35,9 @@ public class JsonDesensitizer {
 	@Getter
 	private final Map<BiPredicate<String, Object>, Function<String, String>> mapping;
 
+	@Getter
+	private final List<BiPredicate<String, Object>> dropping;
+
 	private final ObjectWriter objectWriter;
 
 	@JsonFilter("desensitizer")
@@ -46,13 +52,19 @@ public class JsonDesensitizer {
 	}
 
 	public JsonDesensitizer(Map<BiPredicate<String, Object>, Function<String, String>> mapping) {
+		this(mapping, new CopyOnWriteArrayList<>());
+	}
+
+	public JsonDesensitizer(Map<BiPredicate<String, Object>, Function<String, String>> mapping,
+			List<BiPredicate<String, Object>> dropping) {
 		this.mapping = mapping;
+		this.dropping = dropping;
 		FilterProvider filters = new SimpleFilterProvider().setDefaultFilter(new SimpleBeanPropertyFilter() {
 			@Override
 			public void serializeAsField(Object obj, JsonGenerator jgen, SerializerProvider provider,
 					PropertyWriter writer) throws Exception {
-				if (include(writer)) {
-					String name = writer.getName();
+				String name = writer.getName();
+				if (include(writer) && !dropping.stream().anyMatch(entry -> entry.test(name, obj))) {
 					Optional<Function<String, String>> func = mapping.entrySet().stream()
 							.filter(entry -> entry.getKey().test(name, obj)).findFirst().map(entry -> entry.getValue());
 					if (func.isPresent()) {
@@ -105,6 +117,12 @@ public class JsonDesensitizer {
 
 	private void desensitize(String nodeName, JsonNode node, JsonNode parent) {
 		if (node.isObject()) {
+			List<String> toBeDropped = new ArrayList<>();
+			node.fieldNames().forEachRemaining(name -> {
+				if (dropping.stream().anyMatch(p -> p.test(name, node)))
+					toBeDropped.add(name);
+			});
+			((ObjectNode) node).remove(toBeDropped);
 			Iterator<Map.Entry<String, JsonNode>> iterator = node.fields();
 			while (iterator.hasNext()) {
 				Map.Entry<String, JsonNode> entry = iterator.next();
