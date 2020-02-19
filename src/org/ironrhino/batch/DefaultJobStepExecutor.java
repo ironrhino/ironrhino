@@ -1,11 +1,13 @@
 package org.ironrhino.batch;
 
+import org.ironrhino.core.spring.configuration.BeanPresentConditional;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.configuration.StepRegistry;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.NoSuchJobException;
+import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.core.step.NoSuchStepException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
+@BeanPresentConditional(type = JobRepositoryFactoryBean.class)
 @Slf4j
 public class DefaultJobStepExecutor implements JobStepExecutor {
 
