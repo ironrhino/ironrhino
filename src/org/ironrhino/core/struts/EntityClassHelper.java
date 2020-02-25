@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.time.YearMonth;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -545,8 +546,8 @@ public class EntityClassHelper {
 						} else {
 							temporalType = returnType == Duration.class ? "duration"
 									: returnType == LocalTime.class ? "time"
-											: returnType == LocalDateTime.class ? "datetime"
-													: returnType == ZonedDateTime.class ? "datetime"
+											: (returnType == LocalDateTime.class || returnType == ZonedDateTime.class
+													|| returnType == OffsetDateTime.class) ? "datetime"
 															: returnType == YearMonth.class ? "yearmonth" : "date";
 						}
 						uci.addCssClass(temporalType);

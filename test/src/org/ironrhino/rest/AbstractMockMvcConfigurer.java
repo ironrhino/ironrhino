@@ -12,6 +12,7 @@ import org.ironrhino.core.spring.converter.DateConverter;
 import org.ironrhino.core.spring.converter.LocalDateConverter;
 import org.ironrhino.core.spring.converter.LocalDateTimeConverter;
 import org.ironrhino.core.spring.converter.LocalTimeConverter;
+import org.ironrhino.core.spring.converter.OffsetDateTimeConverter;
 import org.ironrhino.core.spring.converter.YearMonthConverter;
 import org.ironrhino.core.spring.converter.ZonedDateTimeConverter;
 import org.ironrhino.core.util.JsonUtils;
@@ -66,6 +67,7 @@ public abstract class AbstractMockMvcConfigurer implements WebMvcConfigurer {
 		formatterRegistry.addConverter(new LocalDateTimeConverter());
 		formatterRegistry.addConverter(new LocalTimeConverter());
 		formatterRegistry.addConverter(new ZonedDateTimeConverter());
+		formatterRegistry.addConverter(new OffsetDateTimeConverter());
 		formatterRegistry.addConverter(new YearMonthConverter());
 	}
 

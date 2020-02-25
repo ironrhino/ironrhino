@@ -1,5 +1,7 @@
 package org.ironrhino.core.spring.converter;
 
+import java.time.ZonedDateTime;
+
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.util.function.SingletonSupplier;
 
@@ -15,6 +17,7 @@ public class CustomConversionService extends DefaultConversionService {
 		addConverter(new LocalDateTimeConverter());
 		addConverter(new LocalTimeConverter());
 		addConverter(new ZonedDateTimeConverter());
+		addConverter(new OffsetDateTimeConverter());
 		addConverter(new YearMonthConverter());
 		addConverter(new DurationConverter());
 		addConverter(new EnumToEnumConverter());
@@ -27,4 +30,9 @@ public class CustomConversionService extends DefaultConversionService {
 		return singletonSupplier.obtain();
 	}
 
+	public static void main(String[] args) {
+		System.out.println(ZonedDateTime.now());
+		System.out.println(getSharedInstance().convert("2020-02-25T11:35:30", ZonedDateTime.class));
+		System.out.println(getSharedInstance().convert(ZonedDateTime.now(), String.class));
+	}
 }
