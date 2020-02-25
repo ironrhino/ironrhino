@@ -14,6 +14,7 @@ public class CustomConversionService extends DefaultConversionService {
 		addConverter(new LocalDateConverter());
 		addConverter(new LocalDateTimeConverter());
 		addConverter(new LocalTimeConverter());
+		addConverter(new ZonedDateTimeConverter());
 		addConverter(new YearMonthConverter());
 		addConverter(new DurationConverter());
 		addConverter(new EnumToEnumConverter());

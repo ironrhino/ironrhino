@@ -11,6 +11,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -545,7 +546,8 @@ public class EntityClassHelper {
 							temporalType = returnType == Duration.class ? "duration"
 									: returnType == LocalTime.class ? "time"
 											: returnType == LocalDateTime.class ? "datetime"
-													: returnType == YearMonth.class ? "yearmonth" : "date";
+													: returnType == ZonedDateTime.class ? "datetime"
+															: returnType == YearMonth.class ? "yearmonth" : "date";
 						}
 						uci.addCssClass(temporalType);
 						// uci.setInputType(temporalType);

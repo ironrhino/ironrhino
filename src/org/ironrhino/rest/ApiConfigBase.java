@@ -19,6 +19,7 @@ import org.ironrhino.core.spring.converter.LocalDateConverter;
 import org.ironrhino.core.spring.converter.LocalDateTimeConverter;
 import org.ironrhino.core.spring.converter.LocalTimeConverter;
 import org.ironrhino.core.spring.converter.YearMonthConverter;
+import org.ironrhino.core.spring.converter.ZonedDateTimeConverter;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.rest.component.AuthorizeAspect;
@@ -192,6 +193,7 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 		formatterRegistry.addConverter(new LocalDateConverter());
 		formatterRegistry.addConverter(new LocalDateTimeConverter());
 		formatterRegistry.addConverter(new LocalTimeConverter());
+		formatterRegistry.addConverter(new ZonedDateTimeConverter());
 		formatterRegistry.addConverter(new YearMonthConverter());
 	}
 
