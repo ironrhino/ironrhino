@@ -45,10 +45,10 @@ public class RedisConcurrencyService implements ConcurrencyService {
 		if (!success)
 			throttleStringRedisTemplate.opsForValue().increment(key, -1);
 		long millisTimeout = unit.toMillis(timeout);
-		long start = System.currentTimeMillis();
+		long start = System.nanoTime();
 		while (!success) {
 			Thread.sleep(100);
-			if ((System.currentTimeMillis() - start) >= millisTimeout)
+			if (TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start) >= millisTimeout)
 				break;
 			value = throttleStringRedisTemplate.opsForValue().increment(key, 1);
 			success = value != null && value.intValue() <= permits;

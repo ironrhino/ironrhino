@@ -227,10 +227,10 @@ public class AccessFilter implements Filter {
 			MDC.put("request", sb.toString());
 
 			MDC.put("server", " server:" + AppInfo.getInstanceId(true));
-			long start = System.currentTimeMillis();
+			long start = System.nanoTime();
 			try {
 				chain.doFilter(request, response);
-				long responseTime = System.currentTimeMillis() - start;
+				long responseTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
 				if (isRequestDispatcher && responseTime > responseTimeThreshold) {
 					StringBuilder msg = new StringBuilder();
 					msg.append(RequestUtils.serializeData(request)).append(" response time:").append(responseTime)
@@ -244,7 +244,7 @@ public class AccessFilter implements Filter {
 			} finally {
 				if (isRequestDispatcher && print && !uri.startsWith("/assets/") && !uri.startsWith("/remoting/")
 						&& request.getHeader("Last-Event-ID") == null) {
-					long responseTime = System.currentTimeMillis() - start;
+					long responseTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
 					MDC.put("responseTime", " responseTime:" + responseTime);
 					accessLog.info("");
 					Metrics.recordTimer("http.access", responseTime, TimeUnit.MILLISECONDS);

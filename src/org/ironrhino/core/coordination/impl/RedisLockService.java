@@ -99,14 +99,14 @@ public class RedisLockService implements LockService {
 	public boolean tryLock(String name, long timeout, TimeUnit unit) {
 		boolean success = tryLock(name);
 		long millisTimeout = unit.toMillis(timeout);
-		long start = System.currentTimeMillis();
+		long start = System.nanoTime();
 		while (!success) {
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				return false;
 			}
-			if ((System.currentTimeMillis() - start) >= millisTimeout)
+			if (TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start) >= millisTimeout)
 				break;
 			success = tryLock(name);
 		}

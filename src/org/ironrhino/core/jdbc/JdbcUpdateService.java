@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
@@ -208,9 +209,9 @@ public class JdbcUpdateService {
 	@Transactional
 	public int[] update(String sql, Map<String, ?> paramMap) {
 		int[] result = new int[2];
-		long time = System.currentTimeMillis();
+		long time = System.nanoTime();
 		result[0] = namedParameterJdbcTemplate.update(sql, paramMap);
-		result[1] = (int) (System.currentTimeMillis() - time);
+		result[1] = (int) TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - time);
 		return result;
 	}
 

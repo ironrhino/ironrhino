@@ -8,6 +8,7 @@ import java.net.ConnectException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
@@ -257,12 +258,12 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 		do {
 			String targetServiceUrl = discoverServiceUrl();
 			String targetDiscoveredHost = discoveredHost;
-			long time = System.currentTimeMillis();
+			long time = System.nanoTime();
 			try {
 				RemoteInvocationResult result = httpInvokerRequestExecutor.executeRequest(targetServiceUrl, invocation,
 						methodInvocation);
 				if (urlFromDiscovery) {
-					time = System.currentTimeMillis() - time;
+					time = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - time);
 					remotingLogger.info("Invoked to {} success in {}ms", targetDiscoveredHost, time);
 					if (serviceStats != null) {
 						serviceStats.clientSideEmit(targetDiscoveredHost, getServiceInterface().getName(), method, time,
@@ -273,7 +274,7 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 			} catch (Exception e) {
 				remotingLogger.error("Exception:", e.getCause() != null ? e.getCause() : e);
 				if (urlFromDiscovery) {
-					time = System.currentTimeMillis() - time;
+					time = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - time);
 					remotingLogger.info("Invoked to {} fail in {}ms", targetDiscoveredHost, time);
 					if (serviceStats != null) {
 						serviceStats.clientSideEmit(targetDiscoveredHost, getServiceInterface().getName(), method, time,

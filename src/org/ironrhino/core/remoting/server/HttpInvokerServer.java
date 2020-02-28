@@ -11,6 +11,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import javax.servlet.AsyncContext;
@@ -234,7 +235,7 @@ public class HttpInvokerServer implements HttpRequestHandler {
 		HttpInvokerSerializer serializer = HttpInvokerSerializers.forRequest(request);
 		try {
 			RemoteInvocation invocation = invocationFunction.apply(request);
-			long time = System.currentTimeMillis();
+			long time = System.nanoTime();
 			RemoteInvocationResult result = invocationResultFunction.apply(invocation);
 			if (result == null) {
 				return; // async
@@ -244,7 +245,7 @@ public class HttpInvokerServer implements HttpRequestHandler {
 				response.setStatus(HttpServletResponse.SC_NO_CONTENT);
 				return;
 			}
-			time = System.currentTimeMillis() - time;
+			time = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - time);
 			if (serviceStats != null) {
 				String service = MDC.get(MDC_KEY_SERVICE);
 				int index = service.substring(0, service.indexOf('(')).lastIndexOf('.');

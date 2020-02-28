@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
@@ -62,7 +63,7 @@ public class RegionSetup {
 		if (entityManager.countAll() > 0)
 			return;
 		count.set(0);
-		long time = System.currentTimeMillis();
+		long time = System.nanoTime();
 		log.info("Inserting started");
 		List<Region> regions = parseRegions();
 		int displayOrder = 0;
@@ -70,7 +71,7 @@ public class RegionSetup {
 			region.setDisplayOrder(++displayOrder);
 			save(region);
 		}
-		log.info("Inserted {} in {}ms", count.get(), System.currentTimeMillis() - time);
+		log.info("Inserted {} in {}ms", count.get(), TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - time));
 		_regionCoordinateMap = null;
 		_regionAreacodeMap = null;
 		_rgnMap = null;

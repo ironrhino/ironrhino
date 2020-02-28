@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
@@ -452,11 +453,11 @@ public class JdbcQueryService {
 				|| databaseProduct == DatabaseProduct.SQLSERVER && databaseMajorVersion >= 11
 				|| databaseProduct == DatabaseProduct.DERBY)))
 			throw new ErrorMessage("query.result.number.exceed", new Object[] { getCsvMaxRows() });
-		long time = System.currentTimeMillis();
+		long time = System.nanoTime();
 		jdbcTemplate.setQueryTimeout(queryTimeout);
 		resultPage.setResult(query(sql, paramMap, resultPage.getPageSize(),
 				(resultPage.getPageNo() - 1) * resultPage.getPageSize()));
-		resultPage.setTookInMillis(System.currentTimeMillis() - time);
+		resultPage.setTookInMillis(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - time));
 		return resultPage;
 	}
 

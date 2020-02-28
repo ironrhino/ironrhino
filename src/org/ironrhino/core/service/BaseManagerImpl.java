@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -385,7 +386,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 				return resultPage;
 			}
 		}
-		long time = System.currentTimeMillis();
+		long time = System.nanoTime();
 		if (resultPage.isPaged()) {
 			if (!(resultPage.isCounting() && totalResults == 0)) {
 				int start = (resultPage.getPageNo() - 1) * resultPage.getPageSize();
@@ -397,7 +398,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 		} else {
 			resultPage.setResult(findListByCriteria(detachedCriteria));
 		}
-		resultPage.setTookInMillis(System.currentTimeMillis() - time);
+		resultPage.setTookInMillis(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - time));
 		return resultPage;
 	}
 
