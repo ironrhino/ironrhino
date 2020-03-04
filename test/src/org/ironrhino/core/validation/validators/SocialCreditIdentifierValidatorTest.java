@@ -24,4 +24,11 @@ public class SocialCreditIdentifierValidatorTest {
 		assertThat(SocialCreditIdentifierValidator.isValid("31110000358343139K"), is(true));
 	}
 
+	@Test
+	public void testRandomValue() {
+		for (int i = 0; i < 100; i++)
+			assertThat(SocialCreditIdentifierValidator.isValid(SocialCreditIdentifierValidator.randomValue()),
+					is(true));
+	}
+
 }

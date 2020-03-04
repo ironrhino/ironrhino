@@ -29,7 +29,12 @@ public class OrganizationCodeValidatorTest {
 		assertThat(OrganizationCodeValidator.isValid("MA2REG3M4"), is(true));
 		assertThat(OrganizationCodeValidator.isValid("MA6C8G954"), is(true));
 		assertThat(OrganizationCodeValidator.isValid("MA3MJ0PK9"), is(true));
+	}
 
+	@Test
+	public void testRandomValue() {
+		for (int i = 0; i < 100; i++)
+			assertThat(OrganizationCodeValidator.isValid(OrganizationCodeValidator.randomValue()), is(true));
 	}
 
 }

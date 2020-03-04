@@ -2,6 +2,7 @@ package org.ironrhino.core.validation.validators;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -54,6 +55,8 @@ public class SocialCreditIdentifierValidator implements ConstraintValidator<Soci
 
 	private static char getCheckBit(int sum) {
 		int i = 31 - sum % 31;
+		if (i == 31)
+			i = 0;
 		return i < 10 ? (char) (i + '0') : characters.charAt(i - 10);
 	}
 
@@ -64,5 +67,16 @@ public class SocialCreditIdentifierValidator implements ConstraintValidator<Soci
 	private static final int[] power = { 1, 3, 9, 27, 19, 26, 16, 17, 20, 29, 25, 13, 8, 24, 10, 30, 28 };
 
 	private static final String characters = "ABCDEFGHJKLMNPQRTUWXY";
+
+	public static String randomValue() {
+		Random random = new Random();
+		String province = provinces.get(random.nextInt(provinces.size())) + '0';
+		String area = String.valueOf(1 + random.nextInt(3)) + String.valueOf(1 + random.nextInt(3))
+				+ String.valueOf(1 + random.nextInt(7));
+		String organizationCode = OrganizationCodeValidator.randomValue();
+		String s = String.valueOf(1 + random.nextInt(9)) + String.valueOf(1 + random.nextInt(5)) + province + area
+				+ organizationCode;
+		return s + getCheckBit(getPowerSum(s.toCharArray()));
+	}
 
 }
