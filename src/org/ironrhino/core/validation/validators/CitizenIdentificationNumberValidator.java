@@ -3,12 +3,16 @@ package org.ironrhino.core.validation.validators;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.util.DateUtils;
+import org.ironrhino.core.util.NumberUtils;
 import org.ironrhino.core.validation.constraints.CitizenIdentificationNumber;
 
 /**
@@ -68,4 +72,19 @@ public class CitizenIdentificationNumberValidator implements ConstraintValidator
 			"54", "61", "62", "63", "64", "65", "71", "81", "82", "91" });
 
 	private static final int[] power = { 7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2 };
+
+	public static String randomValue() {
+		Random random = new Random();
+		String province = provinces.get(random.nextInt(provinces.size())) + '0';
+		String area = String.valueOf(1 + random.nextInt(3)) + String.valueOf(1 + random.nextInt(3))
+				+ String.valueOf(1 + random.nextInt(7));
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.YEAR, 1970 + random.nextInt(50));
+		cal.set(Calendar.DAY_OF_YEAR, 1 + random.nextInt(365));
+		String dob = DateUtils.formatDate8(cal.getTime());
+		String seq = NumberUtils.format(1 + random.nextInt(999), 3);
+		String s = province + area + dob + seq;
+		return s + getCheckBit(getPowerSum(s.toCharArray()));
+	}
+
 }

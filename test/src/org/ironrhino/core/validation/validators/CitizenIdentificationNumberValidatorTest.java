@@ -27,4 +27,11 @@ public class CitizenIdentificationNumberValidatorTest {
 		assertThat(CitizenIdentificationNumberValidator.isValid("44000019810613759X"), is(true));
 	}
 
+	@Test
+	public void testRandomValue() {
+		for (int i = 0; i < 100; i++)
+			assertThat(CitizenIdentificationNumberValidator.isValid(CitizenIdentificationNumberValidator.randomValue()),
+					is(true));
+	}
+
 }
