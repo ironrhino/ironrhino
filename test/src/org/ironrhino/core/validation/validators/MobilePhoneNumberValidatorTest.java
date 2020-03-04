@@ -16,4 +16,10 @@ public class MobilePhoneNumberValidatorTest {
 		assertThat(MobilePhoneNumberValidator.isValid("18900000000"), is(true));
 	}
 
+	@Test
+	public void testRandomValue() {
+		for (int i = 0; i < 100; i++)
+			assertThat(MobilePhoneNumberValidator.isValid(MobilePhoneNumberValidator.randomValue()), is(true));
+	}
+
 }
