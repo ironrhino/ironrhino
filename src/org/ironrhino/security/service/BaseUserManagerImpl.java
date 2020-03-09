@@ -32,7 +32,6 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import lombok.Getter;
-import lombok.Setter;
 
 public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManagerImpl<T>
 		implements BaseUserManager<T>, CacheNamespaceProvider {
@@ -40,8 +39,7 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 	protected static final String DEFAULT_CACHE_NAMESPACE = "user";
 
 	@Getter
-	@Setter
-	private String cacheNamespace = DEFAULT_CACHE_NAMESPACE;
+	protected String cacheNamespace = DEFAULT_CACHE_NAMESPACE;
 
 	@Autowired(required = false)
 	private PasswordGenerator passwordGenerator;
@@ -60,6 +58,11 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 
 	@Value("${user.password.maxRemembered:0}")
 	private int maxRememberedPasswords;
+
+	@Value("${user.cache.namespace:" + DEFAULT_CACHE_NAMESPACE + "}")
+	public void setCacheNamespace(String cacheNamespace) {
+		this.cacheNamespace = cacheNamespace;
+	}
 
 	@Override
 	@Transactional
