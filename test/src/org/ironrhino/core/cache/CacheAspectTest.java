@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.aopalliance.intercept.MethodInterceptor;
+import org.ironrhino.core.cache.CacheAspectTest.AnotherPersonRepository;
 import org.ironrhino.core.cache.CacheAspectTest.CacheConfiguration;
 import org.ironrhino.core.cache.impl.Cache2kCacheManager;
 import org.junit.After;
@@ -23,20 +24,31 @@ import org.junit.runner.RunWith;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = CacheConfiguration.class)
+@TestPropertySource(properties = AnotherPersonRepository.KEY_CACHE_NAMESPACE + "="
+		+ CacheAspectTest.CUSTOMIZED_CACHE_NAMESPACE)
 public class CacheAspectTest {
+
+	public static final String CUSTOMIZED_CACHE_NAMESPACE = "anotherPerson";
 
 	@Autowired
 	private PersonRepository personRepository;
+
+	@Autowired
+	private AnotherPersonRepository anotherPersonRepository;
 
 	@Autowired
 	private TimeService timeService;
@@ -73,6 +85,26 @@ public class CacheAspectTest {
 		}
 		personRepository.remove(person.getName());
 		assertThat(cacheManager.get(person.getName(), PersonRepository.CACHE_NAMESPACE), is(nullValue()));
+	}
+
+	@Test
+	public void testCacheNamespaceProvider() {
+		Person person = new Person();
+		person.setName("test");
+		anotherPersonRepository.save(person);
+		for (int i = 0; i < 10; i++) {
+			if (i == 0) {
+				assertThat(cacheManager.get(person.getName(), CacheAspectTest.CUSTOMIZED_CACHE_NAMESPACE),
+						is(nullValue()));
+			} else {
+				assertThat(cacheManager.get(person.getName(), CacheAspectTest.CUSTOMIZED_CACHE_NAMESPACE), is(person));
+			}
+			Person person2 = anotherPersonRepository.get(person.getName());
+			assertThat(person2, is(person));
+			assertThat(anotherPersonRepository.count(), is(1));
+		}
+		anotherPersonRepository.remove(person.getName());
+		assertThat(cacheManager.get(person.getName(), CacheAspectTest.CUSTOMIZED_CACHE_NAMESPACE), is(nullValue()));
 	}
 
 	@Test
@@ -175,6 +207,53 @@ public class CacheAspectTest {
 
 	}
 
+	public static class AnotherPersonRepository implements CacheNamespaceProvider {
+
+		public static final String KEY_CACHE_NAMESPACE = "anotherPersonRepository.cacheNamespace";
+		public static final String DEFAULT_CACHE_NAMESPACE = "person";
+		public static final int THROUGH_PERMITS = 10;
+
+		@Getter
+		@Setter
+		@Value("${" + KEY_CACHE_NAMESPACE + ":" + DEFAULT_CACHE_NAMESPACE + "}")
+		private String cacheNamespace;
+
+		public Map<String, Person> people = new ConcurrentHashMap<>();
+
+		public AtomicInteger count = new AtomicInteger();
+
+		@EvictCache(key = "${person.name}")
+		public void save(Person person) {
+			people.put(person.getName(), person);
+		}
+
+		@CheckCache(key = "${name}", throughPermits = THROUGH_PERMITS)
+		public Person get(String name) {
+			count.incrementAndGet();
+			return people.get(name);
+		}
+
+		@CheckCache(key = "${name}", cacheNull = true)
+		public Person getWithCacheNull(String name) {
+			count.incrementAndGet();
+			return people.get(name);
+		}
+
+		@EvictCache(key = "${name}")
+		public void remove(String name) {
+			people.remove(name);
+		}
+
+		protected int count() {
+			return count.get();
+		}
+
+		protected void clearCount() {
+			count.set(0);
+		}
+
+	}
+
 	public interface TimeService {
 
 		String CACHE_NAMESPACE = "time";
@@ -202,6 +281,11 @@ public class CacheAspectTest {
 		@Bean
 		public PersonRepository personRepository() {
 			return new PersonRepository();
+		}
+
+		@Bean
+		public AnotherPersonRepository anotherPersonRepository() {
+			return new AnotherPersonRepository();
 		}
 
 		@Bean

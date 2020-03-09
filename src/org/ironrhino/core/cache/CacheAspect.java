@@ -40,7 +40,7 @@ public class CacheAspect extends BaseAspect {
 		if (isBypass())
 			return jp.proceed();
 		Map<String, Object> context = buildContext(jp);
-		String namespace = ExpressionUtils.evalString(checkCache.namespace(), context);
+		String namespace = evalNamespace(checkCache.namespace(), jp, context);
 		List<String> keys = ExpressionUtils.evalList(checkCache.key(), context);
 		if (keys != null)
 			keys = keys.stream().filter(s -> s != null).collect(Collectors.toList());
@@ -129,7 +129,7 @@ public class CacheAspect extends BaseAspect {
 		if (isBypass())
 			return jp.proceed();
 		Map<String, Object> context = buildContext(jp);
-		String namespace = ExpressionUtils.evalString(evictCache.namespace(), context);
+		String namespace = evalNamespace(evictCache.namespace(), jp, context);
 		boolean fallback = false;
 		List<String> keys = null;
 		try {
@@ -161,6 +161,14 @@ public class CacheAspect extends BaseAspect {
 				cacheManager.put(key.toString(), value, timeToLive, TimeUnit.SECONDS, namespace);
 		}
 		return retval;
+	}
+
+	private static String evalNamespace(String namespace, ProceedingJoinPoint jp, Map<String, Object> context) {
+		Object target = jp.getTarget();
+		if (namespace.isEmpty() && target instanceof CacheNamespaceProvider)
+			return ((CacheNamespaceProvider) target).getCacheNamespace();
+		else
+			return ExpressionUtils.evalString(namespace, context);
 	}
 
 	private static void instrument(String namespace, boolean hit) {
