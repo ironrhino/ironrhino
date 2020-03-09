@@ -16,6 +16,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.ironrhino.common.model.Page;
 import org.ironrhino.core.aop.AopContext;
+import org.ironrhino.core.cache.CacheNamespaceProvider;
 import org.ironrhino.core.cache.CheckCache;
 import org.ironrhino.core.cache.EvictCache;
 import org.ironrhino.core.hibernate.CriterionUtils;
@@ -29,15 +30,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Service
-public class PageManagerImpl extends BaseManagerImpl<Page> implements PageManager {
+public class PageManagerImpl extends BaseManagerImpl<Page> implements PageManager, CacheNamespaceProvider {
+
+	protected static final String DEFAULT_CACHE_NAMESPACE = "page";
+
+	@Getter
+	@Setter
+	private String cacheNamespace = DEFAULT_CACHE_NAMESPACE;
 
 	@Autowired(required = false)
 	private transient SearchService<Page> searchService;
 
 	@Override
 	@Transactional
-	@EvictCache(key = "${page.path}", namespace = "page", renew = "${page}")
+	@EvictCache(key = "${page.path}", renew = "${page}")
 	public void save(Page page) {
 		page.setDraft(null);
 		page.setDraftDate(null);
@@ -46,14 +56,14 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements PageManage
 
 	@Override
 	@Transactional
-	@EvictCache(key = "${page.path}", namespace = "page", renew = "${page}")
+	@EvictCache(key = "${page.path}", renew = "${page}")
 	public void update(Page page) {
 		super.update(page);
 	}
 
 	@Override
 	@Transactional
-	@EvictCache(key = "${page.path}", namespace = "page")
+	@EvictCache(key = "${page.path}")
 	public void delete(Page page) {
 		super.delete(page);
 	}
@@ -61,14 +71,14 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements PageManage
 	@Override
 	@Transactional
 	@EvictCache(key = "${key = [];foreach (page : " + AopContext.CONTEXT_KEY_RETVAL
-			+ ") { key.add(page.path); } return key;}", namespace = "page")
+			+ ") { key.add(page.path); } return key;}")
 	public List<Page> delete(Serializable... id) {
 		return super.delete(id);
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	@CheckCache(key = "${path}", namespace = "page", eternal = true, cacheNull = true)
+	@CheckCache(key = "${path}", eternal = true, cacheNull = true)
 	public Page getByPath(String path) {
 		Page page = findByNaturalId(path);
 		if (page != null) {

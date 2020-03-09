@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.aop.AopContext;
+import org.ironrhino.core.cache.CacheNamespaceProvider;
 import org.ironrhino.core.cache.CheckCache;
 import org.ironrhino.core.cache.EvictCache;
 import org.ironrhino.core.security.role.UserRoleMapper;
@@ -30,9 +31,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManagerImpl<T> implements BaseUserManager<T> {
+import lombok.Getter;
+import lombok.Setter;
+
+public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManagerImpl<T>
+		implements BaseUserManager<T>, CacheNamespaceProvider {
 
 	protected static final String DEFAULT_CACHE_NAMESPACE = "user";
+
+	@Getter
+	@Setter
+	private String cacheNamespace = DEFAULT_CACHE_NAMESPACE;
 
 	@Autowired(required = false)
 	private PasswordGenerator passwordGenerator;
@@ -54,7 +63,7 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 
 	@Override
 	@Transactional
-	@EvictCache(namespace = DEFAULT_CACHE_NAMESPACE, key = "${user.username}")
+	@EvictCache(key = "${user.username}")
 	public void save(T user) {
 		if (user.isNew() && user.getPassword() == null) {
 			resetPassword(user);
@@ -64,7 +73,7 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 
 	@Override
 	@Transactional
-	@EvictCache(namespace = DEFAULT_CACHE_NAMESPACE, key = "${user.username}", renew = "${user}")
+	@EvictCache(key = "${user.username}", renew = "${user}")
 	public void update(T user) {
 		super.update(user);
 
@@ -77,14 +86,14 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 
 	@Override
 	@Transactional
-	@EvictCache(namespace = DEFAULT_CACHE_NAMESPACE, key = "${user.username}")
+	@EvictCache(key = "${user.username}")
 	public void delete(T user) {
 		super.delete(user);
 	}
 
 	@Override
 	@Transactional
-	@EvictCache(namespace = DEFAULT_CACHE_NAMESPACE, key = "${key = [];foreach (user : " + AopContext.CONTEXT_KEY_RETVAL
+	@EvictCache(key = "${key = [];foreach (user : " + AopContext.CONTEXT_KEY_RETVAL
 			+ ") { key.add(user.username); } return key;}")
 	public List<T> delete(Serializable... id) {
 		return super.delete(id);
@@ -92,7 +101,7 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 
 	@Override
 	@Transactional
-	@EvictCache(namespace = DEFAULT_CACHE_NAMESPACE, key = "${user.username}")
+	@EvictCache(key = "${user.username}")
 	public void resetPassword(T user) {
 		T u = user.isNew() ? user : get(user.getId());
 		String newPassword = passwordGenerator != null ? passwordGenerator.generate(user) : user.getUsername();
@@ -115,7 +124,7 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 
 	@Override
 	@Transactional
-	@EvictCache(namespace = DEFAULT_CACHE_NAMESPACE, key = "${user.username}")
+	@EvictCache(key = "${user.username}")
 	public void changePassword(T user, String password) {
 		T u = get(user.getId());
 		checkUsedPassword(u, password);
@@ -134,7 +143,7 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 
 	@Override
 	@Transactional
-	@EvictCache(namespace = DEFAULT_CACHE_NAMESPACE, key = "${user.username}")
+	@EvictCache(key = "${user.username}")
 	public void changePassword(T user, String currentPassword, String password) {
 		T u = get(user.getId());
 		if (!passwordEncoder.matches(currentPassword, u.getPassword()))
@@ -155,7 +164,7 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 
 	@Override
 	@Transactional
-	@EvictCache(namespace = DEFAULT_CACHE_NAMESPACE, key = "${user.username}")
+	@EvictCache(key = "${user.username}")
 	public T updatePassword(UserDetails user, String encodedPassword) {
 		T u = doLoadUserByUsername(user.getUsername());
 		u.setPassword(encodedPassword);
@@ -176,7 +185,7 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 
 	@Override
 	@Transactional(readOnly = true)
-	@CheckCache(namespace = DEFAULT_CACHE_NAMESPACE, key = "${username}", cacheNull = true)
+	@CheckCache(key = "${username}", cacheNull = true)
 	public T loadUserByUsername(String username) {
 		if (StringUtils.isBlank(username))
 			return null;

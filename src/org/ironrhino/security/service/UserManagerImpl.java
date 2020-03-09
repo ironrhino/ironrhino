@@ -8,13 +8,22 @@ import java.util.Set;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.security.model.User;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Service
 @Order(0)
 public class UserManagerImpl extends BaseUserManagerImpl<User> implements UserManager {
+
+	@Getter
+	@Setter
+	@Value("${user.cache.namespace:" + DEFAULT_CACHE_NAMESPACE + "}")
+	private String cacheNamespace = DEFAULT_CACHE_NAMESPACE;
 
 	@Override
 	@Transactional(readOnly = true)
