@@ -68,6 +68,11 @@ public class ApplicationContextInspector {
 				}, field -> {
 					return field.isAnnotationPresent(Value.class);
 				});
+				ReflectionUtils.doWithMethods(Class.forName(clz), method -> {
+					list.add(method.getAnnotation(Value.class).value());
+				}, method -> {
+					return method.isAnnotationPresent(Value.class);
+				});
 			} catch (NoClassDefFoundError e) {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
