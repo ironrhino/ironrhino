@@ -24,7 +24,6 @@ import org.springframework.stereotype.Component;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.SocketOptions;
 import io.lettuce.core.TimeoutOptions;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -32,13 +31,11 @@ import lombok.extern.slf4j.Slf4j;
 @ApplicationContextPropertiesConditional(key = "redlock.addresses", value = ApplicationContextPropertiesConditional.ANY)
 public class Redlock {
 
-	private static final String NAMESPACE = "redlock:";
+	private static final String DEFAULT_NAMESPACE = "redlock:";
 
-	@Getter
 	@Value("${redlock.addresses}")
 	private String[] addresses;
 
-	@Getter
 	@Value("${redlock.database:0}")
 	private int database;
 
@@ -56,6 +53,9 @@ public class Redlock {
 
 	@Value("${redlock.useSsl:false}")
 	private boolean useSsl;
+
+	@Value("${redlock.namespace:" + DEFAULT_NAMESPACE + "}")
+	private String namespace = DEFAULT_NAMESPACE;
 
 	private StringRedisTemplate[] redisTemplates;
 
@@ -109,7 +109,7 @@ public class Redlock {
 		if (validityTime < unit.convert(n * (connectTimeout + readTimeout), TimeUnit.MILLISECONDS)) {
 			log.warn("Please consider increase validityTime: " + validityTime);
 		}
-		String key = NAMESPACE + name;
+		String key = namespace + name;
 		String holder = holder();
 		int c = 0;
 		long time = System.nanoTime();
@@ -135,7 +135,7 @@ public class Redlock {
 	}
 
 	public void unlock(String name) {
-		String key = NAMESPACE + name;
+		String key = namespace + name;
 		String holder = holder();
 		for (int i = 0; i < redisTemplates.length; i++) {
 			try {

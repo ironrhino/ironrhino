@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.ironrhino.core.redis.RedlockServiceTests.RedlockServiceConfiguration;
+import org.ironrhino.core.redis.RedlockTests.RedlockConfiguration;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -23,9 +23,9 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = RedlockServiceConfiguration.class)
+@ContextConfiguration(classes = RedlockConfiguration.class)
 @TestPropertySource(properties = "redlock.addresses=localhost")
-public class RedlockServiceTests {
+public class RedlockTests {
 
 	public static final int THREADS = 10;
 
@@ -96,7 +96,7 @@ public class RedlockServiceTests {
 	}
 
 	@Configuration
-	static class RedlockServiceConfiguration {
+	static class RedlockConfiguration {
 
 		@Bean
 		public Redlock redlock() {
