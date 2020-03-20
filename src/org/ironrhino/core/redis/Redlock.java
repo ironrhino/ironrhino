@@ -2,7 +2,9 @@ package org.ironrhino.core.redis;
 
 import java.time.Duration;
 import java.util.Collections;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -24,9 +26,7 @@ import org.springframework.stereotype.Component;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.SocketOptions;
 import io.lettuce.core.TimeoutOptions;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Component
 @ApplicationContextPropertiesConditional(key = "redlock.addresses", value = ApplicationContextPropertiesConditional.ANY)
 public class Redlock {
@@ -42,11 +42,11 @@ public class Redlock {
 	@Value("${redlock.password:#{null}}")
 	private String password;
 
-	@Value("${redlock.connectTimeout:50}")
-	private int connectTimeout = 50;
+	@Value("${redlock.connectTimeout:100}")
+	private int connectTimeout = 100;
 
-	@Value("${redlock.readTimeout:50}")
-	private int readTimeout = 50;
+	@Value("${redlock.readTimeout:100}")
+	private int readTimeout = 100;
 
 	@Value("${redlock.shutdownTimeout:100}")
 	private int shutdownTimeout = 100;
@@ -105,45 +105,55 @@ public class Redlock {
 	}
 
 	public boolean tryLock(String name, long validityTime, TimeUnit unit) {
-		int n = redisTemplates.length;
-		if (validityTime < unit.convert(n * (connectTimeout + readTimeout), TimeUnit.MILLISECONDS)) {
-			log.warn("Please consider increase validityTime: " + validityTime);
-		}
 		String key = namespace + name;
 		String holder = holder();
-		int c = 0;
+		int n = redisTemplates.length;
+		@SuppressWarnings("unchecked")
+		CompletableFuture<Boolean>[] cfs = new CompletableFuture[n];
 		long time = System.nanoTime();
 		for (int i = 0; i < n; i++) {
-			long actualValidityTime = validityTime - unit.convert(System.nanoTime() - time, TimeUnit.NANOSECONDS);
-			if (actualValidityTime > 0) {
-				try {
-					Boolean success = redisTemplates[i].opsForValue().setIfAbsent(key, holder, actualValidityTime,
-							unit);
-					if (success == null)
-						throw new RuntimeException("Unexpected null");
-					if (success) {
-						if ((++c) >= n / 2 + 1)
-							return true;
-					}
-				} catch (Exception e) {
-					log.warn(e.getMessage(), e);
+			int j = i;
+			cfs[i] = CompletableFuture.supplyAsync(() -> {
+				long actualValidityTime = validityTime - unit.convert(System.nanoTime() - time, TimeUnit.NANOSECONDS);
+				if (actualValidityTime > 0) {
+					return redisTemplates[j].opsForValue().setIfAbsent(key, holder, actualValidityTime, unit);
+				} else {
+					return false;
 				}
-			}
+			});
 		}
-		unlock(name);
-		return false;
+		CompletableFuture.allOf(cfs).join();
+		long success = Stream.of(cfs).filter(cf -> {
+			try {
+				return Boolean.TRUE.equals(cf.get());
+			} catch (Exception e) {
+				return false;
+			}
+		}).count();
+		if (success >= n / 2 + 1) {
+			return true;
+		} else {
+			unlock(key, holder);
+			return false;
+		}
 	}
 
 	public void unlock(String name) {
 		String key = namespace + name;
 		String holder = holder();
+		unlock(key, holder);
+	}
+
+	private void unlock(String key, String holder) {
+		@SuppressWarnings("unchecked")
+		CompletableFuture<Void>[] cfs = new CompletableFuture[redisTemplates.length];
 		for (int i = 0; i < redisTemplates.length; i++) {
-			try {
-				redisTemplates[i].execute(compareAndDeleteScript, Collections.singletonList(key), holder);
-			} catch (Exception e) {
-				log.warn(e.getMessage(), e);
-			}
+			int j = i;
+			cfs[i] = CompletableFuture.runAsync(() -> {
+				redisTemplates[j].execute(compareAndDeleteScript, Collections.singletonList(key), holder);
+			});
 		}
+		CompletableFuture.allOf(cfs).join();
 	}
 
 	private static String holder() {
