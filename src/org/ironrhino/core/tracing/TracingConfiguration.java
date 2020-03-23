@@ -16,16 +16,18 @@ import org.springframework.context.annotation.Configuration;
 
 import io.jaegertracing.internal.Constants;
 import io.jaegertracing.internal.JaegerTracer;
-import io.jaegertracing.internal.propagation.TextMapCodec;
+import io.jaegertracing.internal.propagation.TraceContextCodec;
 import io.jaegertracing.internal.reporters.RemoteReporter;
 import io.jaegertracing.internal.samplers.ConstSampler;
 import io.jaegertracing.internal.samplers.GuaranteedThroughputSampler;
+import io.jaegertracing.spi.Codec;
 import io.jaegertracing.spi.Reporter;
 import io.jaegertracing.spi.Sampler;
 import io.jaegertracing.spi.Sender;
 import io.jaegertracing.thrift.internal.senders.UdpSender;
 import io.opentracing.Tracer;
 import io.opentracing.propagation.Format.Builtin;
+import io.opentracing.propagation.TextMap;
 import io.opentracing.util.GlobalTracer;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -34,10 +36,6 @@ import lombok.extern.slf4j.Slf4j;
 @ClassPresentConditional("io.jaegertracing.Configuration")
 @Slf4j
 public class TracingConfiguration {
-
-	public final static String SPAN_CONTEXT_KEY = "x-trace-id";
-
-	public final static String BAGGAG_EPREFIX = "x-trace-ctx-";
 
 	private static final int ONE_MB_IN_BYTES = 1048576;
 
@@ -102,15 +100,13 @@ public class TracingConfiguration {
 		} else {
 			sampler = new ConstSampler(true);
 		}
-		TextMapCodec codec = new TextMapCodec.Builder().withSpanContextKey(SPAN_CONTEXT_KEY)
-				.withBaggagePrefix(BAGGAG_EPREFIX).withUrlEncoding(true).build();
+		Codec<TextMap> codec = new TraceContextCodec.Builder().build();
 		JaegerTracer.Builder builder = new JaegerTracer.Builder(AppInfo.getAppName()).withTraceId128Bit()
 				.withSampler(sampler).withReporter(reporter).withTag("java.version", System.getProperty("java.version"))
 				.withTag("instance", AppInfo.getInstanceId())
 				.withTag(Constants.TRACER_HOSTNAME_TAG_KEY, AppInfo.getHostName())
 				.withTag(Constants.TRACER_IP_TAG_KEY, AppInfo.getHostAddress())
-				.registerExtractor(Builtin.HTTP_HEADERS, codec).registerInjector(Builtin.HTTP_HEADERS, codec)
-				.registerExtractor(Builtin.TEXT_MAP, codec).registerInjector(Builtin.TEXT_MAP, codec);
+				.registerExtractor(Builtin.HTTP_HEADERS, codec).registerInjector(Builtin.HTTP_HEADERS, codec);
 		String ironrhinoVersion = AppInfo.getIronrhinoVersion();
 		if (StringUtils.isNotBlank(ironrhinoVersion))
 			builder.withTag("ironrhino.version", ironrhinoVersion);

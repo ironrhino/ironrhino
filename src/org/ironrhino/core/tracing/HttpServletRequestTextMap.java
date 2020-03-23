@@ -12,17 +12,19 @@ import io.opentracing.propagation.TextMap;
 
 public final class HttpServletRequestTextMap implements TextMap {
 
+	// W3C TraceContext
+	public static final String TRACE_PARENT = "traceparent";
+
+	public static final String TRACE_STATE = "tracestate";
+
 	private final Map<String, String> map;
 
 	public HttpServletRequestTextMap(HttpServletRequest request) {
 		map = new HashMap<>();
 		Enumeration<String> en = request.getHeaderNames();
 		while (en.hasMoreElements()) {
-			String name = en.nextElement();
-			String lowerCaseName = name.toLowerCase(); // Jetty return X-Trace-Id
-			if (lowerCaseName.equals(TracingConfiguration.SPAN_CONTEXT_KEY)
-					|| lowerCaseName.startsWith(TracingConfiguration.BAGGAG_EPREFIX)
-					|| lowerCaseName.equals(Constants.DEBUG_ID_HEADER_KEY))
+			String name = en.nextElement().toLowerCase(); // Jetty return Traceparent
+			if (name.equals(TRACE_PARENT) || name.equals(TRACE_STATE) || name.equals(Constants.DEBUG_ID_HEADER_KEY))
 				map.put(name, request.getHeader(name));
 		}
 		String debugId = request.getParameter(Constants.DEBUG_ID_HEADER_KEY);
