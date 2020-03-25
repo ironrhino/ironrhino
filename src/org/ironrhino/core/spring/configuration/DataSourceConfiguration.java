@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flywaydb.core.Flyway;
 import org.ironrhino.core.hibernate.HibernateEnabled;
 import org.ironrhino.core.jdbc.DatabaseProduct;
-import org.ironrhino.core.tracing.Tracing;
+import org.ironrhino.core.tracing.TracingConfiguration;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,6 +86,9 @@ public class DataSourceConfiguration {
 	@Getter
 	private boolean enableMigrations;
 
+	@Autowired(required = false)
+	private TracingConfiguration tracingConfiguration;
+
 	protected DataSource createDataSource() {
 		if (AppInfo.getStage() == Stage.DEVELOPMENT && StringUtils.isBlank(env.getProperty("jdbc.url"))) {
 			boolean available = AddressAvailabilityCondition.check(jdbcUrl, 5000);
@@ -118,7 +121,7 @@ public class DataSourceConfiguration {
 		ds.setPoolName("HikariPool-" + AppInfo.getAppName());
 		log.info("Using {} to connect {}", ds.getClass().getName(), ds.getJdbcUrl());
 
-		if (Tracing.isEnabled()) {
+		if (tracingConfiguration != null && tracingConfiguration.getTracer() != null) {
 			ds.setDriverClassName("io.opentracing.contrib.jdbc.TracingDriver");
 			String url = ds.getJdbcUrl();
 			if (url.startsWith("jdbc:"))

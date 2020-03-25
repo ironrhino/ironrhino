@@ -24,6 +24,7 @@ import io.jaegertracing.spi.Reporter;
 import io.jaegertracing.spi.Sampler;
 import io.jaegertracing.spi.Sender;
 import io.jaegertracing.thrift.internal.senders.UdpSender;
+import io.opentracing.Tracer;
 import io.opentracing.propagation.Format.Builtin;
 import io.opentracing.util.GlobalTracer;
 import lombok.Getter;
@@ -58,7 +59,8 @@ public class TracingConfiguration {
 	@Value("${jaeger.sampler.lowerBound:10}")
 	private double lowerBound;
 
-	private JaegerTracer tracer;
+	@Getter
+	private Tracer tracer;
 
 	@Getter
 	private Sampler sampler;
@@ -129,6 +131,7 @@ public class TracingConfiguration {
 	public void destroy() {
 		if (tracer != null) {
 			tracer.close();
+			tracer = null;
 		}
 	}
 
