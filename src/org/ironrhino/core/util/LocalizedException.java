@@ -20,16 +20,17 @@ public class LocalizedException extends RuntimeException {
 
 	@Override
 	public String getLocalizedMessage() {
+		String message = super.getMessage();
 		try {
-			String message = getMessage();
 			String key = getClass().getName();
 			if (message == null && getCause() != null && getClass() == LocalizedException.class) {
 				message = getCause().getMessage();
 				key = getCause().getClass().getName();
 			}
-			return I18N.getText(key, message != null ? new Object[] { I18N.getText(message, null) } : null);
+			String msg = I18N.getText(key, message != null ? new Object[] { I18N.getText(message, null) } : null);
+			return key.equals(msg) ? message : msg;
 		} catch (IllegalArgumentException e) {
-			return getMessage();
+			return message;
 		}
 	}
 
