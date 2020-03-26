@@ -1,9 +1,12 @@
 package org.ironrhino.core.security.webauthn.action;
 
+import java.time.LocalDateTime;
+
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.JsonConfig;
 import org.ironrhino.core.security.role.UserRole;
+import org.ironrhino.core.security.webauthn.StoredCredentialService;
 import org.ironrhino.core.security.webauthn.WebAuthnEnabled;
 import org.ironrhino.core.security.webauthn.WebAuthnService;
 import org.ironrhino.core.security.webauthn.domain.AuthenticatorAttestationResponse;
@@ -37,12 +40,19 @@ public class WebAuthnCredentialAction extends EntityAction<WebAuthnCredential> {
 	@Autowired
 	protected WebAuthnService webAuthnService;
 
+	@Autowired
+	protected StoredCredentialService storedCredentialService;
+
 	@Getter
 	private PublicKeyCredentialCreationOptions options;
 
 	@Getter
 	@Setter
 	private String username;
+
+	@Getter
+	@Setter
+	private LocalDateTime expiryTime;
 
 	@Getter
 	@Setter
@@ -54,6 +64,8 @@ public class WebAuthnCredentialAction extends EntityAction<WebAuthnCredential> {
 				new TypeReference<PublicKeyCredential<AuthenticatorAttestationResponse>>() {
 				});
 		webAuthnService.verifyAttestation(cred, username);
+		if (expiryTime != null)
+			storedCredentialService.updateExpiryTime(cred.getId(), expiryTime);
 		notify("operate.success");
 		return SUCCESS;
 	}

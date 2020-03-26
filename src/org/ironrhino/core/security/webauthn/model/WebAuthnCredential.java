@@ -1,5 +1,6 @@
 package org.ironrhino.core.security.webauthn.model;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;
@@ -29,7 +30,7 @@ import lombok.Setter;
 @AutoConfig
 @Entity
 @Table(name = "webauthn_credential", indexes = @Index(columnList = "username"))
-@Richtable(order = "createDate desc", readonly = @Readonly(value = true, deletable = true), showQueryForm = true, bottomButtons = "<@btn view='create'/> <@btn action='delete' confirm=true/> <@btn class='reload'/> <@btn class='filter'/>")
+@Richtable(order = "createDate desc", readonly = @Readonly(value = true, deletable = true), showQueryForm = true, rowDynamicAttributes = "{\"class\":\"${entity.notExpired?then(entity.isExpiredAt(30)?then('warning',''),'error')}\"}", bottomButtons = "<@btn view='create'/> <@btn action='delete' confirm=true/> <@btn class='reload'/> <@btn class='filter'/>")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -56,11 +57,22 @@ public class WebAuthnCredential implements Persistable<String> {
 	@UiConfig(width = "100px")
 	private String deviceName = "Unknown";
 
+	@UiConfig(width = "130px")
+	private LocalDateTime expiryTime;
+
 	@UiConfig(width = "160px")
 	private LocalDateTime createDate = LocalDateTime.now();
 
 	public String getCredentialId() {
 		return id;
+	}
+
+	public boolean isNotExpired() {
+		return expiryTime == null || LocalDateTime.now().isBefore(expiryTime);
+	}
+
+	public boolean isExpiredAt(int days) {
+		return expiryTime != null && LocalDateTime.now().plus(Duration.ofDays(days)).isAfter(expiryTime);
 	}
 
 	public WebAuthnCredential(StoredCredential c) {

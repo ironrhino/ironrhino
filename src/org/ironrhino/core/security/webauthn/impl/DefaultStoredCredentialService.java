@@ -1,11 +1,13 @@
 package org.ironrhino.core.security.webauthn.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
+import org.ironrhino.core.security.webauthn.CredentialExpiredException;
 import org.ironrhino.core.security.webauthn.StoredCredentialService;
 import org.ironrhino.core.security.webauthn.WebAuthnEnabled;
 import org.ironrhino.core.security.webauthn.domain.StoredCredential;
@@ -30,6 +32,14 @@ public class DefaultStoredCredentialService implements StoredCredentialService {
 	}
 
 	@Override
+	public void updateExpiryTime(byte[] credentialId, LocalDateTime expiryTime) {
+		entityManager.setEntityClass(WebAuthnCredential.class);
+		WebAuthnCredential wac = entityManager.get(Utils.encodeBase64url(credentialId));
+		wac.setExpiryTime(expiryTime);
+		entityManager.save(wac);
+	}
+
+	@Override
 	public void updateSignCount(byte[] credentialId, int signCount) {
 		entityManager.setEntityClass(WebAuthnCredential.class);
 		WebAuthnCredential wac = entityManager.get(Utils.encodeBase64url(credentialId));
@@ -41,6 +51,8 @@ public class DefaultStoredCredentialService implements StoredCredentialService {
 	public Optional<StoredCredential> getCredentialById(byte[] credentialId) {
 		entityManager.setEntityClass(WebAuthnCredential.class);
 		WebAuthnCredential wac = entityManager.get(Utils.encodeBase64url(credentialId));
+		if (wac != null && !wac.isNotExpired())
+			throw new CredentialExpiredException("Credential expired");
 		return Optional.ofNullable(wac != null ? wac.toStoredCredential() : null);
 	}
 
@@ -57,8 +69,9 @@ public class DefaultStoredCredentialService implements StoredCredentialService {
 		entityManager.setEntityClass(WebAuthnCredential.class);
 		DetachedCriteria dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("username", username));
-		return entityManager.findListByCriteria(dc).stream().map(WebAuthnCredential::toStoredCredential)
-				.collect(Collectors.toList());
+		return entityManager.findListByCriteria(dc).stream()
+				// .filter(WebAuthnCredential::isNotExpired)
+				.map(WebAuthnCredential::toStoredCredential).collect(Collectors.toList());
 	}
 
 }

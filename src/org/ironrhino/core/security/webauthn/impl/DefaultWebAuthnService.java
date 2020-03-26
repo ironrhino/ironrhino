@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.security.webauthn.AssertionFailedException;
 import org.ironrhino.core.security.webauthn.AttestationFailedException;
+import org.ironrhino.core.security.webauthn.CredentialExpiredException;
 import org.ironrhino.core.security.webauthn.StoredCredentialService;
 import org.ironrhino.core.security.webauthn.WebAuthnEnabled;
 import org.ironrhino.core.security.webauthn.WebAuthnService;
@@ -205,6 +206,8 @@ public class DefaultWebAuthnService implements WebAuthnService {
 
 			if (authData.getSignCount() > 0)
 				credentialService.updateSignCount(credentialId, authData.getSignCount());
+		} catch (CredentialExpiredException e) {
+			throw e;
 		} catch (Exception e) {
 			throw new AssertionFailedException(e.getMessage(), e);
 		}
