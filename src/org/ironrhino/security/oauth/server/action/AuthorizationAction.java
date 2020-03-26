@@ -40,6 +40,7 @@ public class AuthorizationAction extends EntityAction<Authorization> {
 		if (StringUtils.isBlank(authorization.getClient()))
 			authorization.setClient(null);
 		authorization.setRefreshToken(CodecUtils.nextId(32));
+		authorization.setGrantType(null);
 		authorization.setResponseType(ResponseType.token);
 		authorization.setAddress(ServletActionContext.getRequest().getRemoteAddr());
 		oauthManager.create(authorization);
