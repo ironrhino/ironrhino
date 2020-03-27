@@ -137,6 +137,15 @@ public class UserAction extends EntityAction<User> {
 		return SUCCESS;
 	}
 
+	public String removePassword() {
+		User user = userManager.get(getUid());
+		if (user == null)
+			return NONE;
+		userManager.removePassword(user);
+		notify("operate.success");
+		return SUCCESS;
+	}
+
 	@Authorize(ifAnyGranted = UserRole.ROLE_BUILTIN_USER)
 	@InputConfig(methodName = "inputprofile")
 	@Validations(requiredStrings = {

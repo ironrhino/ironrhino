@@ -115,6 +115,23 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 	@Override
 	@Transactional
 	@EvictCache(namespace = DEFAULT_CACHE_NAMESPACE, key = "${user.username}")
+	public void removePassword(T user) {
+		T u = user.isNew() ? user : get(user.getId());
+		u.setPassword("");
+		u.setPasswordModifyDate(null);
+		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+			@Override
+			public void afterCommit() {
+				user.setPassword("");
+				u.setPasswordModifyDate(null);
+			}
+		});
+		super.save(u);
+	}
+
+	@Override
+	@Transactional
+	@EvictCache(namespace = DEFAULT_CACHE_NAMESPACE, key = "${user.username}")
 	public void changePassword(T user, String password) {
 		T u = get(user.getId());
 		checkUsedPassword(u, password);
