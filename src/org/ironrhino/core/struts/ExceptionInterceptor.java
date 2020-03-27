@@ -1,5 +1,6 @@
 package org.ironrhino.core.struts;
 
+import java.net.SocketTimeoutException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletionException;
@@ -112,6 +113,8 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 					} else if (e instanceof ErrorMessage || cause instanceof ErrorMessage) {
 						ErrorMessage em = (ErrorMessage) ((e instanceof ErrorMessage) ? e : cause);
 						validationAwareAction.addActionError(em.getLocalizedMessage());
+					} else if (e instanceof UnsupportedOperationException || e instanceof SocketTimeoutException) {
+						validationAwareAction.addActionError(findText(e.getClass().getCanonicalName(), null));
 					} else if (e instanceof LocalizedException || cause instanceof LocalizedException) {
 						LocalizedException le = (LocalizedException) ((e instanceof LocalizedException) ? e : cause);
 						validationAwareAction.addActionError(le.getLocalizedMessage());
