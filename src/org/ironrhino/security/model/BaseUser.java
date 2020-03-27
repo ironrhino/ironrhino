@@ -53,7 +53,7 @@ import lombok.Setter;
 @PublishAware
 @AutoConfig
 @Searchable
-@Richtable(order = "username asc", celleditable = false, actionColumnButtons = "<@btn view='input' label='edit'/> <@btn action='resetPassword' confirm=true/>")
+@Richtable(order = "username asc", celleditable = false, actionColumnButtons = "<@btn view='input' label='edit'/> <div class=\"btn-group\"><a class=\"btn dropdown-toggle\" data-toggle=\"dropdown\" href=\"#\">${getText('password')} <span class=\"caret\"></span></a><ul class=\"dropdown-menu\"><li><a class=\"confirm\" data-action=\"resetPassword\">${getText('reset')}</a></li><li><a class=\"confirm\" data-action=\"removePassword\">${getText('remove')}</a></li></ul></div>")
 public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, Enableable {
 
 	private static final long serialVersionUID = -6135434863820342822L;

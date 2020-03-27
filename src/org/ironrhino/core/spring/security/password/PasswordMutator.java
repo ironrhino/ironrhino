@@ -8,6 +8,8 @@ public interface PasswordMutator<T extends UserDetails> {
 
 	void resetPassword(T user);
 
+	void removePassword(T user);
+
 	void changePassword(T user, String password);
 
 	void changePassword(T user, String currentPassword, String password);
