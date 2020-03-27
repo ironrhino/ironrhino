@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.core.Authentication;
@@ -67,6 +68,9 @@ public class DefaultAuthenticationManager extends ProviderManager {
 			Authentication auth = super.authenticate(authentication);
 			cacheManager.delete(username, CACHE_NAMESPACE);
 			return auth;
+		} catch (CredentialsExpiredException e) {
+			cacheManager.delete(username, CACHE_NAMESPACE);
+			throw e;
 		} catch (BadCredentialsException e) {
 			cacheManager.increment(username, 1, lockdownForMinutes, TimeUnit.MINUTES, CACHE_NAMESPACE);
 			throw e;
