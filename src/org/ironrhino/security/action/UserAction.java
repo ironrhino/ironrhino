@@ -17,7 +17,10 @@ import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.JsonConfig;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.model.LabelValue;
+import org.ironrhino.core.security.event.EditProfileEvent;
 import org.ironrhino.core.security.event.ProfileEditedEvent;
+import org.ironrhino.core.security.event.RemovePasswordEvent;
+import org.ironrhino.core.security.event.ResetPasswordEvent;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.security.role.UserRoleFilter;
 import org.ironrhino.core.security.role.UserRoleManager;
@@ -111,7 +114,11 @@ public class UserAction extends EntityAction<User> {
 					@EmailValidator(fieldName = "user.email", key = "validation.invalid") }, regexFields = {
 							@RegexFieldValidator(type = ValidatorType.FIELD, fieldName = "user.username", regex = User.USERNAME_REGEX, key = "validation.invalid") })
 	public String save() throws Exception {
-		return super.save();
+		String result = super.save();
+		if (SUCCESS.equals(result))
+			eventPublisher.publish(new EditProfileEvent(AuthzUtils.getUsername(),
+					ServletActionContext.getRequest().getRemoteAddr(), user.getUsername()), Scope.LOCAL);
+		return result;
 	}
 
 	@Override
@@ -134,6 +141,8 @@ public class UserAction extends EntityAction<User> {
 			return NONE;
 		userManager.resetPassword(user);
 		notify("operate.success");
+		eventPublisher.publish(new ResetPasswordEvent(AuthzUtils.getUsername(),
+				ServletActionContext.getRequest().getRemoteAddr(), user.getUsername()), Scope.LOCAL);
 		return SUCCESS;
 	}
 
@@ -143,6 +152,8 @@ public class UserAction extends EntityAction<User> {
 			return NONE;
 		userManager.removePassword(user);
 		notify("operate.success");
+		eventPublisher.publish(new RemovePasswordEvent(AuthzUtils.getUsername(),
+				ServletActionContext.getRequest().getRemoteAddr(), user.getUsername()), Scope.LOCAL);
 		return SUCCESS;
 	}
 
