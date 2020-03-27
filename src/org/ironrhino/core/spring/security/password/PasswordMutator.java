@@ -8,7 +8,9 @@ public interface PasswordMutator<T extends UserDetails> {
 
 	void resetPassword(T user);
 
-	void removePassword(T user);
+	default void removePassword(T user) {
+		throw new UnsupportedOperationException();
+	}
 
 	void changePassword(T user, String password);
 
