@@ -16,10 +16,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
@@ -240,12 +236,10 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	public boolean exists(Serializable id) {
 		if (id == null)
 			return false;
-		CriteriaBuilder cb = sessionFactory.getCriteriaBuilder();
-		CriteriaQuery<Long> cq = cb.createQuery(Long.class);
-		Root<?> root = cq.from(getEntityClass());
-		cq.select(cb.count(root)).where(cb.equal(root.get("id"), id));
-		Query<Long> query = sessionFactory.getCurrentSession().createQuery(cq);
-		return query.uniqueResult() > 0;
+		DetachedCriteria dc = detachedCriteria();
+		dc.add(Restrictions.eq("id", id));
+		dc.setProjection(Projections.rowCount());
+		return (Long) dc.getExecutableCriteria(sessionFactory.getCurrentSession()).uniqueResult() > 0;
 	}
 
 	@Override
@@ -411,20 +405,15 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	@Transactional(readOnly = true)
 	public List<T> findAll(Order... orders) {
-		CriteriaBuilder cb = sessionFactory.getCriteriaBuilder();
-		CriteriaQuery<T> cq = cb.createQuery(getEntityClass());
-		Root<?> root = cq.from(getEntityClass());
+		DetachedCriteria dc = detachedCriteria();
+		dc.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
 		if (orders.length == 0) {
 			if (Ordered.class.isAssignableFrom(getEntityClass()))
-				cq.orderBy(cb.asc(root.get("displayOrder")));
-		} else {
-			javax.persistence.criteria.Order[] _orders = new javax.persistence.criteria.Order[orders.length];
-			for (int i = 0; i < orders.length; i++)
-				_orders[i] = orders[i].isAscending() ? cb.asc(root.get(orders[i].getPropertyName()))
-						: cb.desc(root.get(orders[i].getPropertyName()));
-			cq.orderBy(_orders);
-		}
-		return sessionFactory.getCurrentSession().createQuery(cq).list();
+				dc.addOrder(Order.asc("displayOrder"));
+		} else
+			for (Order order : orders)
+				dc.addOrder(order);
+		return dc.getExecutableCriteria(sessionFactory.getCurrentSession()).list();
 	}
 
 	@Override
