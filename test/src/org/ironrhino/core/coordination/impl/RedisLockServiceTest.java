@@ -6,18 +6,19 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 
 import java.util.concurrent.TimeUnit;
 
 import org.ironrhino.core.coordination.LockService;
 import org.ironrhino.core.coordination.impl.RedisLockServiceTest.RedisLockServiceConfig;
-import org.ironrhino.core.util.AppInfo;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.script.RedisScript;
@@ -36,73 +37,49 @@ public class RedisLockServiceTest {
 	@Autowired
 	private RedisLockService lockService;
 
-	protected static String holder() {
-		return AppInfo.getInstanceId() + '$' + Thread.currentThread().getId();
-	}
-
+	@SuppressWarnings("unchecked")
 	@Before
-	public void setUp() {
-		AppInfo.setContextPath("");
-		AppInfo.setHttpPort(8080);
+	public void cleanup() {
+		reset(stringRedisTemplate);
+		given(stringRedisTemplate.opsForValue()).willReturn(opsForValue = mock(ValueOperations.class));
 	}
 
 	@Test
 	public void testTryLockSuccessful() {
-		given(opsForValue.setIfAbsent("lock:key", holder(), lockService.getMaxHoldTime(), TimeUnit.SECONDS))
-				.willReturn(true);
+		given(opsForValue.setIfAbsent("lock:key", RedisLockService.holder(), lockService.getWatchdogTimeout(),
+				TimeUnit.MILLISECONDS)).willReturn(true);
 		assertThat(lockService.tryLock("key"), is(true));
 	}
 
 	@Test
 	public void testTryLockFailed() {
-		AppInfo.setContextPath(null);
-		given(opsForValue.setIfAbsent("lock:key", holder(), lockService.getMaxHoldTime(), TimeUnit.SECONDS))
-				.willReturn(false);
+		given(opsForValue.setIfAbsent("lock:key", RedisLockService.holder(), lockService.getWatchdogTimeout(),
+				TimeUnit.MILLISECONDS)).willReturn(false);
 		assertThat(lockService.tryLock("key"), is(false));
 	}
 
 	@Test
-	public void testTryLockWithinSuspiciousHoldTime() {
-		given(opsForValue.setIfAbsent("lock:key", holder(), lockService.getMaxHoldTime(), TimeUnit.SECONDS))
-				.willReturn(false);
-		given(stringRedisTemplate.getExpire("lock:key", TimeUnit.SECONDS))
-				.willReturn(lockService.getMaxHoldTime() - lockService.getSuspiciousHoldTime() + 10L);
-		assertThat(lockService.tryLock("key"), is(false));
-	}
-
-	@Test
-	public void testTryLockOverSuspiciousHoldTime() {
-		given(opsForValue.setIfAbsent("lock:key", holder(), lockService.getMaxHoldTime(), TimeUnit.SECONDS))
-				.willReturn(false);
-		given(stringRedisTemplate.getExpire("lock:key", TimeUnit.SECONDS))
-				.willReturn(lockService.getMaxHoldTime() - lockService.getSuspiciousHoldTime() - 10L);
-		given(opsForValue.get("lock:key")).willReturn("ironrhino-kjdfisf@0.0.0.0:8080$1");
+	public void testUnlockSuccessful() {
 		given(stringRedisTemplate.execute(ArgumentMatchers.<RedisScript<Long>>any(),
-				argThat(keys -> keys != null && keys.contains("lock:key")),
-				eq("ironrhino-kjdfisf@0.0.0.0:8080$1"))).willAnswer(invocation -> {
-					given(opsForValue.setIfAbsent("lock:key", holder(), lockService.getMaxHoldTime(), TimeUnit.SECONDS))
-							.willReturn(true);
-					return 1L;
-				});
-		assertThat(lockService.tryLock("key"), is(true));
-	}
-
-	@Test
-	public void testUnlock() {
-		given(stringRedisTemplate.execute(ArgumentMatchers.<RedisScript<Long>>any(),
-				argThat(keys -> keys != null && keys.contains("lock:key")), eq(holder())))
+				argThat(keys -> keys != null && keys.contains("lock:key")), eq(RedisLockService.holder())))
 						.willReturn(1L);
 		lockService.unlock("key");
 	}
 
+	@Test(expected = IllegalStateException.class)
+	public void testUnlockFailed() {
+		given(stringRedisTemplate.execute(ArgumentMatchers.<RedisScript<Long>>any(),
+				argThat(keys -> keys != null && keys.contains("lock:key")), eq(RedisLockService.holder())))
+						.willReturn(0L);
+		lockService.unlock("key");
+	}
+
+	@Configuration
 	static class RedisLockServiceConfig {
 
 		@Bean
-		@SuppressWarnings("unchecked")
 		public StringRedisTemplate stringRedisTemplate() {
-			StringRedisTemplate stringRedisTemplate = mock(StringRedisTemplate.class);
-			given(stringRedisTemplate.opsForValue()).willReturn(opsForValue = mock(ValueOperations.class));
-			return stringRedisTemplate;
+			return mock(StringRedisTemplate.class);
 		}
 
 		@Bean
