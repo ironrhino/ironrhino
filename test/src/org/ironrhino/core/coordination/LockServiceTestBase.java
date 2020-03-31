@@ -37,10 +37,11 @@ public abstract class LockServiceTestBase {
 
 	@Test
 	public void testTryLock() throws InterruptedException {
-		final ConcurrentHashMap<String, String> map = new ConcurrentHashMap<>();
-		final CountDownLatch cdl = new CountDownLatch(THREADS);
-		final AtomicInteger count = new AtomicInteger();
-		final AtomicInteger error = new AtomicInteger();
+		ConcurrentHashMap<String, String> map = new ConcurrentHashMap<>();
+		CountDownLatch cdl = new CountDownLatch(THREADS);
+		AtomicInteger count = new AtomicInteger();
+		AtomicInteger error = new AtomicInteger();
+		AtomicInteger locked = new AtomicInteger();
 		long time = System.currentTimeMillis();
 		for (int i = 0; i < THREADS; i++) {
 
@@ -50,6 +51,7 @@ public abstract class LockServiceTestBase {
 						String lockName = "lock" + System.currentTimeMillis() % 10;
 						if (lockService.tryLock(lockName))
 							try {
+								locked.incrementAndGet();
 								try {
 									Thread.sleep(1);
 									if (map.putIfAbsent(lockName, lockName) != null)
@@ -74,17 +76,20 @@ public abstract class LockServiceTestBase {
 		}
 		cdl.await();
 		time = System.currentTimeMillis() - time;
-		System.out.println("completed " + count.get() + " requests with concurrency(" + THREADS + ") in " + time
-				+ "ms (tps = " + (count.get() * 1000 / time) + ") with tryLock()");
+		System.out.println(
+				"completed " + count.get() + " requests and locked " + locked.get() + " times with concurrency("
+						+ THREADS + ") in " + time + "ms (tps = " + (count.get() * 1000 / time) + ") with tryLock()");
 		assertThat(error.get(), is(0));
+		assertThat(locked.get() > 0, is(true));
 	}
 
 	@Test
 	public void testLock() throws InterruptedException {
-		final ConcurrentHashMap<String, String> map = new ConcurrentHashMap<>();
-		final CountDownLatch cdl = new CountDownLatch(THREADS);
-		final AtomicInteger count = new AtomicInteger();
-		final AtomicInteger error = new AtomicInteger();
+		ConcurrentHashMap<String, String> map = new ConcurrentHashMap<>();
+		CountDownLatch cdl = new CountDownLatch(THREADS);
+		AtomicInteger count = new AtomicInteger();
+		AtomicInteger error = new AtomicInteger();
+		AtomicInteger locked = new AtomicInteger();
 		long time = System.currentTimeMillis();
 		for (int i = 0; i < THREADS; i++) {
 
@@ -94,6 +99,7 @@ public abstract class LockServiceTestBase {
 						String lockName = "lock" + System.currentTimeMillis() % 10;
 						lockService.lock(lockName);
 						try {
+							locked.incrementAndGet();
 							try {
 								Thread.sleep(1);
 								if (map.putIfAbsent(lockName, lockName) != null)
@@ -118,9 +124,11 @@ public abstract class LockServiceTestBase {
 		}
 		cdl.await();
 		time = System.currentTimeMillis() - time;
-		System.out.println("completed " + count.get() + " requests with concurrency(" + THREADS + ") in " + time
-				+ "ms (tps = " + (count.get() * 1000 / time) + ") with lock()");
+		System.out.println(
+				"completed " + count.get() + " requests and locked " + locked.get() + " times with concurrency("
+						+ THREADS + ") in " + time + "ms (tps = " + (count.get() * 1000 / time) + ") with lock()");
 		assertThat(error.get(), is(0));
+		assertThat(locked.get(), is(LOOP));
 	}
 
 }
