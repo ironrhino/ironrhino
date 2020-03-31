@@ -96,29 +96,6 @@ public class RedisLockService implements LockService {
 	}
 
 	@Override
-	public boolean tryLock(String name, long timeout, TimeUnit unit) {
-		boolean success = tryLock(name);
-		long millisTimeout = unit.toMillis(timeout);
-		long start = System.currentTimeMillis();
-		while (!success) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				return false;
-			}
-			if ((System.currentTimeMillis() - start) >= millisTimeout)
-				break;
-			success = tryLock(name);
-		}
-		return success;
-	}
-
-	@Override
-	public void lock(String name) {
-		tryLock(name, Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-	}
-
-	@Override
 	public void unlock(String name) {
 		String key = NAMESPACE + name;
 		String holder = holder();
