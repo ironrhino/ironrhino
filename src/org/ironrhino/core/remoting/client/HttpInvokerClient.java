@@ -134,8 +134,12 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 		Assert.isTrue(serviceInterface.isInterface(), "'serviceInterface' must be an interface");
 		Assert.notNull(httpInvokerRequestExecutor, "'httpInvokerRequestExecutor' must not be null");
 		Remoting anno = serviceInterface.getAnnotation(Remoting.class);
-		if (anno != null && StringUtils.isNotBlank(anno.serializationType()))
-			this.serializationType = anno.serializationType();
+		if (anno != null) {
+			if (StringUtils.isNotBlank(anno.serializationType()))
+				this.serializationType = anno.serializationType();
+			if (anno.maxAttempts() > 0)
+				this.maxAttempts = anno.maxAttempts();
+		}
 		if (getApplicationContext() != null) {
 			Environment env = getApplicationContext().getEnvironment();
 			this.serializationType = env.getProperty(serviceInterface.getName() + SERIALIZATION_TYPE_SUFFIX,
