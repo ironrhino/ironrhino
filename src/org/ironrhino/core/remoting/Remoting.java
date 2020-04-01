@@ -22,4 +22,6 @@ public @interface Remoting {
 
 	String serializationType() default "";
 
+	int maxAttempts() default 3;
+
 }
