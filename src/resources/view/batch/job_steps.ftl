@@ -30,13 +30,13 @@
 		</div>
 		<div class="row-fluid">
 			<div class="span4">
-				<div class="control-group"><label class="control-label">${getText('startTime')}</label><div class="controls">${(step.startTime?datetime)!}</div></div>
+				<div class="control-group"><label class="control-label">${getText('startTime')}</label><div class="controls">${(step.startTime?string('yyyy-MM-dd HH:mm:ss.SSS'))!}</div></div>
 			</div>
 			<div class="span4">
-				<div class="control-group"><label class="control-label">${getText('endTime')}</label><div class="controls">${(step.endTime?datetime)!}</div></div>
+				<div class="control-group"><label class="control-label">${getText('endTime')}</label><div class="controls">${(step.endTime?string('yyyy-MM-dd HH:mm:ss.SSS'))!}</div></div>
 			</div>
 			<div class="span4">
-				<div class="control-group"><label class="control-label">${getText('lastUpdated')}</label><div class="controls">${(step.lastUpdated?datetime)!}</div></div>
+				<div class="control-group"><label class="control-label">${getText('lastUpdated')}</label><div class="controls">${(step.lastUpdated?string('yyyy-MM-dd HH:mm:ss.SSS'))!}</div></div>
 			</div>
 		</div>
 		<div class="row-fluid">
