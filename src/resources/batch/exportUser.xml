@@ -75,7 +75,7 @@
 	<bean id="moveLastLinesToFirstTask" scope="job"
 		class="org.ironrhino.batch.tasklet.file.MoveLastLinesToFirstTask">
 		<property name="file"
-			value="file:${app.home}/target/output.txt.#{T(org.ironrhino.core.util.DateUtils).formatDate10(jobParameters[workdate])}" />
+			value="${app.home}/target/output.txt.#{T(org.ironrhino.core.util.DateUtils).formatDate10(jobParameters[workdate])}" />
 		<property name="lines" value="1" />
 	</bean>
 

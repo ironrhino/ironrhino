@@ -18,7 +18,6 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
 import lombok.Setter;
@@ -26,7 +25,7 @@ import lombok.Setter;
 @Setter
 public class MoveLastLinesToFirstTask implements Tasklet {
 
-	private Resource file;
+	private File file;
 
 	private int lines = 1;
 
@@ -34,12 +33,11 @@ public class MoveLastLinesToFirstTask implements Tasklet {
 
 	@Override
 	public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-		File target = file.getFile();
 
 		ReversedLinesFileReader rlfr = null;
 		List<String> block = new ArrayList<>();
 		try {
-			rlfr = new ReversedLinesFileReader(target, encoding);
+			rlfr = new ReversedLinesFileReader(file, encoding);
 			for (int i = 0; i < lines; i++) {
 				String line = rlfr.readLine();
 				if (line == null)
@@ -50,16 +48,16 @@ public class MoveLastLinesToFirstTask implements Tasklet {
 			if (rlfr != null)
 				rlfr.close();
 		}
-		Assert.state(block.size() == lines, target.getAbsoluteFile() + " should be at least " + lines + " lines");
+		Assert.state(block.size() == lines, file.getAbsoluteFile() + " should be at least " + lines + " lines");
 
-		File temp = new File(target.getParentFile(), target.getName() + ".tmp");
+		File temp = new File(file.getParentFile(), file.getName() + ".tmp");
 		try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(temp), encoding))) {
 			for (int i = 0; i < lines; i++) {
 				bw.write(block.get(i));
 				if (i < lines - 1)
 					bw.newLine();
 			}
-			try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(target), encoding))) {
+			try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), encoding))) {
 				LinkedList<String> buffer = new LinkedList<>();
 				String line;
 				while ((line = br.readLine()) != null) {
@@ -71,7 +69,7 @@ public class MoveLastLinesToFirstTask implements Tasklet {
 				}
 			}
 		}
-		temp.renameTo(target);
+		temp.renameTo(file);
 		return RepeatStatus.FINISHED;
 	}
 

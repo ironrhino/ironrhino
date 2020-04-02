@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 import org.junit.Test;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.core.io.FileSystemResource;
 
 public class MoveLastLinesToFirstTaskTest {
 
@@ -49,7 +48,7 @@ public class MoveLastLinesToFirstTaskTest {
 	private static void execute(File file, int totalLines, int movedLines) throws Exception {
 		try {
 			MoveLastLinesToFirstTask task = new MoveLastLinesToFirstTask();
-			task.setFile(new FileSystemResource(file));
+			task.setFile(file);
 			task.setLines(movedLines);
 			assertThat(task.execute(null, null), is(RepeatStatus.FINISHED));
 			try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
