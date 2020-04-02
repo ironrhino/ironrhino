@@ -79,6 +79,9 @@ public class BatchSchemaSetup {
 							}
 							if (maxVarCharLength != 2500)
 								sql = sql.replaceAll("2500", String.valueOf(maxVarCharLength));
+							if (dp == DatabaseProduct.MYSQL && dbmd.getDatabaseMinorVersion() >= 6)
+								sql = sql.replaceAll(" DATETIME ", " DATETIME(6) ").replaceAll(" DATETIME,",
+										" DATETIME(6),");
 							stmt.execute(sql);
 						}
 					}
