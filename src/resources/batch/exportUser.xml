@@ -86,6 +86,8 @@
 		<property name="body">
 			<value><![CDATA[{"msgtype":"text","text":{"content":"#{jobName} is finished with workdate: #{T(org.ironrhino.core.util.DateUtils).formatDate10(jobParameters[workdate])}"}}]]></value>
 		</property>
+		<property name="responseFailurePattern" value="errmsg" />
+		<property name="suppressFailure" value="true" />
 	</bean>
 
 	<job id="exportUserJob"
