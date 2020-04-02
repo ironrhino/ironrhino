@@ -3,6 +3,7 @@ package org.ironrhino.batch.tasklet.http;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
@@ -23,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class WebhookTask implements Tasklet {
 
-	private String url;
+	private URI url;
 
 	private String body = "";
 
@@ -32,7 +33,9 @@ public class WebhookTask implements Tasklet {
 
 	private HttpMethod method = HttpMethod.POST;
 
-	private boolean suppressHttpError;
+	private Pattern responseFailurePattern;
+
+	private boolean suppressFailure;
 
 	@Override
 	public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
@@ -40,24 +43,31 @@ public class WebhookTask implements Tasklet {
 		HttpHeaders httpHeaders = new HttpHeaders();
 		for (Map.Entry<String, String> entry : headers.entrySet())
 			httpHeaders.add(entry.getKey(), entry.getValue());
-		RequestEntity<String> request = new RequestEntity<>(body, httpHeaders, method, new URI(url));
+		RequestEntity<String> request = new RequestEntity<>(body, httpHeaders, method, url);
 		validate(rt.exchange(request, String.class));
 		return RepeatStatus.FINISHED;
 	}
 
 	protected void validate(ResponseEntity<String> response) throws Exception {
-		if (response.getStatusCode().is2xxSuccessful()) {
-			log.info("Requested {} with [{}] and received [{}]", url, body, response.getBody());
+		String responseBody = response.getBody();
+		if (response.getStatusCode().is2xxSuccessful() && !isFailure(responseBody)) {
+			log.info("Requested {} with [{}] and received [{}]", url, body, responseBody);
 		} else {
-			if (suppressHttpError) {
-				log.error("Requested {} with [{}] and received [{}] with status code {}", url, body, response.getBody(),
+			if (suppressFailure) {
+				log.error("Requested {} with [{}] and received [{}] with status code {}", url, body, responseBody,
 						response.getStatusCodeValue());
 			} else {
 				throw new UnexpectedJobExecutionException(
 						String.format("Requested %s with [%s] and received [%s] with status code %d", url, body,
-								response.getBody(), response.getStatusCodeValue()));
+								responseBody, response.getStatusCodeValue()));
 			}
 		}
+	}
+
+	protected boolean isFailure(String responseBody) {
+		if (responseFailurePattern != null)
+			return responseFailurePattern.matcher(responseBody).find();
+		return false;
 	}
 
 }
