@@ -96,9 +96,7 @@ public class DataSourceRegistryPostProcessor implements BeanDefinitionRegistryPo
 		Assert.hasText(jdbcUrlFormat, "jdbcUrlFormat shouldn't be blank");
 		Map<String, String> jdbcUrls = buildJdbcUrls();
 		StringBuilder dataSourceMapping = new StringBuilder();
-		for (Map.Entry<String, String> entry : jdbcUrls.entrySet()) {
-			String beanName = entry.getKey();
-			String jdbcUrl = entry.getValue();
+		jdbcUrls.forEach((beanName, jdbcUrl) -> {
 			ChildBeanDefinition beanDefinition = new ChildBeanDefinition(shardingParentName);
 			MutablePropertyValues propertyValues = new MutablePropertyValues();
 			String url = env.getProperty(beanName + ".jdbc.url");
@@ -114,7 +112,7 @@ public class DataSourceRegistryPostProcessor implements BeanDefinitionRegistryPo
 				propertyValues.addPropertyValue("password", password);
 			beanDefinition.setPropertyValues(propertyValues);
 			registry.registerBeanDefinition(beanName, beanDefinition);
-		}
+		});
 		log.info("Register dataSources:\n\n{}", dataSourceMapping.toString());
 		RootBeanDefinition beanDefinition = new RootBeanDefinition(RoutingDataSource.class);
 		MutablePropertyValues propertyValues = new MutablePropertyValues();

@@ -16,6 +16,7 @@ public abstract class TargetOrientedAuditEvent extends AbstractAuditEvent {
 		this.targetUsername = targetUsername;
 	}
 
+	@Override
 	public String[] getArguments() {
 		return new String[] { targetUsername };
 	}

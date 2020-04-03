@@ -201,8 +201,9 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 			return new TreeMap<>(getExportedServiceDescriptions());
 		Map<Object, Object> map = remotingStringRedisTemplate.opsForHash().entries(NAMESPACE_APPS + appName);
 		Map<String, String> services = new TreeMap<>();
-		for (Map.Entry<Object, Object> entry : map.entrySet())
-			services.put((String) entry.getKey(), (String) entry.getValue());
+		map.forEach((k, v) -> {
+			services.put((String) k, (String) v);
+		});
 		return services;
 	}
 

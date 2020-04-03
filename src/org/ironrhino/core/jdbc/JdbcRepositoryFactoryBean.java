@@ -133,9 +133,9 @@ public class JdbcRepositoryFactoryBean extends MethodInterceptorFactoryBean
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		for (Map.Entry<Object, Object> entry : props.entrySet()) {
-			map.put(entry.getKey().toString(), entry.getValue().toString());
-		}
+		props.forEach((k, v) -> {
+			map.put(k.toString(), v.toString());
+		});
 		try (InputStream is = jdbcRepositoryClass.getResourceAsStream(jdbcRepositoryClass.getSimpleName() + ".xml")) {
 			if (is != null) {
 				NodeList nl = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is)

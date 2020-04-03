@@ -90,10 +90,9 @@ public class UserAction extends EntityAction<User> {
 				map = temp;
 		}
 		roles = new ArrayList<>(map.size());
-		for (Map.Entry<String, String> entry : map.entrySet())
-			roles.add(new LabelValue(
-					StringUtils.isNotBlank(entry.getValue()) ? entry.getValue() : getText(entry.getKey()),
-					entry.getKey()));
+		map.forEach((k, v) -> {
+			roles.add(new LabelValue(StringUtils.isNotBlank(v) ? v : getText(k), k));
+		});
 		if (!user.isNew()) {
 			Set<String> userRoles = user.getRoles();
 			for (String r : userRoles) {
@@ -204,10 +203,9 @@ public class UserAction extends EntityAction<User> {
 		Map<String, String> map = userRoleManager
 				.getAllRoles(ServletActionContext.getRequest().getParameter("excludeBuiltin") != null);
 		roles = new ArrayList<>(map.size());
-		for (Map.Entry<String, String> entry : map.entrySet())
-			roles.add(new LabelValue(
-					StringUtils.isNotBlank(entry.getValue()) ? entry.getValue() : getText(entry.getKey()),
-					entry.getKey()));
+		map.forEach((k, v) -> {
+			roles.add(new LabelValue(StringUtils.isNotBlank(v) ? v : getText(k), k));
+		});
 		return JSON;
 	}
 

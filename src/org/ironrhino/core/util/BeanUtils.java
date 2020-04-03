@@ -53,10 +53,10 @@ public class BeanUtils {
 	public static void copyProperties(Map<String, ?> source, Object target) {
 		BeanWrapperImpl bw = new BeanWrapperImpl(target);
 		bw.setConversionService(CustomConversionService.getSharedInstance());
-		for (Map.Entry<String, ?> entry : source.entrySet()) {
-			if (bw.isWritableProperty(entry.getKey()))
-				bw.setPropertyValue(entry.getKey(), entry.getValue());
-		}
+		source.forEach((k, v) -> {
+			if (bw.isWritableProperty(k))
+				bw.setPropertyValue(k, v);
+		});
 	}
 
 	public static void copyProperties(Object source, Object target, boolean ignoreNullValue, boolean ignoreNotInCopy,

@@ -548,8 +548,9 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Transactional(readOnly = true)
 	public List<T> find(String queryString, Map<String, ?> args) {
 		Query query = sessionFactory.getCurrentSession().createQuery(queryString);
-		for (Map.Entry<String, ?> entry : args.entrySet())
-			query.setParameter(entry.getKey(), entry.getValue());
+		args.forEach((k, v) -> {
+			query.setParameter(k, v);
+		});
 		return query.list();
 	}
 
@@ -627,8 +628,9 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Transactional
 	public int executeUpdate(String queryString, Map<String, ?> args) {
 		Query query = sessionFactory.getCurrentSession().createQuery(queryString);
-		for (Map.Entry<String, ?> entry : args.entrySet())
-			query.setParameter(entry.getKey(), entry.getValue());
+		args.forEach((k, v) -> {
+			query.setParameter(k, v);
+		});
 		return query.executeUpdate();
 	}
 

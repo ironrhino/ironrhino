@@ -102,10 +102,10 @@ public class UserRoleManager {
 		Map<String, String> roles = new LinkedHashMap<>();
 		for (String role : staticRoles)
 			roles.put(role, I18N.getText(role));
-		for (Map.Entry<String, String> entry : customRoles.entrySet()) {
-			String value = StringUtils.isNotBlank(entry.getValue()) ? entry.getValue() : entry.getKey();
-			roles.put(entry.getKey(), I18N.getText(value));
-		}
+		customRoles.forEach((k, v) -> {
+			String value = StringUtils.isNotBlank(v) ? v : k;
+			roles.put(k, I18N.getText(value));
+		});
 		return Collections.unmodifiableMap(roles);
 	}
 

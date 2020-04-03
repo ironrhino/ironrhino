@@ -244,12 +244,12 @@ public class PageAction extends EntityAction<Page> {
 			return NONE;
 		Map<String, Integer> map = pageManager.findMatchedTags(keyword);
 		suggestions = new ArrayList<>(map.size());
-		for (Map.Entry<String, Integer> entry : map.entrySet()) {
+		map.forEach((k, v) -> {
 			LabelValue lv = new LabelValue();
-			lv.setValue(entry.getKey());
-			lv.setLabel(new StringBuilder(entry.getKey()).append("(").append(entry.getValue()).append(")").toString());
+			lv.setValue(k);
+			lv.setLabel(k + "(" + v + ")");
 			suggestions.add(lv);
-		}
+		});
 		return JSON;
 	}
 

@@ -256,8 +256,9 @@ public class PageManagerImpl extends BaseManagerImpl<Page> implements PageManage
 			for (int i = 0; i < tag.length; i++)
 				if (StringUtils.isNotBlank(tag[i]))
 					dc.add(CriterionUtils.matchTag("tags", tag[i]));
-			for (Map.Entry<String, Boolean> entry : criteria.getSorts().entrySet())
-				dc.addOrder(entry.getValue() ? Order.desc(entry.getKey()) : Order.asc(entry.getKey()));
+			criteria.getSorts().forEach((k, v) -> {
+				dc.addOrder(v ? Order.desc(k) : Order.asc(k));
+			});
 			resultPage.setCriteria(dc);
 			resultPage = findByResultPage(resultPage);
 		}

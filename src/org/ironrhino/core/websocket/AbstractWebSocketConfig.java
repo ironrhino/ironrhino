@@ -22,15 +22,14 @@ public abstract class AbstractWebSocketConfig implements WebSocketConfigurer {
 
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-		webSocketHandlers.entrySet().stream().forEach(entry -> {
-			String name = entry.getKey();
+		webSocketHandlers.forEach((name, value) -> {
 			if (name.endsWith("WebSocketHandler"))
 				name = name.substring(0, name.length() - "WebSocketHandler".length());
 			else if (name.endsWith("WebSocket"))
 				name = name.substring(0, name.length() - "WebSocket".length());
 			else if (name.endsWith("Handler"))
 				name = name.substring(0, name.length() - "Handler".length());
-			WebSocketHandlerRegistration registration = registry.addHandler(entry.getValue(), name);
+			WebSocketHandlerRegistration registration = registry.addHandler(value, name);
 			if (openForAllOrigin)
 				registration.setAllowedOrigins("*");
 		});

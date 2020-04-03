@@ -183,16 +183,14 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
 	@Override
 	public void evict(String host) {
-		for (Map.Entry<String, List<String>> entry : importedServiceCandidates.entrySet()) {
-			String serviceName = entry.getKey();
-			List<String> hosts = entry.getValue();
+		importedServiceCandidates.forEach((serviceName, hosts) -> {
 			List<String> tobeRemoved = hosts.stream().filter(s -> isSame(s, host)).collect(Collectors.toList());
 			if (!tobeRemoved.isEmpty()) {
 				hosts.removeAll(tobeRemoved);
 				logger.info("Evict {} for service {}", tobeRemoved, serviceName);
 				onServiceHostsChanged(serviceName);
 			}
-		}
+		});
 	}
 
 	@Override

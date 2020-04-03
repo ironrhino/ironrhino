@@ -63,20 +63,20 @@ public class JobParameterHelper {
 			Map<String, ParameterType> requiredKeys = sjpv.getRequiredKeys();
 			Map<String, ParameterType> optionalKeys = sjpv.getOptionalKeys();
 			List<SimpleJobParameter> params = new ArrayList<>(requiredKeys.size() + optionalKeys.size());
-			for (Map.Entry<String, ParameterType> entry : requiredKeys.entrySet()) {
+			requiredKeys.forEach((k, v) -> {
 				SimpleJobParameter sjp = new SimpleJobParameter();
-				sjp.setKey(entry.getKey());
-				sjp.setType(entry.getValue());
+				sjp.setKey(k);
+				sjp.setType(v);
 				sjp.setRequired(true);
 				params.add(sjp);
-			}
-			for (Map.Entry<String, ParameterType> entry : optionalKeys.entrySet()) {
+			});
+			optionalKeys.forEach((k, v) -> {
 				SimpleJobParameter sjp = new SimpleJobParameter();
-				sjp.setKey(entry.getKey());
-				sjp.setType(entry.getValue());
+				sjp.setKey(k);
+				sjp.setType(v);
 				sjp.setRequired(false);
 				params.add(sjp);
-			}
+			});
 			return params;
 		} else if (jobParametersValidator instanceof DefaultJobParametersValidator) {
 			Collection<String> requiredKeys = ReflectionUtils.getFieldValue(jobParametersValidator, "requiredKeys");
@@ -123,17 +123,17 @@ public class JobParameterHelper {
 		if (parameters == null || parameters.isEmpty())
 			return "{}";
 		StringJoiner sj = new StringJoiner(",", "{", "}");
-		for (Map.Entry<String, JobParameter> entry : parameters.entrySet()) {
+		parameters.forEach((k, v) -> {
 			StringBuilder sb = new StringBuilder();
-			sb.append(entry.getKey()).append("=");
-			Object value = entry.getValue().getValue();
-			if (entry.getValue().getType() == ParameterType.DATE) {
+			sb.append(k).append("=");
+			Object value = v.getValue();
+			if (v.getType() == ParameterType.DATE) {
 				sb.append(DateUtils.formatDate10((Date) value));
 			} else {
 				sb.append(value);
 			}
 			sj.add(sb);
-		}
+		});
 		return sj.toString();
 	}
 

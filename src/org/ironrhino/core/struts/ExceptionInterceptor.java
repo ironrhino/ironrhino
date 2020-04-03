@@ -1,8 +1,6 @@
 package org.ironrhino.core.struts;
 
 import java.net.SocketTimeoutException;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletionException;
 
 import javax.servlet.RequestDispatcher;
@@ -106,10 +104,10 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 							validationAwareAction.addActionMessage(findText(s, null));
 						for (String s : ve.getActionErrors())
 							validationAwareAction.addActionError(findText(s, null));
-						for (Map.Entry<String, List<String>> entry : ve.getFieldErrors().entrySet()) {
-							for (String s : entry.getValue())
-								validationAwareAction.addFieldError(entry.getKey(), findText(s, null));
-						}
+						ve.getFieldErrors().forEach((k, v) -> {
+							for (String s : v)
+								validationAwareAction.addFieldError(k, findText(s, null));
+						});
 					} else if (e instanceof ErrorMessage || cause instanceof ErrorMessage) {
 						ErrorMessage em = (ErrorMessage) ((e instanceof ErrorMessage) ? e : cause);
 						validationAwareAction.addActionError(em.getLocalizedMessage());

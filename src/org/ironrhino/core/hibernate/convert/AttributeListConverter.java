@@ -40,8 +40,9 @@ public class AttributeListConverter implements AttributeConverter<List<Attribute
 		try {
 			Map<String, String> map = JsonUtils.fromJson(string, JsonUtils.STRING_MAP_TYPE);
 			List<Attribute> attributes = new ArrayList<>(map.size());
-			for (Map.Entry<String, String> entry : map.entrySet())
-				attributes.add(new Attribute(entry.getKey(), entry.getValue()));
+			map.forEach((k, v) -> {
+				attributes.add(new Attribute(k, v));
+			});
 			return attributes;
 		} catch (Exception e) {
 			if (e instanceof MismatchedInputException) {
