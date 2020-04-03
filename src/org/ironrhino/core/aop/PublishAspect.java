@@ -80,13 +80,11 @@ public class PublishAspect implements TransactionSynchronization, Ordered {
 				continue;
 			actions.put((Persistable<?>) entity, action);
 		}
-		for (Map.Entry<Persistable<?>, EntityOperationType> entry : actions.entrySet()) {
-			PublishAware publishAware = ReflectionUtils.getActualClass(entry.getKey())
-					.getAnnotation(PublishAware.class);
+		actions.forEach((k, v) -> {
+			PublishAware publishAware = ReflectionUtils.getActualClass(k).getAnnotation(PublishAware.class);
 			if (publishAware != null)
-				eventPublisher.publish(new EntityOperationEvent<>(entry.getKey(), entry.getValue()),
-						publishAware.scope());
-		}
+				eventPublisher.publish(new EntityOperationEvent<>(k, v), publishAware.scope());
+		});
 	}
 
 	@Override

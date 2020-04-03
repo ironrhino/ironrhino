@@ -40,8 +40,9 @@ public class ValidationException extends RuntimeException {
 			if (fieldErrors != null && !fieldErrors.isEmpty()) {
 				if (sb.length() > 0)
 					sb.append(';');
-				for (Map.Entry<String, List<String>> entry : fieldErrors.entrySet())
-					sb.append(entry.getKey()).append(": ").append(String.join(",", entry.getValue())).append(';');
+				fieldErrors.forEach((k, v) -> {
+					sb.append(k).append(": ").append(String.join(",", v)).append(';');
+				});
 				sb.deleteCharAt(sb.length() - 1);
 			}
 			msg = sb.toString();

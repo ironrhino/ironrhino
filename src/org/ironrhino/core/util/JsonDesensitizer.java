@@ -135,10 +135,10 @@ public class JsonDesensitizer {
 				desensitize(null, element, node);
 			}
 		} else if (parent instanceof ObjectNode) {
-			mapping.entrySet().stream().forEach(entry -> {
-				if (entry.getKey().test(nodeName, parent)) {
+			mapping.forEach((k, v) -> {
+				if (k.test(nodeName, parent)) {
 					ObjectNode on = ((ObjectNode) parent);
-					String value = entry.getValue().apply(node.isNull() ? null : node.asText());
+					String value = v.apply(node.isNull() ? null : node.asText());
 					try {
 						if (node.isNumber())
 							on.put(nodeName, new BigDecimal(value));

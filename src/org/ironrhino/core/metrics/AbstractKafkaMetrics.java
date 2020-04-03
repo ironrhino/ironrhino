@@ -27,13 +27,12 @@ public abstract class AbstractKafkaMetrics extends JmxBasedMeterBinder {
 		});
 		timeGaugeConfig().forEach((k, v) -> {
 			registerMetricsEventually(getDomain(), k, (name, allTags) -> {
-				for (Map.Entry<String, TimeUnit> entry : v.entrySet()) {
-					String gaugeName = entry.getKey();
+				v.forEach((gaugeName, timeUnit) -> {
 					TimeGauge
-							.builder(toMetricName(gaugeName), mBeanServer, entry.getValue(),
+							.builder(toMetricName(gaugeName), mBeanServer, timeUnit,
 									s -> safeDouble(() -> s.getAttribute(name, gaugeName)))
 							.tags(allTags).register(registry);
-				}
+				});
 			});
 		});
 		counterConfig().forEach((k, v) -> {

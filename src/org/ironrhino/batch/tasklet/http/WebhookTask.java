@@ -41,8 +41,9 @@ public class WebhookTask implements Tasklet {
 	public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
 		RestTemplate rt = new RestTemplate();
 		HttpHeaders httpHeaders = new HttpHeaders();
-		for (Map.Entry<String, String> entry : headers.entrySet())
-			httpHeaders.add(entry.getKey(), entry.getValue());
+		headers.forEach((k, v) -> {
+			httpHeaders.add(k, v);
+		});
 		RequestEntity<String> request = new RequestEntity<>(body, httpHeaders, method, url);
 		validate(rt.exchange(request, String.class));
 		return RepeatStatus.FINISHED;

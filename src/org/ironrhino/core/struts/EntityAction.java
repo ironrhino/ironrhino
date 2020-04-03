@@ -435,10 +435,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			}
 		} else {
 			Set<String> searchableProperties = new HashSet<>();
-			for (Map.Entry<String, UiConfigImpl> entry : getUiConfigs().entrySet()) {
-				if (entry.getValue().isSearchable())
-					searchableProperties.add(entry.getKey());
-			}
+			getUiConfigs().forEach((key, config) -> {
+				if (config.isSearchable())
+					searchableProperties.add(key);
+			});
 			String query = keyword.trim();
 			SearchCriteria criteria = new SearchCriteria();
 			criteria.setQuery(query);
@@ -547,49 +547,47 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				return dc;
 			}
 			Map<String, MatchMode> propertyNamesInLike = new LinkedHashMap<>();
-			for (Map.Entry<String, UiConfigImpl> entry : getUiConfigs().entrySet()) {
-				if (entry.getValue().isSearchable() && !entry.getValue().isExcludedFromLike()) {
-					if (String.class.equals(entry.getValue().getPropertyType())) {
-						propertyNamesInLike.put(entry.getKey(), entry.getValue().isExactMatch() ? MatchMode.EXACT
-								: entry.getValue().getQueryMatchMode());
-					} else if (String.class.equals(entry.getValue().getElementType())) {
-						propertyNamesInLike.put(entry.getKey(), null);
+			getUiConfigs().forEach((key, config) -> {
+				if (config.isSearchable() && !config.isExcludedFromLike()) {
+					if (String.class.equals(config.getPropertyType())) {
+						propertyNamesInLike.put(key,
+								config.isExactMatch() ? MatchMode.EXACT : config.getQueryMatchMode());
+					} else if (String.class.equals(config.getElementType())) {
+						propertyNamesInLike.put(key, null);
 						// null marks as tag
-					} else if (Persistable.class.isAssignableFrom(entry.getValue().getPropertyType())) {
-						Set<String> nestSearchableProperties = entry.getValue().getNestSearchableProperties();
+					} else if (Persistable.class.isAssignableFrom(config.getPropertyType())) {
+						Set<String> nestSearchableProperties = config.getNestSearchableProperties();
 						if (nestSearchableProperties != null && nestSearchableProperties.size() > 0) {
-							String alias = criteriaState.getAliases().get(entry.getKey());
+							String alias = criteriaState.getAliases().get(key);
 							if (alias == null) {
-								alias = entry.getKey() + "_";
+								alias = key + "_";
 								while (criteriaState.getAliases().containsValue(alias))
 									alias += "_";
-								dc.createAlias(entry.getKey(), alias);
-								criteriaState.getAliases().put(entry.getKey(), alias);
+								dc.createAlias(key, alias);
+								criteriaState.getAliases().put(key, alias);
 							}
 							for (String s : nestSearchableProperties) {
-								UiConfigImpl nestUci = EntityClassHelper
-										.getUiConfigs(entry.getValue().getPropertyType()).get(s);
+								UiConfigImpl nestUci = EntityClassHelper.getUiConfigs(config.getPropertyType()).get(s);
 								if (nestUci == null)
 									continue;
 								propertyNamesInLike.put(alias + "." + s,
 										nestUci.isExactMatch() ? MatchMode.EXACT : MatchMode.ANYWHERE);
 							}
 						}
-					} else if (entry.getValue().getEmbeddedUiConfigs() != null) {
-						Set<String> nestSearchableProperties = entry.getValue().getNestSearchableProperties();
+					} else if (config.getEmbeddedUiConfigs() != null) {
+						Set<String> nestSearchableProperties = config.getNestSearchableProperties();
 						if (nestSearchableProperties != null && nestSearchableProperties.size() > 0) {
 							for (String s : nestSearchableProperties) {
-								UiConfigImpl nestUci = entry.getValue().getEmbeddedUiConfigs().get(s);
+								UiConfigImpl nestUci = config.getEmbeddedUiConfigs().get(s);
 								if (nestUci == null)
 									continue;
-								propertyNamesInLike.put(entry.getKey() + "." + s,
+								propertyNamesInLike.put(key + "." + s,
 										nestUci.isExactMatch() ? MatchMode.EXACT : MatchMode.ANYWHERE);
 							}
 						}
 					}
-
 				}
-			}
+			});
 			if (propertyNamesInLike.size() > 0)
 				dc.add(CriterionUtils.like(keyword, propertyNamesInLike));
 			else if (bw.getPropertyType("id") == String.class)
@@ -1880,11 +1878,9 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				ReflectionContextState.setDenyMethodExecution(context, true);
 				ReflectionContextState.setReportingConversionErrors(context,
 						ServletActionContext.getRequest().getMethod().equals("POST"));
-				for (Map.Entry<String, Object> entry : parameters.entrySet()) {
-					String name = entry.getKey();
-					Object value = entry.getValue();
+				parameters.forEach((name, value) -> {
 					if (value instanceof String[]) {
-						String[] arr = (String[]) entry.getValue();
+						String[] arr = (String[]) value;
 						if (name.startsWith(getEntityName() + ".")) {
 							if (name.split("\\.").length > 2) {
 								if (arr.length == 1 && StringUtils.isEmpty(arr[0])) {
@@ -1895,7 +1891,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 						value = arr;
 					}
 					temp.setParameter(name, value);
-				}
+				});
 			} finally {
 				ReflectionContextState.setCreatingNullObjects(context, false);
 				ReflectionContextState.setDenyMethodExecution(context, false);
@@ -1903,11 +1899,10 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					Map<String, Object> conversionErrors = (Map<String, Object>) context
 							.get(ActionContext.CONVERSION_ERRORS);
 					if (conversionErrors != null && !conversionErrors.isEmpty()) {
-						for (Map.Entry<String, Object> entry : conversionErrors.entrySet()) {
-							String propertyName = entry.getKey();
+						conversionErrors.forEach((propertyName, v) -> {
 							String message = XWorkConverter.getConversionErrorMessage(propertyName, temp);
 							addFieldError(propertyName, message);
-						}
+						});
 					}
 				}
 			}

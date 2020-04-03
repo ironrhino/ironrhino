@@ -3,8 +3,6 @@ package org.ironrhino.core.struts;
 import java.io.BufferedReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -430,9 +428,9 @@ public class BaseAction extends ActionSupport {
 			}
 		} else if (!isUseJson() && hasFieldErrors()) {
 			StringBuilder sb = new StringBuilder();
-			for (Map.Entry<String, List<String>> entry : getFieldErrors().entrySet()) {
-				sb.append(entry.getKey()).append(": ").append(String.join("\t", entry.getValue())).append("; ");
-			}
+			getFieldErrors().forEach((k, v) -> {
+				sb.append(k).append(": ").append(String.join("\t", v)).append("; ");
+			});
 			sb.delete(sb.length() - 2, sb.length() - 1);
 			response.setHeader("X-Field-Errors", sb.toString());
 		}

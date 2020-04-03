@@ -36,10 +36,10 @@ public class RoundRobin<T> {
 	public RoundRobin(Map<T, Integer> targets, UsableChecker<T> usableChecker) {
 		if (targets == null || targets.size() == 0)
 			throw new IllegalArgumentException("no target");
-		for (Map.Entry<T, Integer> entry : targets.entrySet()) {
-			TargetWrapper<T> tw = new TargetWrapper<>(entry.getKey(), entry.getValue());
+		targets.forEach((k, v) -> {
+			TargetWrapper<T> tw = new TargetWrapper<>(k, v);
 			targetWrappers.add(tw);
-		}
+		});
 		this.usableChecker = usableChecker;
 	}
 

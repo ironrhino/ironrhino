@@ -73,16 +73,16 @@ public class ApplicationContextConsole {
 
 	private SingletonSupplier<Map<String, Scope>> triggersSupplier = SingletonSupplier.of(() -> {
 		Map<String, Scope> triggers = new TreeMap<>();
-		for (Map.Entry<String, Object> entry : getBeans().entrySet()) {
-			Class<?> clz = ReflectionUtils.getTargetObject(entry.getValue()).getClass();
+		getBeans().forEach((k, v) -> {
+			Class<?> clz = ReflectionUtils.getTargetObject(v).getClass();
 			Set<Method> methods = AnnotationUtils.getAnnotatedMethods(clz, Trigger.class);
 			for (Method m : methods) {
 				if (m.getParameterCount() == 0) {
-					String expression = entry.getKey() + "." + m.getName() + "()";
+					String expression = k + "." + m.getName() + "()";
 					triggers.put(expression, m.getAnnotation(Trigger.class).scope());
 				}
 			}
-		}
+		});
 		return Collections.unmodifiableMap(triggers);
 	});
 

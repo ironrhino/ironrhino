@@ -718,22 +718,21 @@ public class EntityClassHelper {
 
 	public static Map<String, UiConfigImpl> filterPropertyNamesInCriteria(Map<String, UiConfigImpl> uiConfigs) {
 		Map<String, UiConfigImpl> propertyNamesInCriterion = new LinkedHashMap<>();
-		for (Map.Entry<String, UiConfigImpl> entry : uiConfigs.entrySet()) {
-			UiConfigImpl config = entry.getValue();
+		uiConfigs.forEach((key, config) -> {
 			if (!config.isExcludedFromCriteria()) {
 				if ("embedded".equals(config.getType())) {
 					for (Map.Entry<String, UiConfigImpl> entry2 : config.getEmbeddedUiConfigs().entrySet()) {
 						UiConfigImpl config2 = entry2.getValue();
 						if (!config2.isExcludedFromCriteria() && !CriterionOperator
 								.getSupportedOperators(config2.getGenericPropertyType()).isEmpty()) {
-							propertyNamesInCriterion.put(entry.getKey() + '.' + entry2.getKey(), clone(config2));
+							propertyNamesInCriterion.put(key + '.' + entry2.getKey(), clone(config2));
 						}
 					}
 				} else if (!CriterionOperator.getSupportedOperators(config.getGenericPropertyType()).isEmpty()) {
-					propertyNamesInCriterion.put(entry.getKey(), clone(config));
+					propertyNamesInCriterion.put(key, clone(config));
 				}
 			}
-		}
+		});
 		return propertyNamesInCriterion;
 	}
 

@@ -136,8 +136,9 @@ public class FileUtils {
 			if (attrs == null)
 				return null;
 			Map<String, String> map = new HashMap<>();
-			for (Map.Entry<Object, Object> entry : mf.getMainAttributes().entrySet())
-				map.put(entry.getKey().toString(), entry.getValue().toString());
+			mf.getMainAttributes().forEach((k, v) -> {
+				map.put(k.toString(), v.toString());
+			});
 			return map;
 		} catch (IOException e) {
 			e.printStackTrace();

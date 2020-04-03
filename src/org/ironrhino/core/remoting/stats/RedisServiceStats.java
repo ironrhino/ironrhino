@@ -247,16 +247,16 @@ public class RedisServiceStats implements ServiceStats {
 				warningsOperations.trim(0, maxWarningsSize - 1);
 		}
 		for (StatsType type : StatsType.values()) {
-			for (Map.Entry<String, InvocationSampler> entry : type.getSampleBuffer().entrySet()) {
-				InvocationSample sample = entry.getValue().peekAndReset();
+			type.getSampleBuffer().forEach((k, v) -> {
+				InvocationSample sample = v.peekAndReset();
 				if (sample.getCount() > 0) {
-					String key = NAMESPACE_SAMPLES + type.getNamespace() + ':' + entry.getKey();
+					String key = NAMESPACE_SAMPLES + type.getNamespace() + ':' + k;
 					remotingStringRedisTemplate.opsForList().leftPush(key, JsonUtils.toJson(sample));
 					Long size = remotingStringRedisTemplate.opsForList().size(key);
 					if (size != null && size > maxSamplesSize)
 						remotingStringRedisTemplate.opsForList().trim(key, 0, maxSamplesSize - 1);
 				}
-			}
+			});
 		}
 		for (StatsType type : StatsType.values())
 			flush(type);
@@ -264,18 +264,17 @@ public class RedisServiceStats implements ServiceStats {
 
 	private void flush(StatsType type) {
 		Map<String, Map<String, AtomicInteger>> buffer = type.getCountBuffer();
-		for (Map.Entry<String, Map<String, AtomicInteger>> entry : buffer.entrySet()) {
-			remotingStringRedisTemplate.opsForSet().add(NAMESPACE_SERVICES + entry.getKey(),
-					entry.getValue().keySet().toArray(new String[entry.getValue().size()]));
-			for (Map.Entry<String, AtomicInteger> entry2 : entry.getValue().entrySet()) {
-				AtomicInteger ai = entry2.getValue();
+		buffer.forEach((k, v) -> {
+			remotingStringRedisTemplate.opsForSet().add(NAMESPACE_SERVICES + k,
+					v.keySet().toArray(new String[v.size()]));
+			v.forEach((k2, ai) -> {
 				int count = ai.get();
 				if (count > 0) {
-					increment(entry.getKey(), entry2.getKey(), count, type);
+					increment(k, k2, count, type);
 					ai.addAndGet(-count);
 				}
-			}
-		}
+			});
+		});
 	}
 
 	private void increment(String serviceName, String method, int count, StatsType type) {
@@ -303,15 +302,14 @@ public class RedisServiceStats implements ServiceStats {
 				cal.add(Calendar.DAY_OF_YEAR, -archiveDays);
 				Date date = cal.getTime();
 				String day = DateUtils.formatDate8(date);
-				for (Map.Entry<String, Set<String>> entry : getServices().entrySet()) {
-					String serviceName = entry.getKey();
-					for (String method : entry.getValue()) {
+				getServices().forEach((serviceName, methods) -> {
+					for (String method : methods) {
 						for (StatsType type : StatsType.values()) {
 							updateMax(serviceName, method, type);
 							archive(serviceName, method, day, type);
 						}
 					}
-				}
+				});
 			} finally {
 				remotingStringRedisTemplate.delete(lockName);
 			}

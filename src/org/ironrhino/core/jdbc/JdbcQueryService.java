@@ -164,9 +164,7 @@ public class JdbcQueryService {
 		sql = SqlUtils.trim(sql);
 		Map<String, String> parameters = SqlUtils.extractParametersWithType(sql, getDataSource());
 		Map<String, Object> paramMap = new HashMap<>();
-		for (Map.Entry<String, String> entry : parameters.entrySet()) {
-			String name = entry.getKey();
-			String type = entry.getValue();
+		parameters.forEach((name, type) -> {
 			Object value = "19700101";
 			if ("date".equals(type)) {
 				value = new java.sql.Date(DateUtils.parseDate8("19700101").getTime());
@@ -186,7 +184,7 @@ public class JdbcQueryService {
 				value = 0;
 			}
 			paramMap.put(name, value);
-		}
+		});
 		validateAndConvertTypes(sql, paramMap);
 		if (restricted) {
 			for (String table : SqlUtils.extractTables(sql, quoteString)) {
