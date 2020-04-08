@@ -15,6 +15,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import lombok.Setter;
@@ -45,24 +46,24 @@ public class WebhookTask implements Tasklet {
 			httpHeaders.add(k, v);
 		});
 		RequestEntity<String> request = new RequestEntity<>(body, httpHeaders, method, url);
-		validate(rt.exchange(request, String.class));
-		return RepeatStatus.FINISHED;
-	}
-
-	protected void validate(ResponseEntity<String> response) throws Exception {
-		String responseBody = response.getBody();
-		if (response.getStatusCode().is2xxSuccessful() && !isFailure(responseBody)) {
-			log.info("Requested {} with [{}] and received [{}]", url, body, responseBody);
-		} else {
-			if (suppressFailure) {
-				log.error("Requested {} with [{}] and received [{}] with status code {}", url, body, responseBody,
-						response.getStatusCodeValue());
-			} else {
+		try {
+			ResponseEntity<String> response = rt.exchange(request, String.class);
+			String responseBody = response.getBody();
+			if (isFailure(responseBody)) {
 				throw new UnexpectedJobExecutionException(
 						String.format("Requested %s with [%s] and received [%s] with status code %d", url, body,
 								responseBody, response.getStatusCodeValue()));
+			} else {
+				log.info("Requested {} with [{}] and received [{}]", url, body, responseBody);
 			}
+		} catch (HttpStatusCodeException e) {
+			if (suppressFailure)
+				log.error("Requested {} with [{}] and received [{}] with status code {}", url, body,
+						e.getResponseBodyAsString(), e.getRawStatusCode());
+			else
+				throw e;
 		}
+		return RepeatStatus.FINISHED;
 	}
 
 	protected boolean isFailure(String responseBody) {

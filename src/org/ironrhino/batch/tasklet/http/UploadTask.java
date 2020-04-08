@@ -19,6 +19,7 @@ import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import lombok.Setter;
@@ -56,24 +57,24 @@ public class UploadTask implements Tasklet {
 			requestParams.add(fieldName, new FileSystemResource(file));
 			request = new RequestEntity<>(requestParams, httpHeaders, HttpMethod.POST, url);
 		}
-		validate(rt.exchange(request, String.class));
-		return RepeatStatus.FINISHED;
-	}
-
-	protected void validate(ResponseEntity<String> response) throws Exception {
-		String responseBody = response.getBody();
-		if (response.getStatusCode().is2xxSuccessful() && !isFailure(responseBody)) {
-			log.info("Uploaded {} to {} and received [{}]", file, url, responseBody);
-		} else {
-			if (suppressFailure) {
-				log.error("Uploaded {} to {} and received [{}] with status code {}", file, url, responseBody,
-						response.getStatusCodeValue());
-			} else {
+		try {
+			ResponseEntity<String> response = rt.exchange(request, String.class);
+			String responseBody = response.getBody();
+			if (isFailure(responseBody)) {
 				throw new UnexpectedJobExecutionException(
 						String.format("Uploaded %s to %s and received [%s] with status code %d", file.toString(), url,
 								responseBody, response.getStatusCodeValue()));
+			} else {
+				log.info("Uploaded {} to {} and received [{}]", file, url, responseBody);
 			}
+		} catch (HttpStatusCodeException e) {
+			if (suppressFailure)
+				log.error("Uploaded {} to {} and received [{}] with status code {}", file, url,
+						e.getResponseBodyAsString(), e.getRawStatusCode());
+			else
+				throw e;
 		}
+		return RepeatStatus.FINISHED;
 	}
 
 	protected boolean isFailure(String responseBody) {
