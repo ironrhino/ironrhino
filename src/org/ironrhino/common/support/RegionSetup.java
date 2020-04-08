@@ -237,7 +237,7 @@ public class RegionSetup {
 		try (InputStream is = Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream("resources/data/region.zip")) {
 			// https://github.com/xixilive/chinese_regions_db
-			File tempZipFile = File.createTempFile("region", "zip");
+			File tempZipFile = File.createTempFile("region", ".zip");
 			try (OutputStream os = new FileOutputStream(tempZipFile)) {
 				StreamUtils.copy(is, os);
 			}

@@ -34,7 +34,7 @@ public class MoveLastLinesToFirstTaskTest {
 	}
 
 	private static File createAndWrite(int lines) throws IOException {
-		File temp = File.createTempFile("test", "txt");
+		File temp = File.createTempFile("test", ".txt");
 		try (FileWriter fw = new FileWriter(temp)) {
 			for (int i = 0; i < lines; i++) {
 				fw.write(String.valueOf(i));
