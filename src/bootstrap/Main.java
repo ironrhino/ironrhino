@@ -53,7 +53,7 @@ public class Main {
 			for (String entryPath : this.jettyJars) {
 				File tmpFile;
 				try {
-					tmpFile = File.createTempFile(entryPath.replaceAll("/", "_"), "war");
+					tmpFile = File.createTempFile(entryPath.replaceAll("/", "_"), ".war");
 				} catch (IOException e) {
 					String tmpdir = System.getProperty("java.io.tmpdir");
 					throw new IOException("Failed to extract " + entryPath + " to " + tmpdir, e);

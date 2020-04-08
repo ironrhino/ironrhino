@@ -13,8 +13,8 @@ public class RenameTaskTest {
 
 	@Test(expected = UnexpectedJobExecutionException.class)
 	public void testTargetExists() throws Exception {
-		File source = File.createTempFile("source", "txt");
-		File target = File.createTempFile("target", "txt");
+		File source = File.createTempFile("source", ".txt");
+		File target = File.createTempFile("target", ".txt");
 		try {
 			RenameTask task = new RenameTask();
 			task.setSource(source);
@@ -28,9 +28,9 @@ public class RenameTaskTest {
 
 	@Test(expected = UnexpectedJobExecutionException.class)
 	public void testSourceNotExists() throws Exception {
-		File source = File.createTempFile("source", "txt");
+		File source = File.createTempFile("source", ".txt");
 		source.delete();
-		File target = File.createTempFile("target", "txt");
+		File target = File.createTempFile("target", ".txt");
 		try {
 			RenameTask task = new RenameTask();
 			task.setSource(source);
@@ -43,8 +43,8 @@ public class RenameTaskTest {
 
 	@Test
 	public void test() throws Exception {
-		File source = File.createTempFile("source", "txt");
-		File target = File.createTempFile("target", "txt");
+		File source = File.createTempFile("source", ".txt");
+		File target = File.createTempFile("target", ".txt");
 		target.delete();
 		try {
 			RenameTask task = new RenameTask();

@@ -13,7 +13,7 @@ public class DeleteTaskTest {
 
 	@Test
 	public void test() throws Exception {
-		File file = File.createTempFile("target", "txt");
+		File file = File.createTempFile("target", ".txt");
 		try {
 			DeleteTask task = new DeleteTask();
 			task.setFile(file);
@@ -25,7 +25,7 @@ public class DeleteTaskTest {
 
 	@Test(expected = UnexpectedJobExecutionException.class)
 	public void testFileNotExists() throws Exception {
-		File file = File.createTempFile("target", "txt");
+		File file = File.createTempFile("target", ".txt");
 		file.delete();
 		DeleteTask task = new DeleteTask();
 		task.setFile(file);

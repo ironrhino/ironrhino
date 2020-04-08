@@ -61,7 +61,7 @@ public class LinesVerificationTaskTest {
 	}
 
 	private static File createAndWrite(int lines, String header) throws IOException {
-		File temp = File.createTempFile("test", "txt");
+		File temp = File.createTempFile("test", ".txt");
 		try (FileWriter fw = new FileWriter(temp)) {
 			fw.write(header);
 			fw.write("\n");

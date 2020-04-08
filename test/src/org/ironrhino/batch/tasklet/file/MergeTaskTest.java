@@ -25,7 +25,7 @@ public class MergeTaskTest {
 		Resource[] sources = new Resource[files];
 		for (int i = 0; i < files; i++)
 			sources[i] = new FileSystemResource(createAndWrite(i + 1));
-		File target = File.createTempFile("target", "txt");
+		File target = File.createTempFile("target", ".txt");
 		try {
 			MergeTask task = new MergeTask();
 			task.setSources(sources);
@@ -48,7 +48,7 @@ public class MergeTaskTest {
 	}
 
 	private static File createAndWrite(int lines) throws IOException {
-		File temp = File.createTempFile("test", "txt");
+		File temp = File.createTempFile("test", ".txt");
 		try (FileWriter fw = new FileWriter(temp)) {
 			for (int i = 0; i < lines; i++) {
 				fw.write(String.valueOf(i));
