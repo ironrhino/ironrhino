@@ -1,5 +1,6 @@
 package org.ironrhino.batch.tasklet.http;
 
+import java.io.File;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
@@ -10,11 +11,14 @@ import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
@@ -23,16 +27,15 @@ import lombok.extern.slf4j.Slf4j;
 
 @Setter
 @Slf4j
-public class WebhookTask implements Tasklet {
+public class UploadTask implements Tasklet {
 
 	private URI url;
 
-	private String body = "";
+	private File file;
 
-	private Map<String, String> headers = Collections.singletonMap(HttpHeaders.CONTENT_TYPE,
-			MediaType.APPLICATION_JSON_VALUE);
+	private String fieldName;
 
-	private HttpMethod method = HttpMethod.POST;
+	private Map<String, String> headers = Collections.emptyMap();
 
 	private Pattern responseFailurePattern;
 
@@ -45,20 +48,28 @@ public class WebhookTask implements Tasklet {
 		headers.forEach((k, v) -> {
 			httpHeaders.add(k, v);
 		});
-		RequestEntity<String> request = new RequestEntity<>(body, httpHeaders, method, url);
+		RequestEntity<Object> request;
+		if (fieldName == null) {
+			request = new RequestEntity<>(new FileSystemResource(file), httpHeaders, HttpMethod.POST, url);
+		} else {
+			httpHeaders.set(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA_VALUE);
+			MultiValueMap<String, Object> requestParams = new LinkedMultiValueMap<>();
+			requestParams.add(fieldName, new FileSystemResource(file));
+			request = new RequestEntity<>(requestParams, httpHeaders, HttpMethod.POST, url);
+		}
 		try {
 			ResponseEntity<String> response = rt.exchange(request, String.class);
 			String responseBody = response.getBody();
 			if (isFailure(responseBody)) {
 				throw new UnexpectedJobExecutionException(
-						String.format("Requested %s with [%s] and received [%s] with status code %d", url, body,
+						String.format("Uploaded %s to %s and received [%s] with status code %d", file.toString(), url,
 								responseBody, response.getStatusCodeValue()));
 			} else {
-				log.info("Requested {} with [{}] and received [{}]", url, body, responseBody);
+				log.info("Uploaded {} to {} and received [{}]", file, url, responseBody);
 			}
 		} catch (HttpStatusCodeException e) {
 			if (suppressFailure)
-				log.error("Requested {} with [{}] and received [{}] with status code {}", url, body,
+				log.error("Uploaded {} to {} and received [{}] with status code {}", file, url,
 						e.getResponseBodyAsString(), e.getRawStatusCode());
 			else
 				throw e;
