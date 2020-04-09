@@ -8,6 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -22,12 +23,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.ironrhino.core.model.NullObject;
+import org.ironrhino.core.remoting.Remoting;
 import org.ironrhino.core.remoting.RemotingContext;
 import org.ironrhino.core.servlet.AccessFilter;
 import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.JsonSerializationUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.MDC;
+import org.springframework.aop.framework.ReflectiveMethodInvocation;
+import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
@@ -142,6 +146,10 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 				if (b && m.getParameterCount() == parameterCount) {
 					parameterTypes = m.getParameterTypes();
 					Type[] types = m.getGenericParameterTypes();
+					for (int i = 0; i < types.length; i++) {
+						if (types[i] instanceof TypeVariable)
+							types[i] = GenericTypeResolver.resolveType(types[i], serviceInterface);
+					}
 					try {
 						if (paramsNode.isArray()) {
 							for (int i = 0; i < parameterCount; i++)
@@ -226,6 +234,16 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 				tree = tree.get(RESULT);
 				if (tree != null && !tree.isNull()) {
 					Type type = methodInvocation.getMethod().getGenericReturnType();
+					if (type instanceof TypeVariable) {
+						ReflectiveMethodInvocation rmi = (ReflectiveMethodInvocation) methodInvocation;
+						Class<?>[] interfaces = rmi.getProxy().getClass().getInterfaces();
+						for (Class<?> intf : interfaces) {
+							if (intf.isAnnotationPresent(Remoting.class)) {
+								type = GenericTypeResolver.resolveType(type, intf);
+								break;
+							}
+						}
+					}
 					if (type instanceof ParameterizedType) {
 						ParameterizedType pt = (ParameterizedType) type;
 						Type rawType = pt.getRawType();

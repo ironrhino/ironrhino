@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
@@ -14,6 +15,7 @@ import org.ironrhino.core.util.SampleObjectCreator;
 import org.ironrhino.rest.RestStatus;
 import org.ironrhino.rest.doc.annotation.Fields;
 import org.springframework.beans.BeanUtils;
+import org.springframework.core.GenericTypeResolver;
 
 import lombok.experimental.UtilityClass;
 
@@ -53,6 +55,8 @@ public class ApiDocHelper {
 			Object[] args = new Object[argTypes.length];
 			for (int i = 0; i < argTypes.length; i++) {
 				Type type = argTypes[i];
+				if (type instanceof TypeVariable)
+					type = GenericTypeResolver.resolveType(type, apiDocClazz);
 				if (type instanceof Class) {
 					Class<?> cls = (Class<?>) type;
 					if (cls.isPrimitive()) {
@@ -75,7 +79,7 @@ public class ApiDocHelper {
 				obj = null;
 			}
 			if (obj == null) {
-				obj = createSample(apiDocMethod.getGenericReturnType());
+				obj = createSample(GenericTypeResolver.resolveType(apiDocMethod.getGenericReturnType(), apiDocClazz));
 			}
 			return obj;
 		}

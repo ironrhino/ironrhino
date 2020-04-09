@@ -10,6 +10,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -31,6 +32,7 @@ import java.util.function.BiFunction;
 import org.ironrhino.common.model.Coordinate;
 import org.ironrhino.core.model.ResultPage;
 import org.springframework.beans.BeanUtils;
+import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -131,6 +133,8 @@ public class SampleObjectCreator {
 					return null;
 				if (returnType == clazz)
 					return null;
+				if (returnType instanceof TypeVariable)
+					returnType = GenericTypeResolver.resolveType(returnType, clazz);
 				if (returnType instanceof ParameterizedType) {
 					ParameterizedType pt = (ParameterizedType) returnType;
 					for (Type t : pt.getActualTypeArguments())
@@ -147,6 +151,10 @@ public class SampleObjectCreator {
 		} catch (Exception e) {
 			Constructor<?> c = clazz.getConstructors()[0];
 			Type[] types = c.getGenericParameterTypes();
+			for (int i = 0; i < types.length; i++) {
+				if (types[i] instanceof TypeVariable)
+					types[i] = GenericTypeResolver.resolveType(types[i], clazz);
+			}
 			if (types.length > 0) {
 				Object[] arr = new Object[types.length];
 				for (int i = 0; i < types.length; i++)

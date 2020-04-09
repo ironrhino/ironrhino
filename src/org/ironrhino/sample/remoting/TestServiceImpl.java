@@ -231,6 +231,11 @@ public class TestServiceImpl implements TestService {
 		return loadCallableUserByUsername(username);
 	}
 
+	@Override
+	public UserDetails echoGenericUserDetails(UserDetails user) {
+		return user;
+	}
+
 	@PreDestroy
 	private void destroy() {
 		es.shutdown();

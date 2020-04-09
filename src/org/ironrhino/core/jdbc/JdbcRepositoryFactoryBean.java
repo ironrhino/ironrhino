@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -36,6 +37,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.dao.DataAccessException;
@@ -277,6 +279,8 @@ public class JdbcRepositoryFactoryBean extends MethodInterceptorFactoryBean
 			sql = ExpressionUtils.evalString(sql, context);
 
 		Type returnType = method.getGenericReturnType();
+		if (returnType instanceof TypeVariable)
+			returnType = GenericTypeResolver.resolveType(returnType, jdbcRepositoryClass);
 		switch (sqlVerb) {
 		case SELECT:
 			if (returnType instanceof Class) {
@@ -343,6 +347,10 @@ public class JdbcRepositoryFactoryBean extends MethodInterceptorFactoryBean
 					Number key = keyHolder.getKey();
 					if (key != null) {
 						Type[] types = method.getGenericParameterTypes();
+						for (int i = 0; i < types.length; i++) {
+							if (types[i] instanceof TypeVariable)
+								types[i] = GenericTypeResolver.resolveType(types[i], jdbcRepositoryClass);
+						}
 						for (int index = 0; index < arguments.length; index++) {
 							Object arg = arguments[index];
 							if (arg == null || BeanUtils.isSimpleValueType(arg.getClass()))

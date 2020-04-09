@@ -3,6 +3,7 @@ package org.ironrhino.core.remoting.playground;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,6 +28,7 @@ import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.core.util.SampleObjectCreator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.GenericTypeResolver;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -87,7 +89,7 @@ public class ServicePlayground {
 					MethodInfo mi = new MethodInfo();
 					mi.setMethod(m);
 					mi.setName(m.getName());
-					mi.setReturnType(m.getGenericReturnType());
+					mi.setReturnType(GenericTypeResolver.resolveType(m.getGenericReturnType(), clazz));
 					String[] parameterNames = ReflectionUtils.getParameterNames(m);
 					Type[] parameterTypes = m.getGenericParameterTypes();
 					ParameterInfo[] parameters = new ParameterInfo[parameterNames.length];
@@ -95,6 +97,8 @@ public class ServicePlayground {
 						ParameterInfo pi = new ParameterInfo();
 						pi.setName(parameterNames[i]);
 						Type type = parameterTypes[i];
+						if (type instanceof TypeVariable)
+							type = GenericTypeResolver.resolveType(type, clazz);
 						pi.setType(type);
 						try {
 							Object sampleObject = SampleObjectCreator.getDefaultInstance().createSample(type);

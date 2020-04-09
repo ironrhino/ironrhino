@@ -9,6 +9,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -39,6 +40,7 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.env.Environment;
@@ -452,6 +454,8 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 	private Object exchange(Method method, RequestEntity<Object> requestEntity) throws Exception {
 		try {
 			Type type = method.getGenericReturnType();
+			if (type instanceof TypeVariable)
+				type = GenericTypeResolver.resolveType(type, restApiClass);
 			if (method.getReturnType() == ResponseEntity.class) {
 				type = ((ParameterizedType) type).getActualTypeArguments()[0];
 				if (type == InputStream.class) {

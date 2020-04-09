@@ -6,6 +6,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,6 +30,7 @@ import org.ironrhino.rest.doc.annotation.Fields;
 import org.ironrhino.rest.doc.annotation.Status;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.io.Resource;
@@ -192,6 +194,8 @@ public class ApiDoc implements Serializable {
 
 		Class<?> responseBodyClass = method.getReturnType();
 		Type responseBodyGenericType = method.getGenericReturnType();
+		if (responseBodyGenericType instanceof TypeVariable)
+			responseBodyGenericType = GenericTypeResolver.resolveType(responseBodyGenericType, clazz);
 		boolean isRestResult = false;
 		if (responseBodyClass == RestResult.class) {
 			isRestResult = true;
@@ -278,6 +282,8 @@ public class ApiDoc implements Serializable {
 				String parameterName = parameterNames[i];
 				Class<?> parameterType = parameterTypes[i];
 				Type genericParameterType = genericParameterTypes[i];
+				if (genericParameterType instanceof TypeVariable)
+					genericParameterType = GenericTypeResolver.resolveType(genericParameterType, clazz);
 				Annotation[] apiDocAnnotations = apiDocParameterAnnotations[i];
 				Annotation[] annotations = array[i];
 				Field fd = null;
