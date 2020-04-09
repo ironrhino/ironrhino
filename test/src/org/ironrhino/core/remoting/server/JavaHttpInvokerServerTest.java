@@ -511,6 +511,13 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 	}
 
 	@Test
+	public void testGeneric() throws Exception {
+		User user = new User();
+		user.setUsername("username");
+		assertThat(testService.echoGenericUserDetails(user).getUsername(), is(user.getUsername()));
+	}
+
+	@Test
 	public void testAttempt() throws Exception {
 		final int maxAttempts = 5;
 		barServiceClient.setMaxAttempts(maxAttempts);

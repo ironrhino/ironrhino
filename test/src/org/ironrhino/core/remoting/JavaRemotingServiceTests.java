@@ -283,6 +283,13 @@ public class JavaRemotingServiceTests {
 	}
 
 	@Test
+	public void testGeneric() throws Exception {
+		User user = new User();
+		user.setUsername("username");
+		assertThat(testService.echoGenericUserDetails(user).getUsername(), is(user.getUsername()));
+	}
+
+	@Test
 	public void testConcurreny() throws InterruptedException {
 		final CountDownLatch cdl = new CountDownLatch(THREADS);
 		final AtomicInteger count = new AtomicInteger();

@@ -20,7 +20,7 @@ import org.springframework.util.concurrent.ListenableFuture;
 import lombok.Value;
 
 @Remoting
-public interface TestService {
+public interface TestService extends GenericService<UserDetails> {
 
 	enum FutureType {
 		RUNNABLE, COMPLETABLE, LISTENABLE;
