@@ -89,14 +89,14 @@
 </#list>
 </#if>
 </#if>
-<form id="<#if formid?has_content>${formid}<#else>${entityName}<#if Parameters.tab?? && Parameters[Parameters.tab]??>_${Parameters.tab+'_'+Parameters[Parameters.tab]}</#if>_form</#if>" action="${action}" method="post" class="richtable ajax view ${dynamicAttributes['class']!}<#if formCssClass?index_of('nohistory') lt 0 && 'treeview'!=Parameters.view!> history</#if> ${formCssClass}"<#if actionBaseUrl!=action&&!action?starts_with(actionBaseUrl+'?')> data-actionbaseurl="${actionBaseUrl}"</#if><@dynAttrs value=dynamicAttributes exclude='class'/>>
+<form id="<#if formid?has_content>${formid}<#else>${entityName}<#if Parameters.tab?? && Parameters[Parameters.tab]??>_${Parameters.tab?html+'_'+Parameters[Parameters.tab]?html}</#if>_form</#if>" action="${action}" method="post" class="richtable ajax view ${dynamicAttributes['class']!}<#if formCssClass?index_of('nohistory') lt 0 && 'treeview'!=Parameters.view!?html> history</#if> ${formCssClass}"<#if actionBaseUrl!=action&&!action?starts_with(actionBaseUrl+'?')> data-actionbaseurl="${actionBaseUrl}"</#if><@dynAttrs value=dynamicAttributes exclude='class'/>>
 ${formHeader!}
 <#nested/>
 <#if includeParameters>
 <#list request.parameterMap as name,values>
 <#if !parameterNamesInQueryString?seq_contains(name)&&name!='_'&&name!='pn'&&name!='ps'&&!name?starts_with('resultPage.')&&name!='keyword'&&!formHeader?contains(' name="'+name+'" ')>
 <#list values as value>
-<input type="hidden" name="${name}" value="${value}"/>
+<input type="hidden" name="${name?html}" value="${value?html}"/>
 </#list>
 </#if>
 </#list>
@@ -321,7 +321,7 @@ ${formHeader!}
 <#list request.parameterMap as name,values>
 <#list values as value>
 <#if name!='_'&&name!='pn'&&name!='ps'&&!name?starts_with('resultPage.')&&(name!='keyword'||value?has_content)>
-<#local downloadUrl+=downloadUrl?contains('?')?then('&','?')+name+'='+value?url>
+<#local downloadUrl+=downloadUrl?contains('?')?then('&','?')+name?html+'='+value?url>
 </#if>
 </#list>
 </#list>
