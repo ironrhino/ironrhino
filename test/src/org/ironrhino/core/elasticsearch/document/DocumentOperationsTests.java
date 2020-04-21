@@ -38,7 +38,7 @@ public class DocumentOperationsTests {
 		@Bean
 		public static RestApiRegistryPostProcessor restApiRegistryPostProcessor() {
 			RestApiRegistryPostProcessor obj = new RestApiRegistryPostProcessor();
-			obj.setAnnotatedClasses(new Class[] { ArticleOperations.class });
+			obj.setPackagesToScan(new String[] { ArticleOperations.class.getPackage().getName() });
 			return obj;
 		}
 	}
