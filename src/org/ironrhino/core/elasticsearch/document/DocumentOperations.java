@@ -1,5 +1,6 @@
 package org.ironrhino.core.elasticsearch.document;
 
+import org.ironrhino.core.elasticsearch.Constants;
 import org.ironrhino.rest.client.RestApi;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@RestApi(apiBaseUrl = "${elasticsearch.url:http://localhost:9200}", treatNotFoundAsNull = true)
+@RestApi(apiBaseUrl = Constants.ELASTICSEARCH_URL, treatNotFoundAsNull = true)
 public interface DocumentOperations<T> {
 
 	@PostMapping("/{index}/_doc")
