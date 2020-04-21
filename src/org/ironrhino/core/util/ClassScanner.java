@@ -74,14 +74,19 @@ public class ClassScanner {
 	public static Collection<Class<?>> scanAnnotated(String basePackage, Class<? extends Annotation>... annotations) {
 		ClassScanner cs = new ClassScanner();
 		for (Class<? extends Annotation> anno : annotations)
-			cs.addIncludeFilter(new AnnotationTypeFilter(anno, true, true));
+			cs.addIncludeFilter(new AnnotationTypeFilter(anno));
 		return cs.doScan(basePackage);
 	}
 
 	public static Collection<Class<?>> scanAnnotated(String[] basePackages, Class<? extends Annotation> annotation) {
+		return scanAnnotated(basePackages, annotation, false);
+	}
+
+	public static Collection<Class<?>> scanAnnotated(String[] basePackages, Class<? extends Annotation> annotation,
+			boolean considerInterfaces) {
 		basePackages = deduplicate(Arrays.asList(basePackages)).toArray(new String[0]);
 		ClassScanner cs = new ClassScanner();
-		cs.addIncludeFilter(new AnnotationTypeFilter(annotation, true, true));
+		cs.addIncludeFilter(new AnnotationTypeFilter(annotation, true, considerInterfaces));
 		List<Class<?>> classes = new ArrayList<>();
 		for (String s : basePackages)
 			classes.addAll(cs.doScan(s));

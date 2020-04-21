@@ -1,6 +1,7 @@
 package org.ironrhino.core.spring.configuration;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.Inherited;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -62,15 +63,16 @@ public abstract class AnnotationBeanDefinitionRegistryPostProcessor<A extends An
 
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+		boolean inherited = annotationClass.isAnnotationPresent(Inherited.class);
 		Set<Class<?>> classes = new TreeSet<>(Comparator.comparing(Class::getName));
 		if (annotatedClasses != null)
 			classes.addAll(Arrays.asList(annotatedClasses));
 		if (packagesToScan != null)
-			classes.addAll(ClassScanner.scanAnnotated(packagesToScan, annotationClass));
+			classes.addAll(ClassScanner.scanAnnotated(packagesToScan, annotationClass, inherited));
 		if (annotatedClasses == null && packagesToScan == null)
-			classes.addAll(ClassScanner.scanAnnotated(ClassScanner.getAppPackages(), annotationClass));
+			classes.addAll(ClassScanner.scanAnnotated(ClassScanner.getAppPackages(), annotationClass, inherited));
 		for (Class<?> annotatedClass : classes) {
-			if (!annotatedClass.isInterface() || annotatedClass.getTypeParameters().length > 0
+			if (!annotatedClass.isInterface() || inherited && annotatedClass.getTypeParameters().length > 0
 					|| shouldSkip(annotatedClass))
 				continue;
 			String key = annotatedClass.getName() + ".imported";

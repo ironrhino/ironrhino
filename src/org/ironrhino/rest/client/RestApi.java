@@ -3,6 +3,7 @@ package org.ironrhino.rest.client;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -12,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @Retention(RUNTIME)
 @Target(TYPE)
+@Inherited
 public @interface RestApi {
 
 	@AliasFor("name")
@@ -27,7 +29,7 @@ public @interface RestApi {
 	String apiBaseUrl() default "";
 
 	RequestHeader[] requestHeaders() default {};
-	
+
 	boolean treatNotFoundAsNull() default false;
 
 }
