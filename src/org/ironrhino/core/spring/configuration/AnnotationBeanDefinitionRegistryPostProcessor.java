@@ -70,14 +70,15 @@ public abstract class AnnotationBeanDefinitionRegistryPostProcessor<A extends An
 		if (annotatedClasses == null && packagesToScan == null)
 			classes.addAll(ClassScanner.scanAnnotated(ClassScanner.getAppPackages(), annotationClass));
 		for (Class<?> annotatedClass : classes) {
-			if (!annotatedClass.isInterface() || shouldSkip(annotatedClass))
+			if (!annotatedClass.isInterface() || annotatedClass.getTypeParameters().length > 0
+					|| shouldSkip(annotatedClass))
 				continue;
 			String key = annotatedClass.getName() + ".imported";
 			if ("false".equals(env.getProperty(key))) {
 				log.info("Skipped import interface [{}] because {}=false", annotatedClass.getName(), key);
 				continue;
 			}
-			A annotation = AnnotatedElementUtils.getMergedAnnotation(annotatedClass, annotationClass);
+			A annotation = AnnotatedElementUtils.findMergedAnnotation(annotatedClass, annotationClass);
 			String beanName = getExplicitBeanName(annotation);
 			if (StringUtils.isBlank(beanName))
 				beanName = NameGenerator.buildDefaultBeanName(annotatedClass.getName());

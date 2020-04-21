@@ -74,14 +74,14 @@ public class ClassScanner {
 	public static Collection<Class<?>> scanAnnotated(String basePackage, Class<? extends Annotation>... annotations) {
 		ClassScanner cs = new ClassScanner();
 		for (Class<? extends Annotation> anno : annotations)
-			cs.addIncludeFilter(new AnnotationTypeFilter(anno));
+			cs.addIncludeFilter(new AnnotationTypeFilter(anno, true, true));
 		return cs.doScan(basePackage);
 	}
 
 	public static Collection<Class<?>> scanAnnotated(String[] basePackages, Class<? extends Annotation> annotation) {
 		basePackages = deduplicate(Arrays.asList(basePackages)).toArray(new String[0]);
 		ClassScanner cs = new ClassScanner();
-		cs.addIncludeFilter(new AnnotationTypeFilter(annotation));
+		cs.addIncludeFilter(new AnnotationTypeFilter(annotation, true, true));
 		List<Class<?>> classes = new ArrayList<>();
 		for (String s : basePackages)
 			classes.addAll(cs.doScan(s));

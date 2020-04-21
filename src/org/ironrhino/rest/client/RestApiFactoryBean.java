@@ -44,6 +44,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
@@ -129,7 +130,7 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 		if (!restApiClass.isInterface())
 			throw new IllegalArgumentException(restApiClass.getName() + " should be interface");
 		this.restApiClass = restApiClass;
-		this.annotation = restApiClass.getAnnotation(RestApi.class);
+		this.annotation = AnnotationUtils.findAnnotation(restApiClass, RestApi.class);
 		this.apiBaseUrl = (annotation != null) ? annotation.apiBaseUrl() : "";
 		Map<String, String> map = null;
 		if (annotation != null) {
