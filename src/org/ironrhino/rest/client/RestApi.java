@@ -29,4 +29,6 @@ public @interface RestApi {
 
 	RequestHeader[] requestHeaders() default {};
 
+	boolean treatNotFoundAsNull() default false;
+
 }
