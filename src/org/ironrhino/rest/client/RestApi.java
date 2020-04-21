@@ -27,5 +27,7 @@ public @interface RestApi {
 	String apiBaseUrl() default "";
 
 	RequestHeader[] requestHeaders() default {};
+	
+	boolean treatNotFoundAsNull() default false;
 
 }

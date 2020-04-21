@@ -70,6 +70,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpClientErrorException.NotFound;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
@@ -95,6 +96,8 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 	private Object serviceRegistry;
 
 	private final Class<?> restApiClass;
+
+	private final RestApi annotation;
 
 	private final RestTemplate restTemplate;
 
@@ -126,7 +129,7 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 		if (!restApiClass.isInterface())
 			throw new IllegalArgumentException(restApiClass.getName() + " should be interface");
 		this.restApiClass = restApiClass;
-		RestApi annotation = restApiClass.getAnnotation(RestApi.class);
+		this.annotation = restApiClass.getAnnotation(RestApi.class);
 		this.apiBaseUrl = (annotation != null) ? annotation.apiBaseUrl() : "";
 		Map<String, String> map = null;
 		if (annotation != null) {
@@ -488,6 +491,11 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 			}
 			return exchange(requestEntity, type, method.getAnnotation(JsonPointer.class)).getBody();
 		} catch (HttpStatusCodeException e) {
+			if (e instanceof NotFound) {
+				if (requestEntity.getMethod() == HttpMethod.GET && annotation != null
+						&& annotation.treatNotFoundAsNull())
+					return null;
+			}
 			try {
 				JsonNode tree = objectMapper.readTree(e.getResponseBodyAsString());
 				if (tree.has("code") && tree.has("status")) {
