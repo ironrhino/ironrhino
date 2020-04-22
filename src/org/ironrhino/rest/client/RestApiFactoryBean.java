@@ -70,7 +70,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpClientErrorException.NotFound;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResourceAccessException;
@@ -482,7 +481,7 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 				try {
 					restTemplate.exchange(requestEntity, Resource.class);
 					return true;
-				} catch (HttpClientErrorException.NotFound e) {
+				} catch (NotFound e) {
 					return false;
 				}
 			}
