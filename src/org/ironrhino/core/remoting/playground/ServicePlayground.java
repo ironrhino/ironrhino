@@ -3,7 +3,6 @@ package org.ironrhino.core.remoting.playground;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -96,9 +95,7 @@ public class ServicePlayground {
 					for (int i = 0; i < parameterNames.length; i++) {
 						ParameterInfo pi = new ParameterInfo();
 						pi.setName(parameterNames[i]);
-						Type type = parameterTypes[i];
-						if (type instanceof TypeVariable)
-							type = GenericTypeResolver.resolveType(type, clazz);
+						Type type = GenericTypeResolver.resolveType(parameterTypes[i], clazz);
 						pi.setType(type);
 						try {
 							Object sampleObject = SampleObjectCreator.getDefaultInstance().createSample(type);

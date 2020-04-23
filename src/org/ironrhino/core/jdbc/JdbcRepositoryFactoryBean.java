@@ -279,7 +279,7 @@ public class JdbcRepositoryFactoryBean extends MethodInterceptorFactoryBean
 			sql = ExpressionUtils.evalString(sql, context);
 
 		Type returnType = method.getGenericReturnType();
-		if (returnType instanceof TypeVariable)
+		if (returnType instanceof TypeVariable || returnType instanceof ParameterizedType)
 			returnType = GenericTypeResolver.resolveType(returnType, jdbcRepositoryClass);
 		switch (sqlVerb) {
 		case SELECT:
@@ -347,10 +347,6 @@ public class JdbcRepositoryFactoryBean extends MethodInterceptorFactoryBean
 					Number key = keyHolder.getKey();
 					if (key != null) {
 						Type[] types = method.getGenericParameterTypes();
-						for (int i = 0; i < types.length; i++) {
-							if (types[i] instanceof TypeVariable)
-								types[i] = GenericTypeResolver.resolveType(types[i], jdbcRepositoryClass);
-						}
 						for (int index = 0; index < arguments.length; index++) {
 							Object arg = arguments[index];
 							if (arg == null || BeanUtils.isSimpleValueType(arg.getClass()))

@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
@@ -54,9 +53,7 @@ public class ApiDocHelper {
 			Type[] argTypes = apiDocMethod.getGenericParameterTypes();
 			Object[] args = new Object[argTypes.length];
 			for (int i = 0; i < argTypes.length; i++) {
-				Type type = argTypes[i];
-				if (type instanceof TypeVariable)
-					type = GenericTypeResolver.resolveType(type, apiDocClazz);
+				Type type = GenericTypeResolver.resolveType(argTypes[i], apiDocClazz);
 				if (type instanceof Class) {
 					Class<?> cls = (Class<?>) type;
 					if (cls.isPrimitive()) {
