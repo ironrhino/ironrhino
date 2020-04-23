@@ -11,7 +11,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -31,6 +30,7 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.spring.FallbackSupportMethodInterceptorFactoryBean;
+import org.ironrhino.core.spring.http.client.PrependBaseUrlClientHttpRequestInterceptor;
 import org.ironrhino.core.throttle.CircuitBreakerRegistry;
 import org.ironrhino.core.tracing.Tracing;
 import org.ironrhino.core.util.MaxAttemptsExceededException;
@@ -54,13 +54,9 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.ClientHttpRequestExecution;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
@@ -156,36 +152,7 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 			}
 		}
 		this.restTemplate = restTemplate;
-		this.restTemplate.getInterceptors().add(new ClientHttpRequestInterceptor() {
-			@Override
-			public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
-					throws IOException {
-				URI uri = request.getURI();
-				if (uri.getHost() == null) {
-					HttpRequest origin = request;
-					HttpRequest req = new HttpRequest() {
-						@Override
-						public HttpHeaders getHeaders() {
-							return origin.getHeaders();
-						}
-						@Override
-						public String getMethodValue() {
-							return origin.getMethodValue();
-						}
-						@Override
-						public URI getURI() {
-							try {
-								return new URI(apiBaseUrl + uri.toString());
-							} catch (URISyntaxException e) {
-								throw new IllegalArgumentException("apiBaseUrl " + apiBaseUrl + " is not valid uri");
-							}
-						}
-					};
-					request = req;
-				}
-				return execution.execute(request, body);
-			}
-		});
+		this.restTemplate.getInterceptors().add(new PrependBaseUrlClientHttpRequestInterceptor(() -> apiBaseUrl));
 		this.restApiBean = new ProxyFactory(restApiClass, this).getProxy(restApiClass.getClassLoader());
 		for (HttpMessageConverter<?> mc : restTemplate.getMessageConverters()) {
 			if (mc instanceof AbstractJackson2HttpMessageConverter) {
