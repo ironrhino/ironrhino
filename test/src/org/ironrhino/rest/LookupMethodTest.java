@@ -64,7 +64,7 @@ public class LookupMethodTest {
 	}
 
 	@RestApi
-	interface ArticleClient {
+	public interface ArticleClient {
 
 		@Lookup
 		org.springframework.web.client.RestTemplate restTemplate();
