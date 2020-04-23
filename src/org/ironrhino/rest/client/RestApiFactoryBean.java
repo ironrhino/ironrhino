@@ -11,6 +11,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.ParameterizedTypeReference;
@@ -52,9 +54,13 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpRequestExecution;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
@@ -150,6 +156,36 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 			}
 		}
 		this.restTemplate = restTemplate;
+		this.restTemplate.getInterceptors().add(new ClientHttpRequestInterceptor() {
+			@Override
+			public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
+					throws IOException {
+				URI uri = request.getURI();
+				if (uri.getHost() == null) {
+					HttpRequest origin = request;
+					HttpRequest req = new HttpRequest() {
+						@Override
+						public HttpHeaders getHeaders() {
+							return origin.getHeaders();
+						}
+						@Override
+						public String getMethodValue() {
+							return origin.getMethodValue();
+						}
+						@Override
+						public URI getURI() {
+							try {
+								return new URI(apiBaseUrl + uri.toString());
+							} catch (URISyntaxException e) {
+								throw new IllegalArgumentException("apiBaseUrl " + apiBaseUrl + " is not valid uri");
+							}
+						}
+					};
+					request = req;
+				}
+				return execution.execute(request, body);
+			}
+		});
 		this.restApiBean = new ProxyFactory(restApiClass, this).getProxy(restApiClass.getClassLoader());
 		for (HttpMessageConverter<?> mc : restTemplate.getMessageConverters()) {
 			if (mc instanceof AbstractJackson2HttpMessageConverter) {
@@ -220,6 +256,10 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 	@SuppressWarnings("unchecked")
 	private Object actualInvoke(MethodInvocation methodInvocation) throws Exception {
 		Method method = methodInvocation.getMethod();
+		if (method.isAnnotationPresent(Lookup.class)) {
+			if (method.getReturnType() == RestTemplate.class)
+				return restTemplate;
+		}
 		RequestMapping classRequestMapping = AnnotatedElementUtils.findMergedAnnotation(restApiClass,
 				RequestMapping.class);
 		RequestMapping methodRequestMapping = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class);
