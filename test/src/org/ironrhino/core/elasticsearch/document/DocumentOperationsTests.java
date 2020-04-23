@@ -4,6 +4,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import org.ironrhino.core.elasticsearch.Article;
+import org.ironrhino.core.elasticsearch.ArticleOperations;
 import org.ironrhino.core.elasticsearch.document.DocumentOperationsTests.Config;
 import org.ironrhino.rest.client.RestApiRegistryPostProcessor;
 import org.junit.Test;

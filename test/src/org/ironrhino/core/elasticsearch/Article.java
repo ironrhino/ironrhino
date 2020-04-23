@@ -1,4 +1,4 @@
-package org.ironrhino.core.elasticsearch.document;
+package org.ironrhino.core.elasticsearch;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
