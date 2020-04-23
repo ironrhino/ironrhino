@@ -466,7 +466,7 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 	private Object exchange(Method method, RequestEntity<Object> requestEntity) throws Exception {
 		try {
 			Type type = method.getGenericReturnType();
-			if (type instanceof TypeVariable)
+			if (type instanceof TypeVariable || type instanceof ParameterizedType)
 				type = GenericTypeResolver.resolveType(type, restApiClass);
 			if (method.getReturnType() == ResponseEntity.class) {
 				type = ((ParameterizedType) type).getActualTypeArguments()[0];

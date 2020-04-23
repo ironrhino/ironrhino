@@ -148,7 +148,7 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 					parameterTypes = m.getParameterTypes();
 					Type[] types = m.getGenericParameterTypes();
 					for (int i = 0; i < types.length; i++) {
-						if (types[i] instanceof TypeVariable)
+						if (types[i] instanceof TypeVariable || types[i] instanceof ParameterizedType)
 							types[i] = GenericTypeResolver.resolveType(types[i], serviceInterface);
 					}
 					try {
@@ -235,7 +235,9 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 				tree = tree.get(RESULT);
 				if (tree != null && !tree.isNull()) {
 					Type type = methodInvocation.getMethod().getGenericReturnType();
-					if (type instanceof TypeVariable) {
+					if ((type instanceof TypeVariable || type instanceof ParameterizedType)
+							&& methodInvocation instanceof ReflectiveMethodInvocation) {
+						// try resolve generic type
 						ReflectiveMethodInvocation rmi = (ReflectiveMethodInvocation) methodInvocation;
 						Class<?>[] interfaces = rmi.getProxy().getClass().getInterfaces();
 						for (Class<?> intf : interfaces) {
