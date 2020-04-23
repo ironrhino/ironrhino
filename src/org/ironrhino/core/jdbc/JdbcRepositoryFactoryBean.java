@@ -37,6 +37,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -189,6 +190,14 @@ public class JdbcRepositoryFactoryBean extends MethodInterceptorFactoryBean
 		if (AppInfo.getStage() == Stage.DEVELOPMENT)
 			this.sqls = loadSqls();
 		Method method = methodInvocation.getMethod();
+		if (method.isAnnotationPresent(Lookup.class)) {
+			if (method.getReturnType().isAssignableFrom(NamedParameterJdbcTemplate.class))
+				return namedParameterJdbcTemplate;
+			if (method.getReturnType().isAssignableFrom(JdbcTemplate.class))
+				return namedParameterJdbcTemplate.getJdbcTemplate();
+			if (method.getReturnType() == DataSource.class)
+				return namedParameterJdbcTemplate.getJdbcTemplate().getDataSource();
+		}
 		String methodName = method.getName();
 		String sql = sqls.get(methodName);
 		if (StringUtils.isBlank(sql)) {

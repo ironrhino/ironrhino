@@ -281,4 +281,14 @@ public class JdbcRepositoryTest {
 		personRepository.findByNotExistedParamName("test");
 	}
 
+	@Test
+	public void testLookupMethod() {
+		dogRepository.createTable();
+		Dog dog = new Dog();
+		dog.setName("dog");
+		dogRepository.save(dog);
+		assertThat(dogRepository.findDog(dog.getName()), is(dog));
+		dogRepository.dropTable();
+	}
+
 }
