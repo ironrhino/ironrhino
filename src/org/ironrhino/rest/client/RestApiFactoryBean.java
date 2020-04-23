@@ -224,7 +224,7 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 	private Object actualInvoke(MethodInvocation methodInvocation) throws Exception {
 		Method method = methodInvocation.getMethod();
 		if (method.isAnnotationPresent(Lookup.class)) {
-			if (method.getReturnType() == RestTemplate.class)
+			if (method.getReturnType().isAssignableFrom(RestTemplate.class))
 				return restTemplate;
 		}
 		RequestMapping classRequestMapping = AnnotatedElementUtils.findMergedAnnotation(restApiClass,
