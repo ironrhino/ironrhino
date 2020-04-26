@@ -15,27 +15,28 @@
 $(function(){
 		$('#trigger .btn').click(function(){
 			var t = $(this);
-			$.ajax({
-				type:'POST',
-				url:'${actionBaseUrl}/executeJson',
-				data:{
-					expression : $(this).data('expression')||$(this).text(),
-					scope: $(this).data('scope')
-				},
-				beforeSend:function(){
-					t.prop('disabled',true);
-				},
-				success:function(data){
-					if(data && data.actionErrors){
-						Message.showActionError(data.actionErrors);
-					}else{
-						Message.showActionMessage(MessageBundle.get('success'));
+			$.alerts({
+				type : 'confirm',
+				callback : function(b) {
+					if (b) {
+						ajax({
+						type:'POST',
+						url:'${actionBaseUrl}/executeJson',
+						data:{
+							expression : t.data('expression')||t.text(),
+							scope: t.data('scope')
+						},
+						beforeSend:function(){
+							t.prop('disabled',true);
+						},
+						onsuccess:function(data){
+							Message.showActionMessage(MessageBundle.get('success'));
+						},
+						complete:function(){
+							t.prop('disabled',false);
+						}
+						});
 					}
-					t.prop('disabled',false);
-				},
-				error:function(data){
-					Message.showActionError(MessageBundle.get('error'));
-					t.prop('disabled',false);
 				}
 			});
 		});
@@ -44,17 +45,13 @@ $(function(){
 			var t = this;
 			var key = t.name;
 			var value = t.checked;
-			$.post('${actionBaseUrl}/executeJson',
-								{
-								expression : 'settingControl.setValue("'+key+'","'+value+'")'
-								}
-								,function(data){
-									if(data && data.actionErrors){
-										$(t).closest('.switch').bootstrapSwitch('toggleState');
-										Message.showActionError(data.actionErrors);
-										return;
-									}
-								});
+			ajax({
+			type:'POST',
+			url:'${actionBaseUrl}/executeJson',
+			data:{
+				expression : 'settingControl.setValue("'+key+'","'+value+'")'
+			}
+			});
 		});
 		</#if>
 });
