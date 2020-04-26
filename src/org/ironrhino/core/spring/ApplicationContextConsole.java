@@ -83,6 +83,8 @@ public class ApplicationContextConsole {
 				}
 			}
 		});
+		if (getBeans().containsKey("dataSource"))
+			triggers.put("dataSource.hikariPoolMXBean.softEvictConnections()", Scope.APPLICATION);
 		return Collections.unmodifiableMap(triggers);
 	});
 
