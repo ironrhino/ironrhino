@@ -30,7 +30,7 @@ import org.ironrhino.rest.doc.annotation.Fields;
 import org.ironrhino.rest.doc.annotation.Status;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.GenericTypeResolver;
+import org.ironrhino.core.util.GenericTypeResolver;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.io.Resource;

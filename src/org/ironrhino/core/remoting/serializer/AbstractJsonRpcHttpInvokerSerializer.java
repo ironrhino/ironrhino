@@ -31,7 +31,7 @@ import org.ironrhino.core.util.JsonSerializationUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.MDC;
 import org.springframework.aop.framework.ReflectiveMethodInvocation;
-import org.springframework.core.GenericTypeResolver;
+import org.ironrhino.core.util.GenericTypeResolver;
 import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;

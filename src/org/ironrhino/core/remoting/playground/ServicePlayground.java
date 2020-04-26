@@ -27,7 +27,7 @@ import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.core.util.SampleObjectCreator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.GenericTypeResolver;
+import org.ironrhino.core.util.GenericTypeResolver;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
