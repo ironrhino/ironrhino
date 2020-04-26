@@ -14,7 +14,7 @@ import org.ironrhino.core.util.SampleObjectCreator;
 import org.ironrhino.rest.RestStatus;
 import org.ironrhino.rest.doc.annotation.Fields;
 import org.springframework.beans.BeanUtils;
-import org.springframework.core.GenericTypeResolver;
+import org.ironrhino.core.util.GenericTypeResolver;
 
 import lombok.experimental.UtilityClass;
 

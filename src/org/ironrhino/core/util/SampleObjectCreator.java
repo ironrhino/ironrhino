@@ -31,7 +31,6 @@ import java.util.function.BiFunction;
 import org.ironrhino.common.model.Coordinate;
 import org.ironrhino.core.model.ResultPage;
 import org.springframework.beans.BeanUtils;
-import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -132,7 +131,7 @@ public class SampleObjectCreator {
 					return null;
 				if (returnType == clazz)
 					return null;
-					returnType = GenericTypeResolver.resolveType(returnType, clazz);
+				returnType = GenericTypeResolver.resolveType(returnType, clazz);
 				if (returnType instanceof ParameterizedType) {
 					ParameterizedType pt = (ParameterizedType) returnType;
 					for (Type t : pt.getActualTypeArguments())
@@ -150,7 +149,7 @@ public class SampleObjectCreator {
 			Constructor<?> c = clazz.getConstructors()[0];
 			Type[] types = c.getGenericParameterTypes();
 			for (int i = 0; i < types.length; i++) {
-					types[i] = GenericTypeResolver.resolveType(types[i], clazz);
+				types[i] = GenericTypeResolver.resolveType(types[i], clazz);
 			}
 			if (types.length > 0) {
 				Object[] arr = new Object[types.length];
