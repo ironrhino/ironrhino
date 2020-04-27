@@ -47,6 +47,9 @@ public class ReflectionUtils {
 
 	public final static ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
 
+	private static final boolean JDK9PLUS = ClassUtils.isPresent("java.lang.StackWalker",
+			System.class.getClassLoader());
+
 	private static ClassPool classPool = ClassPool.getDefault();
 
 	public static List<String> getAllFields(Class<?> clazz) {
@@ -301,8 +304,7 @@ public class ReflectionUtils {
 			try {
 				Object o = key.getObject();
 				Method m = key.getMethod();
-				if (ClassUtils.isPresent("java.lang.StackWalker", System.class.getClassLoader())) {
-					// jdk 9 and later
+				if (JDK9PLUS) {
 					return MethodHandles.lookup()
 							.findSpecial(objectType, m.getName(),
 									MethodType.methodType(m.getReturnType(), m.getParameterTypes()), objectType)
