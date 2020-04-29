@@ -33,6 +33,8 @@ import org.ironrhino.core.spring.FallbackSupportMethodInterceptorFactoryBean;
 import org.ironrhino.core.spring.http.client.PrependBaseUrlClientHttpRequestInterceptor;
 import org.ironrhino.core.throttle.CircuitBreakerRegistry;
 import org.ironrhino.core.tracing.Tracing;
+import org.ironrhino.core.util.ExpressionUtils;
+import org.ironrhino.core.util.GenericTypeResolver;
 import org.ironrhino.core.util.MaxAttemptsExceededException;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.rest.RestStatus;
@@ -43,7 +45,6 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.context.ApplicationContext;
-import org.ironrhino.core.util.GenericTypeResolver;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -350,7 +351,7 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 		}
 		headers = addCookies(headers, cookieValues);
 		url = resolvePathVariables(url, pathVariables);
-		return exchange(method, createRequestEntity(url, requestMethod, headers, requestParams, body));
+		return exchange(createRequestEntity(url, requestMethod, headers, requestParams, body), methodInvocation);
 	}
 
 	private String getRequestMethod(RequestMapping classRequestMapping, RequestMapping methodRequestMapping) {
@@ -463,7 +464,8 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 		return new RequestEntity<>(body, headers, HttpMethod.valueOf(requestMethod), URI.create(url));
 	}
 
-	private Object exchange(Method method, RequestEntity<Object> requestEntity) throws Exception {
+	private Object exchange(RequestEntity<Object> requestEntity, MethodInvocation methodInvocation) throws Exception {
+		Method method = methodInvocation.getMethod();
 		try {
 			Type type = method.getGenericReturnType();
 			if (type instanceof TypeVariable || type instanceof ParameterizedType)
@@ -477,7 +479,7 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 					return ResponseEntity.status(response.getStatusCode()).headers(response.getHeaders())
 							.body(resource != null ? resource.getInputStream() : null);
 				} else {
-					return exchange(requestEntity, type, method.getAnnotation(JsonPointer.class));
+					return exchange(requestEntity, methodInvocation, type, method.getAnnotation(JsonPointer.class));
 				}
 			}
 			if (type == Void.TYPE) {
@@ -496,7 +498,7 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 				Resource resource = restTemplate.exchange(requestEntity, Resource.class).getBody();
 				return resource != null ? resource.getInputStream() : null;
 			}
-			return exchange(requestEntity, type, method.getAnnotation(JsonPointer.class)).getBody();
+			return exchange(requestEntity, methodInvocation, type, method.getAnnotation(JsonPointer.class)).getBody();
 		} catch (HttpStatusCodeException e) {
 			if (e instanceof NotFound) {
 				if (requestEntity.getMethod() == HttpMethod.GET && annotation != null
@@ -516,8 +518,8 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 		}
 	}
 
-	private ResponseEntity<Object> exchange(RequestEntity<Object> requestEntity, Type type, JsonPointer pointer)
-			throws Exception {
+	private ResponseEntity<Object> exchange(RequestEntity<Object> requestEntity, MethodInvocation invocation, Type type,
+			JsonPointer pointer) throws Exception {
 		if (pointer == null)
 			return restTemplate.exchange(requestEntity, ParameterizedTypeReference.forType(type));
 		ResponseEntity<JsonNode> response = restTemplate.exchange(requestEntity, JsonNode.class);
@@ -538,8 +540,18 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 				validator = BeanUtils.instantiateClass(validatorClass);
 			validator.validate(tree);
 		}
-		if (!pointer.value().isEmpty())
-			tree = tree.at(pointer.value());
+		if (!pointer.value().isEmpty()) {
+			String expr = pointer.value();
+			if (expr.contains("${")) {
+				Map<String, Object> context = new HashMap<>();
+				String[] paramNames = ReflectionUtils.getParameterNames(invocation.getMethod());
+				Object[] args = invocation.getArguments();
+				for (int i = 0; i < args.length; i++)
+					context.put(paramNames[i], args[i]);
+				expr = ExpressionUtils.evalString(expr, context);
+			}
+			tree = tree.at(expr);
+		}
 		Object body;
 		if (type instanceof Class && ((Class<?>) type).isAssignableFrom(JsonNode.class))
 			body = tree;
