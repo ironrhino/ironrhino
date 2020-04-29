@@ -7,6 +7,8 @@ import org.ironrhino.rest.client.JsonPointer;
 import org.ironrhino.rest.client.RestApi;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @RestApi(apiBaseUrl = Constants.ELASTICSEARCH_URL)
@@ -20,5 +22,9 @@ public interface SearchOperations<T> {
 	@JsonPointer("/hits/hits")
 	List<SearchHits<T>> search(@PathVariable String index, @RequestParam("q") String query, @RequestParam int from,
 			@RequestParam int size);
+
+	@PostMapping("/{index}/_search")
+	@JsonPointer("/aggregations/aggs/buckets")
+	List<AggregationBucket> aggregate(@PathVariable String index, @RequestBody TermsAggregation termsAggregation);
 
 }

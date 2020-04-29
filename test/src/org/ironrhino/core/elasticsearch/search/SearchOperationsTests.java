@@ -3,11 +3,16 @@ package org.ironrhino.core.elasticsearch.search;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.ironrhino.core.elasticsearch.Article;
 import org.ironrhino.core.elasticsearch.ArticleOperations;
+import org.ironrhino.core.elasticsearch.index.Configuration;
+import org.ironrhino.core.elasticsearch.index.Field;
+import org.ironrhino.core.elasticsearch.index.Mappings;
 import org.ironrhino.core.elasticsearch.search.SearchOperationsTests.Config;
 import org.ironrhino.rest.client.RestApiRegistryPostProcessor;
 import org.junit.Test;
@@ -27,6 +32,14 @@ public class SearchOperationsTests {
 	@Test
 	public void test() {
 		String index = "article";
+		if (articleOperations.exists(index))
+			articleOperations.delete(index);
+		Configuration conf = new Configuration();
+		Map<String, Field> properties = new HashMap<>();
+		properties.put("id", new Field("keyword"));
+		properties.put("title", new Field("keyword"));
+		conf.setMappings(new Mappings(properties));
+		articleOperations.create(index, conf);
 		int size = 20;
 		for (int i = 0; i < size; i++) {
 			Article article = new Article(String.valueOf(i + 1), i % 2 == 0 ? "title" : "test", "content");
@@ -51,6 +64,12 @@ public class SearchOperationsTests {
 		list = articleOperations.search(index, "content", 0, 20);
 		assertThat(list.size(), is(20));
 		list = articleOperations.search(index, "content", 10, 20);
+		List<AggregationBucket> buckets = articleOperations.aggregate(index, TermsAggregation.of("title"));
+		assertThat(buckets.size(), is(2));
+		assertThat(buckets.get(0).getKey(), is("test"));
+		assertThat(buckets.get(0).getCount(), is(10));
+		assertThat(buckets.get(1).getKey(), is("title"));
+		assertThat(buckets.get(1).getCount(), is(10));
 		assertThat(list.size(), is(10));
 		for (int i = 0; i < size; i++) {
 			articleOperations.delete(index, String.valueOf(i + 1));
