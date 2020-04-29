@@ -4,12 +4,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import lombok.Value;
+public class DateHistogramAggregation extends BucketAggregation {
 
-@Value
-public class DateHistogramAggregation {
-
-	private Map<String, Map<String, Map<String, Object>>> aggregations;
+	protected DateHistogramAggregation(Map<String, Map<String, Map<String, Object>>> aggregations) {
+		super(aggregations);
+	}
 
 	public static DateHistogramAggregation of(String field, String intervalType, String intervalValue) {
 		Map<String, Object> map = new HashMap<>();
