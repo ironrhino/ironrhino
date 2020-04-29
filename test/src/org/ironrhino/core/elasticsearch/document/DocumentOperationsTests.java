@@ -25,7 +25,7 @@ public class DocumentOperationsTests {
 	@Test
 	public void test() {
 		String index = "article";
-		Article article = new Article("id", "title", "content");
+		Article article = new Article("id", "title", "content", 0);
 		articleOperations.index(index, article.getId(), article);
 		assertThat(articleOperations.get(index, article.getId()), is(article));
 		article.setContent("content2");

@@ -42,7 +42,7 @@ public class SearchOperationsTests {
 		articleOperations.create(index, conf);
 		int size = 20;
 		for (int i = 0; i < size; i++) {
-			Article article = new Article(String.valueOf(i + 1), i % 2 == 0 ? "title" : "test", "content");
+			Article article = new Article(String.valueOf(i + 1), i % 2 == 0 ? "title" : "test", "content", i);
 			articleOperations.index(index, article.getId(), article);
 		}
 		try {
@@ -64,13 +64,21 @@ public class SearchOperationsTests {
 		list = articleOperations.search(index, "content", 0, 20);
 		assertThat(list.size(), is(20));
 		list = articleOperations.search(index, "content", 10, 20);
+		assertThat(list.size(), is(10));
+
 		List<AggregationBucket> buckets = articleOperations.aggregate(index, TermsAggregation.of("title"));
 		assertThat(buckets.size(), is(2));
 		assertThat(buckets.get(0).getKey(), is("test"));
 		assertThat(buckets.get(0).getCount(), is(10));
 		assertThat(buckets.get(1).getKey(), is("title"));
 		assertThat(buckets.get(1).getCount(), is(10));
-		assertThat(list.size(), is(10));
+
+		buckets = articleOperations.aggregate(index, HistogramAggregation.of("views", 2));
+		assertThat(buckets.size(), is(10));
+		assertThat(buckets.get(0).getKey(), is("0.0"));
+		assertThat(buckets.get(0).getCount(), is(2));
+		assertThat(buckets.get(9).getKey(), is("18.0"));
+		assertThat(buckets.get(9).getCount(), is(2));
 		for (int i = 0; i < size; i++) {
 			articleOperations.delete(index, String.valueOf(i + 1));
 		}

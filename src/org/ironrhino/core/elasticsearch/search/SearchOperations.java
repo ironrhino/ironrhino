@@ -29,6 +29,10 @@ public interface SearchOperations<T> {
 
 	@PostMapping("/{index}/_search?size=0")
 	@JsonPointer("/aggregations/aggs/buckets")
+	List<AggregationBucket> aggregate(@PathVariable String index, @RequestBody HistogramAggregation aggregation);
+
+	@PostMapping("/{index}/_search?size=0")
+	@JsonPointer("/aggregations/aggs/buckets")
 	List<AggregationBucket> aggregate(@PathVariable String index, @RequestBody DateHistogramAggregation aggregation);
 
 }
