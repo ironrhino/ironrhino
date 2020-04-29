@@ -23,11 +23,11 @@ public interface SearchOperations<T> {
 	List<SearchHits<T>> search(@PathVariable String index, @RequestParam("q") String query, @RequestParam int from,
 			@RequestParam int size);
 
-	@PostMapping("/{index}/_search")
+	@PostMapping("/{index}/_search?size=0")
 	@JsonPointer("/aggregations/aggs/buckets")
 	List<AggregationBucket> aggregate(@PathVariable String index, @RequestBody TermsAggregation aggregation);
 
-	@PostMapping("/{index}/_search")
+	@PostMapping("/{index}/_search?size=0")
 	@JsonPointer("/aggregations/aggs/buckets")
 	List<AggregationBucket> aggregate(@PathVariable String index, @RequestBody DateHistogramAggregation aggregation);
 
