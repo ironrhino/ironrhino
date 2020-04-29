@@ -1,8 +1,10 @@
 package org.ironrhino.core.elasticsearch.index;
 
 import org.ironrhino.core.elasticsearch.Constants;
+import org.ironrhino.rest.client.JsonPointer;
 import org.ironrhino.rest.client.RestApi;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -45,5 +47,12 @@ public interface IndexOperations {
 
 	@DeleteMapping("/{index}/_alias/{alias}")
 	void deleteAlias(@PathVariable String index, @PathVariable String alias);
+
+	@GetMapping("/{index}/_mapping")
+	@JsonPointer("/${index}/mappings")
+	Mappings getMapping(@PathVariable String index);
+
+	@PutMapping("/{index}/_mapping")
+	void putMapping(@PathVariable String index, @RequestBody Mappings mappings);
 
 }

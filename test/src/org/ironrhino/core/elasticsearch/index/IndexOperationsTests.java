@@ -25,12 +25,19 @@ public class IndexOperationsTests {
 	@Test
 	public void test() {
 		String index = "test";
+		if (indexOperations.exists(index))
+			indexOperations.delete(index);
 		assertThat(indexOperations.exists(index), is(false));
 		Configuration conf = new Configuration();
 		conf.setSettings(new Settings());
-		conf.setMappings(new Mappings(Collections.singletonMap("name", new Field("text"))));
+		conf.setMappings(new Mappings(Collections.singletonMap("name", new Field("keyword"))));
 		indexOperations.create(index, conf);
 		assertThat(indexOperations.exists(index), is(true));
+		Mappings mappings = indexOperations.getMapping(index);
+		assertThat(mappings.getProperties().get("name").getType(), is("keyword"));
+		indexOperations.putMapping(index, new Mappings(Collections.singletonMap("name2", new Field("text"))));
+		mappings = indexOperations.getMapping(index);
+		assertThat(mappings.getProperties().get("name2").getType(), is("text"));
 		indexOperations.delete(index);
 		assertThat(indexOperations.exists(index), is(false));
 	}
