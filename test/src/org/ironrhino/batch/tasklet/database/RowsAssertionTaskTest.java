@@ -2,6 +2,7 @@ package org.ironrhino.batch.tasklet.database;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -11,7 +12,9 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.junit.Test;
+import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 
 import com.zaxxer.hikari.HikariDataSource;
@@ -62,7 +65,7 @@ public class RowsAssertionTaskTest {
 		task.setSql(sql);
 		task.setParameterValues(parameterValues);
 		task.setExpectedRows(expectedRows);
-		assertThat(task.execute(null, null), is(RepeatStatus.FINISHED));
+		assertThat(task.execute(mock(StepContribution.class), mock(ChunkContext.class)), is(RepeatStatus.FINISHED));
 	}
 
 }
