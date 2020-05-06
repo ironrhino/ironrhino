@@ -5,7 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 
-public class AbstractFtpTaskTest {
+public abstract class AbstractFtpTaskTestBase {
 
 	static final String FTP_URI = "ftp://admin:admin@localhost:2121/temp";
 
