@@ -21,11 +21,13 @@ public class DownloadTask extends AbstractFtpTask {
 	public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
 		execute(ftpClient -> {
 			String pathname = getPathname(path, ftpClient);
-			try (FileOutputStream os = new FileOutputStream(file)) {
+			File temp = new File(file.getParentFile(), file.getName() + ".tmp");
+			try (FileOutputStream os = new FileOutputStream(temp)) {
 				boolean b = ftpClient.retrieveFile(pathname, os);
 				if (!b)
 					throw new UnexpectedJobExecutionException("Failed to download file from path: " + path);
 			}
+			temp.renameTo(file);
 			return null;
 		});
 		return RepeatStatus.FINISHED;
