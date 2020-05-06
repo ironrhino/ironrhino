@@ -29,6 +29,8 @@ public class DownloadTask implements Tasklet {
 
 	@Override
 	public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
+		if (file.exists())
+			throw new UnexpectedJobExecutionException(String.format("%s already exists", file.toString()));
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		conn.connect();
 		int code = conn.getResponseCode();
