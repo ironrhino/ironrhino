@@ -347,11 +347,9 @@ public class FtpFileStorage extends AbstractFileStorage {
 			if (!s1.equals(s2))
 				return false;
 			ftpClient.changeWorkingDirectory(s1);
-			ftpClient.rename(_fromPath.substring(_fromPath.lastIndexOf('/') + 1),
+			return ftpClient.rename(_fromPath.substring(_fromPath.lastIndexOf('/') + 1),
 					_toPath.substring(_toPath.lastIndexOf('/') + 1));
-			return true;
 		});
-
 	}
 
 	@Override
