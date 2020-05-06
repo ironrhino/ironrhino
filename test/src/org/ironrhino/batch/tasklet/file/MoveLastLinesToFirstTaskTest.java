@@ -2,6 +2,7 @@ package org.ironrhino.batch.tasklet.file;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,6 +14,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.Test;
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 
 public class MoveLastLinesToFirstTaskTest {
@@ -50,7 +53,7 @@ public class MoveLastLinesToFirstTaskTest {
 			MoveLastLinesToFirstTask task = new MoveLastLinesToFirstTask();
 			task.setFile(file);
 			task.setLines(movedLines);
-			assertThat(task.execute(null, null), is(RepeatStatus.FINISHED));
+			assertThat(task.execute(mock(StepContribution.class), mock(ChunkContext.class)), is(RepeatStatus.FINISHED));
 			try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
 				List<String> list = br.lines().collect(Collectors.toList());
 				assertThat(list.size(), is(totalLines));

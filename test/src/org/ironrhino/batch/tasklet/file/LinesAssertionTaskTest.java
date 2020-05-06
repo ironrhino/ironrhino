@@ -2,13 +2,16 @@ package org.ironrhino.batch.tasklet.file;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
 import org.junit.Test;
+import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.io.FileSystemResource;
 
@@ -47,7 +50,7 @@ public class LinesAssertionTaskTest {
 			LinesAssertionTask task = new LinesAssertionTask();
 			task.setResource(new FileSystemResource(file));
 			task.setExpectedLines(expectedLines);
-			assertThat(task.execute(null, null), is(RepeatStatus.FINISHED));
+			assertThat(task.execute(mock(StepContribution.class), mock(ChunkContext.class)), is(RepeatStatus.FINISHED));
 		} finally {
 			file.delete();
 		}

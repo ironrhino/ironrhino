@@ -2,6 +2,7 @@ package org.ironrhino.batch.tasklet.file;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,6 +14,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
 
 import org.junit.Test;
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -30,7 +33,7 @@ public class MergeTaskTest {
 			MergeTask task = new MergeTask();
 			task.setSources(sources);
 			task.setTarget(target);
-			assertThat(task.execute(null, null), is(RepeatStatus.FINISHED));
+			assertThat(task.execute(mock(StepContribution.class), mock(ChunkContext.class)), is(RepeatStatus.FINISHED));
 			try (BufferedReader br = new BufferedReader(
 					new InputStreamReader(new FileInputStream(target), StandardCharsets.UTF_8))) {
 				assertThat(br.lines().count(), is(55L));

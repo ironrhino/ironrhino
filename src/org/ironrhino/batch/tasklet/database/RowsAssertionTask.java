@@ -28,9 +28,15 @@ public class RowsAssertionTask implements Tasklet {
 	@Override
 	public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
 		NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(dataSource);
-		int actualRows = (SqlVerb.parseBySql(sql) == SqlVerb.SELECT)
-				? template.queryForObject(sql, parameterValues, int.class)
-				: template.update(sql, parameterValues);
+		int actualRows;
+		if (SqlVerb.parseBySql(sql) == SqlVerb.SELECT) {
+			Integer count = template.queryForObject(sql, parameterValues, Integer.class);
+			if (count == null)
+				throw new RuntimeException("Unexpected null");
+			actualRows = count;
+		} else {
+			actualRows = template.update(sql, parameterValues);
+		}
 		if (actualRows != expectedRows)
 			throw new UnexpectedJobExecutionException(
 					"Expected rows is " + expectedRows + " but actual rows is " + actualRows);

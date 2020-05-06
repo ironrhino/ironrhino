@@ -100,7 +100,9 @@ public class Redlock {
 	@PreDestroy
 	public void destroy() {
 		for (int i = 0; i < redisTemplates.length; i++) {
-			((LettuceConnectionFactory) redisTemplates[i].getConnectionFactory()).destroy();
+			LettuceConnectionFactory cf = ((LettuceConnectionFactory) redisTemplates[i].getConnectionFactory());
+			if (cf != null)
+				cf.destroy();
 		}
 	}
 
