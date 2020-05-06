@@ -54,12 +54,39 @@ begin
     set n = floor(n / 62);
   end while;
   while length(s) < 22 do
-	if length(s) = 21 then
-		set s = concat(substr(digits, floor(rand() * 8), 1), s);
-	else
-		set s = concat(substr(digits, floor(rand() * 63), 1), s);
+    if length(s) = 21 then
+        set s = concat(substr(digits, floor(rand() * 8), 1), s);
+    else
+        set s = concat(substr(digits, floor(rand() * 63), 1), s);
     end if;
   end while;
   return s;
 end$$
 delimiter ;
+
+drop function if exists next_snowflake_id;
+delimiter $$
+create function `next_snowflake_id`() returns bigint(20)
+begin
+    declare epoch bigint(20);
+    declare workerId integer;
+    declare current_ts bigint(20);
+    declare incr bigint(20);
+    set epoch = 1556150400000;
+    set workerId = 1;
+    set current_ts = round(unix_timestamp(curtime(4)) * 1000);
+    if @sequence > 1023 then
+        while @last_ts = current_ts do
+            set current_ts = round(unix_timestamp(curtime(4)) * 1000);
+        end while;
+    end if;
+    if @last_ts = current_ts then
+        set @sequence = @sequence + 1;
+    else
+        set @sequence = 0;
+    end if;
+    set @last_ts = current_ts;
+return (current_ts - epoch) << 18 | (workerId << 10) | @sequence;
+end$$
+delimiter ;
+
