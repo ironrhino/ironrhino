@@ -17,7 +17,7 @@ import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 
-public class DownloadTaskTests extends AbstractFtpTaskTest {
+public class DownloadTaskTests extends AbstractFtpTaskTestBase {
 
 	@Test
 	public void test() throws Exception {

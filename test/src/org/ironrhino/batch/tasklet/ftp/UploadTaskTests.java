@@ -11,7 +11,7 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 
-public class UploadTaskTests extends AbstractFtpTaskTest {
+public class UploadTaskTests extends AbstractFtpTaskTestBase {
 
 	@Test
 	public void test() throws Exception {

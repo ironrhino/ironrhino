@@ -12,7 +12,7 @@ import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 
-public class RenameTaskTests extends AbstractFtpTaskTest {
+public class RenameTaskTests extends AbstractFtpTaskTestBase {
 
 	@Test
 	public void test() throws Exception {
