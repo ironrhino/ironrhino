@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-@RestApi(apiBaseUrl = Constants.ELASTICSEARCH_URL)
+@RestApi(apiBaseUrl = Constants.ELASTICSEARCH_URL, treatNotFoundAsNull = true)
 public interface IndexOperations {
 
 	@PutMapping("/{index}")
