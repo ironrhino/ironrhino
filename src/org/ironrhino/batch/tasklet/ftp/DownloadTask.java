@@ -19,6 +19,8 @@ public class DownloadTask extends AbstractFtpTask {
 
 	@Override
 	public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
+		if (file.exists())
+			throw new UnexpectedJobExecutionException(String.format("%s already exists", file.toString()));
 		execute(ftpClient -> {
 			String pathname = getPathname(path, ftpClient);
 			File temp = new File(file.getParentFile(), file.getName() + ".tmp");

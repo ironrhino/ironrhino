@@ -26,11 +26,12 @@ public class DownloadTaskTests extends AbstractFtpTaskTest {
 		UploadTask uploadTask = createTask(UploadTask.class);
 		uploadTask.setFile(file);
 		uploadTask.setPath(path);
-		assertThat(uploadTask.execute(mock(StepContribution.class), mock(ChunkContext.class)), is(RepeatStatus.FINISHED));
+		assertThat(uploadTask.execute(mock(StepContribution.class), mock(ChunkContext.class)),
+				is(RepeatStatus.FINISHED));
 
 		try {
 			File newFile = File.createTempFile("target", ".txt");
-			newFile.deleteOnExit();
+			newFile.delete();
 			DownloadTask task = createTask(DownloadTask.class);
 			task.setPath(path);
 			task.setFile(newFile);
