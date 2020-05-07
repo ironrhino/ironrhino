@@ -41,6 +41,13 @@
 	<bean id="partitioner" scope="step"
 		class="org.springframework.batch.core.partition.support.SimplePartitioner" />
 
+	<bean id="partitionHandler" scope="step"
+		class="org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler" >
+		<property name="taskExecutor" ref="taskExecutor" />
+		<property name="gridSize" value="${batch.updateMessage.partitions:10}"/>
+		<property name="step" ref="updateMessage"/>
+	</bean>
+
 	<step id="updateMessage"
 		xmlns="http://www.springframework.org/schema/batch">
 		<tasklet>
@@ -53,10 +60,7 @@
 		xmlns="http://www.springframework.org/schema/batch">
 		<validator ref="jobParametersValidator" />
 		<step id="updateMessage.manager">
-			<partition step="updateMessage" partitioner="partitioner">
-				<handler grid-size="${batch.updateMessage.partitions:10}"
-					task-executor="taskExecutor" />
-			</partition>
+			<partition partitioner="partitioner" handler="partitionHandler"/>
 		</step>
 	</job>
 
