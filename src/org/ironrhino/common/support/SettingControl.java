@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -22,13 +23,20 @@ import org.ironrhino.core.event.EntityOperationEvent;
 import org.ironrhino.core.event.EntityOperationType;
 import org.ironrhino.core.metadata.Setup;
 import org.ironrhino.core.service.EntityManager;
+import org.ironrhino.core.spring.configuration.PropertySourceMode;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.DateUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.EnumerablePropertySource;
+import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.env.PropertySource;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +50,12 @@ public class SettingControl {
 	public static final String SETTING_KEY_SETUP_TIMESTAMP = "setup.timestamp";
 
 	@Autowired
+	private ConfigurableEnvironment environment;
+
+	@Value("${settingControl.propertySourceMode:}")
+	private PropertySourceMode propertySourceMode;
+
+	@Autowired
 	private EntityManager<Setting> entityManager;
 
 	private volatile Map<String, Setting> settings;
@@ -49,6 +63,12 @@ public class SettingControl {
 	@PostConstruct
 	public void afterPropertiesSet() {
 		refresh();
+		if (propertySourceMode != null) {
+			MutablePropertySources mps = environment.getPropertySources();
+			PropertySource<?> ps = new SettingsPropertySource("settings", () -> this.settings);
+			propertySourceMode.add(mps, ps);
+			log.info("Add settings PropertySource as {}", propertySourceMode);
+		}
 	}
 
 	public synchronized void refresh() {
@@ -231,4 +251,28 @@ public class SettingControl {
 		}
 	}
 
+	static class SettingsPropertySource extends EnumerablePropertySource<Supplier<Map<String, Setting>>> {
+
+		public SettingsPropertySource(String name, Supplier<Map<String, Setting>> source) {
+			super(name, source);
+		}
+
+		@Override
+		@Nullable
+		public Object getProperty(String name) {
+			Setting setting = this.source.get().get(name);
+			return setting != null ? setting.getValue() : null;
+		}
+
+		@Override
+		public boolean containsProperty(String name) {
+			return this.source.get().containsKey(name);
+		}
+
+		@Override
+		public String[] getPropertyNames() {
+			return org.springframework.util.StringUtils.toStringArray(this.source.get().keySet());
+		}
+
+	}
 }
