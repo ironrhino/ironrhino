@@ -48,7 +48,7 @@
 	<bean id="partitioner" scope="step"
 		class="org.springframework.batch.core.partition.support.SimplePartitioner" />
 		
-	<bean id="partitionHandler"
+	<bean id="partitionHandler" scope="step"
 		class="org.ironrhino.batch.partition.RemoteInvocationPartitionHandler">
 		<property name="taskExecutor" ref="taskExecutor" />
 		<property name="step" ref="updateMessage" />
@@ -86,8 +86,7 @@
 		xmlns="http://www.springframework.org/schema/batch">
 		<validator ref="jobParametersValidator" />
 		<step id="updateMessage.manager" next="assertion">
-			<partition partitioner="partitioner"
-				handler="partitionHandler" />
+			<partition partitioner="partitioner" handler="partitionHandler" />
 		</step>
 		<step id="assertion">
 			<tasklet ref="assertionTask" />
