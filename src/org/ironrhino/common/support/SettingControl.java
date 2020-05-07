@@ -51,7 +51,7 @@ public class SettingControl {
 		refresh();
 	}
 
-	public void refresh() {
+	public synchronized void refresh() {
 		entityManager.setEntityClass(Setting.class);
 		List<Setting> list = entityManager.findAll(Order.asc("key"));
 		Map<String, Setting> temp = new ConcurrentHashMap<>();
