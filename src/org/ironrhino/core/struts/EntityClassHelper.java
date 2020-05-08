@@ -238,6 +238,7 @@ public class EntityClassHelper {
 						uci.setHiddenInList(hi);
 						uci.setType("collection");
 						uci.setEmbeddedUiConfigs(getUiConfigs(elementType));
+						uci.setExcludedFromCriteria(true);
 					}
 
 					if (idAssigned && propertyName.equals("id"))
