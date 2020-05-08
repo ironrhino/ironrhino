@@ -27,7 +27,7 @@
 				formactions
 						.before('<div style="padding: 10px 50px;"><ul class="attachments resettable thumbnails" style="min-height:50px;"></ul></div>');
 			t.find('button.upload').click(function() {
-				$('<input type="file" multiple />').appendTo(t).hide().change(
+				$('<input type="file" multiple>').appendTo(t).hide().change(
 						function() {
 							upload(this.files, null, t);
 							$(this).remove();
@@ -115,14 +115,14 @@
 							|| suffix == 'gif' || suffix == 'bmp'
 							|| suffix == 'webp';
 				}
-				$('<li class="span2"><a class="remove" href="#"/><input type="hidden" name="'
+				$('<li class="span2"><a class="remove" href="#"></a><input type="hidden" name="'
 						+ form.data('attachmentsfield')
 						+ '" value="'
 						+ path
-						+ '"/><div class="thumbnail"><a href="'
+						+ '"><div class="thumbnail"><a href="'
 						+ uri
 						+ '" target="_blank">'
-						+ (image ? '<img src="' + uri + '"/>' : '<span>'
+						+ (image ? '<img src="' + uri + '">' : '<span>'
 								+ filename + '</span>') + '</a></div></li>')
 						.appendTo(ul);
 			}

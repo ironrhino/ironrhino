@@ -11,7 +11,7 @@ $(function() {
 					}, 200);
 	}).on('click', '.mce-combobox button', function() {
 		if (!$('#mce-browse-modal').length) {
-			var modal = $('<div id="mce-browse-modal" class="modal" style="z-index:65537;height:500px;"><input id="mce-browse-folder" type="hidden"/><div class="modal-close"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><div id="mce-browse-modal-body" class="modal-body" style="height:400px;"></div><div  id="mce-browse-modal-footer" class="modal-footer"></div></div>')
+			var modal = $('<div id="mce-browse-modal" class="modal" style="z-index:65537;height:500px;"><input id="mce-browse-folder" type="hidden"><div class="modal-close"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button></div><div id="mce-browse-modal-body" class="modal-body" style="height:400px;"></div><div  id="mce-browse-modal-footer" class="modal-footer"></div></div>')
 					.appendTo(document.body);
 			var textarea = $('#' + tinymce.EditorManager.activeEditor.id);
 			var folder = textarea.data('uploadfolder');
@@ -111,7 +111,7 @@ function browse() {
 								+ name
 								+ '" title="'
 								+ name
-								+ '" style="margin:5px;width:92px;height:92px;cursor:pointer;"/>';
+								+ '" style="margin:5px;width:92px;height:92px;cursor:pointer;">';
 					} else {
 						var name = key.substring(0, key.length - 1);
 						var name = name.substring(name.lastIndexOf('/') + 1);
@@ -147,7 +147,7 @@ function browse() {
 							return false;
 						});
 				$('#mce-browse-modal-footer')
-						.html('<input id="files" type="file" multiple="true"/>')
+						.html('<input id="files" type="file" multiple="true">')
 						.find('input[type="file"]').change(function() {
 									upload(this.files);
 								});

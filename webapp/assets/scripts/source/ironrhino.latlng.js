@@ -56,7 +56,7 @@
 									+ (t.data('zoom') || 13)
 									+ '&size='
 									+ (t.data('size') || '200*200')
-									+ '&key=' + key + '"/>');
+									+ '&key=' + key + '">');
 				} else {
 					holder.html('');
 				}

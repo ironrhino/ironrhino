@@ -9,7 +9,7 @@
 					var field = document.getElementById(t.data('field'));
 					var maximum = parseInt(t.data('maximum'));
 					t.click(function() {
-								$('<input type="file" accept="image/*" multiple/>')
+								$('<input type="file" accept="image/*" multiple>')
 										.appendTo(target).hide().change(
 												function() {
 													concatenateImages(

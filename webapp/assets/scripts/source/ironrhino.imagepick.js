@@ -11,10 +11,10 @@
 					.parent()
 					.append('<span class="add-on listpick-handle clickable"><i class="glyphicon glyphicon-th-list"></i></span>');
 			if (t.val())
-				t.attr('data-content', '<img src="' + t.val() + '"/>');
+				t.attr('data-content', '<img src="' + t.val() + '">');
 			t.change(function() {
 						var html = this.value ? '<img src="' + this.value
-								+ '"/>' : '';
+								+ '">' : '';
 						$(this).attr('data-content', html);
 						$('.popover-content', $(this).parent()).html(html);
 						var options = $(this).data('popover').options;

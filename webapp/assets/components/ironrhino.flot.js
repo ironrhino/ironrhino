@@ -135,7 +135,7 @@
 								formatter : function(label, series) {
 									return "<div style='font-size:8pt; text-align:center; padding:2px; color:white;'>"
 											+ label
-											+ "<br/>"
+											+ "<br>"
 											+ series.percent.toFixed(1)
 											+ "%</div>";
 								},

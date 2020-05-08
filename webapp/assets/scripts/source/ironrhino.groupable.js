@@ -88,12 +88,12 @@
 			if (t.find('.controls')
 					.find('textarea,table,p,.input-xxlarge,.newline').length) {
 				t.wrap('<div class="' + rowclass
-						+ '"><div class="span12"/></div>');
+						+ '"><div class="span12"></div></div>');
 				current = 0;
 			} else {
 				if (current % columns == 0) {
 					t.wrap('<div class="' + rowclass + '"><div class="' + span
-							+ '"/></div>');
+							+ '"></div></div>');
 				} else {
 					var prev = t.prev('.' + rowclass);
 					t.wrap('<div class="' + span + '"/>').parent()

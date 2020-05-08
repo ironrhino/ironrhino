@@ -233,7 +233,7 @@
 		 * plugins to function.
 		 *
 		 * @name html.wrap
-		 * @default '<div class="text-core"><div class="text-wrap"/></div>'
+		 * @default '<div class="text-core"><div class="text-wrap"></div></div>'
 		 * @author agorbatchev
 		 * @date 2011/08/19
 		 * @id TextExt.options.html.wrap
@@ -458,7 +458,7 @@
 			ext : {},
 
 			html : {
-				wrap   : '<div class="text-core"><div class="text-wrap"/></div>',
+				wrap   : '<div class="text-core"><div class="text-wrap"></div></div>',
 				hidden : '<input type="hidden" />'
 			},
 
@@ -2211,7 +2211,7 @@
 		 * HTML source that is used to generate the dropdown.
 		 *
 		 * @name html.dropdown
-		 * @default '<div class="text-dropdown"><div class="text-list"/></div>'
+		 * @default '<div class="text-dropdown"><div class="text-list"></div></div>'
 		 * @author agorbatchev
 		 * @date 2011/08/17
 		 * @id TextExtAutocomplete.options.html.dropdown
@@ -2222,7 +2222,7 @@
 		 * HTML source that is used to generate each suggestion.
 		 *
 		 * @name html.suggestion
-		 * @default '<div class="text-suggestion"><span class="text-label"/></div>'
+		 * @default '<div class="text-suggestion"><span class="text-label"></span></div>'
 		 * @author agorbatchev
 		 * @date 2011/08/17
 		 * @id TextExtAutocomplete.options.html.suggestion
@@ -2335,8 +2335,8 @@
 			},
 
 			html : {
-				dropdown   : '<div class="text-dropdown"><div class="text-list"/></div>',
-				suggestion : '<div class="text-suggestion"><span class="text-label"/></div>'
+				dropdown   : '<div class="text-dropdown"><div class="text-list"></div></div>',
+				suggestion : '<div class="text-suggestion"><span class="text-label"></span></div>'
 			}
 		}
 		;
@@ -3754,7 +3754,7 @@
 		if(prompt)
 			self.setPrompt(prompt);
 
-		if($.trim(self.val()).length > 0)
+		if(self.val().trim().length > 0)
 			self.hidePrompt();
 
 		self.on({
@@ -3860,7 +3860,7 @@
 			input    = self.input()
 			;
 		
-		if($.trim(self.val()).length === 0 && !input.is(':focus'))
+		if(self.val().trim().length === 0 && !input.is(':focus'))
 			self.containerElement().removeClass(CSS_HIDE_PROMPT);
 	};
 
@@ -4197,7 +4197,7 @@
 		 * HTML source that is used to generate container for the tags.
 		 *
 		 * @name html.tags
-		 * @default '<div class="text-tag"><div class="text-button"><span class="text-label"/><a class="text-remove"/></div></div>'
+		 * @default '<div class="text-tag"><div class="text-button"><span class="text-label"></span><span class="text-remove"></span></div></div>'
 		 * @author agorbatchev
 		 * @date 2011/08/19
 		 * @id TextExtTags.options.html.tags
@@ -4269,7 +4269,7 @@
 
 			html : {
 				tags : '<div class="text-tags"/>',
-				tag  : '<div class="text-tag"><div class="text-button"><span class="text-label"/><span class="text-remove"/></div></div>'
+				tag  : '<div class="text-tag"><div class="text-button"><span class="text-label"></span><span class="text-remove"></span></div></div>'
 			}
 		}
 		;

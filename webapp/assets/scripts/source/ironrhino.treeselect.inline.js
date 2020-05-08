@@ -35,7 +35,7 @@
 					&& !treeselect.closest('.datagrided').length)
 				treeselect.outerWidth(width);
 
-			$('<i class="indicator glyphicon glyphicon-triangle-bottom"/><i class="remove glyphicon glyphicon-remove-sign"/><div class="options"/>')
+			$('<i class="indicator glyphicon glyphicon-triangle-bottom"></i><i class="remove glyphicon glyphicon-remove-sign"></i><div class="options"></div>')
 					.appendTo(treeselect);
 		});
 		return this;

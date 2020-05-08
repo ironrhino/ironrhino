@@ -2,7 +2,7 @@ Observation.treeview = function(container) {
 	$$('.treeview', container).each(function() {
 		var t = $(this);
 		var head = t.data('head');
-		var template = $.trim(t.find('template').html());
+		var template = t.find('template').html().trim();
 		if (template)
 			t.html('');
 		if (head) {

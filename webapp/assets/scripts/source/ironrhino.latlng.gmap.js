@@ -48,7 +48,7 @@
 									+ (t.data('zoom') || 13)
 									+ '&size='
 									+ (t.data('size') || '200x200')
-									+ '&sensor=false"/>');
+									+ '&sensor=false">');
 				} else {
 					holder.html('');
 				}

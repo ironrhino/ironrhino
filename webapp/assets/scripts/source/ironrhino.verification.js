@@ -6,7 +6,7 @@
 					if (t.siblings('img.captcha').length)
 						return;
 					t.after('<img class="captcha" src="' + t.data('captcha')
-							+ '"/>');
+							+ '">');
 				}).on('keyup', 'input.captcha', function() {
 					var t = $(this);
 					t.removeClass('input-error');

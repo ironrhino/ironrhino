@@ -40,7 +40,7 @@
 									newlabels
 											.push('<div class="tag"><span class="tag-label">'
 													+ v
-													+ '</span><span class="tag-remove"/></div>');
+													+ '</span><span class="tag-remove"></span></div>');
 								});
 								t.html(newlabels.join(''));
 							} else {
@@ -155,8 +155,8 @@
 					var txt = nametarget
 							.addClass('treeselect-handle')
 							.html('<div class="text resettable"></div>'
-									+ '<i class="indicator glyphicon glyphicon-list"/>'
-									+ '<i class="remove glyphicon glyphicon-remove-sign"/>')
+									+ '<i class="indicator glyphicon glyphicon-list"></i>'
+									+ '<i class="remove glyphicon glyphicon-remove-sign"></i>')
 							.find('.text');
 					if (options.multiple) {
 						if (!textArr)
@@ -164,7 +164,7 @@
 						txt.addClass('tags');
 						if (text)
 							$.each(textArr, function(i, v) {
-								$('<div class="tag"><span class="tag-label"></span><span class="tag-remove"/></div>')
+								$('<div class="tag"><span class="tag-label"></span><span class="tag-remove"></span></div>')
 										.appendTo(txt).find('.tag-label')
 										.text(v);
 							});
@@ -252,7 +252,7 @@
 					var treeviewoptions = {
 						url : options.url,
 						collapsed : true,
-						template : '<a><input id="cb-{{id}}" type="checkbox" value="{{id}}"/> <label for="cb-{{id}}">{{name}}</label></a>',
+						template : '<a><input id="cb-{{id}}" type="checkbox" value="{{id}}"> <label for="cb-{{id}}">{{name}}</label></a>',
 						placeholder : MessageBundle.get('ajax.loading'),
 						unique : true,
 						separator : options.separator,

@@ -480,7 +480,7 @@ Richtable = {
 			return;
 		var value = cell.data('cellvalue');
 		if (value === undefined)
-			value = $.trim(cell.text());
+			value = cell.text().trim();
 		else
 			value = '' + value;
 		if (cell.data('oldvalue') === undefined)
@@ -489,7 +489,7 @@ Richtable = {
 		var template = '';
 		if (templateId) {
 			var ele = $('#' + templateId);
-			template = $.trim(ele.is('template') ? ele.html() : ele.text());
+			template = (ele.is('template') ? ele.html() : ele.text()).trim();
 		} else {
 			if (type == 'textarea')
 				template = '<textarea type="text" class="text"/>';
@@ -499,7 +499,7 @@ Richtable = {
 						+ '</option><option value="false">'
 						+ MessageBundle.get('false') + '</option></select>';
 			else
-				template = '<input type="text" class="text"/>';
+				template = '<input type="text" class="text">';
 		}
 		cell.html(template);
 		var input = $(':input', cell).val(value).blur(function() {
@@ -584,7 +584,7 @@ Richtable = {
 						newlabels
 								.push('<div class="tag"><span class="tag-label">'
 										+ $(this).text()
-										+ '</span><span class="tag-remove"/></div>');
+										+ '</span><span class="tag-remove"></span></div>');
 					});
 					$(v).html(newlabels.join(''));
 				}
@@ -930,20 +930,20 @@ Observation._richtable = function(container) {
 				} else if ('treeselect' == type) {
 					$('<input name="' + property.val()
 							+ '" class="treeselect-inline required" data-url="'
-							+ option.data('pickurl') + '"/>').appendTo(td);
+							+ option.data('pickurl') + '">').appendTo(td);
 				} else if ('listpick' == type || 'treeselect' == type) {
 					$('<div class="' + type
 							+ ' removeonadd" data-options="{\'url\':\''
 							+ option.data('pickurl') + '\'}"><input class="'
 							+ type + '-id required" type="hidden" name="'
 							+ property.val()
-							+ '" class="required"/><div class="' + type
+							+ '" class="required"><div class="' + type
 							+ '-name input-pseudo"></div></div>').appendTo(td);
 				} else {
 					$('<input type="' + (option.data('inputtype') || 'text')
 							+ '" name="' + property.val()
 							+ '" class="input-medium removeonadd '
-							+ option.data('class') + '"/>').appendTo(td);
+							+ option.data('class') + '">').appendTo(td);
 				}
 				if (size == 2)
 					$(':input', td).clone().appendTo(td).css('margin-left',
@@ -972,7 +972,7 @@ Observation._richtable = function(container) {
 							+ '\',\'multiple\':true}"><input class="' + type
 							+ '-id required" type="hidden" name="'
 							+ property.val()
-							+ '" class="required"/><div class="' + type
+							+ '" class="required"><div class="' + type
 							+ '-name input-pseudo"></div></div>').appendTo(td);
 					_observe(td);
 				}
@@ -1076,7 +1076,7 @@ Observation._richtable = function(container) {
 		t.on('click', function() {
 					var file = t.next('input[type="file"]:hidden');
 					if (!file.length) {
-						file = $('<input type="file"/>').prop('multiple',
+						file = $('<input type="file">').prop('multiple',
 								multiple).insertAfter(t).attr('accept',
 								t.data('accept')).hide().change(function() {
 									upload(this.files);

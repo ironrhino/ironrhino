@@ -2,7 +2,7 @@ $(document).ajaxSuccess(function(ev, xhr, ajaxOptions) {
 	if (xhr.getResponseHeader('X-Double-Check')
 		|| xhr.getResponseHeader('X-Current-Password')) {
 		var dc = xhr.getResponseHeader('X-Double-Check');
-		var modal = $('<div class="modal"><div class="modal-header"><a class="close" data-dismiss="modal"/><h3 style="text-align:center;">'
+		var modal = $('<div class="modal"><div class="modal-header"><a class="close" data-dismiss="modal"></a><h3 style="text-align:center;">'
 			+ MessageBundle.get(dc ? 'double.check' : '&nbsp;')
 			+ '</h3></div><div class="modal-body"><form class="form-horizontal"><fieldset><div class="form-actions"><button type="submit" class="btn btn-primary">'
 			+ MessageBundle.get('confirm')

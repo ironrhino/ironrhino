@@ -6,7 +6,7 @@
 					var button = $(' <button type="button" class="btn">'
 							+ MessageBundle.get('import') + '</button>')
 							.appendTo($('.form-actions', t)).click(function() {
-								$('<input type="file"/>').appendTo(t).hide()
+								$('<input type="file">').appendTo(t).hide()
 										.change(function() {
 													fill(this.files, t);
 													$(this).remove();

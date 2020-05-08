@@ -105,7 +105,7 @@
 			case 'prompt' :
 				glyphicon = 'question-sign';
 				popupMessage
-						.append('<input type="text" size="30" class="popup-prompt" />')
+						.append('<input type="text" size="30" class="popup-prompt">')
 						.after('<div class="popup-panel"><button class="popup-ok">'
 								+ okButton
 								+ '</button> <button class="popup-cancel">'

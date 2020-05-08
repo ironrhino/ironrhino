@@ -40,7 +40,7 @@
 									newlabels
 											.push('<div class="tag"><span class="tag-label">'
 													+ v
-													+ '</span><span class="tag-remove"/></div>');
+													+ '</span><span class="tag-remove"></span></div>');
 								});
 								t.html(newlabels.join(''));
 							} else {
@@ -153,8 +153,8 @@
 					var txt = nametarget
 							.addClass('listpick-handle')
 							.html('<div class="text resettable"></div>'
-									+ '<i class="indicator glyphicon glyphicon-list"/>'
-									+ '<i class="remove glyphicon glyphicon-remove-sign"/>')
+									+ '<i class="indicator glyphicon glyphicon-list"></i>'
+									+ '<i class="remove glyphicon glyphicon-remove-sign"></i>')
 							.find('.text');
 					if (options.multiple) {
 						if (!textArr)
@@ -162,7 +162,7 @@
 						txt.addClass('tags');
 						if (text)
 							$.each(textArr, function(i, v) {
-								$('<div class="tag"><span class="tag-label"></span><span class="tag-remove"/></div>')
+								$('<div class="tag"><span class="tag-label"></span><span class="tag-remove"></span></div>')
 										.appendTo(txt).find('.tag-label')
 										.text(v);
 							});

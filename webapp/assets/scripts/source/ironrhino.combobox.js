@@ -44,7 +44,7 @@
 							+ t.attr('name')
 							+ '" value="'
 							+ t.val()
-							+ '"/><span class="add-on clickable"><i class="glyphicon glyphicon-chevron-down"></i></span></div>')
+							+ '"><span class="add-on clickable"><i class="glyphicon glyphicon-chevron-down"></i></span></div>')
 							.insertAfter(t);
 					var input = $('input', div);
 					input.width(t.width() - 27);

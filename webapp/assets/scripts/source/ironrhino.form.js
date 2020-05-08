@@ -33,7 +33,7 @@
 				function() {
 					var t = $(this);
 					setTimeout(function() {
-								t.val($.trim(t.val()));
+								t.val(t.val().trim());
 							}, 0);
 				}).on('validate', ':input', function(ev) {
 					Form.validate(this, 'validate');
@@ -188,8 +188,8 @@ Observation.form = function(container) {
 		var fp = t
 				.wrap('<div class="filepick input-pseudo" tabindex="0"/>')
 				.after('<div class="text resettable"></div>'
-						+ '<i class="indicator glyphicon glyphicon-folder-open"/>'
-						+ '<i class="remove glyphicon glyphicon-remove-sign"/>')
+						+ '<i class="indicator glyphicon glyphicon-folder-open"></i>'
+						+ '<i class="remove glyphicon glyphicon-remove-sign"></i>')
 				.parent();
 		if (t.prop('disabled'))
 			fp.addClass('disabled').removeAttr('tabindex');

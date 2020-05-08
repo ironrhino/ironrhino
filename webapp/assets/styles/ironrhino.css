@@ -10727,9 +10727,13 @@ form.attachmentable ul.thumbnails li {
 
 form.attachmentable ul.thumbnails li .remove {
 	position: absolute;
-	top: 5px;
-	right: 5px;
-	font-size: 2em;
+	top: 0;
+	right: 0;
+	font-size: 5px;
+}
+
+form.attachmentable .thumbnail {
+	padding: 10px;
 }
 
 .form-horizontal .controls .unstyled {

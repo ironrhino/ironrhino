@@ -34,6 +34,11 @@
 			return value.startsWith(suffix, value.length - suffix.length);
 		};
 	}
+	if (!String.prototype.trim) {
+		String.prototype.trim = function () {
+			return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+		};
+	}
 	$.fn.formAction = function() {
 		var t = $(this);
 		if (!t.is('form'))
@@ -279,7 +284,7 @@ UrlUtils = {
 Message = {
 	compose : function(message, className) {
 		return '<div class="' + className
-				+ '"><a class="close" data-dismiss="alert"/>' + message
+				+ '"><a class="close" data-dismiss="alert"></a>' + message
 				+ '</div>';
 	},
 	showMessage : function() {
@@ -381,7 +386,7 @@ Message = {
 				field.parent().css('position', 'relative');
 				var prompt = $('<div class="field-error field-error-popover"><div class="field-error-content">'
 						+ msg
-						+ '<a class="remove pull-right" href="#"/></div></div>')
+						+ '<a class="remove pull-right" href="#"></a></div></div>')
 						.insertAfter(field);
 				var promptTopPosition, promptleftPosition;
 				var fieldWidth = field.outerWidth();
@@ -987,7 +992,7 @@ Initialization.common = function() {
 			}).on('click', '#message .close,.message-container .close',
 			function() {
 				$('#message,.message-container').each(function(i, v) {
-							if (!$.trim($(v).text()))
+							if (!$(v).text().trim())
 								$(v).remove();
 						});
 			}).on('click', '.removeonclick', function() {
@@ -1065,7 +1070,7 @@ Initialization.common = function() {
 		$('#render-location-qrcode').click(function() {
 			var _this = $(this);
 			_this.hide();
-			var modal = $('<div class="modal" style="z-index:10000;"><div class="modal-close"><a class="close" data-dismiss="modal" aria-hidden="true"/></div><div class="modal-body" style="max-height:600px;"><div class="location-qrcode">'
+			var modal = $('<div class="modal" style="z-index:10000;"><div class="modal-close"><a class="close" data-dismiss="modal" aria-hidden="true"></a></div><div class="modal-body" style="max-height:600px;"><div class="location-qrcode">'
 					+ document.location.href + '</div></div></div>')
 					.appendTo(document.body);
 			$('.location-qrcode', modal).encodeqrcode();
@@ -1402,7 +1407,7 @@ Observation.common = function(container) {
 					.push('<html><head><title>Charts: Export as Image<\/title><\/head><body>');
 			$('object[data]').each(function() {
 				content.push('<img src="data:image/png;base64,'
-						+ this.get_img_binary() + '"/>');
+						+ this.get_img_binary() + '">');
 			});
 			content.push('<\/body><\/html>');
 			var img_win = window.open('', '_blank');
