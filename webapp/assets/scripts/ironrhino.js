@@ -40428,7 +40428,7 @@ $(function() {
 				if (!$(e.target).is('.treeselect-inline,.text,.glyphicon'))
 					return;
 				var treeselect = $(e.target).closest('.treeselect-inline');
-				treeselect.find('.glyphicon')
+				treeselect.find('.indicator')
 						.toggleClass('glyphicon-triangle-bottom')
 						.toggleClass('glyphicon-triangle-top');
 				var options = treeselect.find('.options').toggle();
