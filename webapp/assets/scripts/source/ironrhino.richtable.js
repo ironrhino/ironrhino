@@ -938,10 +938,12 @@ Observation._richtable = function(container) {
 							+ '" class="required"/><div class="' + type
 							+ '-name input-pseudo"></div></div>').appendTo(td);
 				} else {
-					$('<input type="' + (option.data('inputtype') || 'text')
+					var input = $('<input type="' + (option.data('inputtype') || 'text')
 							+ '" name="' + property.val()
 							+ '" class="input-medium removeonadd '
-							+ option.data('class') + '"/>').appendTo(td);
+							+ option.data('class') + '">').appendTo(td);
+					if(input.hasClass('double'))
+						input.attr('step','any');
 				}
 				if (size == 2)
 					$(':input', td).clone().appendTo(td).css('margin-left',

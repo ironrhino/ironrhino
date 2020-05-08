@@ -556,14 +556,16 @@ Form = {
 						Message.showFieldError(target, null, 'double');
 						valid = false;
 					}
-					var i = value.indexOf('.');
-					if (i > -1) {
-						var decimal = value.substring(i + 1);
-						var scale = parseInt(t.data('scale') || '2');
-						if (decimal.length > scale) {
-							value = value.substring(0, i + 1)
-									+ decimal.substring(0, scale);
-							t.val(value);
+					if(!t.attr('step')){
+						var i = value.indexOf('.');
+						if (i > -1) {
+							var decimal = value.substring(i + 1);
+							var scale = parseInt(t.data('scale') || '2');
+							if (decimal.length > scale) {
+								value = value.substring(0, i + 1)
+										+ decimal.substring(0, scale);
+								t.val(value);
+							}
 						}
 					}
 				} else if (evt != 'keyup' && t.hasClass('repeat')) {
