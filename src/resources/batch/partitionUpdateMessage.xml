@@ -44,7 +44,7 @@
 	<bean id="partitionHandler" scope="step"
 		class="org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler" >
 		<property name="taskExecutor" ref="taskExecutor" />
-		<property name="gridSize" value="${batch.updateMessage.partitions:10}"/>
+		<property name="gridSize" value="#{environment['batch.updateMessage.partitions']?:10}"/>
 		<property name="step" ref="updateMessage"/>
 	</bean>
 

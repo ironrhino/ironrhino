@@ -55,7 +55,7 @@
 		class="org.ironrhino.batch.partition.RemoteInvocationPartitionHandler">
 		<property name="taskExecutor" ref="taskExecutor" />
 		<property name="step" ref="updateMessage" />
-		<property name="gridSize" value="${batch.updateMessage.partitions:10}" />
+		<property name="gridSize" value="#{environment['batch.updateMessage.partitions']?:10}" />
 		<property name="connectTimeout" value="${batch.updateMessage.remoteInvocation.connectTimeout:5000}" />
 		<property name="readTimeout" value="${batch.updateMessage.remoteInvocation.readTimeout:3600000}" />
 	</bean>
