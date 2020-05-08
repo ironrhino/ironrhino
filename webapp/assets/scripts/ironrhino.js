@@ -32691,14 +32691,16 @@ Form = {
 						Message.showFieldError(target, null, 'double');
 						valid = false;
 					}
-					var i = value.indexOf('.');
-					if (i > -1) {
-						var decimal = value.substring(i + 1);
-						var scale = parseInt(t.data('scale') || '2');
-						if (decimal.length > scale) {
-							value = value.substring(0, i + 1)
-									+ decimal.substring(0, scale);
-							t.val(value);
+					if(!t.attr('step')){
+						var i = value.indexOf('.');
+						if (i > -1) {
+							var decimal = value.substring(i + 1);
+							var scale = parseInt(t.data('scale') || '2');
+							if (decimal.length > scale) {
+								value = value.substring(0, i + 1)
+										+ decimal.substring(0, scale);
+								t.val(value);
+							}
 						}
 					}
 				} else if (evt != 'keyup' && t.hasClass('repeat')) {
@@ -39403,10 +39405,12 @@ Observation._richtable = function(container) {
 							+ '" class="required"><div class="' + type
 							+ '-name input-pseudo"></div></div>').appendTo(td);
 				} else {
-					$('<input type="' + (option.data('inputtype') || 'text')
+					var input = $('<input type="' + (option.data('inputtype') || 'text')
 							+ '" name="' + property.val()
 							+ '" class="input-medium removeonadd '
 							+ option.data('class') + '">').appendTo(td);
+					if(input.hasClass('double'))
+						input.attr('step','any');
 				}
 				if (size == 2)
 					$(':input', td).clone().appendTo(td).css('margin-left',
