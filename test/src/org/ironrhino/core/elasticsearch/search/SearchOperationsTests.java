@@ -3,6 +3,7 @@ package org.ironrhino.core.elasticsearch.search;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -32,7 +33,8 @@ public class SearchOperationsTests {
 		articleOperations.create(index);
 		int size = 20;
 		for (int i = 0; i < size; i++) {
-			Article article = new Article(String.valueOf(i + 1), i % 2 == 0 ? "title" : "test", "content", i);
+			Article article = new Article(String.valueOf(i + 1), i % 2 == 0 ? "title" : "test", "content", i,
+					LocalDateTime.of(2020, 5, i + 1, 0, 0));
 			articleOperations.index(index, article.getId(), article);
 		}
 		try {
@@ -69,6 +71,15 @@ public class SearchOperationsTests {
 		assertThat(buckets.get(0).getCount(), is(2));
 		assertThat(buckets.get(9).getKey(), is("18.0"));
 		assertThat(buckets.get(9).getCount(), is(2));
+
+		buckets = articleOperations.aggregate(index,
+				DateHistogramAggregation.of("createdAt", "calendar_interval", "1d", "yyyy-MM-dd"));
+		assertThat(buckets.size(), is(20));
+		assertThat(buckets.get(0).getKeyAsString(), is("2020-05-01"));
+		assertThat(buckets.get(0).getCount(), is(1));
+		assertThat(buckets.get(19).getKeyAsString(), is("2020-05-20"));
+		assertThat(buckets.get(19).getCount(), is(1));
+
 		for (int i = 0; i < size; i++) {
 			articleOperations.delete(index, String.valueOf(i + 1));
 		}

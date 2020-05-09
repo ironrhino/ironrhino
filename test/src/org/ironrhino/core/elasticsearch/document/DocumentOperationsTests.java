@@ -4,6 +4,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import java.time.LocalDateTime;
+
 import org.ironrhino.core.elasticsearch.Article;
 import org.ironrhino.core.elasticsearch.ArticleOperations;
 import org.ironrhino.core.elasticsearch.document.DocumentOperationsTests.Config;
@@ -25,7 +27,7 @@ public class DocumentOperationsTests {
 	@Test
 	public void test() {
 		String index = "article";
-		Article article = new Article("id", "title", "content", 0);
+		Article article = new Article("id", "title", "content", 0, LocalDateTime.now());
 		articleOperations.index(index, article.getId(), article);
 		assertThat(articleOperations.get(index, article.getId()), is(article));
 		article.setContent("content2");
@@ -33,7 +35,7 @@ public class DocumentOperationsTests {
 		assertThat(articleOperations.get(index, article.getId()), is(article));
 		articleOperations.delete(index, article.getId());
 		assertThat(articleOperations.get(index, article.getId()), is(nullValue()));
-
+		articleOperations.delete(index);
 	}
 
 	static class Config {

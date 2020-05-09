@@ -12,4 +12,7 @@ public class AggregationBucket {
 	@JsonProperty("doc_count")
 	private int count;
 
+	@JsonProperty("key_as_string")
+	private String keyAsString;
+
 }

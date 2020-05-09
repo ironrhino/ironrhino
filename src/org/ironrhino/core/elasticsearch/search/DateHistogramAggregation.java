@@ -11,9 +11,15 @@ public class DateHistogramAggregation extends BucketAggregation {
 	}
 
 	public static DateHistogramAggregation of(String field, String intervalType, String intervalValue) {
+		return of(field, intervalType, intervalValue, null);
+	}
+
+	public static DateHistogramAggregation of(String field, String intervalType, String intervalValue, String format) {
 		Map<String, Object> map = new HashMap<>();
 		map.put("field", field);
 		map.put(intervalType, intervalValue);
+		if (format != null)
+			map.put("format", format);
 		return new DateHistogramAggregation(
 				Collections.singletonMap("aggs", Collections.singletonMap("date_histogram", map)));
 	}
