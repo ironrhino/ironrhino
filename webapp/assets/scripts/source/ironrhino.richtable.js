@@ -912,21 +912,9 @@ Observation._richtable = function(container) {
 					if (!select.hasClass('required'))
 						$('<option value=""></option>').appendTo(select);
 					var map = option.data('map');
-					if (typeof map == 'object') {
-						for (var key in map)
-							$('<option value="' + key + '">' + map[key]
-									+ '</option>').appendTo(select);
-					} else {
-						if (map.indexOf('{') == 0)
-							map = map.substring(1, map.length - 1);
-						map = map.split(/,\s*/);
-						for (var i = 0; i < map.length; i++) {
-							var arr = map[i].split('=', 2);
-							$('<option value="' + arr[0] + '">'
-									+ (arr[1] || arr[0]) + '</option>')
-									.appendTo(select);
-						}
-					}
+					for (var key in map)
+						$('<option value="' + key + '">' + map[key]
+								+ '</option>').appendTo(select);
 				} else if ('treeselect' == type) {
 					$('<input name="' + property.val()
 							+ '" class="treeselect-inline required" data-url="'
@@ -954,17 +942,13 @@ Observation._richtable = function(container) {
 			} else if (size < 0) {
 				if ('select' == type) {
 					var map = option.data('map');
-					if (map.indexOf('{') == 0)
-						map = map.substring(1, map.length - 1);
-					map = map.split(/,\s*/);
-					for (var i = 0; i < map.length; i++) {
-						var arr = map[i].split('=', 2);
-						var cbid = '-filter-' + property.val() + '-' + i;
+					for (var key in map){
+						var cbid = '-filter-' + property.val() + '-' + key;
 						$('<label for="'
 								+ cbid
 								+ '" class="checkbox inline"><input type="checkbox" name="'
-								+ property.val() + '" value="' + arr[0]
-								+ '" id="' + cbid + '">' + (arr[1] || arr[0])
+								+ property.val() + '" value="' + key
+								+ '" id="' + cbid + '">' + (map[key] || key)
 								+ '</label>').appendTo(td);
 					}
 				} else if ('listpick' == type || 'treeselect' == type) {
