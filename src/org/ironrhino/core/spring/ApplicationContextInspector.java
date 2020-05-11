@@ -1,5 +1,6 @@
 package org.ironrhino.core.spring;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -146,8 +147,33 @@ public class ApplicationContextInspector {
 
 	private void add(Element element, List<String> list) throws Exception {
 		if (element.getTagName().equals("import")) {
-			add(resourcePatternResolver.getResource(element.getAttribute("resource")), list);
+			try {
+				Resource[] resources = resourcePatternResolver
+						.getResources(env.resolvePlaceholders(element.getAttribute("resource")));
+				for (Resource r : resources)
+					add(r, list);
+			} catch (IOException e) {
+			}
 			return;
+		}
+		if ("org.springframework.batch.core.configuration.support.ClasspathXmlApplicationContextsFactoryBean"
+				.equals(element.getAttribute("class"))) {
+			for (int i = 0; i < element.getChildNodes().getLength(); i++) {
+				Node node = element.getChildNodes().item(i);
+				if (node instanceof Element) {
+					Element ele = (Element) node;
+					if ("resources".equals(ele.getAttribute("name"))) {
+						try {
+							Resource[] resources = resourcePatternResolver
+									.getResources(env.resolvePlaceholders(ele.getAttribute("value")));
+							for (Resource r : resources)
+								add(r, list);
+						} catch (IOException e) {
+						}
+						return;
+					}
+				}
+			}
 		}
 		NamedNodeMap map = element.getAttributes();
 		for (int i = 0; i < map.getLength(); i++) {
