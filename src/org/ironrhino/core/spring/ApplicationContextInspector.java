@@ -154,8 +154,33 @@ public class ApplicationContextInspector {
 
 	private void add(Resource resource, Element element, Map<String, String> props) {
 		if (element.getTagName().equals("import")) {
-			add(resourcePatternResolver.getResource(element.getAttribute("resource")), props);
+			try {
+				Resource[] resources = resourcePatternResolver
+						.getResources(env.resolvePlaceholders(element.getAttribute("resource")));
+				for (Resource r : resources)
+					add(r, props);
+			} catch (IOException e) {
+			}
 			return;
+		}
+		if ("org.springframework.batch.core.configuration.support.ClasspathXmlApplicationContextsFactoryBean"
+				.equals(element.getAttribute("class"))) {
+			for (int i = 0; i < element.getChildNodes().getLength(); i++) {
+				Node node = element.getChildNodes().item(i);
+				if (node instanceof Element) {
+					Element ele = (Element) node;
+					if ("resources".equals(ele.getAttribute("name"))) {
+						try {
+							Resource[] resources = resourcePatternResolver
+									.getResources(env.resolvePlaceholders(ele.getAttribute("value")));
+							for (Resource r : resources)
+								add(r, props);
+						} catch (IOException e) {
+						}
+						return;
+					}
+				}
+			}
 		}
 		NamedNodeMap map = element.getAttributes();
 		for (int i = 0; i < map.getLength(); i++) {
