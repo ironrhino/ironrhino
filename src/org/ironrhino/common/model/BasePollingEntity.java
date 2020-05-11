@@ -20,6 +20,9 @@ public abstract class BasePollingEntity extends BaseEntity {
 
 	private static final long serialVersionUID = 3825969412916897020L;
 
+	@UiConfig(width = "130px", displayOrder = 94)
+	private Date scheduledFor;
+
 	@UiConfig(width = "80px", displayOrder = 95)
 	private int precedence;
 

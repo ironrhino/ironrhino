@@ -120,6 +120,7 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> implem
 		// normal
 		DetachedCriteria dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("status", PollingStatus.INITIALIZED));
+		dc.add(Restrictions.or(Restrictions.isNull("scheduledFor"), Restrictions.le("scheduledFor", new Date())));
 		doEnqueue(dc, Mode.NORMAL);
 
 		if (current % 5 == 1) {
