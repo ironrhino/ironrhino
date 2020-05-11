@@ -2,9 +2,8 @@ package org.ironrhino.core.spring;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -47,16 +46,17 @@ public class ApplicationContextInspector {
 
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
-	private SingletonSupplier<Map<String, String>> overridedPropertiesSupplier = SingletonSupplier.of(() -> {
-		Map<String, String> overridedProperties = new TreeMap<>();
-		for (PropertySource<?> ps : env.getPropertySources()) {
-			addOverridedProperties(overridedProperties, ps);
-		}
-		return Collections.unmodifiableMap(overridedProperties);
-	});
+	private SingletonSupplier<Map<String, PropertyDescriptor>> overridedPropertiesSupplier = SingletonSupplier
+			.of(() -> {
+				Map<String, PropertyDescriptor> overridedProperties = new TreeMap<>();
+				for (PropertySource<?> ps : env.getPropertySources()) {
+					addOverridedProperties(overridedProperties, ps);
+				}
+				return Collections.unmodifiableMap(overridedProperties);
+			});
 
-	private SingletonSupplier<Map<String, String>> defaultPropertiesSupplier = SingletonSupplier.of(() -> {
-		List<String> list = new ArrayList<>();
+	private SingletonSupplier<Map<String, PropertyDescriptor>> defaultPropertiesSupplier = SingletonSupplier.of(() -> {
+		Map<String, String> props = new HashMap<>();
 		for (String s : ctx.getBeanDefinitionNames()) {
 			BeanDefinition bd = ctx.getBeanDefinition(s);
 			String clz = bd.getBeanClassName();
@@ -64,13 +64,14 @@ public class ApplicationContextInspector {
 				continue;
 			}
 			try {
-				ReflectionUtils.doWithFields(Class.forName(clz), field -> {
-					list.add(field.getAnnotation(Value.class).value());
+				Class<?> clazz = Class.forName(clz);
+				ReflectionUtils.doWithFields(clazz, field -> {
+					props.put(field.getAnnotation(Value.class).value(), formatClassName(clazz));
 				}, field -> {
 					return field.isAnnotationPresent(Value.class);
 				});
 				ReflectionUtils.doWithMethods(Class.forName(clz), method -> {
-					list.add(method.getAnnotation(Value.class).value());
+					props.put(method.getAnnotation(Value.class).value(), formatClassName(clazz));
 				}, method -> {
 					return method.isAnnotationPresent(Value.class);
 				});
@@ -83,38 +84,39 @@ public class ApplicationContextInspector {
 		try {
 			for (Resource resource : resourcePatternResolver
 					.getResources("classpath*:resources/spring/applicationContext-*.xml"))
-				add(resource, list);
+				add(resource, props);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 		for (Class<?> clazz : ClassScanner.scanAssignable(ClassScanner.getAppPackages(), ActionSupport.class)) {
 			ReflectionUtils.doWithFields(clazz, field -> {
-				list.add(field.getAnnotation(Value.class).value());
+				props.put(field.getAnnotation(Value.class).value(), formatClassName(clazz));
 			}, field -> {
 				return field.isAnnotationPresent(Value.class);
 			});
 		}
-		Map<String, String> defaultProperties = new TreeMap<>();
-		for (String str : list) {
-			int start = str.indexOf("${");
-			int end = str.lastIndexOf("}");
+		Map<String, PropertyDescriptor> defaultProperties = new TreeMap<>();
+		props.forEach((k, v) -> {
+			int start = k.indexOf("${");
+			int end = k.lastIndexOf("}");
 			if (start > -1 && end > start) {
-				str = str.substring(start + 2, end);
-				String[] arr = str.split(":", 2);
+				k = k.substring(start + 2, end);
+				String[] arr = k.split(":", 2);
 				if (arr.length > 1)
-					defaultProperties.put(arr[0], arr[1]);
+					defaultProperties.put(arr[0], new PropertyDescriptor(arr[1], v));
 			}
-		}
-		ctx.getBeanProvider(DefaultPropertiesProvider.class)
-				.forEach(p -> defaultProperties.putAll(p.getDefaultProperties()));
+		});
+
+		ctx.getBeanProvider(DefaultPropertiesProvider.class).forEach(p -> p.getDefaultProperties()
+				.forEach((k, v) -> defaultProperties.put(k, new PropertyDescriptor(v, formatClassName(p.getClass())))));
 		return Collections.unmodifiableMap(defaultProperties);
 	});
 
-	public Map<String, String> getOverridedProperties() {
+	public Map<String, PropertyDescriptor> getOverridedProperties() {
 		return overridedPropertiesSupplier.obtain();
 	}
 
-	private void addOverridedProperties(Map<String, String> properties, PropertySource<?> propertySource) {
+	private void addOverridedProperties(Map<String, PropertyDescriptor> properties, PropertySource<?> propertySource) {
 		String name = propertySource.getName();
 		if (name != null && name.startsWith("servlet"))
 			return;
@@ -124,8 +126,8 @@ public class ApplicationContextInspector {
 				if (!(propertySource instanceof ResourcePropertySource) && !getDefaultProperties().containsKey(s))
 					continue;
 				if (!properties.containsKey(s))
-					properties.put(s, s.endsWith(".password") ? "********" : String.valueOf(ps.getProperty(s)));
-
+					properties.put(s, new PropertyDescriptor(
+							s.endsWith(".password") ? "********" : String.valueOf(ps.getProperty(s)), name));
 			}
 		} else if (propertySource instanceof CompositePropertySource) {
 			for (PropertySource<?> ps : ((CompositePropertySource) propertySource).getPropertySources()) {
@@ -134,44 +136,54 @@ public class ApplicationContextInspector {
 		}
 	}
 
-	public Map<String, String> getDefaultProperties() {
+	public Map<String, PropertyDescriptor> getDefaultProperties() {
 		return defaultPropertiesSupplier.obtain();
 	}
 
 	DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
 
-	private void add(Resource resource, List<String> list) {
+	private void add(Resource resource, Map<String, String> props) {
 		if (resource.isReadable())
 			try (InputStream is = resource.getInputStream()) {
 				Document doc = builderFactory.newDocumentBuilder().parse(new InputSource(is));
-				add(doc.getDocumentElement(), list);
+				add(resource, doc.getDocumentElement(), props);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 	}
 
-	private void add(Element element, List<String> list) {
+	private void add(Resource resource, Element element, Map<String, String> props) {
 		if (element.getTagName().equals("import")) {
-			add(resourcePatternResolver.getResource(element.getAttribute("resource")), list);
+			add(resourcePatternResolver.getResource(element.getAttribute("resource")), props);
 			return;
 		}
 		NamedNodeMap map = element.getAttributes();
 		for (int i = 0; i < map.getLength(); i++) {
 			Attr attr = (Attr) map.item(i);
 			if (attr.getValue().contains("${"))
-				list.add(attr.getValue());
+				props.put(attr.getValue(), resource.toString());
 		}
 		for (int i = 0; i < element.getChildNodes().getLength(); i++) {
 			Node node = element.getChildNodes().item(i);
 			if (node instanceof Text) {
 				Text text = (Text) node;
 				if (text.getTextContent().contains("${"))
-					list.add(text.getTextContent());
+					props.put(text.getTextContent(), resource.toString());
 			} else if (node instanceof Element) {
-				add((Element) node, list);
+				add(resource, (Element) node, props);
 			}
 		}
+	}
 
+	private static String formatClassName(Class<?> clazz) {
+		return String.format("class [%s]",
+				org.ironrhino.core.util.ReflectionUtils.getActualClass(clazz).getCanonicalName());
+	}
+
+	@lombok.Value
+	public static class PropertyDescriptor {
+		private String value;
+		private String source;
 	}
 
 }
