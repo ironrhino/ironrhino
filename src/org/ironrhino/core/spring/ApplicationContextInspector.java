@@ -17,6 +17,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.env.CompositePropertySource;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -113,12 +114,18 @@ public class ApplicationContextInspector {
 		return overridedPropertiesSupplier.obtain();
 	}
 
-	private static void addOverridedProperties(Map<String, String> properties, PropertySource<?> propertySource) {
-		if (propertySource instanceof ResourcePropertySource) {
-			ResourcePropertySource rps = (ResourcePropertySource) propertySource;
-			for (String s : rps.getPropertyNames()) {
+	private void addOverridedProperties(Map<String, String> properties, PropertySource<?> propertySource) {
+		String name = propertySource.getName();
+		if (name != null && name.startsWith("servlet"))
+			return;
+		if (propertySource instanceof EnumerablePropertySource) {
+			EnumerablePropertySource<?> ps = (EnumerablePropertySource<?>) propertySource;
+			for (String s : ps.getPropertyNames()) {
+				if (!(propertySource instanceof ResourcePropertySource) && !getDefaultProperties().containsKey(s))
+					continue;
 				if (!properties.containsKey(s))
-					properties.put(s, s.endsWith(".password") ? "********" : String.valueOf(rps.getProperty(s)));
+					properties.put(s, s.endsWith(".password") ? "********" : String.valueOf(ps.getProperty(s)));
+
 			}
 		} else if (propertySource instanceof CompositePropertySource) {
 			for (PropertySource<?> ps : ((CompositePropertySource) propertySource).getPropertySources()) {

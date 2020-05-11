@@ -32,16 +32,9 @@ public class PropertiesAction extends BaseAction {
 		for (Map.Entry<String, String> entry : defaultProperties.entrySet()) {
 			String key = entry.getKey();
 			String value = entry.getValue();
-			boolean fromSystemProperty = false;
 			String overridedValue = overridedProperties.get(key);
-			if (overridedValue == null) {
-				overridedValue = System.getProperty(key);
-				if (overridedValue != null)
-					fromSystemProperty = true;
-			}
 			if (overridedValue != null && !overridedValue.equals(value) && !key.startsWith("app.")) {
-				writer.write(
-						"#" + key + '=' + value + (fromSystemProperty ? " # overrided by system property\n" : "\n"));
+				writer.write("#" + key + '=' + value + "\n");
 			}
 			writer.write(key + '=' + (overridedValue != null ? overridedValue : value) + "\n");
 		}
