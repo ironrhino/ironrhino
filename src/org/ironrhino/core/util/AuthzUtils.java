@@ -209,7 +209,7 @@ public class AuthzUtils {
 	@SuppressWarnings("unchecked")
 	public static <T extends UserDetails> T getUserDetails(Class<T> clazz) {
 		UserDetails ud = getUserDetails();
-		return ud != null && clazz.isAssignableFrom(ud.getClass()) ? (T) ud : null;
+		return ud != null && clazz.isInstance(ud) ? (T) ud : null;
 	}
 
 	public static void autoLogin(UserDetails ud) {
@@ -247,7 +247,7 @@ public class AuthzUtils {
 		UserDetails ud = DOUBLE_CHCKER_HOLDER.get();
 		if (ud == null)
 			return null;
-		if (clazz.isAssignableFrom(ud.getClass()))
+		if (clazz.isInstance(ud))
 			return (T) ud;
 		return null;
 	}

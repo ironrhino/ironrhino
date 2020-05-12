@@ -31,8 +31,8 @@ public abstract class AbstractEntity<PK extends Serializable> implements Persist
 			return false;
 		if (object == this)
 			return true;
-		if (!this.getClass().isAssignableFrom(object.getClass())
-				&& !object.getClass().isAssignableFrom(this.getClass()))
+		if (!this.getClass().isInstance(object)
+				&& !object.getClass().isInstance(this))
 			return false;
 		Map<String, Object> naturalIds = AnnotationUtils.getAnnotatedPropertyNameAndValues(this, NaturalId.class);
 		if (!naturalIds.isEmpty()) {

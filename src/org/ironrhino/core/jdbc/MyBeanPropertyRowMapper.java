@@ -165,7 +165,7 @@ class MyBeanPropertyRowMapper<T> implements RowMapper<T> {
 						if (fromFind) {
 							bw.setPropertyValue(column, value);
 						} else {
-							if (value == null || pd.getPropertyType().isAssignableFrom(value.getClass())) {
+							if (value == null || pd.getPropertyType().isInstance(value)) {
 								try {
 									// https://github.com/spring-projects/spring-framework/blob/098ac0bbb88cd178e85b7dc31642bed091560316/spring-core/src/main/java/org/springframework/core/convert/TypeDescriptor.java#L501
 									// Annotation.equals is expensive cause bw.setPropertyValue() is costly
