@@ -51,13 +51,13 @@ public class ApplicationContextInspector {
 
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
-	private SingletonSupplier<Map<String, ApplicationProperty>> overridedPropertiesSupplier = SingletonSupplier
+	private SingletonSupplier<Map<String, ApplicationProperty>> overridenPropertiesSupplier = SingletonSupplier
 			.of(() -> {
-				Map<String, ApplicationProperty> overridedProperties = new TreeMap<>();
+				Map<String, ApplicationProperty> overridenProperties = new TreeMap<>();
 				for (PropertySource<?> ps : env.getPropertySources()) {
-					addOverridedProperties(overridedProperties, ps);
+					addOverridenProperties(overridenProperties, ps);
 				}
-				return Collections.unmodifiableMap(overridedProperties);
+				return Collections.unmodifiableMap(overridenProperties);
 			});
 
 	private SingletonSupplier<Map<String, ApplicationProperty>> defaultPropertiesSupplier = SingletonSupplier.of(() -> {
@@ -131,11 +131,11 @@ public class ApplicationContextInspector {
 		return Collections.unmodifiableMap(defaultProperties);
 	});
 
-	public Map<String, ApplicationProperty> getOverridedProperties() {
-		return overridedPropertiesSupplier.obtain();
+	public Map<String, ApplicationProperty> getOverridenProperties() {
+		return overridenPropertiesSupplier.obtain();
 	}
 
-	private void addOverridedProperties(Map<String, ApplicationProperty> properties, PropertySource<?> propertySource) {
+	private void addOverridenProperties(Map<String, ApplicationProperty> properties, PropertySource<?> propertySource) {
 		String name = propertySource.getName();
 		if (name != null && name.startsWith("servlet"))
 			return;
@@ -153,7 +153,7 @@ public class ApplicationContextInspector {
 			}
 		} else if (propertySource instanceof CompositePropertySource) {
 			for (PropertySource<?> ps : ((CompositePropertySource) propertySource).getPropertySources()) {
-				addOverridedProperties(properties, ps);
+				addOverridenProperties(properties, ps);
 			}
 		}
 	}
@@ -238,7 +238,7 @@ public class ApplicationContextInspector {
 			return format(String.join(", ", list));
 		}
 
-		public String getOverridingSource() {
+		public String getOverridenSource() {
 			String source = sources.size() > 0 ? sources.get(0) : null;
 			return format(extract(source));
 		}
