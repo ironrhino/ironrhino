@@ -45,27 +45,27 @@ public class ApplicationContextInspector {
 
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
-	private volatile Map<String, String> overridedProperties;
+	private volatile Map<String, String> overridenProperties;
 
 	private volatile Map<String, String> defaultProperties;
 
-	public Map<String, String> getOverridedProperties() {
-		Map<String, String> temp = overridedProperties;
+	public Map<String, String> getOverridenProperties() {
+		Map<String, String> temp = overridenProperties;
 		if (temp == null) {
 			synchronized (this) {
-				if ((temp = overridedProperties) == null) {
+				if ((temp = overridenProperties) == null) {
 					Map<String, String> map = new TreeMap<>();
 					for (PropertySource<?> ps : env.getPropertySources()) {
-						addOverridedProperties(map, ps);
+						addOverridenProperties(map, ps);
 					}
-					overridedProperties = temp = Collections.unmodifiableMap(map);
+					overridenProperties = temp = Collections.unmodifiableMap(map);
 				}
 			}
 		}
 		return temp;
 	}
 
-	private static void addOverridedProperties(Map<String, String> properties, PropertySource<?> propertySource) {
+	private static void addOverridenProperties(Map<String, String> properties, PropertySource<?> propertySource) {
 		if (propertySource instanceof ResourcePropertySource) {
 			ResourcePropertySource rps = (ResourcePropertySource) propertySource;
 			for (String s : rps.getPropertyNames()) {
@@ -74,7 +74,7 @@ public class ApplicationContextInspector {
 			}
 		} else if (propertySource instanceof CompositePropertySource) {
 			for (PropertySource<?> ps : ((CompositePropertySource) propertySource).getPropertySources()) {
-				addOverridedProperties(properties, ps);
+				addOverridenProperties(properties, ps);
 			}
 		}
 	}

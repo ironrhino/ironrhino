@@ -28,36 +28,36 @@ public class PropertiesAction extends BaseAction {
 		response.setContentType("text/plain");
 		Writer writer = response.getWriter();
 		Map<String, String> defaultProperties = applicationContextInspector.getDefaultProperties();
-		Map<String, String> overridedProperties = applicationContextInspector.getOverridedProperties();
+		Map<String, String> overridenProperties = applicationContextInspector.getOverridenProperties();
 		for (Map.Entry<String, String> entry : defaultProperties.entrySet()) {
 			String key = entry.getKey();
 			String value = entry.getValue();
 			boolean fromSystemProperty = false;
-			String overridedValue = overridedProperties.get(key);
-			if (overridedValue == null) {
-				overridedValue = System.getProperty(key);
-				if (overridedValue != null)
+			String overridenValue = overridenProperties.get(key);
+			if (overridenValue == null) {
+				overridenValue = System.getProperty(key);
+				if (overridenValue != null)
 					fromSystemProperty = true;
 			}
-			if (overridedValue != null && !overridedValue.equals(value) && !key.startsWith("app.")) {
+			if (overridenValue != null && !overridenValue.equals(value) && !key.startsWith("app.")) {
 				writer.write(
-						"#" + key + '=' + value + (fromSystemProperty ? " # overrided by system property\n" : "\n"));
+						"#" + key + '=' + value + (fromSystemProperty ? " # overriden by system property\n" : "\n"));
 			}
-			writer.write(key + '=' + (overridedValue != null ? overridedValue : value) + "\n");
+			writer.write(key + '=' + (overridenValue != null ? overridenValue : value) + "\n");
 		}
 		writer.write("\n");
-		for (Map.Entry<String, String> entry : overridedProperties.entrySet())
+		for (Map.Entry<String, String> entry : overridenProperties.entrySet())
 			if (!defaultProperties.containsKey(entry.getKey()))
 				writer.write(entry.getKey() + '=' + entry.getValue() + "\n");
 		return NONE;
 	}
 
-	public String overrided() throws Exception {
+	public String overriden() throws Exception {
 		HttpServletResponse response = ServletActionContext.getResponse();
 		response.setContentType("text/plain");
 		Writer writer = response.getWriter();
-		Map<String, String> overridedProperties = applicationContextInspector.getOverridedProperties();
-		for (Map.Entry<String, String> entry : overridedProperties.entrySet())
+		Map<String, String> overridenProperties = applicationContextInspector.getOverridenProperties();
+		for (Map.Entry<String, String> entry : overridenProperties.entrySet())
 			writer.write(entry.getKey() + '=' + entry.getValue() + "\n");
 		return NONE;
 	}
