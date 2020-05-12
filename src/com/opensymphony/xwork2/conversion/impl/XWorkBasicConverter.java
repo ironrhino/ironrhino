@@ -54,7 +54,7 @@ import java.util.Map;
  * @author Rainer Hermanns
  * @author <a href='mailto:the_mindstorm[at]evolva[dot]ro'>Alexandru Popescu</a>
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings("rawtypes")
 public class XWorkBasicConverter extends DefaultTypeConverter {
 
     private Container container;
@@ -68,7 +68,7 @@ public class XWorkBasicConverter extends DefaultTypeConverter {
     public Object convertValue(Map<String, Object> context, Object o, Member member, String propertyName, Object value, Class toType) {
         Object result = null;
 
-        if (value == null || toType.isAssignableFrom(value.getClass())) {
+        if (value == null || toType.isInstance(value)) {
             // no need to convert at all, right?
             return value;
         }

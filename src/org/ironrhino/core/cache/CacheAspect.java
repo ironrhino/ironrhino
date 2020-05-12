@@ -60,7 +60,7 @@ public class CacheAspect extends BaseAspect {
 			}
 			if (value != null) {
 				if (returnType.isPrimitive() && value.getClass() == ClassUtils.primitiveToWrapper(returnType)
-						|| returnType.isAssignableFrom(value.getClass())) {
+						|| returnType.isInstance(value)) {
 					putReturnValueIntoContext(context, value);
 					ExpressionUtils.eval(checkCache.onHit(), context);
 					instrument(namespace, true);
@@ -89,7 +89,7 @@ public class CacheAspect extends BaseAspect {
 				}
 				if (value != null) {
 					if (returnType.isPrimitive() && value.getClass() == ClassUtils.primitiveToWrapper(returnType)
-							|| returnType.isAssignableFrom(value.getClass())) {
+							|| returnType.isInstance(value)) {
 						putReturnValueIntoContext(context, value);
 						ExpressionUtils.eval(checkCache.onHit(), context);
 						instrument(namespace, true);

@@ -185,7 +185,7 @@ public class Component {
             //for (int i = componentStack.size() - 2; i >= 0; i--) {
             for (int i = start; i >=0; i--) {
                 Component component = (Component) componentStack.get(i);
-                if (clazz.isAssignableFrom(component.getClass()) && component != this) {
+                if (clazz.isInstance(component) && component != this) {
                     return component;
                 }
             }

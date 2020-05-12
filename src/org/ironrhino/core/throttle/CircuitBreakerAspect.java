@@ -43,7 +43,7 @@ public class CircuitBreakerAspect extends BaseAspect {
 
 	private static boolean matches(Throwable failure, Class<? extends Throwable>[] types) {
 		for (Class<? extends Throwable> type : types)
-			if (type.isAssignableFrom(failure.getClass()))
+			if (type.isInstance(failure))
 				return true;
 		return false;
 	}

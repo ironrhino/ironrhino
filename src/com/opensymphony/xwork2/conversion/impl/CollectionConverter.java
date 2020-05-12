@@ -38,7 +38,7 @@ public class CollectionConverter extends DefaultTypeConverter {
 			}
 		}
 
-		if (toType.isAssignableFrom(value.getClass())) {
+		if (toType.isInstance(value)) {
 			// no need to do anything
 			result = (Collection) value;
 		} else if (value instanceof Object[]) {
@@ -53,7 +53,7 @@ public class CollectionConverter extends DefaultTypeConverter {
 					result.add(convertedValue);
 				}
 			}
-		} else if (Collection.class.isAssignableFrom(value.getClass())) {
+		} else if (Collection.class.isInstance(value)) {
 			Collection col = (Collection) value;
 			TypeConverter converter = getTypeConverter(context);
 			result = createCollection(toType, memberType, col.size());

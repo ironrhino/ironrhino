@@ -87,7 +87,7 @@ public class ServletContainerHelper {
 				Method getParent = container.getClass().getMethod("getParent");
 				Object c = getParent.invoke(container);
 				Class<?> standardEngineClass = Class.forName("org.apache.catalina.core.StandardEngine");
-				while (c != null && !(standardEngineClass.isAssignableFrom(c.getClass())))
+				while (c != null && !(standardEngineClass.isInstance(c)))
 					c = getParent.invoke(c);
 				if (c != null) {
 					Object service = standardEngineClass.getMethod("getService").invoke(c);
