@@ -46,16 +46,16 @@ public class ApplicationContextInspector {
 
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
-	private SingletonSupplier<Map<String, PropertyDescriptor>> overridedPropertiesSupplier = SingletonSupplier
+	private SingletonSupplier<Map<String, ApplicationProperty>> overridedPropertiesSupplier = SingletonSupplier
 			.of(() -> {
-				Map<String, PropertyDescriptor> overridedProperties = new TreeMap<>();
+				Map<String, ApplicationProperty> overridedProperties = new TreeMap<>();
 				for (PropertySource<?> ps : env.getPropertySources()) {
 					addOverridedProperties(overridedProperties, ps);
 				}
 				return Collections.unmodifiableMap(overridedProperties);
 			});
 
-	private SingletonSupplier<Map<String, PropertyDescriptor>> defaultPropertiesSupplier = SingletonSupplier.of(() -> {
+	private SingletonSupplier<Map<String, ApplicationProperty>> defaultPropertiesSupplier = SingletonSupplier.of(() -> {
 		Map<String, String> props = new HashMap<>();
 		for (String s : ctx.getBeanDefinitionNames()) {
 			BeanDefinition bd = ctx.getBeanDefinition(s);
@@ -95,7 +95,7 @@ public class ApplicationContextInspector {
 				return field.isAnnotationPresent(Value.class);
 			});
 		}
-		Map<String, PropertyDescriptor> defaultProperties = new TreeMap<>();
+		Map<String, ApplicationProperty> defaultProperties = new TreeMap<>();
 		props.forEach((k, v) -> {
 			int start = k.indexOf("${");
 			int end = k.lastIndexOf("}");
@@ -103,20 +103,20 @@ public class ApplicationContextInspector {
 				k = k.substring(start + 2, end);
 				String[] arr = k.split(":", 2);
 				if (arr.length > 1)
-					defaultProperties.put(arr[0], new PropertyDescriptor(arr[1], v));
+					defaultProperties.put(arr[0], new ApplicationProperty(arr[1], v));
 			}
 		});
 
-		ctx.getBeanProvider(DefaultPropertiesProvider.class).forEach(p -> p.getDefaultProperties()
-				.forEach((k, v) -> defaultProperties.put(k, new PropertyDescriptor(v, formatClassName(p.getClass())))));
+		ctx.getBeanProvider(DefaultPropertiesProvider.class).forEach(p -> p.getDefaultProperties().forEach(
+				(k, v) -> defaultProperties.put(k, new ApplicationProperty(v, formatClassName(p.getClass())))));
 		return Collections.unmodifiableMap(defaultProperties);
 	});
 
-	public Map<String, PropertyDescriptor> getOverridedProperties() {
+	public Map<String, ApplicationProperty> getOverridedProperties() {
 		return overridedPropertiesSupplier.obtain();
 	}
 
-	private void addOverridedProperties(Map<String, PropertyDescriptor> properties, PropertySource<?> propertySource) {
+	private void addOverridedProperties(Map<String, ApplicationProperty> properties, PropertySource<?> propertySource) {
 		String name = propertySource.getName();
 		if (name != null && name.startsWith("servlet"))
 			return;
@@ -126,7 +126,7 @@ public class ApplicationContextInspector {
 				if (!(propertySource instanceof ResourcePropertySource) && !getDefaultProperties().containsKey(s))
 					continue;
 				if (!properties.containsKey(s))
-					properties.put(s, new PropertyDescriptor(
+					properties.put(s, new ApplicationProperty(
 							s.endsWith(".password") ? "********" : String.valueOf(ps.getProperty(s)), name));
 			}
 		} else if (propertySource instanceof CompositePropertySource) {
@@ -136,7 +136,7 @@ public class ApplicationContextInspector {
 		}
 	}
 
-	public Map<String, PropertyDescriptor> getDefaultProperties() {
+	public Map<String, ApplicationProperty> getDefaultProperties() {
 		return defaultPropertiesSupplier.obtain();
 	}
 
@@ -206,7 +206,7 @@ public class ApplicationContextInspector {
 	}
 
 	@lombok.Value
-	public static class PropertyDescriptor {
+	public static class ApplicationProperty {
 		private String value;
 		private String source;
 	}
