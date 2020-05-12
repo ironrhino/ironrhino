@@ -51,8 +51,6 @@
 	<property name="security-config-http-sources-jar.includes" value="resources/spring/applicationContext-security-http.xml" />
 	<property name="security-loginrecord-sources-jar.name" value="ironrhino-security-loginrecord-${version}-sources.jar" />
 	<property name="security-loginrecord-sources-jar.includes" value="org/ironrhino/security/**/LoginRecord*" />
-	<property name="security-oauth-client-sources-jar.name" value="ironrhino-security-oauth-client-${version}-sources.jar" />
-	<property name="security-oauth-client-sources-jar.includes" value="org/ironrhino/security/oauth/package-info.java,org/ironrhino/security/oauth/client/**,resources/view/oauth/connect.ftl" />
 	<property name="security-oauth-server-sources-jar.name" value="ironrhino-security-oauth-server-${version}-sources.jar" />
 	<property name="security-oauth-server-sources-jar.includes" value="org/ironrhino/security/oauth/package-info.java,org/ironrhino/security/oauth/server/**,resources/i18n/security/oauth/**,resources/view/oauth/auth**" />
 	<property name="security-remoting-provider-sources-jar.name" value="ironrhino-security-remoting-provider-sources-${version}.jar" />
@@ -118,7 +116,6 @@
 		<delete file="${target.dir}/${security-config-base-sources-jar.name}" />
 		<delete file="${target.dir}/${security-config-http-sources-jar.name}" />
 		<delete file="${target.dir}/${security-loginrecord-sources-jar.name}" />
-		<delete file="${target.dir}/${security-oauth-client-sources-jar.name}" />
 		<delete file="${target.dir}/${security-oauth-server-sources-jar.name}" />
 		<delete file="${target.dir}/${security-remoting-provider-sources-jar.name}" />
 		<delete file="${target.dir}/${security-remoting-sources-jar.name}" />
@@ -311,7 +308,7 @@
 				<attribute name="Build-Revision" value="${revision}" />
 			</manifest>
 		</jar>
-		<jar jarfile="${target.dir}/${security-sources-jar.name}" basedir="${src.dir}" includes="org/ironrhino/security/**,resources/view/user_*.ftl" excludes="${security-config-sources-jar.includes},${security-loginrecord-sources-jar.includes},${security-remoting-provider-sources-jar.includes},${security-oauth-client-sources-jar.includes},${security-oauth-server-sources-jar.includes}">
+		<jar jarfile="${target.dir}/${security-sources-jar.name}" basedir="${src.dir}" includes="org/ironrhino/security/**,resources/view/user_*.ftl" excludes="${security-config-sources-jar.includes},${security-loginrecord-sources-jar.includes},${security-remoting-provider-sources-jar.includes},${security-oauth-server-sources-jar.includes}">
 			<manifest>
 				<attribute name="Implementation-Title" value="ironrhino-security" />
 				<attribute name="Implementation-Vendor" value="ironrhino" />
@@ -362,17 +359,6 @@
 				<attribute name="Implementation-Version" value="${version}" />
 				<attribute name="Ironrhino-Component-Id" value="ironrhino-security-loginrecord" />
 				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-security" />
-				<attribute name="Build-Timestamp" value="${timestamp}" />
-				<attribute name="Build-Revision" value="${revision}" />
-			</manifest>
-		</jar>
-		<jar jarfile="${target.dir}/${security-oauth-client-sources-jar.name}" basedir="${src.dir}" includes="${security-oauth-client-sources-jar.includes}">
-			<manifest>
-				<attribute name="Implementation-Title" value="ironrhino-security-oauth-client" />
-				<attribute name="Implementation-Vendor" value="ironrhino" />
-				<attribute name="Implementation-Version" value="${version}" />
-				<attribute name="Ironrhino-Component-Id" value="ironrhino-security-oauth-client" />
-				<attribute name="Ironrhino-Component-Dependence" value="ironrhino-core,ironrhino-common-setting,ironrhino-security" />
 				<attribute name="Build-Timestamp" value="${timestamp}" />
 				<attribute name="Build-Revision" value="${revision}" />
 			</manifest>
