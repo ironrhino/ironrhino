@@ -2,10 +2,15 @@ package org.ironrhino.core.spring;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -56,7 +61,7 @@ public class ApplicationContextInspector {
 			});
 
 	private SingletonSupplier<Map<String, ApplicationProperty>> defaultPropertiesSupplier = SingletonSupplier.of(() -> {
-		Map<String, String> props = new HashMap<>();
+		Map<String, Set<String>> props = new HashMap<>();
 		for (String s : ctx.getBeanDefinitionNames()) {
 			BeanDefinition bd = ctx.getBeanDefinition(s);
 			String clz = bd.getBeanClassName();
@@ -66,12 +71,14 @@ public class ApplicationContextInspector {
 			try {
 				Class<?> clazz = Class.forName(clz);
 				ReflectionUtils.doWithFields(clazz, field -> {
-					props.put(field.getAnnotation(Value.class).value(), formatClassName(clazz));
+					props.computeIfAbsent(field.getAnnotation(Value.class).value(), k -> new TreeSet<>())
+							.add(formatClassName(field.getDeclaringClass()));
 				}, field -> {
 					return field.isAnnotationPresent(Value.class);
 				});
-				ReflectionUtils.doWithMethods(Class.forName(clz), method -> {
-					props.put(method.getAnnotation(Value.class).value(), formatClassName(clazz));
+				ReflectionUtils.doWithMethods(clazz, method -> {
+					props.computeIfAbsent(method.getAnnotation(Value.class).value(), k -> new TreeSet<>())
+							.add(formatClassName(method.getDeclaringClass()));
 				}, method -> {
 					return method.isAnnotationPresent(Value.class);
 				});
@@ -90,9 +97,16 @@ public class ApplicationContextInspector {
 		}
 		for (Class<?> clazz : ClassScanner.scanAssignable(ClassScanner.getAppPackages(), ActionSupport.class)) {
 			ReflectionUtils.doWithFields(clazz, field -> {
-				props.put(field.getAnnotation(Value.class).value(), formatClassName(clazz));
+				props.computeIfAbsent(field.getAnnotation(Value.class).value(), k -> new TreeSet<>())
+						.add(formatClassName(field.getDeclaringClass()));
 			}, field -> {
 				return field.isAnnotationPresent(Value.class);
+			});
+			ReflectionUtils.doWithMethods(clazz, method -> {
+				props.computeIfAbsent(method.getAnnotation(Value.class).value(), k -> new TreeSet<>())
+						.add(formatClassName(method.getDeclaringClass()));
+			}, method -> {
+				return method.isAnnotationPresent(Value.class);
 			});
 		}
 		Map<String, ApplicationProperty> defaultProperties = new TreeMap<>();
@@ -102,13 +116,18 @@ public class ApplicationContextInspector {
 			if (start > -1 && end > start) {
 				k = k.substring(start + 2, end);
 				String[] arr = k.split(":", 2);
-				if (arr.length > 1)
-					defaultProperties.put(arr[0], new ApplicationProperty(arr[1], v));
+				if (arr.length > 1) {
+					ApplicationProperty ap = new ApplicationProperty(arr[1]);
+					ap.getSources().addAll(v);
+					defaultProperties.put(arr[0], ap);
+				}
 			}
 		});
 
-		ctx.getBeanProvider(DefaultPropertiesProvider.class).forEach(p -> p.getDefaultProperties().forEach(
-				(k, v) -> defaultProperties.put(k, new ApplicationProperty(v, formatClassName(p.getClass())))));
+		ctx.getBeanProvider(DefaultPropertiesProvider.class).forEach(p -> p.getDefaultProperties().forEach((k, v) -> {
+			ApplicationProperty ap = defaultProperties.computeIfAbsent(k, s -> new ApplicationProperty(v));
+			ap.getSources().add(formatClassName(org.ironrhino.core.util.ReflectionUtils.getActualClass(p.getClass())));
+		}));
 		return Collections.unmodifiableMap(defaultProperties);
 	});
 
@@ -125,9 +144,12 @@ public class ApplicationContextInspector {
 			for (String s : ps.getPropertyNames()) {
 				if (!(propertySource instanceof ResourcePropertySource) && !getDefaultProperties().containsKey(s))
 					continue;
-				if (!properties.containsKey(s))
-					properties.put(s, new ApplicationProperty(
-							s.endsWith(".password") ? "********" : String.valueOf(ps.getProperty(s)), name));
+				if (!properties.containsKey(s)) {
+					ApplicationProperty ap = new ApplicationProperty(
+							s.endsWith(".password") ? "********" : String.valueOf(ps.getProperty(s)));
+					ap.getSources().add(name);
+					properties.put(s, ap);
+				}
 			}
 		} else if (propertySource instanceof CompositePropertySource) {
 			for (PropertySource<?> ps : ((CompositePropertySource) propertySource).getPropertySources()) {
@@ -142,7 +164,7 @@ public class ApplicationContextInspector {
 
 	DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
 
-	private void add(Resource resource, Map<String, String> props) {
+	private void add(Resource resource, Map<String, Set<String>> props) {
 		if (resource.isReadable())
 			try (InputStream is = resource.getInputStream()) {
 				Document doc = builderFactory.newDocumentBuilder().parse(new InputSource(is));
@@ -152,7 +174,7 @@ public class ApplicationContextInspector {
 			}
 	}
 
-	private void add(Resource resource, Element element, Map<String, String> props) {
+	private void add(Resource resource, Element element, Map<String, Set<String>> props) {
 		if (element.getTagName().equals("import")) {
 			try {
 				Resource[] resources = resourcePatternResolver
@@ -186,14 +208,14 @@ public class ApplicationContextInspector {
 		for (int i = 0; i < map.getLength(); i++) {
 			Attr attr = (Attr) map.item(i);
 			if (attr.getValue().contains("${"))
-				props.put(attr.getValue(), resource.toString());
+				props.computeIfAbsent(attr.getValue(), k -> new TreeSet<>()).add(resource.toString());
 		}
 		for (int i = 0; i < element.getChildNodes().getLength(); i++) {
 			Node node = element.getChildNodes().item(i);
 			if (node instanceof Text) {
 				Text text = (Text) node;
 				if (text.getTextContent().contains("${"))
-					props.put(text.getTextContent(), resource.toString());
+					props.computeIfAbsent(text.getTextContent(), k -> new TreeSet<>()).add(resource.toString());
 			} else if (node instanceof Element) {
 				add(resource, (Element) node, props);
 			}
@@ -201,14 +223,49 @@ public class ApplicationContextInspector {
 	}
 
 	private static String formatClassName(Class<?> clazz) {
-		return String.format("class [%s]",
-				org.ironrhino.core.util.ReflectionUtils.getActualClass(clazz).getCanonicalName());
+		return String.format("class [%s]", clazz.getCanonicalName());
 	}
 
 	@lombok.Value
 	public static class ApplicationProperty {
 		private String value;
-		private String source;
+		private List<String> sources = new ArrayList<>();
+
+		public String getDefinedSource() {
+			List<String> list = sources.stream().map(ApplicationProperty::extract).collect(Collectors.toList());
+			if (list.size() == 1)
+				return format(list.get(0));
+			return format(String.join(", ", list));
+		}
+
+		public String getOverridingSource() {
+			String source = sources.size() > 0 ? sources.get(0) : null;
+			return format(extract(source));
+		}
+
+		private static String extract(String source) {
+			if (source == null)
+				return source;
+			int start = source.indexOf('[');
+			int end = source.indexOf(']');
+			if (start > 0 && end > start) {
+				String s = source.substring(start + 1, end);
+				int index;
+				if ((index = s.indexOf("/WEB-INF/")) > 0) {
+					s = s.substring(index);
+				} else {
+					String home = System.getProperty("user.home");
+					if (home != null && (index = s.indexOf(home)) > 0)
+						s = "~" + s.substring(index + home.length());
+				}
+				return s;
+			}
+			return source;
+		}
+
+		private static String format(String sources) {
+			return String.format("[%s]", sources);
+		}
 	}
 
 }

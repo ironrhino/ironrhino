@@ -44,8 +44,8 @@ public class PropertiesAction extends BaseAction {
 			}
 			writer.write(key + '=' + (orverrided != null ? orverrided.getValue() : value) + "\n");
 			if (!brief)
-				writer.write("#defined in " + entry.getValue().getSource()
-						+ (orverrided != null ? ", overrided in " + orverrided.getSource() : "") + "\n\n");
+				writer.write("#defined in " + entry.getValue().getDefinedSource()
+						+ (orverrided != null ? ", overrided in " + orverrided.getOverridingSource() : "") + "\n\n");
 		}
 		writer.write("\n");
 		writer.write("\n");
@@ -53,7 +53,7 @@ public class PropertiesAction extends BaseAction {
 			if (!defaultProperties.containsKey(entry.getKey())) {
 				writer.write(entry.getKey() + '=' + entry.getValue().getValue() + "\n");
 				if (!brief)
-					writer.write("#defined in " + entry.getValue().getSource() + "\n\n");
+					writer.write("#defined in " + entry.getValue().getOverridingSource() + "\n\n");
 			}
 		return NONE;
 	}
@@ -66,7 +66,7 @@ public class PropertiesAction extends BaseAction {
 		for (Map.Entry<String, ApplicationProperty> entry : overridedProperties.entrySet()) {
 			writer.write(entry.getKey() + '=' + entry.getValue().getValue() + "\n");
 			if (!brief)
-				writer.write("#defined in " + entry.getValue().getSource() + "\n\n");
+				writer.write("#defined in " + entry.getValue().getOverridingSource() + "\n\n");
 		}
 		return NONE;
 	}
