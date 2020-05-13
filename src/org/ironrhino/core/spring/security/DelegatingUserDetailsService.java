@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Component("userDetailsService")
 @Primary
 @SpringSecurityEnabled
-public class DelegatedUserDetailsService implements UserDetailsService, UserDetailsPasswordService {
+public class DelegatingUserDetailsService implements UserDetailsService, UserDetailsPasswordService {
 
 	@Autowired(required = false)
 	private List<ConcreteUserDetailsService<? extends UserDetails>> userDetailsServices;
