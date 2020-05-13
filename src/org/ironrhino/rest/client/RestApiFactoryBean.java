@@ -13,6 +13,7 @@ import java.lang.reflect.TypeVariable;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -60,6 +61,7 @@ import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
@@ -148,8 +150,14 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 			restTemplate = new org.ironrhino.core.spring.http.client.RestTemplate();
 			Iterator<HttpMessageConverter<?>> it = restTemplate.getMessageConverters().iterator();
 			while (it.hasNext()) {
-				if (it.next() instanceof MappingJackson2XmlHttpMessageConverter)
+				HttpMessageConverter<?> converter = it.next();
+				if (converter instanceof MappingJackson2XmlHttpMessageConverter)
 					it.remove();
+				else if (converter instanceof MappingJackson2HttpMessageConverter) {
+					MappingJackson2HttpMessageConverter c = (MappingJackson2HttpMessageConverter) converter;
+					if (annotation != null && !annotation.dateFormat().isEmpty())
+						c.getObjectMapper().setDateFormat(new SimpleDateFormat(annotation.dateFormat()));
+				}
 			}
 		}
 		this.restTemplate = restTemplate;

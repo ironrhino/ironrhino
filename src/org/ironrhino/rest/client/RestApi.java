@@ -32,4 +32,6 @@ public @interface RestApi {
 
 	boolean treatNotFoundAsNull() default false;
 
+	String dateFormat() default "";
+
 }

@@ -3,13 +3,14 @@ package org.ironrhino.core.elasticsearch.search;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.ironrhino.core.elasticsearch.Article;
 import org.ironrhino.core.elasticsearch.ArticleOperations;
 import org.ironrhino.core.elasticsearch.search.SearchOperationsTests.Config;
+import org.ironrhino.core.util.DateUtils;
+import org.ironrhino.core.util.NumberUtils;
 import org.ironrhino.rest.client.RestApiRegistryPostProcessor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,7 +35,7 @@ public class SearchOperationsTests {
 		int size = 20;
 		for (int i = 0; i < size; i++) {
 			Article article = new Article(String.valueOf(i + 1), i % 2 == 0 ? "title" : "test", "content", i,
-					LocalDateTime.of(2020, 5, i + 1, 0, 0));
+					DateUtils.parse("2020-05-" + NumberUtils.format(i + 1, 2)));
 			articleOperations.index(index, article.getId(), article);
 		}
 		try {

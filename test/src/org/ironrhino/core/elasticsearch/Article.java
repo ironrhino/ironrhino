@@ -1,6 +1,6 @@
 package org.ironrhino.core.elasticsearch;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,6 +19,6 @@ public class Article {
 	
 	private int views;
 	
-	private LocalDateTime createdAt;
+	private Date createdAt;
 
 }
