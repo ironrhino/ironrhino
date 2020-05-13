@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.config.EmbeddedValueResolver;
 import org.springframework.core.env.CompositePropertySource;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.EnumerablePropertySource;
@@ -175,10 +176,11 @@ public class ApplicationContextInspector {
 	}
 
 	private void add(Resource resource, Element element, Map<String, Set<String>> props) {
+		EmbeddedValueResolver resolver = new EmbeddedValueResolver(ctx);
 		if (element.getTagName().equals("import")) {
 			try {
 				Resource[] resources = resourcePatternResolver
-						.getResources(env.resolvePlaceholders(element.getAttribute("resource")));
+						.getResources(resolver.resolveStringValue(element.getAttribute("resource")));
 				for (Resource r : resources)
 					add(r, props);
 			} catch (IOException e) {
@@ -194,7 +196,7 @@ public class ApplicationContextInspector {
 					if ("resources".equals(ele.getAttribute("name"))) {
 						try {
 							Resource[] resources = resourcePatternResolver
-									.getResources(env.resolvePlaceholders(ele.getAttribute("value")));
+									.getResources(resolver.resolveStringValue(ele.getAttribute("value")));
 							for (Resource r : resources)
 								add(r, props);
 						} catch (IOException e) {
