@@ -41,7 +41,10 @@ import org.xml.sax.InputSource;
 
 import com.opensymphony.xwork2.ActionSupport;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class ApplicationContextInspector {
 
 	@Autowired
@@ -129,6 +132,14 @@ public class ApplicationContextInspector {
 			ApplicationProperty ap = defaultProperties.computeIfAbsent(k, s -> new ApplicationProperty(v));
 			ap.getSources().add(formatClassName(org.ironrhino.core.util.ReflectionUtils.getActualClass(p.getClass())));
 		}));
+
+		defaultProperties.forEach((k, v) -> {
+			String definedSource = v.getDefinedSource();
+			if (definedSource.indexOf(",") > 0) {
+				log.warn("'{}' is defined in multiple sources {}, please consider create a specified config bean", k,
+						definedSource);
+			}
+		});
 		return Collections.unmodifiableMap(defaultProperties);
 	});
 
