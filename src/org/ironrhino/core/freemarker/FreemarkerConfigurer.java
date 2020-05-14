@@ -12,6 +12,7 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.metadata.Trigger;
+import org.ironrhino.core.security.SecurityConfig;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,9 +76,10 @@ public class FreemarkerConfigurer {
 	@Value("${assetsBase:}")
 	private String assetsBase;
 
-	@Getter
-	@Value("${ssoServerBase:}")
-	private String ssoServerBase;
+	private String ssoServerBase = "";
+
+	@Autowired(required = false)
+	private SecurityConfig securityConfig;
 
 	@Getter
 	@Value("${layout.fluid:true}")
@@ -106,8 +108,8 @@ public class FreemarkerConfigurer {
 			base = org.ironrhino.core.util.StringUtils.trimTailSlash(base);
 		if (StringUtils.isNotBlank(assetsBase))
 			assetsBase = org.ironrhino.core.util.StringUtils.trimTailSlash(assetsBase);
-		if (StringUtils.isNotBlank(ssoServerBase))
-			ssoServerBase = org.ironrhino.core.util.StringUtils.trimTailSlash(ssoServerBase);
+		if (securityConfig != null)
+			ssoServerBase = org.ironrhino.core.util.StringUtils.trimTailSlash(securityConfig.getSsoServerBase());
 	}
 
 	public Configuration createConfiguration() throws TemplateException {

@@ -1,8 +1,5 @@
 package org.ironrhino.common.action;
 
-import static org.ironrhino.core.security.action.PasswordAction.DEFAULT_VALUE_PASSWORD_ENTRY_POINT;
-import static org.ironrhino.core.security.action.PasswordAction.KEY_PASSWORD_ENTRY_POINT;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
@@ -14,11 +11,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.ironrhino.core.metadata.AutoConfig;
+import org.ironrhino.core.security.SecurityConfig;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.LocalizedException;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -45,8 +43,8 @@ public class ErrorAction extends ActionSupport {
 	@Getter
 	private Throwable exception;
 
-	@Value("${" + KEY_PASSWORD_ENTRY_POINT + ":" + DEFAULT_VALUE_PASSWORD_ENTRY_POINT + "}")
-	private String passwordEntryPoint;
+	@Autowired(required = false)
+	private SecurityConfig securityConfig;
 
 	public String getUid() {
 		if (id != null && id.length > 0)
@@ -72,7 +70,7 @@ public class ErrorAction extends ActionSupport {
 				if (exception instanceof CredentialsExpiredException) {
 					UserDetails ud = AuthzUtils.getUserDetails();
 					if (ud != null) {
-						targetUrl = passwordEntryPoint;
+						targetUrl = securityConfig != null ? securityConfig.getPasswordEntryPoint() : "/password";
 						String s = (String) request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI);
 						if (StringUtils.isNotBlank(s)) {
 							String qs = request.getQueryString();

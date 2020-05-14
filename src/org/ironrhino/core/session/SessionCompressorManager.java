@@ -1,18 +1,14 @@
 package org.ironrhino.core.session;
 
-import static org.ironrhino.core.security.action.PasswordAction.DEFAULT_VALUE_PASSWORD_ENTRY_POINT;
-import static org.ironrhino.core.security.action.PasswordAction.KEY_PASSWORD_ENTRY_POINT;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.security.SecurityConfig;
 import org.ironrhino.core.session.impl.DefaultSessionCompressor;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.authentication.CredentialsExpiredException;
@@ -30,8 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SessionCompressorManager {
 
-	@Value("${" + KEY_PASSWORD_ENTRY_POINT + ":" + DEFAULT_VALUE_PASSWORD_ENTRY_POINT + "}")
-	private String passwordEntryPoint;
+	@Autowired(required = false)
+	private SecurityConfig securityConfig;
 
 	@Autowired(required = false)
 	private List<SessionCompressor> compressors;
@@ -115,9 +111,8 @@ public class SessionCompressorManager {
 							} else if (!ud.isAccountNonLocked()) {
 								throw new LockedException(username);
 							} else if (!ud.isCredentialsNonExpired()) {
-								boolean isPasswordEntryPoint = StringUtils.isNotBlank(passwordEntryPoint)
-										? uri.equals(passwordEntryPoint)
-										: uri.endsWith("/password");
+								boolean isPasswordEntryPoint = uri.equals(
+										securityConfig != null ? securityConfig.getPasswordEntryPoint() : "/password");
 								String accept = session.getRequest().getHeader("Accept");
 								if (!isPasswordEntryPoint && !uri.startsWith("/assets/")
 										&& (accept == null || !accept.contains("application/json")))

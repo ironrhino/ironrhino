@@ -8,6 +8,7 @@ import java.util.TreeMap;
 import javax.servlet.http.Cookie;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.security.SecurityConfig;
 import org.ironrhino.core.security.util.Blowfish;
 import org.ironrhino.core.session.HttpSessionManager;
 import org.ironrhino.core.session.HttpSessionStore;
@@ -30,8 +31,8 @@ public class CookieBasedHttpSessionStore implements HttpSessionStore {
 	@Value("${httpSessionManager.sessionCookieName:" + HttpSessionManager.DEFAULT_SESSION_COOKIE_NAME + "}")
 	private String sessionCookieName = HttpSessionManager.DEFAULT_SESSION_COOKIE_NAME;
 
-	@Value("${globalCookie:false}")
-	private boolean globalCookie;
+	@Autowired(required = false)
+	private SecurityConfig securityConfig;
 
 	@Autowired
 	private SessionCompressorManager sessionCompressorManager;
@@ -109,12 +110,11 @@ public class CookieBasedHttpSessionStore implements HttpSessionStore {
 			if (value.length() % SINGLE_COOKIE_SIZE != 0)
 				pieces++;
 			for (int i = 0; i < pieces; i++)
-				RequestUtils
-						.saveCookie(session.getRequest(), session.getResponse(),
-								i == 0 ? sessionCookieName : sessionCookieName + (i - 1),
-								value.substring(i * SINGLE_COOKIE_SIZE,
-										i == pieces - 1 ? value.length() : (i + 1) * SINGLE_COOKIE_SIZE),
-								globalCookie, true);
+				RequestUtils.saveCookie(session.getRequest(), session.getResponse(),
+						i == 0 ? sessionCookieName : sessionCookieName + (i - 1),
+						value.substring(i * SINGLE_COOKIE_SIZE,
+								i == pieces - 1 ? value.length() : (i + 1) * SINGLE_COOKIE_SIZE),
+						securityConfig != null ? securityConfig.isGlobalCookie() : false, true);
 		}
 	}
 

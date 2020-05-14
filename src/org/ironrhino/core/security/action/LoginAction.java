@@ -1,8 +1,5 @@
 package org.ironrhino.core.security.action;
 
-import static org.ironrhino.core.security.action.PasswordAction.DEFAULT_VALUE_PASSWORD_ENTRY_POINT;
-import static org.ironrhino.core.security.action.PasswordAction.KEY_PASSWORD_ENTRY_POINT;
-
 import java.net.URLEncoder;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +16,7 @@ import org.ironrhino.core.metadata.JsonConfig;
 import org.ironrhino.core.metadata.Redirect;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.model.Persistable;
+import org.ironrhino.core.security.SecurityConfig;
 import org.ironrhino.core.security.event.LoginEvent;
 import org.ironrhino.core.security.verfication.ReceiverNotFoundException;
 import org.ironrhino.core.security.verfication.VerificationManager;
@@ -33,7 +31,6 @@ import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.ExceptionUtils;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.CredentialsExpiredException;
@@ -59,10 +56,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LoginAction extends BaseAction {
 
-	public final static String KEY_LOGIN_DEFAULT_TARGET_URL = "login.defaultTargetUrl";
-
-	public final static String DEFAULT_VALUE_LOGIN_DEFAULT_TARGET_URL = "/";
-
 	public final static String COOKIE_NAME_LOGIN_USER = "U";
 
 	private static final long serialVersionUID = 2783386542815083811L;
@@ -79,11 +72,8 @@ public class LoginAction extends BaseAction {
 	@Getter
 	protected VerificationCodeRequirement verificationCodeRequirement;
 
-	@Value("${" + KEY_LOGIN_DEFAULT_TARGET_URL + ":" + DEFAULT_VALUE_LOGIN_DEFAULT_TARGET_URL + "}")
-	protected String defaultTargetUrl;
-
-	@Value("${" + KEY_PASSWORD_ENTRY_POINT + ":" + DEFAULT_VALUE_PASSWORD_ENTRY_POINT + "}")
-	private String passwordEntryPoint;
+	@Autowired(required = false)
+	protected SecurityConfig securityConfig;
 
 	@Autowired
 	protected UserDetailsService userDetailsService;
@@ -163,12 +153,13 @@ public class LoginAction extends BaseAction {
 				log.error(e.getMessage(), e);
 			}
 			if (credentialsExpired) {
-				String s = passwordEntryPoint;
+				String s = securityConfig != null ? securityConfig.getPasswordEntryPoint() : "/password";
+				;
 				if (StringUtils.isNotBlank(targetUrl))
 					s += "?targetUrl=" + URLEncoder.encode(targetUrl, "UTF-8");
 				targetUrl = s;
 			} else if (StringUtils.isBlank(targetUrl)) {
-				targetUrl = defaultTargetUrl;
+				targetUrl = securityConfig != null ? securityConfig.getLoginDefaultTargetUrl() : "/";
 			}
 		}
 		return REDIRECT;
@@ -178,7 +169,7 @@ public class LoginAction extends BaseAction {
 	public String input() {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		if (StringUtils.isNotBlank(targetUrl) && !RequestUtils.isSameOrigin(request, targetUrl))
-			targetUrl = defaultTargetUrl;
+			targetUrl = securityConfig != null ? securityConfig.getLoginDefaultTargetUrl() : "/";
 		if (username == null)
 			username = RequestUtils.getCookieValue(request, DefaultAuthenticationSuccessHandler.COOKIE_NAME_LOGIN_USER);
 		String referer = request.getHeader("Referer");

@@ -12,11 +12,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.ironrhino.common.support.LocaleProvider;
 import org.ironrhino.core.metadata.AutoConfig;
+import org.ironrhino.core.security.SecurityConfig;
 import org.ironrhino.core.session.HttpSessionManager;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -35,8 +35,8 @@ public class LocaleAction extends BaseAction {
 	@Getter
 	private Locale[] availableLocales;
 
-	@Value("${globalCookie:false}")
-	private boolean globalCookie;
+	@Autowired(required = false)
+	private SecurityConfig securityConfig;
 
 	@Autowired(required = false)
 	private LocaleProvider localeProvider;
@@ -62,7 +62,7 @@ public class LocaleAction extends BaseAction {
 			}
 			if (loc != null) {
 				RequestUtils.saveCookie(request, response, httpSessionManager.getLocaleCookieName(), loc.toString(),
-						globalCookie);
+						securityConfig != null ? securityConfig.isGlobalCookie() : false);
 			} else {
 				RequestUtils.deleteCookie(request, response, httpSessionManager.getLocaleCookieName(), true);
 			}

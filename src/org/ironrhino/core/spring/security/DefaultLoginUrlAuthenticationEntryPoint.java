@@ -4,10 +4,12 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.security.SecurityConfig;
 import org.ironrhino.core.util.RequestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,22 +17,27 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.RedirectUrlBuilder;
 
-import lombok.Setter;
-
 public class DefaultLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticationEntryPoint {
 
 	@Value("${login.ignoreSavedRequest:false}")
 	private boolean ignoreSavedRequest;
 
-	@Setter
-	@Value("${ssoServerBase:}")
-	private String ssoServerBase;
+	private String ssoServerBase = "";
+
+	@Autowired(required = false)
+	private SecurityConfig securityConfig;
 
 	@Autowired(required = false)
 	private List<LoginEntryPointHandler> loginEntryPointHandlers;
 
 	public DefaultLoginUrlAuthenticationEntryPoint(String loginFormUrl) {
 		super(loginFormUrl);
+	}
+
+	@PostConstruct
+	private void init() {
+		if (securityConfig != null)
+			ssoServerBase = org.ironrhino.core.util.StringUtils.trimTailSlash(securityConfig.getSsoServerBase());
 	}
 
 	@Override

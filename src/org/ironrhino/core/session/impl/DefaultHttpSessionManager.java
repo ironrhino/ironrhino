@@ -8,6 +8,7 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.security.SecurityConfig;
 import org.ironrhino.core.session.HttpSessionManager;
 import org.ironrhino.core.session.HttpSessionStore;
 import org.ironrhino.core.session.WrappedHttpSession;
@@ -52,6 +53,9 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 	@Autowired
 	private HttpSessionStore cacheBased;
 
+	@Autowired(required = false)
+	private SecurityConfig securityConfig;
+
 	@Value("${httpSessionManager.lifetime:" + DEFAULT_LIFETIME + "}")
 	private int lifetime;
 
@@ -67,9 +71,6 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 
 	@Value("${httpSessionManager.checkRemoteAddr:false}")
 	private boolean checkRemoteAddr;
-
-	@Value("${globalCookie:false}")
-	private boolean globalCookie;
 
 	@Value("${httpSessionManager.alwaysUseCacheBased:}")
 	private Boolean alwaysUseCacheBased;
@@ -293,7 +294,7 @@ public class DefaultHttpSessionManager implements HttpSessionManager {
 
 	private void saveSessionTracker(WrappedHttpSession session) {
 		RequestUtils.saveCookie(session.getRequest(), session.getResponse(), getSessionTrackerName(),
-				session.getSessionTracker(), globalCookie, true);
+				session.getSessionTracker(), securityConfig != null ? securityConfig.isGlobalCookie() : false, true);
 	}
 
 	protected String nextSessionId() {
