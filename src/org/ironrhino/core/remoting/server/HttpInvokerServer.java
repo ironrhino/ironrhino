@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -153,8 +153,8 @@ public class HttpInvokerServer implements HttpRequestHandler {
 				Object span = asyncSpan;
 				// generated lambda function use Span as captured parameter type
 				// NoClassDefFoundError could be thrown when perform Class.getDeclaredMethods()
-				if (value instanceof CompletableFuture) {
-					((CompletableFuture<?>) value).whenComplete((obj, e) -> {
+				if (value instanceof CompletionStage<?>) {
+					((CompletionStage<?>) value).whenComplete((obj, e) -> {
 						try (Scope s = (span != null ? GlobalTracer.get().activateSpan((Span) span) : null)) {
 							RemoteInvocationResult asyncResult = new RemoteInvocationResult();
 							if (e == null) {

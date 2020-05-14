@@ -511,6 +511,20 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 	}
 
 	@Test
+	public void testNonConcreteCompletionStage() throws Exception {
+		testService.loadCompletionStageUserDetailsByUsername("username").thenAccept(ud -> {
+			assertThat(ud.getUsername(), is("username"));
+		});
+		Thread.sleep(500);
+		then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(TestService.class)),
+				argThat(ri -> "loadCompletionStageUserDetailsByUsername".equals(ri.getMethodName())),
+				any(MethodInvocation.class));
+		then(mockHttpServletRequest).should().startAsync();
+		then(mockAsyncContext).should().complete();
+		then(mockTestService).should().loadCompletionStageUserDetailsByUsername("username");
+	}
+
+	@Test
 	public void testGeneric() throws Exception {
 		User user = new User();
 		user.setUsername("username");
