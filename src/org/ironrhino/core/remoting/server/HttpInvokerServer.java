@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Function;
@@ -122,8 +122,8 @@ public class HttpInvokerServer implements HttpRequestHandler {
 		} else if (value instanceof Callable || value instanceof Future) {
 			AsyncContext context = request.startAsync();
 			Map<String, String> contextMap = MDC.getCopyOfContextMap();
-			if (value instanceof CompletableFuture) {
-				((CompletableFuture<?>) value).whenComplete((obj, e) -> {
+			if (value instanceof CompletionStage) {
+				((CompletionStage<?>) value).whenComplete((obj, e) -> {
 					RemoteInvocationResult asyncResult = new RemoteInvocationResult();
 					if (e == null) {
 						asyncResult.setValue(obj);

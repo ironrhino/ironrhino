@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Future;
 
 import javax.validation.Valid;
@@ -92,6 +93,8 @@ public interface TestService extends GenericService<UserDetails> {
 	CompletableFuture<User> loadCompletableFutureUserByUsername(String username);
 
 	CompletableFuture<? extends UserDetails> loadCompletableFutureUserDetailsByUsername(String username);
+	
+	CompletionStage<? extends UserDetails> loadCompletionStageUserDetailsByUsername(String username);
 
 	Callable<User> loadCallableUserByUsername(String username);
 

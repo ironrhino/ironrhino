@@ -263,6 +263,14 @@ public class JavaRemotingServiceTests {
 	}
 
 	@Test
+	public void testNonConcreteCompletionStage() throws Exception {
+		testService.loadCompletionStageUserDetailsByUsername("username").thenAccept(ud -> {
+			assertThat(ud.getUsername(), is("username"));
+		});
+		Thread.sleep(500);
+	}
+
+	@Test
 	public void testConcreteCallable() throws Exception {
 		assertThat(testService.loadCallableUserByUsername("username").call().getUsername(), is("username"));
 	}
