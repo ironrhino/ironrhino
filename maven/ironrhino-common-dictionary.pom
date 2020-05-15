@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.ironrhino</groupId>
 	<artifactId>ironrhino-common-dictionary</artifactId>
-	<version>5.0.3</version>
+	<version>5.0.4</version>
 	<packaging>jar</packaging>
 	<description>Common Dictionary</description>
 	<dependencies>
