@@ -62,24 +62,28 @@ public class RegionSetup {
 		entityManager.setEntityClass(Region.class);
 		if (entityManager.countAll() > 0)
 			return;
-		count.set(0);
-		long time = System.nanoTime();
-		log.info("Inserting started");
-		List<Region> regions = parseRegions();
-		int displayOrder = 0;
-		for (Region region : regions) {
-			region.setDisplayOrder(++displayOrder);
-			save(region);
+		try {
+			AopContext.disable(PublishAspect.class);
+			count.set(0);
+			long time = System.nanoTime();
+			log.info("Inserting started");
+			List<Region> regions = parseRegions();
+			int displayOrder = 0;
+			for (Region region : regions) {
+				region.setDisplayOrder(++displayOrder);
+				save(region);
+			}
+			log.info("Inserted {} in {}ms", count.get(), TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - time));
+		} finally {
+			AopContext.enable(PublishAspect.class);
+			_regionCoordinateMap = null;
+			_regionAreacodeMap = null;
+			_rgnMap = null;
 		}
-		log.info("Inserted {} in {}ms", count.get(), TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - time));
-		_regionCoordinateMap = null;
-		_regionAreacodeMap = null;
-		_rgnMap = null;
 	}
 
 	private void save(Region region) {
 		walk(region);
-		AopContext.setBypass(PublishAspect.class);
 		entityManager.save(region);
 		if (count.incrementAndGet() % 5000 == 0)
 			log.info("Inserting {} ...", count.get());
