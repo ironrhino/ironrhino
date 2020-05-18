@@ -56,15 +56,53 @@ public class ApplicationContextInspector {
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
 	private SingletonSupplier<Map<String, ApplicationProperty>> overridenPropertiesSupplier = SingletonSupplier
-			.of(() -> {
-				Map<String, ApplicationProperty> overridenProperties = new TreeMap<>();
-				for (PropertySource<?> ps : env.getPropertySources()) {
-					addOverridenProperties(overridenProperties, ps);
-				}
-				return Collections.unmodifiableMap(overridenProperties);
-			});
+			.of(this::computeOverridenProperties);
 
-	private SingletonSupplier<Map<String, ApplicationProperty>> defaultPropertiesSupplier = SingletonSupplier.of(() -> {
+	private SingletonSupplier<Map<String, ApplicationProperty>> defaultPropertiesSupplier = SingletonSupplier
+			.of(this::computeDefaultProperties);
+
+	public Map<String, ApplicationProperty> getOverridenProperties() {
+		return overridenPropertiesSupplier.obtain();
+	}
+
+	private Map<String, ApplicationProperty> computeOverridenProperties() {
+		Map<String, ApplicationProperty> overridenProperties = new TreeMap<>();
+		for (PropertySource<?> ps : env.getPropertySources()) {
+			addOverridenProperties(overridenProperties, ps);
+		}
+		return Collections.unmodifiableMap(overridenProperties);
+
+	}
+
+	private void addOverridenProperties(Map<String, ApplicationProperty> properties, PropertySource<?> propertySource) {
+		String name = propertySource.getName();
+		if (name != null && name.startsWith("servlet"))
+			return;
+		if (propertySource instanceof EnumerablePropertySource) {
+			EnumerablePropertySource<?> ps = (EnumerablePropertySource<?>) propertySource;
+			for (String s : ps.getPropertyNames()) {
+				if (!(propertySource instanceof ResourcePropertySource) && !getDefaultProperties().containsKey(s))
+					continue;
+				if (!properties.containsKey(s)) {
+					ApplicationProperty ap = new ApplicationProperty(
+							s.endsWith(".password") ? "********" : String.valueOf(ps.getProperty(s)));
+					ap.getSources().add(name);
+					properties.put(s, ap);
+				}
+			}
+		} else if (propertySource instanceof CompositePropertySource) {
+			for (PropertySource<?> ps : ((CompositePropertySource) propertySource).getPropertySources()) {
+				addOverridenProperties(properties, ps);
+			}
+		}
+	}
+
+	public Map<String, ApplicationProperty> getDefaultProperties() {
+		return defaultPropertiesSupplier.obtain();
+	}
+
+	private Map<String, ApplicationProperty> computeDefaultProperties() {
+
 		Map<String, Set<String>> props = new HashMap<>();
 		for (String s : ctx.getBeanDefinitionNames()) {
 			BeanDefinition bd = ctx.getBeanDefinition(s);
@@ -141,37 +179,7 @@ public class ApplicationContextInspector {
 			}
 		});
 		return Collections.unmodifiableMap(defaultProperties);
-	});
 
-	public Map<String, ApplicationProperty> getOverridenProperties() {
-		return overridenPropertiesSupplier.obtain();
-	}
-
-	private void addOverridenProperties(Map<String, ApplicationProperty> properties, PropertySource<?> propertySource) {
-		String name = propertySource.getName();
-		if (name != null && name.startsWith("servlet"))
-			return;
-		if (propertySource instanceof EnumerablePropertySource) {
-			EnumerablePropertySource<?> ps = (EnumerablePropertySource<?>) propertySource;
-			for (String s : ps.getPropertyNames()) {
-				if (!(propertySource instanceof ResourcePropertySource) && !getDefaultProperties().containsKey(s))
-					continue;
-				if (!properties.containsKey(s)) {
-					ApplicationProperty ap = new ApplicationProperty(
-							s.endsWith(".password") ? "********" : String.valueOf(ps.getProperty(s)));
-					ap.getSources().add(name);
-					properties.put(s, ap);
-				}
-			}
-		} else if (propertySource instanceof CompositePropertySource) {
-			for (PropertySource<?> ps : ((CompositePropertySource) propertySource).getPropertySources()) {
-				addOverridenProperties(properties, ps);
-			}
-		}
-	}
-
-	public Map<String, ApplicationProperty> getDefaultProperties() {
-		return defaultPropertiesSupplier.obtain();
 	}
 
 	DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
@@ -190,10 +198,12 @@ public class ApplicationContextInspector {
 		EmbeddedValueResolver resolver = new EmbeddedValueResolver(ctx);
 		if (element.getTagName().equals("import")) {
 			try {
-				Resource[] resources = resourcePatternResolver
-						.getResources(resolver.resolveStringValue(element.getAttribute("resource")));
-				for (Resource r : resources)
-					add(r, props);
+				String resovled = resolver.resolveStringValue(element.getAttribute("resource"));
+				if (resovled != null) {
+					Resource[] resources = resourcePatternResolver.getResources(resovled);
+					for (Resource r : resources)
+						add(r, props);
+				}
 			} catch (IOException e) {
 			}
 			return;
@@ -206,10 +216,12 @@ public class ApplicationContextInspector {
 					Element ele = (Element) node;
 					if ("resources".equals(ele.getAttribute("name"))) {
 						try {
-							Resource[] resources = resourcePatternResolver
-									.getResources(resolver.resolveStringValue(ele.getAttribute("value")));
-							for (Resource r : resources)
-								add(r, props);
+							String resovled = resolver.resolveStringValue(ele.getAttribute("value"));
+							if (resovled != null) {
+								Resource[] resources = resourcePatternResolver.getResources(resovled);
+								for (Resource r : resources)
+									add(r, props);
+							}
 						} catch (IOException e) {
 						}
 						return;
