@@ -101,15 +101,11 @@ public class SmartSchemaManagementToolInitiator implements StandardServiceInitia
 								}
 								try (ResultSet rs = dbmd.getIndexInfo(catalog, schema, existedTableName, false,
 										false)) {
-									boolean tableFound = false;
 									while (rs.next()) {
-										tableFound = true;
 										String indexName = rs.getString("INDEX_NAME");
 										if (indexName != null)
 											existedIndexes.add(indexName);
 									}
-									if (tableFound)
-										break;
 								} catch (SQLException e) {
 								}
 								@SuppressWarnings("unchecked")
