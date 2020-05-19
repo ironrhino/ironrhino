@@ -46,7 +46,7 @@ public class HttpClientUtils {
 
 	static {
 		DEFAULT_HEADERS.add(new BasicHeader("User-Agent",
-				"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.16 Safari/537.36"));
+				"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36"));
 		DEFAULT_HEADERS.add(new BasicHeader("Accept",
 				"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"));
 		DEFAULT_HEADERS.add(new BasicHeader("Accept-Encoding", "gzip,deflate,sdch"));
@@ -201,15 +201,7 @@ public class HttpClientUtils {
 
 	static class BasicResponseHandler implements ResponseHandler<String> {
 
-		private String charset;
-
-		public String getCharset() {
-			return charset;
-		}
-
-		public void setCharset(String charset) {
-			this.charset = charset;
-		}
+		private final String charset;
 
 		BasicResponseHandler(String charset) {
 			this.charset = charset;
