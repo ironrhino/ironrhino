@@ -33,6 +33,10 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 		try {
 			return invocation.invoke();
 		} catch (Exception e) {
+			if (e instanceof NoSuchMethodException) {
+				log.error("{}: {}", e.getClass().getName(), e.getMessage());
+				return BaseAction.NOTFOUND;
+			}
 			ServletActionContext.getRequest().setAttribute(RequestDispatcher.ERROR_EXCEPTION, e);
 			if (e instanceof LocalizedException || e instanceof ErrorMessage)
 				log.error(e.getClass().getCanonicalName() + ": " + e.getLocalizedMessage());
@@ -41,8 +45,6 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 			if ((e instanceof MethodFailedException || e instanceof CompletionException)
 					&& e.getCause() instanceof Exception)
 				e = (Exception) e.getCause();
-			if (e instanceof NoSuchMethodException)
-				return BaseAction.NOTFOUND;
 			Object action = invocation.getAction();
 			if (action instanceof ValidationAware) {
 				ValidationAware validationAwareAction = (ValidationAware) action;
