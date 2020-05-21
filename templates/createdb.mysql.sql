@@ -5,10 +5,12 @@ use ironrhino;
 
 drop function if exists get_dictionary_label;
 delimiter $$  
-create function get_dictionary_label(items text, value varchar(255)) returns varchar(255)
+create function get_dictionary_label(name varchar(255), value varchar(255)) returns varchar(255) deterministic 
 begin
+    declare items json;
     declare length integer;
     declare idx integer;
+    select t.items into items from common_dictionary t where t.name=name;
     select json_length(items) into length;
     set idx = 0;
     while idx < length do
@@ -20,7 +22,6 @@ begin
     return null;
 end $$
 delimiter ;
-
 
 drop procedure if exists get_dictionary;
 delimiter $$  
