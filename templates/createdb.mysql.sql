@@ -24,7 +24,7 @@ delimiter ;
 
 drop procedure if exists get_dictionary;
 delimiter $$  
-create procedure get_dictionary(in name varchar(255))           
+create procedure get_dictionary(in name varchar(255))
 begin
     declare items json;
     declare length integer;
@@ -66,15 +66,12 @@ delimiter ;
 
 drop function if exists next_snowflake_id;
 delimiter $$
-create function `next_snowflake_id`() returns bigint(20)
+create function next_snowflake_id(worker_id int) returns bigint(20) not deterministic
 begin
-    declare epoch bigint(20);
-    declare workerId integer;
-    declare current_ts bigint(20);
-    declare incr bigint(20);
-    set epoch = 1556150400000;
-    set workerId = 1;
-    set current_ts = round(unix_timestamp(curtime(4)) * 1000);
+    declare epoch bigint(20) default 1556150400000;
+    declare worker_id_length int default 8;
+    declare sequence_length int default 10;
+    declare current_ts bigint(20) default round(unix_timestamp(curtime(4)) * 1000);
     if @sequence > 1023 then
         while @last_ts = current_ts do
             set current_ts = round(unix_timestamp(curtime(4)) * 1000);
@@ -86,7 +83,7 @@ begin
         set @sequence = 0;
     end if;
     set @last_ts = current_ts;
-return (current_ts - epoch) << 18 | (workerId << 10) | @sequence;
+return (current_ts - epoch) << (sequence_length + worker_id_length) | (worker_id << sequence_length) | @sequence;
 end$$
 delimiter ;
 
