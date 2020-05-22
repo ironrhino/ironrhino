@@ -398,9 +398,9 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 						Object marker = conversionService.convert(resultPage.getMarker(),
 								keysetProperty.getPropertyType());
 						if (arr.length == 2 && "desc".equalsIgnoreCase(arr[1]))
-							dc.add(Restrictions.le(keysetProperty.getName(), marker));
+							dc.add(Restrictions.lt(keysetProperty.getName(), marker));
 						else
-							dc.add(Restrictions.ge(keysetProperty.getName(), marker));
+							dc.add(Restrictions.gt(keysetProperty.getName(), marker));
 					}
 				}
 			}
@@ -410,11 +410,12 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				Collection<EN> result = resultPage.getResult();
 				if (result.size() == resultPage.getPageSize() + 1) {
 					Iterator<EN> it = result.iterator();
+					EN previous = null;
 					while (it.hasNext()) {
 						EN en = it.next();
 						if (!it.hasNext()) {
 							it.remove();
-							Object val = new BeanWrapperImpl(en).getPropertyValue(keysetProperty.getName());
+							Object val = new BeanWrapperImpl(previous).getPropertyValue(keysetProperty.getName());
 							String nextMarker = null;
 							if (val instanceof Date) {
 								nextMarker = String.valueOf(((Date) val).getTime());
@@ -430,6 +431,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 								}
 							resultPage.setNextMarker(nextMarker);
 						}
+						previous = en;
 					}
 				}
 			}
