@@ -3,10 +3,7 @@ package org.ironrhino.core.model;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,7 +28,7 @@ public class ResultPage<T> implements Serializable {
 
 	public static final String MARKER_PARAM_NAME = "m";
 
-	public static final String PREVIOUSMARKER_PARAM_NAME = "pm";
+	public static final String BACKWARD_MARKER_PARAM_NAME = "bm";
 
 	public static final int DEFAULT_MAX_PAGESIZE = 1000;
 
@@ -94,6 +91,11 @@ public class ResultPage<T> implements Serializable {
 	@Getter
 	@Setter
 	protected String nextMarker;
+
+	@JsonIgnore
+	@Getter
+	@Setter
+	protected boolean backward;
 
 	public void setPageSize(int pageSize) {
 		if (pageSize > MAX_PAGESIZE.get())
@@ -160,35 +162,8 @@ public class ResultPage<T> implements Serializable {
 	}
 
 	public String renderUrlWithMarker(boolean forward) throws UnsupportedEncodingException {
-		String url;
-		if (forward) {
-			url = doRenderUrl(MARKER_PARAM_NAME, nextMarker);
-			if (StringUtils.isNotBlank(marker)) {
-				List<String> history = new ArrayList<>();
-				if (StringUtils.isNotBlank(previousMarker))
-					history.addAll(Arrays.asList(previousMarker.split(",")));
-				history.add(marker);
-				int maxlength = 5;
-				if (history.size() > maxlength) {
-					history = history.subList(history.size() - maxlength, history.size());
-				}
-				url += '&' + PREVIOUSMARKER_PARAM_NAME + '=' + URLEncoder.encode(String.join(",", history), "UTF-8");
-			}
-		} else {
-			if (StringUtils.isNotBlank(previousMarker)) {
-				int index = previousMarker.lastIndexOf(',');
-				if (index > 0) {
-					url = doRenderUrl(MARKER_PARAM_NAME, previousMarker.substring(index + 1));
-					url += '&' + PREVIOUSMARKER_PARAM_NAME + '='
-							+ URLEncoder.encode(previousMarker.substring(0, index), "UTF-8");
-				} else {
-					url = doRenderUrl(MARKER_PARAM_NAME, previousMarker);
-				}
-			} else {
-				url = doRenderUrl(MARKER_PARAM_NAME, "");
-			}
-		}
-		return url;
+		return forward ? doRenderUrl(MARKER_PARAM_NAME, nextMarker)
+				: doRenderUrl(BACKWARD_MARKER_PARAM_NAME, previousMarker);
 	}
 
 	private String doRenderUrl(String name, String value) throws UnsupportedEncodingException {
@@ -229,7 +204,7 @@ public class ResultPage<T> implements Serializable {
 				String[] values = entry.getValue();
 				if (values.length == 1 && values[0].isEmpty() || name.equals("_") || name.equals(PAGENO_PARAM_NAME)
 						|| name.equals(PAGESIZE_PARAM_NAME) || name.equals(MARKER_PARAM_NAME)
-						|| name.equals(PREVIOUSMARKER_PARAM_NAME)
+						|| name.equals(BACKWARD_MARKER_PARAM_NAME)
 						|| name.startsWith(StringUtils.uncapitalize(ResultPage.class.getSimpleName()) + '.'))
 					continue;
 				for (String value : values)

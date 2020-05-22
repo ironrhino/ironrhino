@@ -218,10 +218,10 @@ ${formHeader!}
 <div class="toolbar row-fluid">
 <div class="pagination span<#if showBottomButtons>4<#else>6</#if><#if ((resultPage.useKeysetPagination)!false)> keyset</#if>">
 <#if ((resultPage.useKeysetPagination)!false)>
-<#if resultPage.marker?has_content> 
-<a class="ajax view history" href="${resultPage.renderUrlWithMarker(false)}">${getText(resultPage.previousMarker?has_content?then('previouspage','firstpage'))}</a>
+<#if resultPage.marker?has_content && !resultPage.backward || resultPage.previousMarker?has_content && resultPage.backward> 
+<a class="ajax view history" href="${resultPage.renderUrlWithMarker(false)}">${getText('previouspage')}</a>
 <#else>
-<span>${getText('firstpage')}</span>
+<span>${getText('previouspage')}</span>
 </#if>
 <#if resultPage.nextMarker?has_content>
 <a class="ajax view history" href="${resultPage.renderUrlWithMarker(true)}">${getText('nextpage')}</a>

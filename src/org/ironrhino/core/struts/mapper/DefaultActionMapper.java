@@ -162,9 +162,11 @@ public class DefaultActionMapper extends AbstractActionMapper {
 		String m = request.getParameter(ResultPage.MARKER_PARAM_NAME);
 		if (m != null)
 			params.put("resultPage.marker", m);
-		String pm = request.getParameter(ResultPage.PREVIOUSMARKER_PARAM_NAME);
-		if (pm != null)
-			params.put("resultPage.previousMarker", pm);
+		String bm = request.getParameter(ResultPage.BACKWARD_MARKER_PARAM_NAME);
+		if (bm != null) {
+			params.put("resultPage.marker", bm);
+			params.put("resultPage.backward", "true");
+		}
 		if (StringUtils.isNotBlank(methodAndUid)) {
 			String uid = null;
 			if (methodAndUid.indexOf('/') < 0

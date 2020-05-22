@@ -13,6 +13,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -385,19 +386,25 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					resultPage.setCounting(false);
 					resultPage.setPageNo(1);
 					resultPage.setPageSize(resultPage.getPageSize() + 1);
+					String field;
+					boolean desc;
 					String order = richtableConfig.order();
 					if (StringUtils.isBlank(order)) {
-						order = "id desc";
-						dc.addOrder(Order.desc("id"));
+						field = "id";
+						desc = true;
 					} else {
 						order = order.split(",")[0].trim();
+						String[] arr = order.split("\\s+", 2);
+						field = arr[0];
+						desc = arr.length == 2 && "desc".equalsIgnoreCase(arr[1]);
 					}
-					String[] arr = order.split("\\s+", 2);
-					keysetProperty = new BeanWrapperImpl(getEntityClass()).getPropertyDescriptor(arr[0]);
+					boolean actualDesc = desc && !resultPage.isBackward() || !desc && resultPage.isBackward();
+					dc.addOrder(actualDesc ? Order.desc(field) : Order.asc(field));
+					keysetProperty = new BeanWrapperImpl(getEntityClass()).getPropertyDescriptor(field);
 					if (StringUtils.isNotBlank(resultPage.getMarker())) {
 						Object marker = conversionService.convert(resultPage.getMarker(),
 								keysetProperty.getPropertyType());
-						if (arr.length == 2 && "desc".equalsIgnoreCase(arr[1]))
+						if (actualDesc)
 							dc.add(Restrictions.lt(keysetProperty.getName(), marker));
 						else
 							dc.add(Restrictions.gt(keysetProperty.getName(), marker));
@@ -408,31 +415,47 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			if (resultPage.isUseKeysetPagination()) {
 				resultPage.setPageSize(resultPage.getPageSize() - 1);
 				Collection<EN> result = resultPage.getResult();
-				if (result.size() == resultPage.getPageSize() + 1) {
-					Iterator<EN> it = result.iterator();
-					EN previous = null;
-					while (it.hasNext()) {
-						EN en = it.next();
-						if (!it.hasNext()) {
-							it.remove();
-							Object val = new BeanWrapperImpl(previous).getPropertyValue(keysetProperty.getName());
-							String nextMarker = null;
-							if (val instanceof Date) {
-								nextMarker = String.valueOf(((Date) val).getTime());
-							} else if (val instanceof LocalDateTime) {
-								nextMarker = String.valueOf(((LocalDateTime) val).atZone(ZoneId.systemDefault())
-										.toInstant().toEpochMilli());
-							}
-							if (nextMarker == null)
-								try {
-									nextMarker = conversionService.convert(val, String.class);
-								} catch (ConverterNotFoundException cnfe) {
-									nextMarker = String.valueOf(val);
-								}
-							resultPage.setNextMarker(nextMarker);
-						}
-						previous = en;
+				Iterator<EN> it = result.iterator();
+				EN previous = null;
+				while (it.hasNext()) {
+					EN en = it.next();
+					boolean hasNextPage = false;
+					if (!it.hasNext() && (result.size() == resultPage.getPageSize() + 1)) {
+						it.remove();
+						hasNextPage = true;
 					}
+					if (previous == null || hasNextPage) {
+						Object val = new BeanWrapperImpl(previous != null ? previous : en)
+								.getPropertyValue(keysetProperty.getName());
+						String marker = null;
+						if (val instanceof Date) {
+							marker = String.valueOf(((Date) val).getTime());
+						} else if (val instanceof LocalDateTime) {
+							marker = String.valueOf(
+									((LocalDateTime) val).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+						}
+						if (marker == null)
+							try {
+								marker = conversionService.convert(val, String.class);
+							} catch (ConverterNotFoundException cnfe) {
+								marker = String.valueOf(val);
+							}
+						if (previous == null)
+							resultPage.setPreviousMarker(marker);
+						if (hasNextPage)
+							resultPage.setNextMarker(marker);
+					}
+					previous = en;
+				}
+				if (resultPage.isBackward()) {
+					List<EN> list = new ArrayList<>(result);
+					Collections.reverse(list);
+					result = list;
+					resultPage.setResult(result);
+					String previousMarker = resultPage.getPreviousMarker();
+					String nextMarker = resultPage.getNextMarker();
+					resultPage.setNextMarker(previousMarker);
+					resultPage.setPreviousMarker(nextMarker);
 				}
 			}
 		} else {
@@ -598,7 +621,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				return dc.add(Restrictions.isNull("id")); // force empty result
 		}
 		if (criteriaState.getOrderings().isEmpty()) {
-			if (richtableConfig != null && StringUtils.isNotBlank(richtableConfig.order())) {
+			if (richtableConfig != null && !richtableConfig.useKeysetPagination()
+					&& StringUtils.isNotBlank(richtableConfig.order())) {
 				String[] ar = richtableConfig.order().split("\\s*,\\s*");
 				for (String s : ar) {
 					String[] arr = s.trim().split("\\s+", 2);
