@@ -378,7 +378,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 				resultPage.setPageSize(richtableConfig.defaultPageSize());
 			DetachedCriteria dc = doPrepareCriteria(entityManager, bw, richtableConfig, isSearchable(), ownerProperty);
 			resultPage.setCriteria(dc);
-			PropertyDescriptor keysetProperty = null;
+			String keysetProperty = null;
 			if (richtableConfig != null) {
 				resultPage.setPaged(richtableConfig.paged());
 				if (richtableConfig.useKeysetPagination()) {
@@ -386,28 +386,27 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					resultPage.setCounting(false);
 					resultPage.setPageNo(1);
 					resultPage.setPageSize(resultPage.getPageSize() + 1);
-					String field;
+
 					boolean desc;
 					String order = richtableConfig.order();
 					if (StringUtils.isBlank(order)) {
-						field = "id";
+						keysetProperty = "id";
 						desc = true;
 					} else {
 						order = order.split(",")[0].trim();
 						String[] arr = order.split("\\s+", 2);
-						field = arr[0];
+						keysetProperty = arr[0];
 						desc = arr.length == 2 && "desc".equalsIgnoreCase(arr[1]);
 					}
 					boolean actualDesc = desc && !resultPage.isBackward() || !desc && resultPage.isBackward();
-					dc.addOrder(actualDesc ? Order.desc(field) : Order.asc(field));
-					keysetProperty = new BeanWrapperImpl(getEntityClass()).getPropertyDescriptor(field);
+					dc.addOrder(actualDesc ? Order.desc(keysetProperty) : Order.asc(keysetProperty));
 					if (StringUtils.isNotBlank(resultPage.getMarker())) {
 						Object marker = conversionService.convert(resultPage.getMarker(),
-								keysetProperty.getPropertyType());
+								BeanUtils.getPropertyDescriptor(getEntityClass(), keysetProperty).getPropertyType());
 						if (actualDesc)
-							dc.add(Restrictions.lt(keysetProperty.getName(), marker));
+							dc.add(Restrictions.lt(keysetProperty, marker));
 						else
-							dc.add(Restrictions.gt(keysetProperty.getName(), marker));
+							dc.add(Restrictions.gt(keysetProperty, marker));
 					}
 				}
 			}
@@ -426,7 +425,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					}
 					if (previous == null || hasNextPage) {
 						Object val = new BeanWrapperImpl(previous != null ? previous : en)
-								.getPropertyValue(keysetProperty.getName());
+								.getPropertyValue(keysetProperty);
 						String marker = null;
 						if (val instanceof Date) {
 							marker = String.valueOf(((Date) val).getTime());
