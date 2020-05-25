@@ -149,9 +149,11 @@ public class RestClient implements BeanNameAware {
 			HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
 			try {
 				token = internalRestTemplate.postForEntity(accessTokenEndpoint, request, getTokenClass()).getBody();
+				log.info("Refresh token for clientId:[{}] successfully", getClientId());
 			} catch (HttpClientErrorException.Unauthorized | HttpClientErrorException.BadRequest e) {
 				String text = e.getResponseBodyAsString().toLowerCase(Locale.ROOT);
 				if (text.contains("invalid_token") || text.contains("expired_token")) {
+					log.warn("Refresh token for clientId[{}] failed: {}", getClientId(), text);
 					token = requestToken();
 				} else {
 					throw e;
@@ -175,11 +177,10 @@ public class RestClient implements BeanNameAware {
 		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
 		try {
 			Token t = internalRestTemplate.postForEntity(accessTokenEndpoint, request, getTokenClass()).getBody();
-			if (t == null)
-				throw new RuntimeException(accessTokenEndpoint + " return no token");
+			log.info("Request token for clientId[{}] successfully", getClientId());
 			return t;
 		} catch (HttpClientErrorException e) {
-			log.error(e.getResponseBodyAsString());
+			log.error("Request token for clientId[{}] failed: {}", getClientId(), e.getResponseBodyAsString());
 			throw e;
 		}
 	}

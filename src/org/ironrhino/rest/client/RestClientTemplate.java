@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.ironrhino.core.spring.http.client.PrependBaseUrlClientHttpRequestInterceptor;
 import org.ironrhino.core.spring.http.client.RestTemplate;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpRequestExecution;
@@ -16,6 +17,9 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.util.Assert;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 class RestClientTemplate extends RestTemplate {
 
 	public RestClientTemplate(RestClient client) {
@@ -26,7 +30,7 @@ class RestClientTemplate extends RestTemplate {
 			@Override
 			public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
 					throws IOException {
-				request.getHeaders().set("Authorization", client.getAuthorizationHeader());
+				request.getHeaders().set(HttpHeaders.AUTHORIZATION, client.getAuthorizationHeader());
 				ClientHttpResponse response = execution.execute(request, body);
 				if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 					try (BufferedReader br = new BufferedReader(
@@ -34,8 +38,9 @@ class RestClientTemplate extends RestTemplate {
 						String text = br.lines().collect(Collectors.joining("\n")).toLowerCase(Locale.ROOT);
 						if (text.contains("invalid_token") || text.contains("expired_token")) {
 							client.getTokenStore().setToken(client.getTokenStoreKey(), null);
+							log.warn("Detected stale token of clientId[{}]:{}", client.getClientId(), text);
 						}
-						request.getHeaders().set("Authorization", client.getAuthorizationHeader());
+						request.getHeaders().set(HttpHeaders.AUTHORIZATION, client.getAuthorizationHeader());
 						return execution.execute(request, body);
 					}
 				}

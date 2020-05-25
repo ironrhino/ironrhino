@@ -14,7 +14,7 @@ public class CacheBasedTokenStore implements TokenStore {
 
 	@Getter
 	@Setter
-	private String cacheNamespace = "Token";
+	private String cacheNamespace = "token";
 
 	public CacheBasedTokenStore(CacheManager cacheManager) {
 		this.cacheManager = cacheManager;
