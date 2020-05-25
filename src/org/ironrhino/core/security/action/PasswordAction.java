@@ -101,12 +101,14 @@ public class PasswordAction extends BaseAction {
 		if (!verificationCodeCheckers.isEmpty()) {
 			WrongVerificationCodeException ex = null;
 			for (VerificationCodeChecker checker : verificationCodeCheckers) {
-				try {
-					checker.verify(user, null, verificationCode);
-					ex = null;
-					break;
-				} catch (WrongVerificationCodeException e) {
-					ex = e;
+				if (!checker.skip(user)) {
+					try {
+						checker.verify(user, null, verificationCode);
+						ex = null;
+						break;
+					} catch (WrongVerificationCodeException e) {
+						ex = e;
+					}
 				}
 			}
 			if (ex != null) {
