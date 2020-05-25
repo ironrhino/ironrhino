@@ -32,9 +32,7 @@ class RestClientTemplate extends RestTemplate {
 					try (BufferedReader br = new BufferedReader(
 							new InputStreamReader(response.getBody(), StandardCharsets.UTF_8))) {
 						String text = br.lines().collect(Collectors.joining("\n")).toLowerCase(Locale.ROOT);
-						if (text.contains("invalid_token")) {
-							client.getTokenStore().setToken(client.getTokenStoreKey(), null);
-						} else if (text.contains("expired_token")) {
+						if (text.contains("invalid_token") || text.contains("expired_token")) {
 							client.getTokenStore().setToken(client.getTokenStoreKey(), null);
 						}
 						request.getHeaders().set("Authorization", client.getAuthorizationHeader());

@@ -149,8 +149,9 @@ public class RestClient implements BeanNameAware {
 			HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
 			try {
 				token = internalRestTemplate.postForEntity(accessTokenEndpoint, request, getTokenClass()).getBody();
-			} catch (HttpClientErrorException.Unauthorized e) {
-				if (e.getResponseBodyAsString().toLowerCase(Locale.ROOT).contains("invalid_token")) {
+			} catch (HttpClientErrorException.Unauthorized | HttpClientErrorException.BadRequest e) {
+				String text = e.getResponseBodyAsString().toLowerCase(Locale.ROOT);
+				if (text.contains("invalid_token") || text.contains("expired_token")) {
 					token = requestToken();
 				} else {
 					throw e;
