@@ -27,7 +27,6 @@ import org.slf4j.MDC;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -145,11 +144,10 @@ public class SsoHandler extends AccessHandler {
 					request.setAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API, sessionMap);
 					request.setAttribute(REQUEST_ATTRIBUTE_KEY_SSO, true);
 				}
+			} catch (HttpClientErrorException.NotFound e) {
+				redirect(request, response);
+				return true;
 			} catch (HttpClientErrorException e) {
-				if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-					redirect(request, response);
-					return true;
-				}
 				log.error(e.getMessage(), e);
 				try {
 					String body = e.getResponseBodyAsString();

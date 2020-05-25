@@ -104,7 +104,7 @@ public class SsoHandlerTest {
 		request.setCookies(new Cookie("T", "1234567890"));
 
 		URI apiUri = new URI("http://portal.cywb.com/api/user/@self");
-		willThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND)).given(restTemplate)
+		willThrow(HttpClientErrorException.create(HttpStatus.NOT_FOUND, "", null, null, null)).given(restTemplate)
 				.exchange(argThat(entity -> entity.getUrl().equals(apiUri)), eq(SsoHandler.User.class));
 		assertThat(ssoHandler.handle(request, response), is(true));
 		then(response).should().sendRedirect(
@@ -138,7 +138,9 @@ public class SsoHandlerTest {
 		assertThat(authentication, is(notNullValue()));
 		assertThat(authentication.getName(), is("admin"));
 		assertThat(authentication.getAuthorities(), is(notNullValue()));
-		assertThat(authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()).containsAll(Arrays.asList("ROLE_PORTAL_1", "ROLE_PORTAL_2", "ROLE_APP_1", "ROLE_APP_2")), is(true));
+		assertThat(authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+				.collect(Collectors.toList())
+				.containsAll(Arrays.asList("ROLE_PORTAL_1", "ROLE_PORTAL_2", "ROLE_APP_1", "ROLE_APP_2")), is(true));
 		SecurityContextHolder.clearContext();
 	}
 

@@ -17,7 +17,6 @@ import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
@@ -150,9 +149,8 @@ public class RestClient implements BeanNameAware {
 			HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
 			try {
 				token = internalRestTemplate.postForEntity(accessTokenEndpoint, request, getTokenClass()).getBody();
-			} catch (HttpClientErrorException e) {
-				if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)
-						|| e.getResponseBodyAsString().toLowerCase(Locale.ROOT).contains("invalid_token")) {
+			} catch (HttpClientErrorException.Unauthorized e) {
+				if (e.getResponseBodyAsString().toLowerCase(Locale.ROOT).contains("invalid_token")) {
 					token = requestToken();
 				} else {
 					throw e;
