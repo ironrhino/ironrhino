@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -30,6 +31,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -104,8 +106,9 @@ public class SsoHandlerTest {
 		request.setCookies(new Cookie("T", "1234567890"));
 
 		URI apiUri = new URI("http://portal.cywb.com/api/user/@self");
-		willThrow(HttpClientErrorException.create(HttpStatus.NOT_FOUND, "", null, null, null)).given(restTemplate)
-				.exchange(argThat(entity -> entity.getUrl().equals(apiUri)), eq(SsoHandler.User.class));
+		willThrow(HttpClientErrorException.create(HttpStatus.NOT_FOUND, "", HttpHeaders.EMPTY, new byte[0],
+				StandardCharsets.UTF_8)).given(restTemplate).exchange(argThat(entity -> entity.getUrl().equals(apiUri)),
+						eq(SsoHandler.User.class));
 		assertThat(ssoHandler.handle(request, response), is(true));
 		then(response).should().sendRedirect(
 				eq("http://portal.cywb.com/login?targetUrl=" + URLEncoder.encode("http://app.cywb.com", "UTF-8")));
