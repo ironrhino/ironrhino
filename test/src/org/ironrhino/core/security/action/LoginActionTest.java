@@ -52,7 +52,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -199,6 +198,7 @@ public class LoginActionTest extends StrutsSpringJUnit4TestCase<LoginAction> {
 		request.setMethod("POST");
 		request.setParameter("username", "test");
 		request.setParameter("password", "password");
+		request.getSession(); // avoid exception when request.changeSessionId()
 
 		Authentication auth = mock(Authentication.class);
 		given(auth.getPrincipal()).willReturn("test");
@@ -287,11 +287,6 @@ public class LoginActionTest extends StrutsSpringJUnit4TestCase<LoginAction> {
 		@Bean
 		public WebAuthenticationDetailsSource authenticationDetailsSource() {
 			return mock(WebAuthenticationDetailsSource.class);
-		}
-
-		@Bean
-		public SessionAuthenticationStrategy sessionAuthenticationStrategy() {
-			return mock(SessionAuthenticationStrategy.class);
 		}
 
 		@Bean

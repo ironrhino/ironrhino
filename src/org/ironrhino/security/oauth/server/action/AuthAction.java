@@ -136,6 +136,11 @@ public class AuthAction extends BaseAction {
 						.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 				if (authResult != null) {
 					usernamePasswordAuthenticationFilter.success(request, response, authResult);
+					try {
+						request.changeSessionId();
+					} catch (Exception e) {
+						log.error(e.getMessage(), e);
+					}
 					grantor = (UserDetails) authResult.getPrincipal();
 				}
 			} catch (UsernameNotFoundException | DisabledException | LockedException | AccountExpiredException failed) {

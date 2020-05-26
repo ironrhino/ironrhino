@@ -43,7 +43,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
 
@@ -82,9 +81,6 @@ public class LoginAction extends BaseAction {
 	protected DefaultUsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter;
 
 	@Autowired
-	protected SessionAuthenticationStrategy sessionAuthenticationStrategy;
-
-	@Autowired
 	protected EventPublisher eventPublisher;
 
 	@Autowired(required = false)
@@ -108,7 +104,6 @@ public class LoginAction extends BaseAction {
 			UsernamePasswordAuthenticationToken attempt = new UsernamePasswordAuthenticationToken(username, password);
 			attempt.setDetails(authenticationDetailsSource.buildDetails(request));
 			authResult = authenticationManager.authenticate(attempt);
-			sessionAuthenticationStrategy.onAuthentication(authResult, request, response);
 		} catch (InternalAuthenticationServiceException failed) {
 			Throwable cause = failed.getCause();
 			if (cause instanceof Exception) {
@@ -144,6 +139,7 @@ public class LoginAction extends BaseAction {
 		if (authResult != null) {
 			try {
 				usernamePasswordAuthenticationFilter.success(request, response, authResult);
+				request.changeSessionId();
 				Object principal = authResult.getPrincipal();
 				if (principal instanceof UserDetails)
 					eventPublisher.publish(
