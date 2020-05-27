@@ -1,6 +1,6 @@
 (function() {
 	var d = document.domain;
-	if (!d.match(/^(\d+\.){3}\d+$/)) {
+	if (!d.match(/^(\d+\.){3}\d+$/) && d.indexOf('[') != 0) {
 		d = d.split('.');
 		try {
 			if (d.length > 2)
@@ -201,12 +201,16 @@ ProgressBar = {
 UrlUtils = {
 	extractDomain : function(a) {
 		if (UrlUtils.isAbsolute(a)) {
-			a = a.replace(/:\d+/, '');
 			a = a.substring(a.indexOf('://') + 3);
 			var i = a.indexOf('/');
 			if (i > 0)
 				a = a.substring(0, i);
-			return a;
+			if (a.indexOf('[') == 0) {
+				return a.substring(0, a.indexOf(']') + 1);
+			} else {
+				i = a.indexOf(':');
+				return i > 0 ? a.substring(0, i) : a;
+			}
 		} else {
 			return document.location.hostname;
 		}

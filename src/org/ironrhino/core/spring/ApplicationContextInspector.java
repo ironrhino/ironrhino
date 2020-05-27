@@ -308,6 +308,7 @@ public class ApplicationContextInspector {
 			if (v instanceof HikariDataSource) {
 				HikariDataSource hds = (HikariDataSource) v;
 				String url = hds.getJdbcUrl();
+				url = url.substring(url.indexOf(':') + 1);
 				String type = url.substring(0, url.indexOf(':'));
 				String address = url.substring(url.indexOf("//") + 2);
 				int i = address.indexOf('/');

@@ -41,8 +41,18 @@ public class AddressAvailabilityCondition extends SimpleCondition<AddressAvailab
 				}
 				index = address.indexOf(':');
 				if (index > 0) {
-					host = address.substring(0, index);
-					port = Integer.parseInt(address.substring(index + 1));
+					if (address.startsWith("[")) {
+						String[] arr = address.split("]", 2);
+						host = arr[0] + ']';
+						if (arr[1].isEmpty()) {
+							port = 0;
+						} else {
+							port = Integer.parseInt(arr[1].substring(1));
+						}
+					} else {
+						host = address.substring(0, index);
+						port = Integer.parseInt(address.substring(index + 1));
+					}
 				} else {
 					host = address;
 					port = 0;

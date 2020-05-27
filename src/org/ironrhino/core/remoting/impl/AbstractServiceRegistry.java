@@ -77,7 +77,10 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
 	@PostConstruct
 	private void afterPropertiesSet() {
-		localHost = AppInfo.getAppName() + '@' + AppInfo.getHostAddress() + ':'
+		String address = AppInfo.getHostAddress();
+		if (address.indexOf(':') > -1)
+			address = '[' + address + ']'; // IPv6
+		localHost = AppInfo.getAppName() + '@' + address + ':'
 				+ (AppInfo.getHttpPort() > 0 ? AppInfo.getHttpPort() : DEFAULT_HTTP_PORT);
 		if (ctx instanceof ConfigurableWebApplicationContext) {
 			ServletContext servletContext = ((ConfigurableWebApplicationContext) ctx).getServletContext();

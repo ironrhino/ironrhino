@@ -182,7 +182,7 @@ public class RequestUtils {
 		Cookie cookie = new Cookie(cookieName, cookieValue);
 		cookie.setHttpOnly(httpOnly);
 		cookie.setMaxAge(maxAge);
-		if (StringUtils.isNotBlank(domain))
+		if (StringUtils.isNotBlank(domain) && !domain.startsWith("[")) // IPv6
 			cookie.setDomain(domain);
 		cookie.setPath(path);
 		response.addCookie(cookie);
