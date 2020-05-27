@@ -10,7 +10,7 @@ public abstract class AbstractFtpTaskTestBase {
 	static final String FTP_URI = "ftp://admin:admin@localhost:2121/temp";
 
 	public static <T extends AbstractFtpTask> T createTask(Class<T> clazz) throws Exception {
-		T task = (T) clazz.getConstructor().newInstance();
+		T task = clazz.getConstructor().newInstance();
 		task.setUri(new URI(FTP_URI));
 		return task;
 	}
