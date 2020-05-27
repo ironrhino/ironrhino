@@ -41931,6 +41931,7 @@ Observation._patterninput = function(container) {
 				ajax({
 					url: '/webAuthnOptions',
 					data: { username: username.val() },
+					target: username.closest('form')[0],
 					onsuccess: function(options) {
 						options.challenge = _atob(options.challenge);
 						$.each(options.allowCredentials, function() {

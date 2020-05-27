@@ -2,8 +2,6 @@ package org.ironrhino.core.security.webauthn.component;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +12,7 @@ import org.ironrhino.core.security.webauthn.WebAuthnEnabled;
 import org.ironrhino.core.security.webauthn.WebAuthnService;
 import org.ironrhino.core.security.webauthn.internal.Utils;
 import org.ironrhino.core.servlet.AccessHandler;
+import org.ironrhino.core.struts.I18N;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
@@ -39,9 +38,8 @@ public class WebAuthnOptionsHandler extends AccessHandler {
 		Object value;
 		String username = request.getParameter("username");
 		if (StringUtils.isBlank(username)) {
-			Map<String, Object> map = new HashMap<>();
-			map.put("actionErrors", Collections.singletonList("Missing username"));
-			value = map;
+			value = Collections.singletonMap("fieldErrors",
+					Collections.singletonMap("username", Collections.singletonList(I18N.getText("validation.required"))));
 		} else {
 			value = webAuthnService.buildRequestOptions(username);
 		}
