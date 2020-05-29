@@ -48,6 +48,7 @@ import org.springframework.data.redis.connection.RedisSentinelConfiguration;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisConnectionUtils;
+import org.springframework.kafka.config.AbstractKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
@@ -288,6 +289,7 @@ public class ApplicationContextInspector {
 		return serverMapSupplier.obtain();
 	}
 
+	@SuppressWarnings("rawtypes")
 	private ServerMap computeServerMap() {
 		ServerMap sm = new ServerMap(AppInfo.getAppName());
 
@@ -305,6 +307,8 @@ public class ApplicationContextInspector {
 
 		// database
 		ctx.getBeansOfType(DataSource.class).forEach((k, v) -> {
+			if (!ClassUtils.isPresent("com.zaxxer.hikari.HikariDataSource", this.getClass().getClassLoader()))
+				return;
 			if (v instanceof HikariDataSource) {
 				HikariDataSource hds = (HikariDataSource) v;
 				String url = hds.getJdbcUrl();
@@ -330,62 +334,70 @@ public class ApplicationContextInspector {
 		});
 
 		// redis
-		ctx.getBeansOfType(RedisConnectionFactory.class).forEach((k, v) -> {
-			if (v instanceof LettuceConnectionFactory) {
-				LettuceConnectionFactory cf = (LettuceConnectionFactory) v;
-				String type = "Redis";
+		if (ClassUtils.isPresent("org.springframework.data.redis.connection.RedisConnectionFactory",
+				this.getClass().getClassLoader())) {
+			for (Map.Entry<String, RedisConnectionFactory> entry : ctx.getBeansOfType(RedisConnectionFactory.class)
+					.entrySet()) {
+				RedisConnectionFactory v = entry.getValue();
+				if (v instanceof LettuceConnectionFactory) {
+					LettuceConnectionFactory cf = (LettuceConnectionFactory) v;
+					String type = "Redis";
+					String version = null;
+					String address = null;
+					RedisSentinelConfiguration sconf;
+					RedisClusterConfiguration cconf;
+					if ((sconf = cf.getSentinelConfiguration()) != null) {
+						String master = sconf.getMaster().getName();
+						address = "sentinel://"
+								+ sconf.getSentinels().stream().map(Object::toString).collect(Collectors.joining(","))
+								+ "/" + master;
+					} else if ((cconf = cf.getClusterConfiguration()) != null) {
+						address = "cluster://" + cconf.getClusterNodes().stream().map(Object::toString)
+								.collect(Collectors.joining(","));
+					} else {
+						RedisStandaloneConfiguration conf = cf.getStandaloneConfiguration();
+						address = conf.getHostName();
+						int port = conf.getPort();
+						if (port > 0 && port != 6379)
+							address += ':' + port;
+					}
+					RedisConnection connection = null;
+					try {
+						connection = RedisConnectionUtils.getConnection(cf);
+						version = connection.info().getProperty("redis_version");
+					} finally {
+						if (connection != null)
+							RedisConnectionUtils.releaseConnection(connection, cf, false);
+					}
+					sm.getServices().add(new Service(type, version, address));
+				}
+			}
+		}
+
+		// ftp org.ironrhino.core.fs.impl
+		if (ClassUtils.isPresent("org.ironrhino.core.fs.impl.FtpFileStorage", this.getClass().getClassLoader())) {
+			for (Map.Entry<String, FtpFileStorage> entry : ctx.getBeansOfType(FtpFileStorage.class).entrySet()) {
+				URI uri = entry.getValue().getUri();
+				String type = "FTP";
 				String version = null;
-				String address = null;
-				RedisSentinelConfiguration sconf;
-				RedisClusterConfiguration cconf;
-				if ((sconf = cf.getSentinelConfiguration()) != null) {
-					String master = sconf.getMaster().getName();
-					address = "sentinel://"
-							+ sconf.getSentinels().stream().map(Object::toString).collect(Collectors.joining(",")) + "/"
-							+ master;
-				} else if ((cconf = cf.getClusterConfiguration()) != null) {
-					address = "cluster://"
-							+ cconf.getClusterNodes().stream().map(Object::toString).collect(Collectors.joining(","));
-				} else {
-					RedisStandaloneConfiguration conf = cf.getStandaloneConfiguration();
-					address = conf.getHostName();
-					int port = conf.getPort();
-					if (port > 0 && port != 6379)
-						address += ':' + port;
-				}
-				RedisConnection connection = null;
-				try {
-					connection = RedisConnectionUtils.getConnection(cf);
-					version = connection.info().getProperty("redis_version");
-				} finally {
-					if (connection != null)
-						RedisConnectionUtils.releaseConnection(connection, cf, false);
-				}
+				String address = uri.getHost();
+				int port = uri.getPort();
+				if (port > 0)
+					address += ":" + port;
 				sm.getServices().add(new Service(type, version, address));
 			}
-		});
-
-		// ftp
-		ctx.getBeansOfType(FtpFileStorage.class).forEach((k, v) -> {
-			URI uri = v.getUri();
-			String type = "FTP";
-			String version = null;
-			String address = uri.getHost();
-			int port = uri.getPort();
-			if (port > 0)
-				address += ":" + port;
-			sm.getServices().add(new Service(type, version, address));
-		});
+		}
 
 		// kafka
 		if (ClassUtils.isPresent("org.springframework.kafka.annotation.EnableKafka",
 				this.getClass().getClassLoader())) {
-			ctx.getBeansOfType(ProducerFactory.class).forEach((k, v) -> {
-				ProducerFactory<?, ?> pf = v;
+			for (Map.Entry<String, ProducerFactory> entry : ctx.getBeansOfType(ProducerFactory.class).entrySet()) {
+				ProducerFactory<?, ?> pf = entry.getValue();
 				try {
-					Field f = v.getClass().getField("producerFactory");
+					// io.opentracing.contrib.kafka.spring.TracingProducerFactory
+					Field f = pf.getClass().getDeclaredField("producerFactory");
 					f.setAccessible(true);
-					pf = (ProducerFactory<?, ?>) f.get(v);
+					pf = (ProducerFactory<?, ?>) f.get(pf);
 				} catch (Exception ex) {
 					// Ignore
 				}
@@ -397,13 +409,15 @@ public class ApplicationContextInspector {
 							.get(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG);
 					sm.getServices().add(new Service(type, version, address));
 				}
-			});
-			ctx.getBeansOfType(ConsumerFactory.class).forEach((k, v) -> {
-				ConsumerFactory<?, ?> cf = v;
+			}
+			for (Map.Entry<String, AbstractKafkaListenerContainerFactory> entry : ctx
+					.getBeansOfType(AbstractKafkaListenerContainerFactory.class).entrySet()) {
+				ConsumerFactory<?, ?> cf = entry.getValue().getConsumerFactory();
 				try {
-					Field f = v.getClass().getField("consumerFactory");
+					// io.opentracing.contrib.kafka.spring.TracingConsumerFactory
+					Field f = cf.getClass().getDeclaredField("consumerFactory");
 					f.setAccessible(true);
-					cf = (ConsumerFactory<?, ?>) f.get(v);
+					cf = (ConsumerFactory<?, ?>) f.get(cf);
 				} catch (Exception ex) {
 					// Ignore
 				}
@@ -415,7 +429,8 @@ public class ApplicationContextInspector {
 							.get(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG);
 					sm.getServices().add(new Service(type, version, address));
 				}
-			});
+			}
+
 		}
 
 		// elasticsearch
