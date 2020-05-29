@@ -1,7 +1,6 @@
 package org.ironrhino.security.service;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.util.Collections;
 import java.util.Set;
 
@@ -20,25 +19,20 @@ public class UserManagerImpl extends BaseUserManagerImpl<User> implements UserMa
 	@Transactional(readOnly = true)
 	public String suggestUsername(String candidate) {
 		if (candidate.indexOf("://") > 0) {
-			try {
-				URL url = new URL(candidate);
-				String path = url.getPath();
-				if (path.length() > 1) {
-					candidate = path.substring(1);
-					if (candidate.endsWith("/"))
-						candidate = candidate.substring(0, candidate.length() - 1);
+			String path = URI.create(candidate).getPath();
+			if (path.length() > 1) {
+				candidate = path.substring(1);
+				if (candidate.endsWith("/"))
+					candidate = candidate.substring(0, candidate.length() - 1);
+			} else {
+				candidate = candidate.substring(candidate.indexOf("://") + 3);
+				String temp = candidate.substring(0, candidate.indexOf('.'));
+				if (!temp.equalsIgnoreCase("www")) {
+					candidate = temp;
 				} else {
-					candidate = candidate.substring(candidate.indexOf("://") + 3);
-					String temp = candidate.substring(0, candidate.indexOf('.'));
-					if (!temp.equalsIgnoreCase("www")) {
-						candidate = temp;
-					} else {
-						candidate = candidate.substring(candidate.indexOf('.') + 1);
-						candidate = candidate.substring(0, candidate.indexOf('.'));
-					}
+					candidate = candidate.substring(candidate.indexOf('.') + 1);
+					candidate = candidate.substring(0, candidate.indexOf('.'));
 				}
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
 			}
 		}
 		int i = candidate.indexOf('@');

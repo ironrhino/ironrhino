@@ -1,8 +1,7 @@
 package org.ironrhino.core.util;
 
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Collections;
@@ -91,23 +90,14 @@ public class RequestUtils {
 	}
 
 	public static String getBaseUrl(HttpServletRequest request, boolean secured, boolean includeContextPath) {
-		String host = "localhost";
-		String protocol = "http";
-		int port = 80;
-		URL url = null;
-		try {
-			url = new URL(request.getRequestURL().toString());
-			host = url.getHost();
-			protocol = url.getProtocol();
-			port = url.getPort();
-			if (port <= 0)
-				port = url.getDefaultPort();
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
-		if ((protocol.equalsIgnoreCase("https") && secured) || (protocol.equalsIgnoreCase("http") && !secured)) {
+		URI url = URI.create(request.getRequestURL().toString());
+		String protocol = url.getScheme();
+		if ((protocol.equalsIgnoreCase("https") && secured) || (protocol.equalsIgnoreCase("http") && !secured))
 			return getBaseUrl(request);
-		}
+		String host = url.getHost();
+		int port = url.getPort();
+		if (port <= 0)
+			port = protocol.equalsIgnoreCase("https") ? 443 : 80;
 		StringBuilder sb = new StringBuilder();
 		sb.append(secured ? "https://" : "http://");
 		sb.append(host);
@@ -231,17 +221,13 @@ public class RequestUtils {
 			b = "http:" + b;
 		if (b.indexOf("://") < 0 || a.indexOf("://") < 0)
 			return true;
-		try {
-			String host1 = new URL(a).getHost();
-			if (host1 == null)
-				host1 = "localhost";
-			String host2 = new URL(b).getHost();
-			if (host2 == null)
-				host2 = "localhost";
-			return host1.equalsIgnoreCase(host2) || getDomainRoot(host1).equalsIgnoreCase(getDomainRoot(host2));
-		} catch (MalformedURLException e) {
-			return false;
-		}
+		String host1 = URI.create(a).getHost();
+		if (host1 == null)
+			host1 = "localhost";
+		String host2 = URI.create(b).getHost();
+		if (host2 == null)
+			host2 = "localhost";
+		return host1.equalsIgnoreCase(host2) || getDomainRoot(host1).equalsIgnoreCase(getDomainRoot(host2));
 	}
 
 	public static String getValueFromQueryString(String queryString, String name) {

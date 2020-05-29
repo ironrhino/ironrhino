@@ -1,7 +1,6 @@
 package org.ironrhino.common.service;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
@@ -49,13 +48,9 @@ public class PageViewServiceImpl implements PageViewService {
 		if (pageViewStringRedisTemplate == null)
 			return;
 		String domain = null;
-		try {
-			domain = new URL(url).getHost();
-			if (domain.startsWith("www."))
-				domain = domain.substring(4);
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
+		domain = URI.create(url).getHost();
+		if (domain.startsWith("www."))
+			domain = domain.substring(4);
 		addDomain(domain);
 		addPageView(date, null);
 		addPageView(date, domain);
@@ -391,20 +386,16 @@ public class PageViewServiceImpl implements PageViewService {
 	}
 
 	private static String[] parseSearchUrl(String searchUrl) {
-		try {
-			URL url = new URL(searchUrl);
-			String host = url.getHost();
-			String query = url.getQuery();
-			for (Map.Entry<String, String> entry : searchengines.entrySet()) {
-				if (host.indexOf(entry.getKey() + ".") == 0 || host.indexOf("." + entry.getKey() + ".") > 0) {
-					String[] result = new String[2];
-					result[0] = entry.getKey();
-					result[1] = RequestUtils.getValueFromQueryString(query, entry.getValue());
-					return result;
-				}
+		URI url = URI.create(searchUrl);
+		String host = url.getHost();
+		String query = url.getQuery();
+		for (Map.Entry<String, String> entry : searchengines.entrySet()) {
+			if (host.indexOf(entry.getKey() + ".") == 0 || host.indexOf("." + entry.getKey() + ".") > 0) {
+				String[] result = new String[2];
+				result[0] = entry.getKey();
+				result[1] = RequestUtils.getValueFromQueryString(query, entry.getValue());
+				return result;
 			}
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
 		}
 		return null;
 	}

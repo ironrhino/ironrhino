@@ -1,7 +1,7 @@
 package org.ironrhino.core.security.webauthn.domain;
 
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 
 import org.ironrhino.core.security.webauthn.internal.Utils;
 
@@ -40,8 +40,7 @@ public class ClientData {
 			throw new IllegalArgumentException("Invalid type: " + type);
 		if (!this.challenge.equals(challenge))
 			throw new IllegalArgumentException("Challenge failed");
-		URL url = new URL(origin);
-		if (!url.getHost().equals(rpId))
+		if (!URI.create(origin).getHost().equals(rpId))
 			throw new IllegalArgumentException("Mismatched origin");
 		if (tokenBinding != null && tokenBinding.getStatus() == TokenBindingStatus.present) {
 			if (tokenBinding.getId() == null)

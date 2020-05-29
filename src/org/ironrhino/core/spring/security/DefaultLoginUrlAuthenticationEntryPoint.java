@@ -1,6 +1,7 @@
 package org.ironrhino.core.spring.security;
 
-import java.net.URL;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.util.List;
 
@@ -101,7 +102,7 @@ public class DefaultLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticat
 						.append(URLEncoder.encode(targetUrl, "UTF-8"));
 			redirectUrl = loginUrl.toString();
 			if (isForceHttps() && redirectUrl.startsWith("http://")) {
-				URL url = new URL(redirectUrl);
+				URI url = URI.create(redirectUrl);
 				RedirectUrlBuilder urlBuilder = new RedirectUrlBuilder();
 				urlBuilder.setScheme("https");
 				urlBuilder.setServerName(url.getHost());
@@ -113,7 +114,7 @@ public class DefaultLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticat
 				urlBuilder.setQuery(url.getQuery());
 				redirectUrl = urlBuilder.getUrl();
 			}
-		} catch (Exception e) {
+		} catch (UnsupportedEncodingException e) {
 			redirectUrl = loginUrl.toString();
 		}
 		return redirectUrl;
