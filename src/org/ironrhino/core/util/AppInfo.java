@@ -431,7 +431,7 @@ public class AppInfo {
 				System.setProperty("Log4jContextSelector",
 						"org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
 			if (System.getProperty("AsyncLogger.RingBufferSize") == null)
-				System.setProperty("AsyncLogger.RingBufferSize", "16384");
+				System.setProperty("AsyncLogger.RingBufferSize", String.valueOf(256 * 1024));
 		}
 		System.setProperty("log4j2.threadContextMap", MyThreadContextMap.class.getName());
 		System.setProperty("log4j2.isThreadContextMapInheritable", String.valueOf(true));
