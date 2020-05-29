@@ -423,15 +423,15 @@ public class AppInfo {
 			if (AppInfo.class.getClassLoader().getResource(file) != null)
 				sb.append(",classpath:" + file);
 		String configurationFile = sb.toString();
-		System.setProperty("log4j.configurationFile", configurationFile);
+		System.setProperty("log4j2.configurationFile", configurationFile);
 		if (configurationFile.indexOf(',') > 0)
-			System.setProperty("log4j.mergeStrategy", SimpleMergeStrategy.class.getName());
+			System.setProperty("log4j2.mergeStrategy", SimpleMergeStrategy.class.getName());
 		if (!SystemUtils.IS_OS_WINDOWS) {
-			if (System.getProperty("Log4jContextSelector") == null)
-				System.setProperty("Log4jContextSelector",
+			if (System.getProperty("log4j2.contextSelector") == null)
+				System.setProperty("log4j2.contextSelector",
 						"org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
-			if (System.getProperty("AsyncLogger.RingBufferSize") == null)
-				System.setProperty("AsyncLogger.RingBufferSize", String.valueOf(256 * 1024));
+			if (System.getProperty("log4j2.asyncLoggerRingBufferSize") == null)
+				System.setProperty("log4j2.asyncLoggerRingBufferSize", String.valueOf(256 * 1024));
 		}
 		System.setProperty("log4j2.threadContextMap", MyThreadContextMap.class.getName());
 		System.setProperty("log4j2.isThreadContextMapInheritable", String.valueOf(true));
