@@ -22,7 +22,6 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.ironrhino.core.tracing.Tracing;
 import org.ironrhino.core.util.NameableThreadFactory;
 import org.ironrhino.core.util.ReflectionUtils;
-import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -63,7 +62,7 @@ public abstract class MethodInterceptorFactoryBean implements MethodInterceptor,
 	@Override
 	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
 		Method method = methodInvocation.getMethod();
-		if (AopUtils.isToStringMethod(method)) {
+		if (org.springframework.util.ReflectionUtils.isToStringMethod(method)) {
 			Class<?> objectType = getObjectType();
 			return "Dynamic proxy for [" + (objectType != null ? objectType.getName() : "Unknown") + "]";
 		}
