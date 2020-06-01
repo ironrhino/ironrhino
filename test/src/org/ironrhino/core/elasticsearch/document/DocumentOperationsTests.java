@@ -29,10 +29,10 @@ public class DocumentOperationsTests {
 	public void test() {
 		String index = "article";
 		Article article = new Article("id", "title", "content", 0, new Date());
-		articleOperations.index(index, article.getId(), article);
+		assertThat(articleOperations.index(index, article.getId(), article).getVersion(), is(1));
 		assertThat(articleOperations.get(index, article.getId()), is(article));
 		article.setContent("content2");
-		articleOperations.update(index, article.getId(), article);
+		assertThat(articleOperations.update(index, article.getId(), article).getVersion(), is(2));
 		assertThat(articleOperations.get(index, article.getId()), is(article));
 		articleOperations.delete(index, article.getId());
 		assertThat(articleOperations.get(index, article.getId()), is(nullValue()));

@@ -14,19 +14,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface DocumentOperations<T> {
 
 	@PostMapping("/{index}/_doc")
-	void index(@PathVariable String index, @RequestBody T document);
+	IndexResult index(@PathVariable String index, @RequestBody T document);
 
 	@PutMapping("/{index}/_doc/{id}")
-	void index(@PathVariable String index, @PathVariable String id, @RequestBody T document);
+	IndexResult index(@PathVariable String index, @PathVariable String id, @RequestBody T document);
 
 	@PutMapping("/{index}/_create/{id}")
-	void putIfAbsent(@PathVariable String index, @PathVariable String id, @RequestBody T document);
+	IndexResult putIfAbsent(@PathVariable String index, @PathVariable String id, @RequestBody T document);
 
 	@PostMapping("/{index}/_doc/{id}")
-	void update(@PathVariable String index, @PathVariable String id, @RequestBody T document);
+	IndexResult update(@PathVariable String index, @PathVariable String id, @RequestBody T document);
 
 	@PostMapping("/{index}/_doc/{id}")
-	void update(@PathVariable String index, @PathVariable String id, @RequestBody T document,
+	IndexResult update(@PathVariable String index, @PathVariable String id, @RequestBody T document,
 			@RequestParam("if_seq_no") int seqNo, @RequestParam("if_primary_term") int primaryTerm);
 
 	@GetMapping("/{index}/_source/{id}")
