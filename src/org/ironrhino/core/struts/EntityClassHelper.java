@@ -214,9 +214,11 @@ public class EntityClassHelper {
 					EmbeddedId embeddedId = findAnnotation(readMethod, declaredField, EmbeddedId.class);
 					if ((embedded != null || embeddedId != null)
 							&& (uiConfig == null || !uiConfig.embeddedAsSingle())) {
-						HiddenImpl hi = new HiddenImpl();
-						hi.setValue(true);
-						uci.setHiddenInList(hi);
+						if (StringUtils.isBlank(uci.getListTemplate())) {
+							HiddenImpl hi = new HiddenImpl();
+							hi.setValue(true);
+							uci.setHiddenInList(hi);
+						}
 						uci.setType("embedded");
 						Map<String, UiConfigImpl> map2 = getUiConfigs(readMethod.getReturnType());
 						for (UiConfigImpl ui : map2.values()) {
@@ -235,9 +237,11 @@ public class EntityClassHelper {
 
 					if (collectionType != null && elementType != null
 							&& elementType.getAnnotation(Embeddable.class) != null) {
-						HiddenImpl hi = new HiddenImpl();
-						hi.setValue(true);
-						uci.setHiddenInList(hi);
+						if (StringUtils.isBlank(uci.getListTemplate())) {
+							HiddenImpl hi = new HiddenImpl();
+							hi.setValue(true);
+							uci.setHiddenInList(hi);
+						}
 						uci.setType("collection");
 						uci.setEmbeddedUiConfigs(getUiConfigs(elementType));
 						uci.setExcludedFromCriteria(true);
