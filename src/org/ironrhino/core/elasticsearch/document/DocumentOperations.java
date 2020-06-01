@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @ElasticsearchEnabled
-@RestApi(apiBaseUrl = Constants.VALUE_ELASTICSEARCH_URL, treatNotFoundAsNull = true, dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+@RestApi(apiBaseUrl = Constants.VALUE_ELASTICSEARCH_URL, treatNotFoundAsNull = true, dateFormat = Constants.DATE_FORMAT)
 public interface DocumentOperations<T> {
 
 	@PostMapping("/{index}/_doc")

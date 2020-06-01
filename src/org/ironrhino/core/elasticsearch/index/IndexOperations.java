@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @ElasticsearchEnabled
-@RestApi(apiBaseUrl = Constants.VALUE_ELASTICSEARCH_URL, treatNotFoundAsNull = true, dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+@RestApi(apiBaseUrl = Constants.VALUE_ELASTICSEARCH_URL, treatNotFoundAsNull = true, dateFormat = Constants.DATE_FORMAT)
 public interface IndexOperations {
 
 	@PutMapping("/{index}")
