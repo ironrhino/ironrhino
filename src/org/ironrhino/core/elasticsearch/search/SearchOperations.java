@@ -3,6 +3,7 @@ package org.ironrhino.core.elasticsearch.search;
 import java.util.List;
 
 import org.ironrhino.core.elasticsearch.Constants;
+import org.ironrhino.core.elasticsearch.ElasticsearchEnabled;
 import org.ironrhino.rest.client.JsonPointer;
 import org.ironrhino.rest.client.RestApi;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,7 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@RestApi(apiBaseUrl = Constants.ELASTICSEARCH_URL, treatNotFoundAsNull = true, dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+@ElasticsearchEnabled
+@RestApi(apiBaseUrl = Constants.VALUE_ELASTICSEARCH_URL, treatNotFoundAsNull = true, dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS")
 public interface SearchOperations<T> {
 
 	@GetMapping("/{index}/_count")

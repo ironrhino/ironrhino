@@ -2,6 +2,8 @@ package org.ironrhino.core.elasticsearch;
 
 public interface Constants {
 
-	String ELASTICSEARCH_URL = "${elasticsearch.url:http://localhost:9200}";
+	String KEY_ELASTICSEARCH_URL = "elasticsearch.url";
+
+	String VALUE_ELASTICSEARCH_URL = "${" + KEY_ELASTICSEARCH_URL + "}";
 
 }
