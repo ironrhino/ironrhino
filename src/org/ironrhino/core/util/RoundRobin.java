@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,13 +14,13 @@ public class RoundRobin<T> {
 
 	protected List<TargetWrapper<T>> targetWrappers = new ArrayList<>();
 
-	protected UsableChecker<T> usableChecker;
+	protected Predicate<T> usableChecker;
 
 	public RoundRobin(Collection<T> targets) {
 		this(targets, null);
 	}
 
-	public RoundRobin(Collection<T> targets, UsableChecker<T> usableChecker) {
+	public RoundRobin(Collection<T> targets, Predicate<T> usableChecker) {
 		if (targets == null || targets.size() == 0)
 			throw new IllegalArgumentException("no target");
 		for (T target : targets) {
@@ -33,7 +34,7 @@ public class RoundRobin<T> {
 		this(targets, null);
 	}
 
-	public RoundRobin(Map<T, Integer> targets, UsableChecker<T> usableChecker) {
+	public RoundRobin(Map<T, Integer> targets, Predicate<T> usableChecker) {
 		if (targets == null || targets.size() == 0)
 			throw new IllegalArgumentException("no target");
 		targets.forEach((k, v) -> {
@@ -49,7 +50,7 @@ public class RoundRobin<T> {
 		for (int i = 0; i < targetWrappers.size(); i++) {
 			TargetWrapper<T> target = targetWrappers.get(i);
 			AtomicInteger targetStat = target.getStat();
-			if (!(usableChecker == null || usableChecker.isUsable(target.getTarget())))
+			if (!(usableChecker == null || usableChecker.test(target.getTarget())))
 				continue;
 			totalWeight += target.getWeight();
 			int newStat = targetStat.addAndGet(target.getWeight());
@@ -60,13 +61,6 @@ public class RoundRobin<T> {
 			return null;
 		tw.getStat().addAndGet(-totalWeight);
 		return tw.getTarget();
-	}
-
-	@FunctionalInterface
-	public interface UsableChecker<T> {
-
-		boolean isUsable(T target);
-
 	}
 
 	static class TargetWrapper<T> {
