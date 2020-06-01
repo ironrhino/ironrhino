@@ -1,5 +1,7 @@
 package org.ironrhino.core.elasticsearch.search;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
@@ -7,10 +9,11 @@ import lombok.Data;
 @Data
 public class SearchHits<T> {
 
-	@JsonProperty("_score")
-	private double score;
+	@JsonProperty("max_score")
+	private double maxScore;
 
-	@JsonProperty("_source")
-	private T document;
-	
+	private Total total;
+
+	private List<SearchHit<T>> hits;
+
 }

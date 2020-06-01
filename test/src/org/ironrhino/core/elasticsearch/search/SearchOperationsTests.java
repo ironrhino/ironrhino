@@ -43,20 +43,20 @@ public class SearchOperationsTests {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		List<SearchHits<Article>> list = articleOperations.search(index, "title:title");
+		List<SearchHit<Article>> list = articleOperations.search(index, "title:title").getHits().getHits();
 		assertThat(list.size(), is(10));
-		list = articleOperations.search(index, "title:test");
+		list = articleOperations.search(index, "title:test").getHits().getHits();
 		assertThat(list.size(), is(10));
-		list = articleOperations.search(index, "content");
+		list = articleOperations.search(index, "content").getHits().getHits();
 		assertThat(list.size(), is(10)); // default size is 10
 
-		list = articleOperations.search(index, "title:title", 0, 5);
+		list = articleOperations.search(index, "title:title", 0, 5).getHits().getHits();
 		assertThat(list.size(), is(5));
-		list = articleOperations.search(index, "title:test", 0, 5);
+		list = articleOperations.search(index, "title:test", 0, 5).getHits().getHits();
 		assertThat(list.size(), is(5));
-		list = articleOperations.search(index, "content", 0, 20);
+		list = articleOperations.search(index, "content", 0, 20).getHits().getHits();
 		assertThat(list.size(), is(20));
-		list = articleOperations.search(index, "content", 10, 20);
+		list = articleOperations.search(index, "content", 10, 20).getHits().getHits();
 		assertThat(list.size(), is(10));
 
 		List<AggregationBucket> buckets = articleOperations.aggregate(index, TermsAggregation.of("title.keyword"));
@@ -81,9 +81,39 @@ public class SearchOperationsTests {
 		assertThat(buckets.get(19).getKeyAsString(), is("2020-05-20"));
 		assertThat(buckets.get(19).getCount(), is(1));
 
-		for (int i = 0; i < size; i++) {
-			articleOperations.delete(index, String.valueOf(i + 1));
+		articleOperations.delete(index);
+	}
+
+	@Test
+	public void testScroll() {
+		String index = "article";
+		if (articleOperations.exists(index))
+			articleOperations.delete(index);
+		articleOperations.create(index);
+		for (int i = 0; i < 10; i++) {
+			Article article = new Article(String.valueOf(i + 1), "title", "content", i,
+					DateUtils.parse("2020-05-" + NumberUtils.format(i + 1, 2)));
+			articleOperations.index(index, article.getId(), article);
 		}
+		try {
+			TimeUnit.MILLISECONDS.sleep(1000); // wait for index completion
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		SearchResult<Article> result = articleOperations.search(index, "title:title", "100s", 3);
+		assertThat(result.isTimedOut(), is(false));
+		assertThat(result.getHits().getTotal().getValue(), is(10));
+		assertThat(result.getHits().getHits().size(), is(3));
+		result = articleOperations.scroll("100s", result.getScrollId());
+		assertThat(result.getHits().getHits().size(), is(3));
+		result = articleOperations.scroll("100s", result.getScrollId());
+		assertThat(result.getHits().getHits().size(), is(3));
+		result = articleOperations.scroll("100s", result.getScrollId());
+		assertThat(result.getHits().getHits().size(), is(1));
+		result = articleOperations.scroll("100s", result.getScrollId());
+		assertThat(result.getHits().getHits().size(), is(0));
+		articleOperations.clearScroll(result.getScrollId());
+		articleOperations.delete(index);
 	}
 
 	static class Config {
