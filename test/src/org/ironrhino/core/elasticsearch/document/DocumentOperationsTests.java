@@ -62,12 +62,12 @@ public class DocumentOperationsTests {
 		assertThat(detail.getIndex(), is(index));
 		assertThat(detail.getId(), is(article.getId()));
 		assertThat(detail.getVersion(), is(1));
-		assertThat(detail.getDocument(), is(article));
+		assertThat(detail.getSource(), is(article));
 		article.setContent("content2");
 		articleOperations.update(index, article.getId(), article, detail.getSeqNo(), detail.getPrimaryTerm());
 		detail = articleOperations.detail(index, article.getId());
 		assertThat(detail.getVersion(), is(2));
-		assertThat(detail.getDocument(), is(article));
+		assertThat(detail.getSource(), is(article));
 		articleOperations.delete(index);
 	}
 
@@ -80,7 +80,7 @@ public class DocumentOperationsTests {
 		assertThat(detail.getIndex(), is(index));
 		assertThat(detail.getId(), is(article.getId()));
 		assertThat(detail.getVersion(), is(1));
-		assertThat(detail.getDocument(), is(article));
+		assertThat(detail.getSource(), is(article));
 		article.setContent("content2");
 		try {
 			articleOperations.update(index, article.getId(), article, 100, 100);

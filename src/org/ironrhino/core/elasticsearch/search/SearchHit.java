@@ -11,6 +11,6 @@ public class SearchHit<T> {
 	private double score;
 
 	@JsonProperty("_source")
-	private T document;
-	
+	private T source;
+
 }

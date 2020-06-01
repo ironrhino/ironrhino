@@ -10,6 +10,6 @@ import lombok.Setter;
 public class Detail<T> extends IndexResult {
 
 	@JsonProperty("_source")
-	private T document;
+	private T source;
 
 }
