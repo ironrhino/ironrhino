@@ -53,6 +53,42 @@ public class DocumentOperationsTests {
 		}
 	}
 
+	@Test
+	public void testCAS() {
+		String index = "article";
+		Article article = new Article("id", "title", "content", 0, new Date());
+		articleOperations.index(index, article.getId(), article);
+		Detail<Article> detail = articleOperations.detail(index, article.getId());
+		assertThat(detail.getIndex(), is(index));
+		assertThat(detail.getId(), is(article.getId()));
+		assertThat(detail.getVersion(), is(1));
+		assertThat(detail.getDocument(), is(article));
+		article.setContent("content2");
+		articleOperations.update(index, article.getId(), article, detail.getSeqNo(), detail.getPrimaryTerm());
+		detail = articleOperations.detail(index, article.getId());
+		assertThat(detail.getVersion(), is(2));
+		assertThat(detail.getDocument(), is(article));
+		articleOperations.delete(index);
+	}
+
+	@Test(expected = HttpClientErrorException.Conflict.class)
+	public void testCASWithConflict() {
+		String index = "article";
+		Article article = new Article("id", "title", "content", 0, new Date());
+		articleOperations.index(index, article.getId(), article);
+		Detail<Article> detail = articleOperations.detail(index, article.getId());
+		assertThat(detail.getIndex(), is(index));
+		assertThat(detail.getId(), is(article.getId()));
+		assertThat(detail.getVersion(), is(1));
+		assertThat(detail.getDocument(), is(article));
+		article.setContent("content2");
+		try {
+			articleOperations.update(index, article.getId(), article, 100, 100);
+		} finally {
+			articleOperations.delete(index);
+		}
+	}
+
 	static class Config {
 		@Bean
 		public static RestApiRegistryPostProcessor restApiRegistryPostProcessor() {

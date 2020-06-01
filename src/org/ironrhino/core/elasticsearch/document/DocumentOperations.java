@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestApi(apiBaseUrl = Constants.ELASTICSEARCH_URL, treatNotFoundAsNull = true, dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS")
 public interface DocumentOperations<T> {
@@ -24,8 +25,15 @@ public interface DocumentOperations<T> {
 	@PostMapping("/{index}/_doc/{id}")
 	void update(@PathVariable String index, @PathVariable String id, @RequestBody T document);
 
+	@PostMapping("/{index}/_doc/{id}")
+	void update(@PathVariable String index, @PathVariable String id, @RequestBody T document,
+			@RequestParam("if_seq_no") int seqNo, @RequestParam("if_primary_term") int primaryTerm);
+
 	@GetMapping("/{index}/_source/{id}")
 	T get(@PathVariable String index, @PathVariable String id);
+
+	@GetMapping("/{index}/_doc/{id}")
+	Detail<T> detail(@PathVariable String index, @PathVariable String id);
 
 	@DeleteMapping("/{index}/_doc/{id}")
 	void delete(@PathVariable String index, @PathVariable String id);
