@@ -15,6 +15,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RestApi(apiBaseUrl = Constants.ELASTICSEARCH_URL, treatNotFoundAsNull = true, dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS")
 public interface SearchOperations<T> {
 
+	@GetMapping("/{index}/_count")
+	@JsonPointer("/count")
+	int count(@PathVariable String index, @RequestParam("q") String query);
+
 	@GetMapping("/{index}/_search")
 	SearchResult<T> search(@PathVariable String index, @RequestParam("q") String query);
 

@@ -43,6 +43,7 @@ public class SearchOperationsTests {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		assertThat(articleOperations.count(index, "title:title"), is(10));
 		List<SearchHit<Article>> list = articleOperations.search(index, "title:title").getHits().getHits();
 		assertThat(list.size(), is(10));
 		list = articleOperations.search(index, "title:test").getHits().getHits();
