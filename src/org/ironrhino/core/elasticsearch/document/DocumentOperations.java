@@ -18,6 +18,9 @@ public interface DocumentOperations<T> {
 	@PutMapping("/{index}/_doc/{id}")
 	void index(@PathVariable String index, @PathVariable String id, @RequestBody T document);
 
+	@PutMapping("/{index}/_create/{id}")
+	void putIfAbsent(@PathVariable String index, @PathVariable String id, @RequestBody T document);
+
 	@PostMapping("/{index}/_doc/{id}")
 	void update(@PathVariable String index, @PathVariable String id, @RequestBody T document);
 

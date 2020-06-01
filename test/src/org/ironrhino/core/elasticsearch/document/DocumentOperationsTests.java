@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.HttpClientErrorException;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = Config.class)
@@ -36,6 +37,20 @@ public class DocumentOperationsTests {
 		articleOperations.delete(index, article.getId());
 		assertThat(articleOperations.get(index, article.getId()), is(nullValue()));
 		articleOperations.delete(index);
+	}
+
+	@Test(expected = HttpClientErrorException.Conflict.class)
+	public void testPutIfAbsent() {
+		String index = "article";
+		Article article = new Article("id", "title", "content", 0, new Date());
+		articleOperations.index(index, article.getId(), article);
+		assertThat(articleOperations.get(index, article.getId()), is(article));
+		article.setContent("content2");
+		try {
+			articleOperations.putIfAbsent(index, article.getId(), article);
+		} finally {
+			articleOperations.delete(index);
+		}
 	}
 
 	static class Config {
