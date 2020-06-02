@@ -10,6 +10,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 import org.hamcrest.Matcher;
+import org.ironrhino.core.metadata.JsonDesensitize;
 import org.junit.Test;
 
 import lombok.Getter;
@@ -55,7 +56,6 @@ public class JsonDesensitizerTest {
 		assertThat(desensitizer.toJson(user), not(containsString("\"mate\"")));
 		desensitizer.getDropping().add((name, parent) -> name.equals("user"));
 		assertThat(desensitizer.toJson(Collections.singletonMap("user", user)), not(containsString("\"user\"")));
-
 	}
 
 	@Test
@@ -78,6 +78,15 @@ public class JsonDesensitizerTest {
 		assertThat(json, not(containsString("age")));
 	}
 
+	@Test
+	public void testToJsonWithAnnotation() {
+		JsonDesensitizer desensitizer = new JsonDesensitizer();
+		Person p = new Person("test", "13333333333", 12);
+		String json = desensitizer.toJson(p);
+		assertThat(json, containsString("\"1**********\""));
+		assertThat(json, not(containsString("age")));
+	}
+
 	@RequiredArgsConstructor
 	@Getter
 	static class User {
@@ -85,6 +94,16 @@ public class JsonDesensitizerTest {
 		private final String password;
 		private final int age;
 		private User mate;
+	}
+
+	@RequiredArgsConstructor
+	@Getter
+	static class Person {
+		private final String name;
+		@JsonDesensitize("1**********")
+		private final String phone;
+		@JsonDesensitize
+		private final int age;
 	}
 
 }

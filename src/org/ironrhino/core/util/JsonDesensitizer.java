@@ -12,7 +12,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
+import org.ironrhino.core.metadata.JsonDesensitize;
 import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.core.annotation.AnnotationUtils;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -65,15 +67,15 @@ public class JsonDesensitizer {
 					PropertyWriter writer) throws Exception {
 				String name = writer.getName();
 				if (include(writer) && !dropping.stream().anyMatch(entry -> entry.test(name, obj))) {
+					BeanWrapperImpl bw = new BeanWrapperImpl(obj);
 					Optional<Function<String, String>> func = mapping.entrySet().stream()
 							.filter(entry -> entry.getKey().test(name, obj)).findFirst().map(entry -> entry.getValue());
 					if (func.isPresent()) {
-						BeanWrapperImpl bw = new BeanWrapperImpl(obj);
 						Object value = bw.getPropertyValue(name);
 						try {
 							String newValue = func.get().apply(value != null ? String.valueOf(value) : null);
 							Class<?> type = bw.getPropertyType(name);
-							if (TypeUtils.isNumeric(type)) {
+							if (TypeUtils.isNumeric(type) && NumberUtils.isNumber(newValue)) {
 								jgen.writeFieldName(name);
 								jgen.writeNumber(newValue);
 							} else if ((type == Boolean.class || type == boolean.class)
@@ -86,7 +88,35 @@ public class JsonDesensitizer {
 							e.printStackTrace();
 						}
 					} else {
-						writer.serializeAsField(obj, jgen, provider);
+						JsonDesensitize annotation = null;
+						try {
+							annotation = AnnotationUtils.findAnnotation(bw.getPropertyDescriptor(name).getReadMethod(),
+									JsonDesensitize.class);
+							if (annotation == null)
+								annotation = AnnotationUtils.findAnnotation(
+										ReflectionUtils.getField(obj.getClass(), name), JsonDesensitize.class);
+						} catch (Exception e) {
+
+						}
+						if (annotation != null) {
+							String newValue = annotation.value();
+							if (newValue.equals(JsonDesensitize.DEFAULT_NONE)) {
+								writer.serializeAsOmittedField(obj, jgen, provider);
+							} else {
+								Class<?> type = bw.getPropertyType(name);
+								if (TypeUtils.isNumeric(type) && NumberUtils.isNumber(newValue)) {
+									jgen.writeFieldName(name);
+									jgen.writeNumber(newValue);
+								} else if ((type == Boolean.class || type == boolean.class)
+										&& ("true".equals(newValue) || "false".equals(newValue))) {
+									jgen.writeBooleanField(name, Boolean.getBoolean(newValue));
+								} else {
+									jgen.writeStringField(name, newValue);
+								}
+							}
+						} else {
+							writer.serializeAsField(obj, jgen, provider);
+						}
 					}
 				} else if (!jgen.canOmitFields()) {
 					writer.serializeAsOmittedField(obj, jgen, provider);

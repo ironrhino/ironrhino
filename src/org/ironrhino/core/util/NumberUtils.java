@@ -13,6 +13,15 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class NumberUtils {
 
+	public static boolean isNumber(String value) {
+		try {
+			Double.parseDouble(value);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
 	public static String formatAmount(BigDecimal value) {
 		return new DecimalFormat("#,##0.00").format(value);
 	}
