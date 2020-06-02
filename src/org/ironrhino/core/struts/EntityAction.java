@@ -118,6 +118,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	private Map<String, UiConfigImpl> _uiConfigs;
 
+	private Map<String, UiConfigImpl> _specifiedColumns;
+
 	private volatile EN _entity;
 
 	private String _entityName;
@@ -291,6 +293,34 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		if (_uiConfigs == null)
 			_uiConfigs = EntityClassHelper.getUiConfigs(getEntityClass());
 		return _uiConfigs;
+	}
+
+	public Map<String, UiConfigImpl> getSpecifiedColumns() {
+		String columns = ServletActionContext.getRequest().getParameter("columns");
+		if (StringUtils.isBlank(columns))
+			return null;
+		if (_specifiedColumns == null) {
+			String[] arr = columns.split(",");
+			Map<String, UiConfigImpl> temp = new LinkedHashMap<>();
+			boolean hasWidth = true;
+			UiConfigImpl config = null;
+			for (String s : arr) {
+				if (_uiConfigs.containsKey(s)) {
+					config = new UiConfigImpl();
+					BeanUtils.copyProperties(_uiConfigs.get(s), config);
+					HiddenImpl hidden = config.getHiddenInList();
+					hidden.setValue(false);
+					hidden.setExpression("");
+					temp.put(s, config);
+					if (StringUtils.isBlank(config.getWidth()))
+						hasWidth = false;
+				}
+			}
+			if (hasWidth && config != null)
+				config.setWidth("");
+			_specifiedColumns = temp;
+		}
+		return _specifiedColumns;
 	}
 
 	protected <T extends Persistable<?>> BaseManager<T> getEntityManager(Class<T> entityClass) {
