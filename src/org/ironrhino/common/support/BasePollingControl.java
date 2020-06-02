@@ -15,7 +15,7 @@ public abstract class BasePollingControl<T extends BasePollingEntity> extends Ab
 	protected void doDequeue() {
 		entityManager.setEntityClass(entityClass);
 		while (true) {
-			String id = pop();
+			Long id = pop();
 			if (id == null)
 				break;
 			T entity = entityManager.get(id);

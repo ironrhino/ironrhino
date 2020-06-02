@@ -202,19 +202,19 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> implem
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	protected void push(List<String> ids, boolean deduplication) {
+	protected void push(List<Long> ids, boolean deduplication) {
 		if (ids.isEmpty())
 			return;
 		if (deduplication) {
-			List<String> prepend = new ArrayList<String>();
-			List<String> append = new ArrayList<String>();
+			List<String> prepend = new ArrayList<>();
+			List<String> append = new ArrayList<>();
 			List results = stringRedisTemplate.executePipelined((SessionCallback) redisOperations -> {
-				for (String id : ids)
-					redisOperations.opsForList().remove(boundListOperations.getKey(), 1, id);
+				for (Long id : ids)
+					redisOperations.opsForList().remove(boundListOperations.getKey(), 1, String.valueOf(id));
 				return null;
 			});
 			for (int i = 0; i < ids.size(); i++) {
-				String id = ids.get(i);
+				String id = String.valueOf(ids.get(i));
 				Long removed = (Long) results.get(i);
 				if (removed != null && removed > 0) {
 					prepend.add(id);
@@ -228,12 +228,13 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> implem
 			if (append.size() > 0)
 				boundListOperations.leftPushAll(append.toArray(new String[append.size()]));
 		} else {
-			boundListOperations.leftPushAll(ids.toArray(new String[ids.size()]));
+			boundListOperations.leftPushAll(ids.stream().map(i -> i.toString()).toArray(String[]::new));
 		}
 	}
 
-	protected String pop() {
-		return boundListOperations.rightPop();
+	protected Long pop() {
+		String id = boundListOperations.rightPop();
+		return id != null ? Long.valueOf(id) : null;
 	}
 
 	protected boolean isTemporaryError(Exception e) {

@@ -15,7 +15,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @AutoConfig
-@Richtable(alias = "balanceQuery", readonly = @Readonly(true), order = "createDate desc")
+@Richtable(alias = "balanceQuery", readonly = @Readonly(true), useKeysetPagination = true)
 @MappedSuperclass
 @Getter
 @Setter

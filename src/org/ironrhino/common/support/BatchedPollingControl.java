@@ -22,7 +22,7 @@ public abstract class BatchedPollingControl<T extends BasePollingEntity> extends
 		while (true) {
 			List<T> entities = new ArrayList<>();
 			while (entities.size() < batchLimit) {
-				String id = pop();
+				Long id = pop();
 				if (id == null)
 					break;
 				if (entities.stream().map(BasePollingEntity::getId).anyMatch(s -> s.equals(id)))

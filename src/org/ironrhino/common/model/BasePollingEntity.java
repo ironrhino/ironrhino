@@ -3,12 +3,15 @@ package org.ironrhino.common.model;
 import java.util.Date;
 
 import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.GenericGenerator;
 import org.ironrhino.core.metadata.Readonly;
 import org.ironrhino.core.metadata.UiConfig;
-import org.ironrhino.core.model.BaseEntity;
+import org.ironrhino.core.model.Persistable;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -16,9 +19,14 @@ import lombok.Setter;
 @MappedSuperclass
 @Getter
 @Setter
-public abstract class BasePollingEntity extends BaseEntity {
+public abstract class BasePollingEntity implements Persistable<Long> {
 
 	private static final long serialVersionUID = 3825969412916897020L;
+
+	@Id
+	@GeneratedValue(generator = "snowflake")
+	@GenericGenerator(name = "snowflake", strategy = "snowflake")
+	private Long id;
 
 	@UiConfig(width = "130px", displayOrder = 94)
 	private Date scheduledFor;
