@@ -19,7 +19,7 @@ public interface SearchOperations<T> {
 
 	@GetMapping("/{index}/_count")
 	@JsonPointer("/count")
-	int count(@PathVariable String index, @RequestParam("q") String query);
+	long count(@PathVariable String index, @RequestParam("q") String query);
 
 	@GetMapping("/{index}/_search")
 	SearchResult<T> search(@PathVariable String index, @RequestParam("q") String query);

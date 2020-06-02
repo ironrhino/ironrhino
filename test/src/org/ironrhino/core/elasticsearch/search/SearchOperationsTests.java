@@ -46,7 +46,7 @@ public class SearchOperationsTests {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		assertThat(articleOperations.count(index, "title:title"), is(10));
+		assertThat(articleOperations.count(index, "title:title"), is(10L));
 		List<SearchHit<Article>> list = articleOperations.search(index, "title:title").getHits().getHits();
 		assertThat(list.size(), is(10));
 		list = articleOperations.search(index, "title:test").getHits().getHits();
@@ -106,7 +106,7 @@ public class SearchOperationsTests {
 		}
 		SearchResult<Article> result = articleOperations.search(index, "title:title", "100s", 3);
 		assertThat(result.isTimedOut(), is(false));
-		assertThat(result.getHits().getTotal().getValue(), is(10));
+		assertThat(result.getHits().getTotal().getValue(), is(10L));
 		assertThat(result.getHits().getHits().size(), is(3));
 		result = articleOperations.scroll("100s", result.getScrollId());
 		assertThat(result.getHits().getHits().size(), is(3));
