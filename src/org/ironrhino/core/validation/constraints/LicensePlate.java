@@ -16,7 +16,7 @@ import org.ironrhino.core.validation.validators.LicensePlateValidator;
 @Constraint(validatedBy = { LicensePlateValidator.class })
 public @interface LicensePlate {
 
-	String message() default "{org.ironrhino.core.validation.validators.constraints.LicencePlate.message}";
+	String message() default "{org.ironrhino.core.validation.constraints.LicencePlate.message}";
 
 	Class<?>[] groups() default {};
 

@@ -16,7 +16,7 @@ import org.ironrhino.core.validation.validators.OrganizationCodeValidator;
 @Constraint(validatedBy = { OrganizationCodeValidator.class })
 public @interface OrganizationCode {
 
-	String message() default "{org.ironrhino.core.validation.validators.constraints.OrganizationCode.message}";
+	String message() default "{org.ironrhino.core.validation.constraints.OrganizationCode.message}";
 
 	Class<?>[] groups() default {};
 

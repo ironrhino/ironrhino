@@ -16,7 +16,7 @@ import org.ironrhino.core.validation.validators.CitizenIdentificationNumberValid
 @Constraint(validatedBy = { CitizenIdentificationNumberValidator.class })
 public @interface CitizenIdentificationNumber {
 
-	String message() default "{org.ironrhino.core.validation.validators.constraints.CitizenIdentificationNumber.message}";
+	String message() default "{org.ironrhino.core.validation.constraints.CitizenIdentificationNumber.message}";
 
 	Class<?>[] groups() default {};
 

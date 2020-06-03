@@ -16,7 +16,7 @@ import org.ironrhino.core.validation.validators.SocialCreditIdentifierValidator;
 @Constraint(validatedBy = { SocialCreditIdentifierValidator.class })
 public @interface SocialCreditIdentifier {
 
-	String message() default "{org.ironrhino.core.validation.validators.constraints.SocialCreditIdentifier.message}";
+	String message() default "{org.ironrhino.core.validation.constraints.SocialCreditIdentifier.message}";
 
 	Class<?>[] groups() default {};
 

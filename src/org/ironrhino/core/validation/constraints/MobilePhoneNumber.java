@@ -16,7 +16,7 @@ import org.ironrhino.core.validation.validators.MobilePhoneNumberValidator;
 @Constraint(validatedBy = { MobilePhoneNumberValidator.class })
 public @interface MobilePhoneNumber {
 
-	String message() default "{org.ironrhino.core.validation.validators.constraints.MobilePhoneNumber.message}";
+	String message() default "{org.ironrhino.core.validation.constraints.MobilePhoneNumber.message}";
 
 	Class<?>[] groups() default {};
 
