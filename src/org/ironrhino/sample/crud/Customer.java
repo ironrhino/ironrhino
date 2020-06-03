@@ -32,6 +32,7 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.NaturalId;
 import org.ironrhino.common.model.Gender;
+import org.ironrhino.common.validation.DictionaryValue;
 import org.ironrhino.core.hibernate.convert.EnumArrayConverter;
 import org.ironrhino.core.hibernate.convert.EnumSetConverter;
 import org.ironrhino.core.metadata.AutoConfig;
@@ -79,10 +80,11 @@ public class Customer extends BaseRecordableEntity {
 	private boolean enabled;
 
 	@UiConfig(width = "80px", type = "dictionary", cssClass = "chosen", templateName = "customer_category")
+	@DictionaryValue(templateName = "customer_category")
 	private String category;
 
 	@UiConfig(type = "dictionary", cssClass = "chosen", templateName = "customer_category", hiddenInList = @Hidden(true), description = "potentialCategories.description")
-	private Set<String> potentialCategories;
+	private Set<@DictionaryValue(templateName = "customer_category") String> potentialCategories;
 
 	@UiConfig(width = "80px")
 	@Column(nullable = false)
