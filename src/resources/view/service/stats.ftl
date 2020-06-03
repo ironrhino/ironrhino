@@ -50,15 +50,15 @@ function toggleUrl(url,type){
 Initialization.stats = function() {
 	$('#side button').click(function() {
 				var type = $(this).data('type');
-				$('a.ajax.view').each(function(){
+				$('#services-accordion a.ajax.view').each(function(){
 					this.href = toggleUrl(this.href,type);
 				});
-				$('form.ajax.view').each(function(){
+				$('#count form.ajax.view').each(function(){
 					this.action = toggleUrl(this.action,type);
 				});
-				$('.ajaxpanel').each(function() {
+				$('#count_result .ajaxpanel').each(function() {
 					var t = $(this);
-					t.data('url', toggleUrl(t.data('url'),type));
+					t.attr('data-url', toggleUrl(t.data('url'),type));
 					t.trigger('load');
 				});
 			});
