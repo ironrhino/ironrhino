@@ -1,3 +1,4 @@
+<#ftl output_format='HTML'>
 <ul class="dropdown-menu">
 	<#if frozenLayout??&&!frozenLayout>
 	<li><div style="padding: 3px 20px;">${getText('layout.change')}</div></li>

@@ -1,3 +1,4 @@
+<#ftl output_format='HTML'>
 <ul class="nav">
 	<li><a href="<@url value="/"/>" class="ajax view">${getText('index')}</a></li>
 	<@authorize ifAnyGranted="ROLE_ADMINISTRATOR">
