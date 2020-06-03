@@ -52,9 +52,16 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 				if (e instanceof ConstraintViolationException) {
 					ConstraintViolationException cve = (ConstraintViolationException) e;
 					for (ConstraintViolation<?> cv : cve.getConstraintViolations()) {
-						validationAwareAction
-								.addFieldError(StringUtils.uncapitalize(cv.getRootBeanClass().getSimpleName()) + "."
-										+ cv.getPropertyPath(), cv.getMessage());
+						String propertyPath = cv.getPropertyPath().toString();
+						if (propertyPath.indexOf(".<") > 0) {
+							// collection[].<iterable element>
+							// list[0].<list element>
+							// map[test].<map value>
+							propertyPath = propertyPath.substring(0, propertyPath.lastIndexOf("["));
+						}
+						validationAwareAction.addFieldError(
+								StringUtils.uncapitalize(cv.getRootBeanClass().getSimpleName()) + "." + propertyPath,
+								cv.getMessage());
 					}
 				} else if (e instanceof javax.validation.ValidationException) {
 					// dehydrated ConstraintViolationException for remoting service
@@ -75,6 +82,12 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 										index += 13;
 										String propertyPath = violation.substring(index,
 												violation.indexOf(",", index + 1));
+										if (propertyPath.indexOf(".<") > 0) {
+											// collection[].<iterable element>
+											// list[0].<list element>
+											// map[test].<map value>
+											propertyPath = propertyPath.substring(0, propertyPath.lastIndexOf("["));
+										}
 										index = violation.indexOf("rootBeanClass=class ");
 										if (index > 0) {
 											index += 20;
