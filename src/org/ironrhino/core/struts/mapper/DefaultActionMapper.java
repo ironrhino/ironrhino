@@ -127,15 +127,20 @@ public class DefaultActionMapper extends AbstractActionMapper {
 					return mapping;
 			}
 
-			String location = AutoConfigResult
-					.getTemplateLocation(request.getAttribute(REQUEST_ATTRIBUTE_KEY_IMPLICIT_DEFAULT_ACTION) != null
-							? uri + DEFAULT_ACTION_NAME
-							: uri);
-			if (location != null) {
-				mapping = new ActionMapping();
-				mapping.setNamespace(DirectTemplateAction.NAMESPACE);
-				mapping.setName(DirectTemplateAction.ACTION_NAME);
-				return mapping;
+			if (!uri.startsWith("/decorator/") && !uri.startsWith("/meta/") && !uri.contains("/include/")) {
+				String templateName = uri.substring(uri.lastIndexOf('/') + 1);
+				if (templateName.indexOf('.') < 0 && templateName.indexOf('_') < 0) {
+					String location = AutoConfigResult.getTemplateLocation(
+							request.getAttribute(REQUEST_ATTRIBUTE_KEY_IMPLICIT_DEFAULT_ACTION) != null
+									? uri + DEFAULT_ACTION_NAME
+									: uri);
+					if (location != null) {
+						mapping = new ActionMapping();
+						mapping.setNamespace(DirectTemplateAction.NAMESPACE);
+						mapping.setName(DirectTemplateAction.ACTION_NAME);
+						return mapping;
+					}
+				}
 			}
 			request.removeAttribute("com.opensymphony.sitemesh.APPLIED_ONCE");
 			return null;
