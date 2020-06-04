@@ -19,13 +19,13 @@
 	<div class="span6 offset3">
 	<h2 class="caption">${getText('login')}</h2>
 	<div class="hero-unit">
-	<#assign webAuthnEnabled = (properties['webAuthn.enabled']!)=='true'>
-	<#assign verificationCodeRequirement = beans['verificationCodeRequirementService'].getVerificationRequirement(username)!>
 	<@s.form id="login" action=request.requestURI+request.queryString???then('?'+request.queryString,'') method="post" class="ajax focus form-horizontal well">
+		<#assign verificationCodeRequirement = beans['verificationCodeRequirementService'].getVerificationRequirement(username)!>
 		<#assign dynamicAttributes={}>
 		<#if (verificationCodeRequirement.required)!false>
 		<#assign dynamicAttributes+={'data-replacement':'verification'}>
 		</#if>
+		<#assign webAuthnEnabled = (properties['webAuthn.enabled']!)=='true'>
 		<@s.textfield name="username" class="required span2${(verificationCodeRequirement?has_content)?then(' conjunct','')}${webAuthnEnabled?then(' webAuthn','')}" dynamicAttributes=dynamicAttributes/>
 		<#if verificationCodeRequirement?has_content><div id="verification"></#if>
 		<#if !(((verificationCodeRequirement.required)!false) && verificationCodeRequirement.passwordHidden)>
