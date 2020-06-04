@@ -323,6 +323,13 @@
 			<unzip dest="${webapp.dir}">
 				<fileset dir="${webapp.dir}/WEB-INF/lib" includes="ironrhino-assets-*.jar" />
 			</unzip>
+			<unzip dest="${webapp.dir}">
+				<fileset dir="${webapp.dir}/WEB-INF/lib" includes="ironrhino-alternative-*.jar" />
+			</unzip>
+			<copy todir="${webapp.dir}/resources" overwrite="true" >
+				<fileset dir="${classes.dir}/resources" />
+			</copy>
+			<move file="${webapp.dir}/resources" tofile="${classes.dir}/resources" />
 			<sync todir="${webapp.dir}/assets">
 				<fileset dir="${webapp.dir}/META-INF/resources/assets" />
 				<preserveintarget>
