@@ -66,11 +66,7 @@
 	<target name="set-revision">
 		<script language="javascript">
 			<![CDATA[
-			try{
-				load('nashorn:mozilla_compat.js');
-			}catch(e){
-			}
-			importPackage(java.io);
+			var File = Java.type('java.io.File');
 			project.setProperty('timestamp',new java.text.SimpleDateFormat('yyyy-MM-dd HH:mm:ss').format(new java.util.Date()));
 			if(new File(basedir+'/.git').isDirectory()){
 				var exec = project.createTask('exec');
@@ -97,11 +93,7 @@
 	<target name="append-revision-for-assets">
 		<script language="javascript">
 			<![CDATA[
-			try{
-				load('nashorn:mozilla_compat.js');
-			}catch(e){
-			}
-			importPackage(java.io);
+			var File = Java.type('java.io.File');
 			var vcs;
 			if(new File(basedir+'/.git').isDirectory())
 				vcs = 'git';

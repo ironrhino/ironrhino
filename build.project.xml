@@ -156,11 +156,7 @@
 	<target name="set-revision">
 		<script language="javascript">
 			<![CDATA[
-			try {
-				load('nashorn:mozilla_compat.js');
-			} catch (e) {
-			}
-			importPackage(java.io);
+			var File = Java.type('java.io.File');
 			project.setProperty('timestamp',
 					new java.text.SimpleDateFormat('yyyy-MM-dd HH:mm:ss')
 							.format(new java.util.Date()));
@@ -216,11 +212,7 @@
 	<target name="append-revision-for-assets" depends="set-revision">
 		<script language="javascript">
 			<![CDATA[
-			try {
-				load('nashorn:mozilla_compat.js');
-			} catch (e) {
-			}
-			importPackage(java.io);
+			var File = Java.type('java.io.File');
 			var vcs;
 			if (new File(basedir + '/.svn').isDirectory())
 				vcs = 'svn';
@@ -420,12 +412,8 @@
 			<antcall target="reset-assets" />
 			<script language="javascript">
 				<![CDATA[
-				try {
-					load('nashorn:mozilla_compat.js');
-				} catch (e) {
-				}
-				importPackage(java.io);
-				importPackage(java.util);
+				var File = Java.type('java.io.File');
+				var UUID = Java.type('java.util.UUID');
 				var blowfish = new File(basedir
 						+ '/webapp/WEB-INF/classes/resources/key/blowfish');
 				if (!blowfish.exists()) {
@@ -524,11 +512,7 @@
 			</copy>
 			<script language="javascript">
 				<![CDATA[
-				try {
-					load('nashorn:mozilla_compat.js');
-				} catch (e) {
-				}
-				importPackage(java.io);
+				var File = Java.type('java.io.File');
 				var lib = new File(project.getProperty('webapp.dir') + '/BOOT-INF/lib');
 				var ironrhinolib = new File(project.getProperty('basedir')
 						+ '/../ironrhino/lib');
