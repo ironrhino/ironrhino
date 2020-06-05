@@ -424,7 +424,7 @@
 				<attribute name="Build-Timestamp" value="${timestamp}" />
 				<attribute name="Build-Revision" value="${revision}" />
 			</manifest>
-		</jar>		
+		</jar>
 	</target>
 
 </project>

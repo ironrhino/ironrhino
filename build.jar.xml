@@ -139,96 +139,96 @@
 					replaceregexp.setEncoding('utf-8');
 					replaceregexp.setPreserveLastModified(true);
 					var fs = project.createDataType("fileset");
-	      			fs.setDir(new File(project.getProperty('webapp.dir')+'/WEB-INF/classes/resources/view/decorator'));
-	      			fs.setIncludes('**/*.ftl');
-	      			replaceregexp.addFileset(fs);
+					fs.setDir(new File(project.getProperty('webapp.dir')+'/WEB-INF/classes/resources/view/decorator'));
+					fs.setIncludes('**/*.ftl');
+					replaceregexp.addFileset(fs);
 					var prefix = name.substring(0,name.lastIndexOf('.'));
 					var suffix = name.substring(name.lastIndexOf('.')+1);
-		  			var match = '/'+dir.getName()+'/'+prefix+'(.*)\\.'+suffix;
-		  			var replace = '/'+dir.getName()+'/'+prefix+'\\1\\.'+suffix+'?'+revision;
-	        		replaceregexp.setMatch(match);
-	        		replaceregexp.setReplace(replace);
-	        		replaceregexp.perform();
+					var match = '/'+dir.getName()+'/'+prefix+'(.*)\\.'+suffix;
+					var replace = '/'+dir.getName()+'/'+prefix+'\\1\\.'+suffix+'?'+revision;
+					replaceregexp.setMatch(match);
+					replaceregexp.setReplace(replace);
+					replaceregexp.perform();
 				}
 			}
 			]]>
 		</script>
-		</target>
-		<target name="reset-append-revision-for-assets">
-			<copy todir="${webapp.dir}/WEB-INF/classes/resources/view/decorator" preservelastmodified="true" overwrite="true">
-				<fileset dir="${src.dir}/resources/view/decorator">
-					<include name="**/*.ftl" />
-				</fileset>
-			</copy>
-		</target>
-		<target name="jar" depends="set-revision">
-			<delete dir="${target.dir}" />
-			<mkdir dir="${target.dir}" />
-			<delete file="${target.dir}/${assets-jar.name}" />
-			<delete file="${target.dir}/${core-jar.name}" />
-			<delete file="${target.dir}/${fs-jar.name}" />
-			<delete file="${target.dir}/${remoting-common-jar.name}" />
-			<delete file="${target.dir}/${remoting-server-jar.name}" />
-			<delete file="${target.dir}/${remoting-client-jar.name}" />
-			<delete file="${target.dir}/${hibernate-config-jar.name}" />
-			<delete file="${target.dir}/${sitemesh-config-jar.name}" />
-			<delete file="${target.dir}/${common-setting-jar.name}" />
-			<delete file="${target.dir}/${common-pageview-jar.name}" />
-			<delete file="${target.dir}/${common-cms-jar.name}" />
-			<delete file="${target.dir}/${common-dictionary-jar.name}" />
-			<delete file="${target.dir}/${common-treenode-jar.name}" />
-			<delete file="${target.dir}/${common-region-jar.name}" />
-			<delete file="${target.dir}/${common-record-jar.name}" />
-			<delete file="${target.dir}/${common-upload-jar.name}" />
-			<delete file="${target.dir}/${common-audit-jar.name}" />
-			<delete file="${target.dir}/${security-jar.name}" />
-			<delete file="${target.dir}/${security-config-jar.name}" />
-			<delete file="${target.dir}/${security-config-base-jar.name}" />
-			<delete file="${target.dir}/${security-config-http-jar.name}" />
-			<delete file="${target.dir}/${security-loginrecord-jar.name}" />
-			<delete file="${target.dir}/${security-oauth-server-jar.name}" />
-			<delete file="${target.dir}/${security-remoting-provider-jar.name}" />
-			<delete file="${target.dir}/${security-remoting-jar.name}" />
-			<delete file="${target.dir}/${security-oauth-server-remoting-jar.name}" />
-			<delete file="${target.dir}/${rest-jar.name}" />
-			<delete file="${target.dir}/${batch-jar.name}" />
-			<delete file="${target.dir}/bootstrap.jar" />
-			<antcall target="compressAssets" />
-			<unzip dest="${webapp.dir}/assets/components">
-				<fileset dir="${webapp.dir}/assets/components" includes="*.zip" />
-			</unzip>
-			<mkdir dir="${target.dir}/assets/META-INF/resources/assets" />
-			<copy todir="${target.dir}/assets/META-INF/resources/assets" preservelastmodified="true">
-				<fileset dir="${webapp.dir}/assets" includes="scripts/*.js,styles/*.css,**/images/**,components/*/**,fonts/*/**" excludes="components/*" />
-			</copy>
-			<jar jarfile="${target.dir}/${assets-jar.name}" basedir="${target.dir}/assets">
-				<manifest>
-					<attribute name="Implementation-Title" value="ironrhino-assets" />
-					<attribute name="Implementation-Vendor" value="ironrhino" />
-					<attribute name="Implementation-Version" value="${version}" />
-					<attribute name="Ironrhino-Component-Id" value="ironrhino-assets" />
-					<attribute name="Build-Timestamp" value="${timestamp}" />
-					<attribute name="Build-Revision" value="${revision}" />
-				</manifest>
-			</jar>
-			<delete dir="${target.dir}/assets" />
-			<antcall target="cleanAssets" />
-			<antcall target="append-revision-for-assets" />
-			<mkdir dir="${classes.dir}/META-INF/descriptors" />
-			<copy todir="${classes.dir}/META-INF/descriptors">
-				<fileset dir="${webapp.dir}/WEB-INF">
-					<exclude name="web.xml" />
-					<include name="*.xml" />
-				</fileset>
-			</copy>
-			<loadfile srcfile="${classes.dir}/resources/view/login.ftl" property="login.ftl"/>
-			<script language="javascript">
-				<![CDATA[
+	</target>
+	<target name="reset-append-revision-for-assets">
+		<copy todir="${webapp.dir}/WEB-INF/classes/resources/view/decorator" preservelastmodified="true" overwrite="true">
+			<fileset dir="${src.dir}/resources/view/decorator">
+				<include name="**/*.ftl" />
+			</fileset>
+		</copy>
+	</target>
+	<target name="jar" depends="set-revision">
+		<delete dir="${target.dir}" />
+		<mkdir dir="${target.dir}" />
+		<delete file="${target.dir}/${assets-jar.name}" />
+		<delete file="${target.dir}/${core-jar.name}" />
+		<delete file="${target.dir}/${fs-jar.name}" />
+		<delete file="${target.dir}/${remoting-common-jar.name}" />
+		<delete file="${target.dir}/${remoting-server-jar.name}" />
+		<delete file="${target.dir}/${remoting-client-jar.name}" />
+		<delete file="${target.dir}/${hibernate-config-jar.name}" />
+		<delete file="${target.dir}/${sitemesh-config-jar.name}" />
+		<delete file="${target.dir}/${common-setting-jar.name}" />
+		<delete file="${target.dir}/${common-pageview-jar.name}" />
+		<delete file="${target.dir}/${common-cms-jar.name}" />
+		<delete file="${target.dir}/${common-dictionary-jar.name}" />
+		<delete file="${target.dir}/${common-treenode-jar.name}" />
+		<delete file="${target.dir}/${common-region-jar.name}" />
+		<delete file="${target.dir}/${common-record-jar.name}" />
+		<delete file="${target.dir}/${common-upload-jar.name}" />
+		<delete file="${target.dir}/${common-audit-jar.name}" />
+		<delete file="${target.dir}/${security-jar.name}" />
+		<delete file="${target.dir}/${security-config-jar.name}" />
+		<delete file="${target.dir}/${security-config-base-jar.name}" />
+		<delete file="${target.dir}/${security-config-http-jar.name}" />
+		<delete file="${target.dir}/${security-loginrecord-jar.name}" />
+		<delete file="${target.dir}/${security-oauth-server-jar.name}" />
+		<delete file="${target.dir}/${security-remoting-provider-jar.name}" />
+		<delete file="${target.dir}/${security-remoting-jar.name}" />
+		<delete file="${target.dir}/${security-oauth-server-remoting-jar.name}" />
+		<delete file="${target.dir}/${rest-jar.name}" />
+		<delete file="${target.dir}/${batch-jar.name}" />
+		<delete file="${target.dir}/bootstrap.jar" />
+		<antcall target="compressAssets" />
+		<unzip dest="${webapp.dir}/assets/components">
+			<fileset dir="${webapp.dir}/assets/components" includes="*.zip" />
+		</unzip>
+		<mkdir dir="${target.dir}/assets/META-INF/resources/assets" />
+		<copy todir="${target.dir}/assets/META-INF/resources/assets" preservelastmodified="true">
+			<fileset dir="${webapp.dir}/assets" includes="scripts/*.js,styles/*.css,**/images/**,components/*/**,fonts/*/**" excludes="components/*" />
+		</copy>
+		<jar jarfile="${target.dir}/${assets-jar.name}" basedir="${target.dir}/assets">
+			<manifest>
+				<attribute name="Implementation-Title" value="ironrhino-assets" />
+				<attribute name="Implementation-Vendor" value="ironrhino" />
+				<attribute name="Implementation-Version" value="${version}" />
+				<attribute name="Ironrhino-Component-Id" value="ironrhino-assets" />
+				<attribute name="Build-Timestamp" value="${timestamp}" />
+				<attribute name="Build-Revision" value="${revision}" />
+			</manifest>
+		</jar>
+		<delete dir="${target.dir}/assets" />
+		<antcall target="cleanAssets" />
+		<antcall target="append-revision-for-assets" />
+		<mkdir dir="${classes.dir}/META-INF/descriptors" />
+		<copy todir="${classes.dir}/META-INF/descriptors">
+			<fileset dir="${webapp.dir}/WEB-INF">
+				<exclude name="web.xml" />
+				<include name="*.xml" />
+			</fileset>
+		</copy>
+		<loadfile srcfile="${classes.dir}/resources/view/login.ftl" property="login.ftl" />
+		<script language="javascript">
+			<![CDATA[
 				var source = project.getProperty('login.ftl');
 				project.setProperty('login.form.ftl','<#ftl output_format="HTML">\n	'+source.substring(source.indexOf('<@s.form'),source.indexOf('</@s.form>')+10));
 				]]>
 			</script>
-			<echo message="${login.form.ftl}" file="${classes.dir}/resources/view/login.form.ftl"/>
+			<echo message="${login.form.ftl}" file="${classes.dir}/resources/view/login.form.ftl" />
 			<jar jarfile="${target.dir}/${core-jar.name}" basedir="${classes.dir}" includes="${core-jar.includes}" excludes="${fs-jar.includes},${remoting-common-jar.includes},${common-setting-jar.includes},${common-cms-jar.includes},${common-dictionary-jar.includes},${common-schema-jar.includes},${common-treenode-jar.includes},${common-region-jar.includes},${common-record-jar.includes},${common-upload-jar.includes},${common-audit-jar.includes}">
 				<manifest>
 					<attribute name="Implementation-Title" value="ironrhino-core" />

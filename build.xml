@@ -80,7 +80,7 @@
 			<formatter type="plain" />
 			<formatter type="xml" />
 			<batchtest todir="${test.results.dir}">
-				<fileset dir="${test.classes.dir}" includes="**/*Test.class" excludes="**/generated/*.class"/>
+				<fileset dir="${test.classes.dir}" includes="**/*Test.class" excludes="**/generated/*.class" />
 				<!--
 				<fileset dir="${test.classes.dir}" includes="**/*Tests.class" />
 				-->

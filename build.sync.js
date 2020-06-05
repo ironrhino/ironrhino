@@ -1,14 +1,13 @@
-try {
-	load('nashorn:mozilla_compat.js');
-} catch (e) {
-}
-importPackage(java.io);
+var File = Java.type('java.io.File');
+var FileInputStream = Java.type('java.io.FileInputStream');
+var InputStreamReader = Java.type('java.io.InputStreamReader');
+var BufferedReader = Java.type('java.io.BufferedReader');
 if (!new File(basedir + '/../ironrhino').isDirectory()) {
 	print("	directory ../ironrhino doesn't exists");
 } else {
 
 	var ironrhinoPaths = readClasspath(new File(basedir
-			+ '/../ironrhino/.classpath')).paths;
+		+ '/../ironrhino/.classpath')).paths;
 	var classpathfile = new File(basedir + '/.classpath');
 	var cp = readClasspath(classpathfile);
 	var paths = cp.paths;
@@ -27,11 +26,11 @@ if (!new File(basedir + '/../ironrhino').isDirectory()) {
 	}
 
 	var dependence = resolveDependence(['../ironrhino/.dependence',
-			'.dependence']);
+		'.dependence']);
 	var increment = dependence.increment;
 	var decrement = dependence.decrement;
 
-	label : for (var i = 0; i < increment.length; i++) {
+	label: for (var i = 0; i < increment.length; i++) {
 		var candidate = increment[i];
 		if (decrement.indexOf(candidate) > -1)
 			continue;
@@ -88,8 +87,8 @@ function readClasspath(classpathfile) {
 	br.close();
 	is.close();
 	return {
-		paths : paths,
-		jarnames : jarnames
+		paths: paths,
+		jarnames: jarnames
 	};
 }
 
@@ -114,8 +113,8 @@ function resolveDependence(paths) {
 		}
 	}
 	return {
-		increment : increment,
-		decrement : decrement
+		increment: increment,
+		decrement: decrement
 	}
 }
 
@@ -126,7 +125,7 @@ function upgradeDependence(path, replacement) {
 	var version = fileInfo.version;
 	var copy = project.createTask("copy");
 	var file = new File(basedir + '/../ironrhino/'
-			+ (filename.startsWith('ironrhino') ? 'target/' + filename : path));
+		+ (filename.startsWith('ironrhino') ? 'target/' + filename : path));
 	var tofile = new File(basedir, path);
 	var func = function() {
 		var parent = file.getParentFile();
@@ -140,7 +139,7 @@ function upgradeDependence(path, replacement) {
 			var jarname2 = fileInfo2.jarname;
 			var version2 = fileInfo2.version;
 			if (f.isFile() && filename != filename2 && jarname == jarname2
-					&& version2.length() > 0) {
+				&& version2.length() > 0) {
 				if (!compareVersion(version, version2))
 					continue;
 				print('	[sync] Upgrading ' + filename + ' to ' + f.getName());
@@ -251,13 +250,13 @@ function cleanup(classpathfile) {
 
 function getFileInfo(filename) {
 	var jarname = filename.substring(0, filename.lastIndexOf(filename
-					.lastIndexOf('-') > 0 ? '-' : '.'));
+		.lastIndexOf('-') > 0 ? '-' : '.'));
 	var version = filename.substring(jarname.length() + 1);
 	if (version.length() > 4)
 		version = version.substring(0, version.length() - 4);
 	return {
-		jarname : jarname,
-		version : version
+		jarname: jarname,
+		version: version
 	};
 }
 
@@ -267,7 +266,7 @@ function compareVersion(v1, v2) {
 	var upgradable = false;
 	for (var j = 0; j < verarr2.length; j++) {
 		if (j == verarr1.length || verarr2[j] > verarr1[j]
-				|| verarr2[j].length() > verarr1[j].length()) {
+			|| verarr2[j].length() > verarr1[j].length()) {
 			upgradable = true;
 			break;
 		}
