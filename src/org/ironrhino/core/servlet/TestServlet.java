@@ -1,10 +1,12 @@
 package org.ironrhino.core.servlet;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 import javax.servlet.http.HttpServlet;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.AppInfo;
-import org.ironrhino.core.util.HttpClientUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -48,7 +50,13 @@ public class TestServlet extends HttpServlet {
 	private boolean test(String testurl) {
 		log.info("testing: " + testurl);
 		try {
-			return HttpClientUtils.get(testurl) != null;
+			HttpURLConnection conn = (HttpURLConnection) new URL(testurl).openConnection();
+			conn.setConnectTimeout(1000);
+			conn.setReadTimeout(1000);
+			conn.connect();
+			int status = conn.getResponseCode();
+			conn.disconnect();
+			return status == 200;
 		} catch (Exception e) {
 			return false;
 		}
