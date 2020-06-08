@@ -53,7 +53,7 @@ public class HttpClientUtils {
 	}
 
 	static class HttpClientHolder {
-		static CloseableHttpClient httpClient = create();
+		static CloseableHttpClient httpClient = create(5000, 10000, true);
 	}
 
 	public static CloseableHttpClient getDefaultInstance() {
@@ -65,6 +65,10 @@ public class HttpClientUtils {
 	}
 
 	public static CloseableHttpClient create(int connectTimeout, int socketTimeout) {
+		return create(connectTimeout, socketTimeout, false);
+	}
+
+	public static CloseableHttpClient create(int connectTimeout, int socketTimeout, boolean evictExpiredConnections) {
 		RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(connectTimeout)
 				.setConnectTimeout(connectTimeout).setSocketTimeout(socketTimeout).build();
 		HttpClientBuilder builder;
@@ -80,6 +84,8 @@ public class HttpClientUtils {
 				.setDefaultHeaders(DEFAULT_HEADERS).useSystemProperties()
 				.setRetryHandler((e, executionCount, httpCtx) -> executionCount < 3
 						&& (e instanceof NoHttpResponseException || e instanceof UnknownHostException));
+		if (evictExpiredConnections)
+			builder.evictExpiredConnections();
 		return builder.build();
 	}
 
