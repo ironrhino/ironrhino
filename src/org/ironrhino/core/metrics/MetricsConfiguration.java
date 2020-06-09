@@ -6,7 +6,6 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
-import javax.sql.DataSource;
 
 import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.ironrhino.core.util.AppInfo;
@@ -17,8 +16,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Role;
 import org.springframework.core.annotation.Order;
-
-import com.zaxxer.hikari.HikariDataSource;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Metrics;
@@ -37,9 +34,6 @@ public class MetricsConfiguration {
 
 	@Autowired(required = false)
 	private List<MeterRegistryProvider> meterRegistryProviders = Collections.emptyList();
-
-	@Autowired(required = false)
-	private DataSource dataSource;
 
 	@Autowired(required = false)
 	private ServletContext servletContext;
@@ -73,10 +67,6 @@ public class MetricsConfiguration {
 		new JvmThreadMetrics().bindTo(meterRegistry);
 		new JvmMemoryMetrics().bindTo(meterRegistry);
 		meterBinders.forEach(mb -> mb.bindTo(meterRegistry));
-
-		if (dataSource instanceof HikariDataSource) {
-			((HikariDataSource) dataSource).setMetricRegistry(meterRegistry);
-		}
 
 		if (servletContext != null) {
 			String className = servletContext.getClass().getName();

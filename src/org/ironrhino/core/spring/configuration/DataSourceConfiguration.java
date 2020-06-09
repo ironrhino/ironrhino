@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flywaydb.core.Flyway;
 import org.ironrhino.core.hibernate.HibernateEnabled;
 import org.ironrhino.core.jdbc.DatabaseProduct;
+import org.ironrhino.core.metrics.MetricsConfiguration;
 import org.ironrhino.core.tracing.TracingConfiguration;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
@@ -27,6 +28,7 @@ import org.springframework.util.ClassUtils;
 
 import com.zaxxer.hikari.HikariDataSource;
 
+import io.micrometer.core.instrument.Metrics;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -87,6 +89,9 @@ public class DataSourceConfiguration {
 	private boolean enableMigrations;
 
 	@Autowired(required = false)
+	private MetricsConfiguration metricsConfiguration;
+
+	@Autowired(required = false)
 	private TracingConfiguration tracingConfiguration;
 
 	protected DataSource createDataSource() {
@@ -120,6 +125,10 @@ public class DataSourceConfiguration {
 			ds.setConnectionTestQuery(connectionTestQuery);
 		ds.setPoolName("HikariPool-" + AppInfo.getAppName());
 		log.info("Using {} to connect {}", ds.getClass().getName(), ds.getJdbcUrl());
+
+		if (metricsConfiguration != null) {
+			ds.setMetricRegistry(Metrics.globalRegistry);
+		}
 
 		if (tracingConfiguration != null && tracingConfiguration.getTracer() != null) {
 			ds.setDriverClassName("io.opentracing.contrib.jdbc.TracingDriver");
