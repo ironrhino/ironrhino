@@ -1,22 +1,11 @@
 package org.ironrhino.core.spring.http.client;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
-import org.apache.http.NoHttpResponseException;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContextBuilder;
-import org.apache.http.ssl.SSLContexts;
 import org.ironrhino.core.servlet.AccessFilter;
 import org.ironrhino.core.tracing.Tracing;
 import org.ironrhino.core.tracing.TracingClientHttpRequestInterceptor;
@@ -54,7 +43,7 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 	private ClientHttpRequestFactory requestFactory;
 
 	public RestTemplate() {
-		this(new TrustAllHostsClientHttpRequestFactory(false));
+		this(new TrustAllHostsHttpComponentsClientHttpRequestFactory(false));
 	}
 
 	public RestTemplate(ClientHttpRequestFactory requestFactory) {
@@ -108,7 +97,7 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 
 	@Value("${restTemplate.trustAllHosts:" + TRUST_ALL_HOSTS + "}")
 	public void setTrustAllHosts(boolean trustAllHosts) {
-		setRequestFactory(new TrustAllHostsClientHttpRequestFactory(trustAllHosts));
+		setRequestFactory(new TrustAllHostsHttpComponentsClientHttpRequestFactory(trustAllHosts));
 	}
 
 	private static class AddHeadersClientHttpRequestInterceptor implements ClientHttpRequestInterceptor {
@@ -127,28 +116,6 @@ public class RestTemplate extends org.springframework.web.client.RestTemplate {
 			if (locale != null)
 				request.getHeaders().setAcceptLanguageAsLocales(Collections.singletonList(locale));
 			return execution.execute(request, body);
-		}
-
-	}
-
-	private static class TrustAllHostsClientHttpRequestFactory extends HttpComponentsClientHttpRequestFactory {
-
-		public TrustAllHostsClientHttpRequestFactory(boolean trustAllHosts) {
-			HttpClientBuilder builder = HttpClients.custom().useSystemProperties().disableAuthCaching()
-					.disableConnectionState().disableCookieManagement().setConnectionTimeToLive(60, TimeUnit.SECONDS)
-					.setRetryHandler((e, executionCount, httpCtx) -> executionCount < 3
-							&& (e instanceof NoHttpResponseException || e instanceof UnknownHostException));
-			if (trustAllHosts) {
-				try {
-					SSLContextBuilder sbuilder = SSLContexts.custom().loadTrustMaterial(null, (chain, authType) -> {
-						return true;
-					});
-					builder.setSSLSocketFactory(new SSLConnectionSocketFactory(sbuilder.build()));
-				} catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e) {
-					e.printStackTrace();
-				}
-			}
-			setHttpClient(builder.build());
 		}
 
 	}

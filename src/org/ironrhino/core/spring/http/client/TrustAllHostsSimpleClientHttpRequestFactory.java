@@ -11,11 +11,17 @@ import javax.net.ssl.X509TrustManager;
 
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 
-public class TrustAllHostsClientHttpRequestFactory extends SimpleClientHttpRequestFactory {
+public class TrustAllHostsSimpleClientHttpRequestFactory extends SimpleClientHttpRequestFactory {
+
+	private final boolean trustAllHosts;
+
+	public TrustAllHostsSimpleClientHttpRequestFactory(boolean trustAllHosts) {
+		this.trustAllHosts = trustAllHosts;
+	}
 
 	@Override
 	protected void prepareConnection(HttpURLConnection connection, String httpMethod) throws IOException {
-		if (connection instanceof HttpsURLConnection) {
+		if (trustAllHosts && connection instanceof HttpsURLConnection) {
 			((HttpsURLConnection) connection).setHostnameVerifier((hostname, session) -> true);
 			((HttpsURLConnection) connection).setSSLSocketFactory(initSSLContext().getSocketFactory());
 		}
@@ -42,7 +48,7 @@ public class TrustAllHostsClientHttpRequestFactory extends SimpleClientHttpReque
 			sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
 			return sslContext;
 		} catch (Exception ex) {
-			return null;
+			throw new RuntimeException(ex);
 		}
 	}
 
