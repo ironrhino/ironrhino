@@ -1,4 +1,7 @@
 var File = Java.type('java.io.File');
+var FileInputStream = Java.type('java.io.FileInputStream');
+var InputStreamReader = Java.type('java.io.InputStreamReader');
+var BufferedReader = Java.type('java.io.BufferedReader');
 var classpathfile = new File(project.getProperty('basedir') + '/.classpath');
 var is = new FileInputStream(classpathfile);
 var br = new BufferedReader(new InputStreamReader(is, 'utf-8'));
