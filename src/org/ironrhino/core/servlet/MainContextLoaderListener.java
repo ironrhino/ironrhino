@@ -73,38 +73,45 @@ public class MainContextLoaderListener extends ContextLoaderListener {
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
+
 		try {
-			String className = "oracle.jdbc.driver.BlockSource.ThreadedCachingBlockSource";
-			if (ClassUtils.isPresent(className, cl)) {
-				Method m = ClassUtils.forName(className, cl).getDeclaredMethod("stopBlockReleaserThread");
-				m.setAccessible(true);
-				m.invoke(null);
-			}
-			className = "oracle.net.nt.TimeoutInterruptHandler";
-			if (ClassUtils.isPresent(className, cl)) {
-				Field f = ClassUtils.forName(className, cl).getDeclaredField("interruptTimer");
-				f.setAccessible(true);
-				Object interruptTimer = f.get(null);
-				if (interruptTimer != null)
-					interruptTimer.getClass().getMethod("cancel").invoke(interruptTimer);
-			}
-			className = "oracle.jdbc.driver.NoSupportHAManager";
-			if (ClassUtils.isPresent(className, cl)) {
-				Field f = ClassUtils.forName(className, cl).getDeclaredField("noSupportHAManager");
-				f.setAccessible(true);
-				Object noSupportHAManager = f.get(null);
-				if (noSupportHAManager != null) {
-//	java.lang.NoClassDefFoundError: Loracle/simplefan/FanManager;
-//					f = ClassUtils.forName("oracle.jdbc.driver.HAManager", cl).getDeclaredField("timer");
-//					f.setAccessible(true);
-//					Object timer = f.get(noSupportHAManager);
-//					if (timer != null)
-//						timer.getClass().getMethod("cancel").invoke(timer);
+			if (ClassUtils.isPresent("oracle.jdbc.OracleDriver", cl)) {
+				if (Thread.getAllStackTraces().keySet().stream().anyMatch(t -> t.getName().equals("InterruptTimer"))) {
+					String className = "oracle.jdbc.driver.BlockSource.ThreadedCachingBlockSource";
+					if (ClassUtils.isPresent(className, cl)) {
+						Method m = ClassUtils.forName(className, cl).getDeclaredMethod("stopBlockReleaserThread");
+						m.setAccessible(true);
+						m.invoke(null);
+					}
+					className = "oracle.net.nt.TimeoutInterruptHandler";
+					if (ClassUtils.isPresent(className, cl)) {
+						Field f = ClassUtils.forName(className, cl).getDeclaredField("interruptTimer");
+						f.setAccessible(true);
+						Object interruptTimer = f.get(null);
+						if (interruptTimer != null)
+							interruptTimer.getClass().getMethod("cancel").invoke(interruptTimer);
+					}
+					className = "oracle.jdbc.driver.NoSupportHAManager";
+					if (ClassUtils.isPresent(className, cl)) {
+						Field f = ClassUtils.forName(className, cl).getDeclaredField("noSupportHAManager");
+						f.setAccessible(true);
+						Object noSupportHAManager = f.get(null);
+						if (noSupportHAManager != null) {
+							// java.lang.NoClassDefFoundError: Loracle/simplefan/FanManager;
+							// f = ClassUtils.forName("oracle.jdbc.driver.HAManager",
+							// cl).getDeclaredField("timer");
+							// f.setAccessible(true);
+							// Object timer = f.get(noSupportHAManager);
+							// if (timer != null)
+							// timer.getClass().getMethod("cancel").invoke(timer);
+						}
+					}
 				}
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
+
 		Enumeration<Driver> drivers = DriverManager.getDrivers();
 		while (drivers.hasMoreElements()) {
 			Driver driver = drivers.nextElement();
