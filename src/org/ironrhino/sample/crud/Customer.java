@@ -17,6 +17,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OrderBy;
 import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -118,6 +119,7 @@ public class Customer extends BaseRecordableEntity {
 	@UiConfig(width = "120px", description = "relatedCompanies.description")
 	@ManyToMany
 	@JoinTable(name = "sample_company_customer", joinColumns = @JoinColumn(name = "customer"), inverseJoinColumns = @JoinColumn(name = "company"))
+	@OrderBy("type,name")
 	private Set<Company> relatedCompanies;
 
 	@Valid

@@ -90,6 +90,7 @@ public class Company extends BaseEntity {
 	@UiConfig(width = "150px", description = "relatedCustomers.description", group = "customer")
 	@ManyToMany
 	@JoinTable(name = "sample_company_customer", joinColumns = @JoinColumn(name = "company"), inverseJoinColumns = @JoinColumn(name = "customer"))
+	@OrderBy("gender,name")
 	// @ManyToMany(mappedBy = "relatedCompanies")
 	// add mappedBy and remove @JoinTable to make this readonly at this side
 	private Set<Customer> relatedCustomers;
