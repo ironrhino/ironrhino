@@ -111,7 +111,7 @@ ${formHeader!}
 
 <#macro rttheadtd name,alias='',description='',title='',cellname='',cellEdit='',class='',width='',readonly=false,resizable=true>
 <th<#if title?has_content> title="${getText(title)}"</#if><#if class?has_content> class="${class}"</#if><#if width?has_content> style="width:${width};"</#if> data-cellname="${cellname}"<#if cellEdit?has_content> data-celledit="${cellEdit}"</#if>>
-<#if resizable><span class="resizeTitle"></#if><#if !alias?has_content><#local alias=name/><#if alias?index_of('.') gt 0><#local alias=alias?keep_after_last('.')/></#if></#if>${getText(alias)}<#if resizable></span><#if description?has_content> <span data-content="${getText(description)}" class="poped glyphicon glyphicon-question-sign"></span></#if><span class="resizeBar visible-desktop"></span></#if>
+<#if resizable><span class="resizeTitle"></#if><#if !alias?has_content><#local alias=name/><#if alias?index_of('.') gt 0><#local alias=alias?keep_after_last('.')/></#if></#if>${getText(alias)}<#if description?has_content> <span data-content="${getText(description)}" class="poped glyphicon glyphicon-question-sign"></span></#if><#if resizable></span><span class="resizeBar visible-desktop"></span></#if>
 </th>
 </#macro>
 <#macro rtmiddle width='50px' showActionColumn=true>
