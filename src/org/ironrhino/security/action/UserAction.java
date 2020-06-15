@@ -10,6 +10,7 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Restrictions;
 import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.hibernate.CriteriaState;
 import org.ironrhino.core.hibernate.CriterionUtils;
@@ -41,7 +42,7 @@ import com.opensymphony.xwork2.validator.annotations.ValidatorType;
 import lombok.Getter;
 import lombok.Setter;
 
-@Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
+@Authorize(ifAnyGranted = { UserRole.ROLE_ADMINISTRATOR, UserRole.ROLE_USER_MANAGER })
 public class UserAction extends EntityAction<User> {
 
 	private static final long serialVersionUID = -79191921685741502L;
@@ -74,6 +75,8 @@ public class UserAction extends EntityAction<User> {
 
 	@Override
 	protected void prepare(DetachedCriteria dc, CriteriaState criteriaState) {
+		if (!AuthzUtils.hasRole(UserRole.ROLE_ADMINISTRATOR))
+			dc.add(Restrictions.not(CriterionUtils.matchTag("roles", UserRole.ROLE_ADMINISTRATOR)));
 		String role = ServletActionContext.getRequest().getParameter("role");
 		if (StringUtils.isNotBlank(role))
 			dc.add(CriterionUtils.matchTag("roles", role));
@@ -90,8 +93,10 @@ public class UserAction extends EntityAction<User> {
 				map = temp;
 		}
 		roles = new ArrayList<>(map.size());
+		boolean isAdmin = AuthzUtils.hasRole(UserRole.ROLE_ADMINISTRATOR);
 		map.forEach((k, v) -> {
-			roles.add(new LabelValue(StringUtils.isNotBlank(v) ? v : getText(k), k));
+			if (isAdmin || !k.equals(UserRole.ROLE_ADMINISTRATOR))
+				roles.add(new LabelValue(StringUtils.isNotBlank(v) ? v : getText(k), k));
 		});
 		if (!user.isNew()) {
 			Set<String> userRoles = user.getRoles();
@@ -113,6 +118,15 @@ public class UserAction extends EntityAction<User> {
 					@EmailValidator(fieldName = "user.email", key = "validation.invalid") }, regexFields = {
 							@RegexFieldValidator(type = ValidatorType.FIELD, fieldName = "user.username", regex = User.USERNAME_REGEX, key = "validation.invalid") })
 	public String save() throws Exception {
+		boolean isAdmin = false;
+		if (userManager.get(user.getId()).getRoles().contains(UserRole.ROLE_ADMINISTRATOR))
+			isAdmin = true;
+		if (user.getRoles().contains(UserRole.ROLE_ADMINISTRATOR))
+			isAdmin = true;
+		if (isAdmin && !AuthzUtils.hasRole(UserRole.ROLE_ADMINISTRATOR)) {
+			addActionError(getText("access.denied"));
+			return ACCESSDENIED;
+		}
 		String result = super.save();
 		if (SUCCESS.equals(result))
 			eventPublisher.publish(new EditProfileEvent(AuthzUtils.getUsername(),

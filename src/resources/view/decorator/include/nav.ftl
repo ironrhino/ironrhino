@@ -1,8 +1,10 @@
 <#ftl output_format='HTML'>
 <ul class="nav">
 	<li><a href="<@url value="/"/>" class="ajax view">${getText('index')}</a></li>
-	<@authorize ifAnyGranted="ROLE_ADMINISTRATOR">
+	<@authorize ifAnyGranted=["ROLE_ADMINISTRATOR","ROLE_USER_MANAGER"]>
 	<li><a href="<@url value="${ssoServerBase!}/user"/>" class="ajax view">${getText('user')}</a></li>
+	</@authorize>
+	<@authorize ifAnyGranted="ROLE_ADMINISTRATOR">
 	<li><a href="<@url value="${ssoServerBase!}/loginRecord"/>" class="ajax view">${getText('loginRecord')}</a></li>
 	<li><a href="<@url value="/common/setting"/>" class="ajax view">${getText('setting')}</a></li>
 	<li><a href="<@url value="/common/dictionary"/>" class="ajax view">${getText('dictionary')}</a></li>
