@@ -11227,9 +11227,12 @@ table .resizeBar {
 	height: 24px;
 	font-size: 1px;
 	background-color: #cccccc;
-	display: inline;
+	display: block;
 }
 
+table th:last-child .resizeBar {
+	display: none !important;
+}
 .window-richtable form:first-child {
 	padding-top: 20px;
 }
