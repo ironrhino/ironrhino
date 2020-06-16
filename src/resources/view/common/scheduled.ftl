@@ -19,12 +19,26 @@ $(function(){
 										return;
 									}
 								});
-		});		
+		});
+		$('.btn.all').click(function(){
+			var selector = '#scheduled input:checkbox:' + ($(this).hasClass('disable') ? 'checked' : 'not(:checked)');
+			$.alerts({
+				type : 'confirm',
+				callback : function(b) {
+					if (b) 
+						$(selector).click();
+				}
+			});
+		});
 });
 </script>
 </head>
 <body>
-
+<div class="row<#if fluidLayout>-fluid</#if> center">
+	<#list ['disable','enable'] as var>
+	<button class="btn all ${var}">${getText(var)}${getText('all')}</button>
+	</#list>
+</div>
 <div id="scheduled">
 	<style>
 	li.task{
