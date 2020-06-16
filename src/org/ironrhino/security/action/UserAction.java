@@ -119,7 +119,8 @@ public class UserAction extends EntityAction<User> {
 							@RegexFieldValidator(type = ValidatorType.FIELD, fieldName = "user.username", regex = User.USERNAME_REGEX, key = "validation.invalid") })
 	public String save() throws Exception {
 		boolean isAdmin = false;
-		if (userManager.get(user.getId()).getRoles().contains(UserRole.ROLE_ADMINISTRATOR))
+		User temp = StringUtils.isNotBlank(user.getId()) ? userManager.get(user.getId()) : null;
+		if (temp != null && temp.getRoles().contains(UserRole.ROLE_ADMINISTRATOR))
 			isAdmin = true;
 		if (user.getRoles().contains(UserRole.ROLE_ADMINISTRATOR))
 			isAdmin = true;
