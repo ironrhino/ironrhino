@@ -33,7 +33,7 @@ public class ScheduledTaskCircuitBreakerAspect extends BaseAspect {
 			beanName = comp.value();
 		String task = beanName + '.' + jp.getSignature().getName() + '(' + ')';
 		if (circuitBreaker.isShortCircuit(task)) {
-			throw new IllegalStateException("Execution[\"" + task + "\"] is short circuit");
+			throw new ShortCircuitException("Execution[\"" + task + "\"] is short circuit");
 		} else {
 			return jp.proceed();
 		}

@@ -2,6 +2,7 @@ package org.ironrhino.core.spring.configuration;
 
 import java.util.concurrent.Executor;
 
+import org.ironrhino.core.scheduled.ShortCircuitException;
 import org.ironrhino.core.throttle.Bulkhead;
 import org.ironrhino.core.throttle.Concurrency;
 import org.ironrhino.core.throttle.Frequency;
@@ -70,7 +71,7 @@ public class SchedulingConfiguration implements SchedulingConfigurer, AsyncConfi
 		threadPoolTaskScheduler.setErrorHandler(ex -> {
 			if (ex instanceof FrequencyLimitExceededException || ex instanceof IllegalConcurrentAccessException
 					|| ex instanceof RequestNotPermitted || ex instanceof BulkheadFullException
-					|| ex instanceof LockFailedException)
+					|| ex instanceof LockFailedException || ex instanceof ShortCircuitException)
 				log.warn("Error occurred in scheduled task: {}", ex.getLocalizedMessage());
 			else
 				log.error("Unexpected error occurred in scheduled task", ex);
