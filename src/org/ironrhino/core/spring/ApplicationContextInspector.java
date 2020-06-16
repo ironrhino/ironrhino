@@ -314,13 +314,24 @@ public class ApplicationContextInspector {
 				String url = hds.getJdbcUrl();
 				url = url.substring(url.indexOf(':') + 1);
 				String type = url.substring(0, url.indexOf(':'));
-				String address = url.substring(url.indexOf("//") + 2);
-				int i = address.indexOf('/');
-				if (i > 0)
-					address = address.substring(0, i);
-				i = address.indexOf(';');
-				if (i > 0)
-					address = address.substring(0, i);
+				String address;
+				int i = url.indexOf("//");
+				if (i > 0) {
+					address = url.substring(i + 2);
+					i = address.indexOf('/');
+					if (i > 0)
+						address = address.substring(0, i);
+					i = address.indexOf(';');
+					if (i > 0)
+						address = address.substring(0, i);
+				} else {
+					address = url;
+					// jdbc:oracle:thin:@localhost:1521:XE
+					if (address.contains("oracle:thin:@")) {
+						address = address.substring(address.indexOf(":@") + 2);
+						address = address.substring(0, address.lastIndexOf(':'));
+					}
+				}
 				String version = null;
 				try (Connection c = hds.getConnection()) {
 					DatabaseMetaData dbmd = c.getMetaData();
