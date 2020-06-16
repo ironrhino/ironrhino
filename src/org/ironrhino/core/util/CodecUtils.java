@@ -10,6 +10,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.codec.binary.Hex;
 import org.ironrhino.core.tracing.Tracing;
+import org.slf4j.MDC;
 
 import io.opentracing.Span;
 import io.opentracing.util.GlobalTracer;
@@ -19,6 +20,10 @@ import lombok.experimental.UtilityClass;
 public class CodecUtils {
 
 	public static final String DEFAULT_ENCODING = "UTF-8";
+
+	public static final String MDC_KEY_REQUEST_ID = "requestId";
+
+	public static final String MDC_KEY_REQUEST = "request";
 
 	public static final char[] CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
 
@@ -306,6 +311,15 @@ public class CodecUtils {
 				return span.context().toTraceId();
 		}
 		return nextId();
+	}
+
+	public static void putRequestIdIfAbsent() {
+		String requestId = MDC.get(MDC_KEY_REQUEST_ID);
+		if (requestId == null) {
+			requestId = generateRequestId();
+			MDC.put(MDC_KEY_REQUEST_ID, requestId);
+			MDC.put(MDC_KEY_REQUEST, " request:" + requestId);
+		}
 	}
 
 }

@@ -52,7 +52,8 @@ public class AccessFilter implements Filter {
 
 	public static final String HTTP_HEADER_INSTANCE_ID = "X-Instance-Id";
 	public static final String HTTP_HEADER_REQUEST_ID = "X-Request-Id";
-	public static final String MDC_KEY_REQUEST_ID = "requestId";
+	public static final String MDC_KEY_REQUEST_ID = CodecUtils.MDC_KEY_REQUEST_ID;
+	public static final String MDC_KEY_REQUEST = CodecUtils.MDC_KEY_REQUEST;
 	public static final String HTTP_HEADER_REQUEST_CHAIN = "X-Request-Chain";
 	public static final String MDC_KEY_REQUEST_CHAIN = "requestChain";
 	public static final String HTTP_HEADER_REQUEST_FROM = "X-Request-From";
@@ -224,7 +225,7 @@ public class AccessFilter implements Filter {
 				// sb.append(requestFrom);
 				MDC.put(MDC_KEY_REQUEST_FROM, requestFrom);
 			}
-			MDC.put("request", sb.toString());
+			MDC.put(MDC_KEY_REQUEST, sb.toString());
 
 			MDC.put("server", " server:" + AppInfo.getInstanceId(true));
 			long start = System.nanoTime();
