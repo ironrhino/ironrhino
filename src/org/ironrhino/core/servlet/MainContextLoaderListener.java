@@ -75,28 +75,13 @@ public class MainContextLoaderListener extends ContextLoaderListener {
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
-
-		try {
-			if (ClassUtils.isPresent("oracle.jdbc.OracleDriver", cl)) {
-				if (Thread.getAllStackTraces().keySet().stream().anyMatch(t -> t.getName().equals("InterruptTimer"))) {
-					String className = "oracle.jdbc.driver.BlockSource$ThreadedCachingBlockSource";
-					Method m = Class.forName(className).getDeclaredMethod("stopBlockReleaserThread");
-					m.setAccessible(true);
-					m.invoke(null);
-				}
-			}
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-
 		Enumeration<Driver> drivers = DriverManager.getDrivers();
 		while (drivers.hasMoreElements()) {
 			Driver driver = drivers.nextElement();
-			if (driver.getClass().getClassLoader() == cl) {
-				try {
-					DriverManager.deregisterDriver(driver);
-				} catch (SQLException ex) {
-				}
+			try {
+				DriverManager.deregisterDriver(driver);
+			} catch (SQLException ex) {
+				ex.printStackTrace();
 			}
 		}
 	}
