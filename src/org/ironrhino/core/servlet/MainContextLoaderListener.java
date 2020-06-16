@@ -7,7 +7,6 @@ import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Enumeration;
-import java.util.Timer;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -15,6 +14,7 @@ import javax.servlet.annotation.WebListener;
 
 import org.apache.logging.log4j.LogManager;
 import org.ironrhino.core.util.HttpClientUtils;
+import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.context.ContextLoaderListener;
 
@@ -51,6 +51,7 @@ public class MainContextLoaderListener extends ContextLoaderListener {
 		}
 		LogManager.shutdown();
 		cleanupJdbcDrivers();
+		cancelTimers();
 		cleanupThreadLocals();
 	}
 
@@ -82,26 +83,6 @@ public class MainContextLoaderListener extends ContextLoaderListener {
 					Method m = Class.forName(className).getDeclaredMethod("stopBlockReleaserThread");
 					m.setAccessible(true);
 					m.invoke(null);
-					className = "oracle.net.nt.TimeoutInterruptHandler";
-					Field f = Class.forName(className).getDeclaredField("interruptTimer");
-					f.setAccessible(true);
-					Timer timer = (Timer) f.get(null);
-					if (timer != null)
-						timer.cancel();
-					try {
-						className = "oracle.jdbc.driver.NoSupportHAManager";
-						Object noSupportHAManager = Class.forName(className).getMethod("getInstance").invoke(null);
-						f.setAccessible(true);
-						if (noSupportHAManager != null) {
-							f = Class.forName("oracle.jdbc.driver.HAManager").getDeclaredField("timer");
-							f.setAccessible(true);
-							timer = (Timer) f.get(noSupportHAManager);
-							if (timer != null)
-								timer.cancel();
-						}
-					} catch (NoClassDefFoundError err) {
-						// java.lang.NoClassDefFoundError: Loracle/simplefan/FanManager;
-					}
 				}
 			}
 		} catch (Throwable e) {
@@ -117,6 +98,28 @@ public class MainContextLoaderListener extends ContextLoaderListener {
 				} catch (SQLException ex) {
 				}
 			}
+		}
+	}
+
+	protected void cancelTimers() {
+		try {
+			for (Thread thread : Thread.getAllStackTraces().keySet())
+				if (thread.getClass().getSimpleName().equals("TimerThread"))
+					cancelTimer(thread);
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void cancelTimer(Thread thread) throws Exception {
+		// Timer::cancel
+		Object queue = ReflectionUtils.getFieldValue(thread, "queue");
+		synchronized (queue) {
+			ReflectionUtils.setFieldValue(thread, "newTasksMayBeScheduled", false);
+			Method m = queue.getClass().getDeclaredMethod("clear");
+			m.setAccessible(true);
+			m.invoke(queue);
+			queue.notify();
 		}
 	}
 
