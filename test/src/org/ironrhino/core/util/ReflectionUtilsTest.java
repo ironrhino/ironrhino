@@ -39,11 +39,20 @@ public class ReflectionUtilsTest {
 		Field f1 = ReflectionUtils.getField(A.class, "a");
 		Field f2 = ReflectionUtils.getField(B.class, "a");
 		assertThat(f2, equalTo(f1));
+	}
+
+	@Test
+	public void testGetAndSetFieldValue() throws Exception {
 		B b = new B();
 		b.setA("test");
 		assertThat(ReflectionUtils.getFieldValue(b, "a"), equalTo("test"));
 		ReflectionUtils.setFieldValue(b, "a", "test2");
 		assertThat(ReflectionUtils.getFieldValue(b, "a"), equalTo("test2"));
+	}
+
+	@Test(expected = NoSuchFieldException.class)
+	public void testGetFieldWithException() throws Exception {
+		ReflectionUtils.getField(A.class, "none");
 	}
 
 	@Test
