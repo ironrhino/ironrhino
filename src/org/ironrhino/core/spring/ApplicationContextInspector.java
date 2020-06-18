@@ -69,7 +69,6 @@ import org.xml.sax.InputSource;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.opensymphony.xwork2.ActionSupport;
-import com.zaxxer.hikari.HikariDataSource;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -307,14 +306,10 @@ public class ApplicationContextInspector {
 
 		// database
 		ctx.getBeansOfType(DataSource.class).forEach((k, v) -> {
-			if (!ClassUtils.isPresent("com.zaxxer.hikari.HikariDataSource", this.getClass().getClassLoader()))
-				return;
-			if (v instanceof HikariDataSource) {
-				HikariDataSource hds = (HikariDataSource) v;
-				String url = hds.getJdbcUrl();
+			String address = null;
+			try {
+				String url = org.ironrhino.core.util.ReflectionUtils.getFieldValue(v, "jdbcUrl");
 				url = url.substring(url.indexOf(':') + 1);
-				String type = url.substring(0, url.indexOf(':'));
-				String address;
 				int i = url.indexOf("//");
 				if (i > 0) {
 					address = url.substring(i + 2);
@@ -327,21 +322,23 @@ public class ApplicationContextInspector {
 				} else {
 					address = url;
 					// jdbc:oracle:thin:@localhost:1521:XE
-					if (address.contains("oracle:thin:@")) {
-						address = address.substring(address.indexOf(":@") + 2);
+					if (address.startsWith("oracle:thin:")) {
+						address = address.substring(address.indexOf("@") + 1);
 						address = address.substring(0, address.lastIndexOf(':'));
 					}
 				}
-				String version = null;
-				try (Connection c = hds.getConnection()) {
-					DatabaseMetaData dbmd = c.getMetaData();
-					type = dbmd.getDatabaseProductName();
-					version = dbmd.getDatabaseProductVersion();
-				} catch (SQLException e) {
-					// Ignore
-				}
-				sm.getServices().add(new Service(type, version, address));
+			} catch (Exception e) {
 			}
+			String type = null;
+			String version = null;
+			try (Connection c = v.getConnection()) {
+				DatabaseMetaData dbmd = c.getMetaData();
+				type = dbmd.getDatabaseProductName();
+				version = dbmd.getDatabaseProductVersion();
+			} catch (SQLException e) {
+				// Ignore
+			}
+			sm.getServices().add(new Service(type, version, address));
 		});
 
 		// redis
