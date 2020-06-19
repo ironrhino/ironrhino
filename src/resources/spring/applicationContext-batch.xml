@@ -14,7 +14,7 @@
 	https://www.springframework.org/schema/batch/spring-batch.xsd">
 	<bean id="batchTaskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor" c:threadNamePrefix="batch-"/>
 	<bean id="executionContextSerializer" class="org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializer"/>
-	<batch:job-repository serializer="executionContextSerializer" isolation-level-for-create="REPEATABLE_READ" table-prefix="${jobRepository.tablePrefix:BATCH_}" max-varchar-length="4000"/>
+	<batch:job-repository serializer="executionContextSerializer" isolation-level-for-create="SERIALIZABLE" table-prefix="${jobRepository.tablePrefix:BATCH_}" max-varchar-length="4000"/>
 	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher" p:taskExecutor-ref="batchTaskExecutor"/>
 	<bean id="jobExplorer" class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean" p:tablePrefix="${jobRepository.tablePrefix:BATCH_}" p:serializer-ref="executionContextSerializer"/>
 	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator">
