@@ -20,7 +20,6 @@ import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
@@ -215,17 +214,13 @@ public class HttpClientUtils {
 
 		@Override
 		public String handleResponse(HttpResponse response) throws HttpResponseException, IOException {
-			try {
-				StatusLine statusLine = response.getStatusLine();
-				HttpEntity entity = response.getEntity();
-				if (statusLine.getStatusCode() >= 300) {
-					EntityUtils.consume(entity);
-					throw new HttpResponseException(statusLine.getStatusCode(), statusLine.getReasonPhrase());
-				}
-				return entity == null ? null : EntityUtils.toString(entity, charset);
-			} finally {
-				((CloseableHttpResponse) response).close();
+			StatusLine statusLine = response.getStatusLine();
+			HttpEntity entity = response.getEntity();
+			if (statusLine.getStatusCode() >= 300) {
+				EntityUtils.consume(entity);
+				throw new HttpResponseException(statusLine.getStatusCode(), statusLine.getReasonPhrase());
 			}
+			return entity == null ? null : EntityUtils.toString(entity, charset);
 		}
 
 	}
