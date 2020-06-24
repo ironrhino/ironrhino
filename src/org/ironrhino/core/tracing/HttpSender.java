@@ -5,9 +5,9 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.NoHttpResponseException;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
@@ -63,8 +63,7 @@ public class HttpSender extends ThriftSender {
 		}
 		HttpPost post = new HttpPost(collectorUrl);
 		post.setEntity(new ByteArrayEntity(bytes, CONTENT_TYPE_THRIFT));
-		try {
-			HttpResponse response = httpClient.execute(post);
+		try (CloseableHttpResponse response = httpClient.execute(post)) {
 			if (response.getStatusLine().getStatusCode() != 200) {
 				String responseBody;
 				try {
@@ -75,6 +74,8 @@ public class HttpSender extends ThriftSender {
 				String exceptionMessage = String.format("Could not send %d spans, response %d: %s", spans.size(),
 						response.getStatusLine().getStatusCode(), responseBody);
 				throw new SenderException(exceptionMessage, null, spans.size());
+			} else {
+				EntityUtils.consume(response.getEntity());
 			}
 		} catch (IOException e) {
 			throw new SenderException(String.format("Could not send %d spans", spans.size()), e, spans.size());
