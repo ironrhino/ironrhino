@@ -299,9 +299,8 @@
 						replaceregexp.addFileset(fs);
 						var prefix = name.substring(0, name.lastIndexOf('.'));
 						var suffix = name.substring(name.lastIndexOf('.') + 1);
-						var match = '/' + dir.getName() + '/' + prefix + '(.*)\\.' + suffix;
-						var replace = '/' + dir.getName() + '/' + prefix + '\\1\\.'
-								+ suffix + '?' + revision;
+						var match = '/' + dir.getName() + '/' + prefix + '(.*\\.' + suffix + '(?!\\?))';
+						var replace = '/' + dir.getName() + '/' + prefix + '\\1\\.' + '?' + revision;
 						replaceregexp.setMatch(match);
 						replaceregexp.setReplace(replace);
 						replaceregexp.perform();

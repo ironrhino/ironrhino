@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE project>
 <project default="create">
 
-	<property file="build.properties" />
+	<import file="build.xml" />
 
-	<property name="src.dir" location="${basedir}/src" />
-	<property name="target.dir" location="${basedir}/target" />
-	<property name="webapp.dir" location="${basedir}/webapp" />
-	<property name="version" value="1.0" />
 	<property name="dist.jar.name" value="ironrhino-alternative-${version}.jar" />
 	<property name="dist.jar.includes" value="resources/view/decorator/**/*.ftl,resources/view/login.ftl" />
 
@@ -16,7 +13,8 @@
 		<copy todir="${target.dir}/META-INF/resources/assets" preservelastmodified="true">
 			<fileset dir="${webapp.dir}/assets" />
 		</copy>
-		<jar jarfile="${target.dir}/${dist.jar.name}" basedir="${src.dir}" includes="${dist.jar.includes}">
+		<antcall target="append-revision-for-assets" />
+		<jar jarfile="${target.dir}/${dist.jar.name}" basedir="${classes.dir}" includes="${dist.jar.includes}">
 			<manifest>
 				<attribute name="Artifact-Version" value="${version}" />
 				<attribute name="Build-Timestamp" value="${timestamp}" />
@@ -24,6 +22,7 @@
 			</manifest>
 			<metainf dir="${target.dir}/META-INF" />
 		</jar>
+		<antcall target="reset-append-revision-for-assets" />
 		<delete dir="${target.dir}/META-INF" />
 	</target>
 
