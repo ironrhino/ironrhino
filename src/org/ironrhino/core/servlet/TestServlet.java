@@ -44,7 +44,7 @@ public class TestServlet extends HttpServlet {
 					}
 				}
 			}
-		}).start();
+		}, "test").start();
 	}
 
 	private boolean test(String testurl) {
