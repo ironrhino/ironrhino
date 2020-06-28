@@ -76,6 +76,7 @@ public class SchedulingConfiguration implements SchedulingConfigurer, AsyncConfi
 		ThreadPoolTaskScheduler threadPoolTaskScheduler = new WrappedThreadPoolTaskScheduler();
 		threadPoolTaskScheduler.setPoolSize(taskSchedulerPoolSize);
 		threadPoolTaskScheduler.setThreadNamePrefix("taskScheduler-");
+		threadPoolTaskScheduler.setRemoveOnCancelPolicy(true);
 		threadPoolTaskScheduler.setErrorHandler(ex -> {
 			if (ex instanceof FrequencyLimitExceededException || ex instanceof IllegalConcurrentAccessException
 					|| ex instanceof RequestNotPermitted || ex instanceof BulkheadFullException
