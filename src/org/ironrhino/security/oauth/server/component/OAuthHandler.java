@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.security.jwt.Jwt;
 import org.ironrhino.core.servlet.AccessHandler;
 import org.ironrhino.core.session.HttpSessionManager;
 import org.ironrhino.core.util.RequestUtils;
@@ -49,6 +50,9 @@ public class OAuthHandler extends AccessHandler {
 
 	@Value("${oauth.api.sessionFallback:true}")
 	private boolean sessionFallback = true;
+
+	@Value("${oauth.api.jwtEnabled:false}")
+	private boolean jwtEnabled;
 
 	@Autowired
 	private OAuthAuthorizationService oauthAuthorizationService;
@@ -120,62 +124,77 @@ public class OAuthHandler extends AccessHandler {
 
 		UserDetails ud = null;
 
-		OAuthAuthorization authorization = oauthAuthorizationService.get(token);
-		if (authorization == null) {
-			oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.INVALID_TOKEN));
-			return true;
-		}
-		if (authorization.isKicked()) {
-			oauthErrorHandler.handle(request, response,
-					new OAuthError(OAuthError.INVALID_TOKEN, OAuthError.ERROR_KICKED_TOKEN));
-			return true;
-		}
-		if (authorization.getExpiresIn() < 0) {
-			oauthErrorHandler.handle(request, response,
-					new OAuthError(OAuthError.INVALID_TOKEN, OAuthError.ERROR_EXPIRED_TOKEN));
-			return true;
-		}
-		request.setAttribute(REQUEST_ATTRIBUTE_KEY_OAUTH_AUTHORIZATION, authorization);
-		String[] scopes = null;
-		if (StringUtils.isNotBlank(authorization.getScope()))
-			scopes = authorization.getScope().split("\\s");
-		boolean scopeAuthorized = (scopes == null);
-		if (!scopeAuthorized && scopes != null) {
-			for (String s : scopes) {
-				String requestURL = request.getRequestURL().toString();
-				if (requestURL.startsWith(s)) {
-					scopeAuthorized = true;
-					break;
-				}
-			}
-		}
-		if (!scopeAuthorized) {
-			oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.INSUFFICIENT_SCOPE));
-			return true;
-		}
-		String clientId = authorization.getClientId();
-		if (clientId != null) {
-			String clientName = authorization.getClientName();
-			if (clientName == null) {
-				oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.UNAUTHORIZED_CLIENT));
+		if (jwtEnabled && arr.length == 3) {
+			try {
+				String username = Jwt.extractSubject(token);
+				ud = userDetailsService.loadUserByUsername(username);
+				Jwt.verifySignature(token, ud.getPassword());
+			} catch (UsernameNotFoundException unf) {
+				log.error(unf.getMessage(), unf);
+			} catch (IllegalArgumentException e) {
+				String message = e.getMessage();
+				oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.INVALID_TOKEN,
+						message != null && message.startsWith("Expired") ? OAuthError.ERROR_EXPIRED_TOKEN : null));
 				return true;
 			}
-			UserAgent ua = new UserAgent(request.getHeader("User-Agent"));
-			ua.setAppId(clientId);
-			ua.setAppName(clientName);
-			request.setAttribute("userAgent", ua);
-		}
-		if (authorization.getGrantType() == GrantType.client_credentials) {
-			try {
-				ud = userDetailsService.loadUserByUsername(authorization.getClientOwner());
-			} catch (UsernameNotFoundException unf) {
-				log.error(unf.getMessage(), unf);
+		} else {
+			OAuthAuthorization authorization = oauthAuthorizationService.get(token);
+			if (authorization == null) {
+				oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.INVALID_TOKEN));
+				return true;
 			}
-		} else if (authorization.getGrantor() != null) {
-			try {
-				ud = userDetailsService.loadUserByUsername(authorization.getGrantor());
-			} catch (UsernameNotFoundException unf) {
-				log.error(unf.getMessage(), unf);
+			if (authorization.isKicked()) {
+				oauthErrorHandler.handle(request, response,
+						new OAuthError(OAuthError.INVALID_TOKEN, OAuthError.ERROR_KICKED_TOKEN));
+				return true;
+			}
+			if (authorization.getExpiresIn() < 0) {
+				oauthErrorHandler.handle(request, response,
+						new OAuthError(OAuthError.INVALID_TOKEN, OAuthError.ERROR_EXPIRED_TOKEN));
+				return true;
+			}
+			request.setAttribute(REQUEST_ATTRIBUTE_KEY_OAUTH_AUTHORIZATION, authorization);
+			String[] scopes = null;
+			if (StringUtils.isNotBlank(authorization.getScope()))
+				scopes = authorization.getScope().split("\\s");
+			boolean scopeAuthorized = (scopes == null);
+			if (!scopeAuthorized && scopes != null) {
+				for (String s : scopes) {
+					String requestURL = request.getRequestURL().toString();
+					if (requestURL.startsWith(s)) {
+						scopeAuthorized = true;
+						break;
+					}
+				}
+			}
+			if (!scopeAuthorized) {
+				oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.INSUFFICIENT_SCOPE));
+				return true;
+			}
+			String clientId = authorization.getClientId();
+			if (clientId != null) {
+				String clientName = authorization.getClientName();
+				if (clientName == null) {
+					oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.UNAUTHORIZED_CLIENT));
+					return true;
+				}
+				UserAgent ua = new UserAgent(request.getHeader("User-Agent"));
+				ua.setAppId(clientId);
+				ua.setAppName(clientName);
+				request.setAttribute("userAgent", ua);
+			}
+			if (authorization.getGrantType() == GrantType.client_credentials) {
+				try {
+					ud = userDetailsService.loadUserByUsername(authorization.getClientOwner());
+				} catch (UsernameNotFoundException unf) {
+					log.error(unf.getMessage(), unf);
+				}
+			} else if (authorization.getGrantor() != null) {
+				try {
+					ud = userDetailsService.loadUserByUsername(authorization.getGrantor());
+				} catch (UsernameNotFoundException unf) {
+					log.error(unf.getMessage(), unf);
+				}
 			}
 		}
 
