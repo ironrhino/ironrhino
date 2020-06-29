@@ -110,7 +110,8 @@ public class OAuthHandler extends AccessHandler {
 				if (StringUtils.isNotBlank(sessionTracker))
 					return false;
 			}
-			oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.INVALID_TOKEN, "missing_token"));
+			oauthErrorHandler.handle(request, response,
+					new OAuthError(OAuthError.INVALID_TOKEN, OAuthError.ERROR_MISSING_TOKEN));
 			return true;
 		}
 
@@ -121,12 +122,14 @@ public class OAuthHandler extends AccessHandler {
 		}
 
 		if (authorization.isKicked()) {
-			oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.INVALID_TOKEN, "kicked_token"));
+			oauthErrorHandler.handle(request, response,
+					new OAuthError(OAuthError.INVALID_TOKEN, OAuthError.ERROR_KICKED_TOKEN));
 			return true;
 		}
 
 		if (authorization.getExpiresIn() < 0) {
-			oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.INVALID_TOKEN, "expired_token"));
+			oauthErrorHandler.handle(request, response,
+					new OAuthError(OAuthError.INVALID_TOKEN, OAuthError.ERROR_EXPIRED_TOKEN));
 			return true;
 		}
 
@@ -182,7 +185,8 @@ public class OAuthHandler extends AccessHandler {
 		}
 		if (ud == null || !ud.isEnabled() || !ud.isAccountNonExpired() || !ud.isAccountNonLocked()) {
 			warn(ud);
-			oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.INVALID_REQUEST, "invalid_user"));
+			oauthErrorHandler.handle(request, response,
+					new OAuthError(OAuthError.INVALID_REQUEST, OAuthError.ERROR_INVALID_USER));
 			return true;
 		}
 

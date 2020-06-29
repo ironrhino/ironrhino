@@ -28,6 +28,12 @@ public class OAuthError extends RuntimeException {
 	public static final String UNAUTHORIZED_CLIENT = "unauthorized_client";
 	public static final String UNSUPPORTED_GRANT_TYPE = "unsupported_grant_type";
 
+	// error message
+	public static final String ERROR_MISSING_TOKEN = "missing_token";
+	public static final String ERROR_EXPIRED_TOKEN = "expired_token";
+	public static final String ERROR_KICKED_TOKEN = "kicked_token";
+	public static final String ERROR_INVALID_USER = "invalid_user";
+
 	private final String error;
 
 	@JsonProperty("error_message")
