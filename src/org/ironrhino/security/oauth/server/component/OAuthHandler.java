@@ -114,25 +114,28 @@ public class OAuthHandler extends AccessHandler {
 					new OAuthError(OAuthError.INVALID_TOKEN, OAuthError.ERROR_MISSING_TOKEN));
 			return true;
 		}
+		String[] arr = token.split("\\.");
+		request.setAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_ID_FOR_API,
+				SESSION_ID_PREFIX + arr[arr.length - 1]);
+
+		UserDetails ud = null;
 
 		OAuthAuthorization authorization = oauthAuthorizationService.get(token);
 		if (authorization == null) {
 			oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.INVALID_TOKEN));
 			return true;
 		}
-
 		if (authorization.isKicked()) {
 			oauthErrorHandler.handle(request, response,
 					new OAuthError(OAuthError.INVALID_TOKEN, OAuthError.ERROR_KICKED_TOKEN));
 			return true;
 		}
-
 		if (authorization.getExpiresIn() < 0) {
 			oauthErrorHandler.handle(request, response,
 					new OAuthError(OAuthError.INVALID_TOKEN, OAuthError.ERROR_EXPIRED_TOKEN));
 			return true;
 		}
-
+		request.setAttribute(REQUEST_ATTRIBUTE_KEY_OAUTH_AUTHORIZATION, authorization);
 		String[] scopes = null;
 		if (StringUtils.isNotBlank(authorization.getScope()))
 			scopes = authorization.getScope().split("\\s");
@@ -150,7 +153,6 @@ public class OAuthHandler extends AccessHandler {
 			oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.INSUFFICIENT_SCOPE));
 			return true;
 		}
-
 		String clientId = authorization.getClientId();
 		if (clientId != null) {
 			String clientName = authorization.getClientName();
@@ -163,18 +165,11 @@ public class OAuthHandler extends AccessHandler {
 			ua.setAppName(clientName);
 			request.setAttribute("userAgent", ua);
 		}
-
-		UserDetails ud = null;
 		if (authorization.getGrantType() == GrantType.client_credentials) {
 			try {
 				ud = userDetailsService.loadUserByUsername(authorization.getClientOwner());
 			} catch (UsernameNotFoundException unf) {
 				log.error(unf.getMessage(), unf);
-			}
-			if (ud == null || !ud.isEnabled() || !ud.isAccountNonExpired() || !ud.isAccountNonLocked()) {
-				warn(ud);
-				oauthErrorHandler.handle(request, response, new OAuthError(OAuthError.UNAUTHORIZED_CLIENT));
-				return true;
 			}
 		} else if (authorization.getGrantor() != null) {
 			try {
@@ -183,10 +178,23 @@ public class OAuthHandler extends AccessHandler {
 				log.error(unf.getMessage(), unf);
 			}
 		}
+
 		if (ud == null || !ud.isEnabled() || !ud.isAccountNonExpired() || !ud.isAccountNonLocked()) {
-			warn(ud);
+			if (ud != null) {
+				if (!ud.isEnabled())
+					log.warn("{} is disabled", ud.getUsername());
+				else if (!ud.isAccountNonExpired())
+					log.warn("{} is expired", ud.getUsername());
+				else if (!ud.isAccountNonLocked())
+					log.warn("{} is locked", ud.getUsername());
+			}
+			OAuthAuthorization auth = (OAuthAuthorization) request
+					.getAttribute(REQUEST_ATTRIBUTE_KEY_OAUTH_AUTHORIZATION);
 			oauthErrorHandler.handle(request, response,
-					new OAuthError(OAuthError.INVALID_REQUEST, OAuthError.ERROR_INVALID_USER));
+					new OAuthError(OAuthError.INVALID_REQUEST,
+							auth != null && auth.getGrantType() == GrantType.client_credentials
+									? OAuthError.UNAUTHORIZED_CLIENT
+									: OAuthError.ERROR_INVALID_USER));
 			return true;
 		}
 
@@ -197,20 +205,7 @@ public class OAuthHandler extends AccessHandler {
 		Map<String, Object> sessionMap = new HashMap<>(2, 1);
 		sessionMap.put(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, sc);
 		request.setAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_MAP_FOR_API, sessionMap);
-		request.setAttribute(REQUEST_ATTRIBUTE_KEY_OAUTH_AUTHORIZATION, authorization);
-		request.setAttribute(HttpSessionManager.REQUEST_ATTRIBUTE_KEY_SESSION_ID_FOR_API, SESSION_ID_PREFIX + token);
 		return false;
-	}
-
-	private void warn(UserDetails ud) {
-		if (ud != null) {
-			if (!ud.isEnabled())
-				log.warn("{} is disabled", ud.getUsername());
-			else if (!ud.isAccountNonExpired())
-				log.warn("{} is expired", ud.getUsername());
-			else if (!ud.isAccountNonLocked())
-				log.warn("{} is locked", ud.getUsername());
-		}
 	}
 
 }
