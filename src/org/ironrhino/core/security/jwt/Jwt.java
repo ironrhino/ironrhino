@@ -1,7 +1,6 @@
 package org.ironrhino.core.security.jwt;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Base64;
@@ -32,14 +31,18 @@ public class Jwt {
 			.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
 			.setSerializationInclusion(JsonInclude.Include.NON_NULL).registerModule(new ParameterNamesModule());
 
-	public static String createWithSubject(String subject, Duration lifetime, String secret) {
+	public static String createWithSubject(String subject, String secret) {
+		return createWithSubject(subject, secret, 0);
+	}
+
+	public static String createWithSubject(String subject, String secret, int expiresIn) {
 		try {
 			LocalDateTime now = LocalDateTime.now();
 			Payload pl = new Payload();
 			pl.setSub(subject);
 			pl.setIat(now.atZone(ZoneId.systemDefault()).toEpochSecond());
-			if (lifetime != null) {
-				pl.setExp(now.plus(lifetime).atZone(ZoneId.systemDefault()).toEpochSecond());
+			if (expiresIn != 0) {
+				pl.setExp(pl.getIat() + expiresIn);
 			}
 			String payload = BASE64_URL_ENCODER.encodeToString(JSON_OBJECTMAPPER.writeValueAsBytes(pl));
 			String signature = digestWithHmacSHA256(header + '.' + payload, secret);
