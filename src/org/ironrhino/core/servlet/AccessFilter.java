@@ -175,10 +175,7 @@ public class AccessFilter implements Filter {
 				remoteAddr += " via " + proxyAddr;
 			MDC.put("remoteAddr", remoteAddr);
 			MDC.put("method", request.getMethod());
-			StringBuffer url = request.getRequestURL();
-			if (StringUtils.isNotBlank(request.getQueryString()))
-				url.append('?').append(request.getQueryString());
-			MDC.put("url", " " + url.toString());
+			MDC.put("url", " " + request.getRequestURL());
 			String s = request.getHeader("User-Agent");
 			if (s == null)
 				s = "";
