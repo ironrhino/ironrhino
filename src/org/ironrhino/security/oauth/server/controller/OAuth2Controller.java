@@ -79,7 +79,7 @@ public class OAuth2Controller {
 			@RequestParam(required = false) String refresh_token) throws Exception {
 		Client client;
 		Authorization authorization;
-		Map<String, Object> result = null;
+		Map<String, Object> result = new LinkedHashMap<>();
 		if (grant_type == GrantType.password) {
 			client = oauthManager.findClientById(client_id);
 			try {
@@ -100,20 +100,17 @@ public class OAuth2Controller {
 						authenticationSuccessHandler.onAuthenticationSuccess(request, response, authResult);
 				} catch (InternalAuthenticationServiceException failed) {
 					throw new IllegalArgumentException(ExceptionUtils.getRootMessage(failed));
-				}
-				// catch (BadVerificationCodeException e) {
-				// throw new IllegalArgumentException("INVALID_VERIFICATION_CODE");
-				// } catch (UsernameNotFoundException e) {
-				// throw new IllegalArgumentException("USERNAME_NOT_EXISTS");
-				// } catch (BadCredentialsException e) {
-				// throw new IllegalArgumentException("BAD_CREDENTIALS");
-				// }
-				catch (AuthenticationException failed) {
+				} catch (AuthenticationException failed) {
 					authenticationFailureHandler.onAuthenticationFailure(request, response, failed);
 					throw new IllegalArgumentException(I18N.getText(failed.getClass().getName()), failed);
 				}
-				UserDetails u = userDetailsService.loadUserByUsername(username);
-				authorization = oauthManager.grant(client, u.getUsername(), device_id, device_name);
+				UserDetails ud = userDetailsService.loadUserByUsername(username);
+				authorization = oauthManager.grant(client, ud.getUsername(), device_id, device_name);
+				result.put("access_token", authorization.getAccessToken());
+				result.put("refresh_token", authorization.getRefreshToken());
+				result.put("expires_in", authorization.getExpiresIn());
+				eventPublisher.publish(new AuthorizeEvent(ud.getUsername(), request.getRemoteAddr(), client.getName(),
+						grant_type.name()), Scope.LOCAL);
 			} catch (Exception e) {
 				if (e instanceof MissingServletRequestParameterException)
 					throw e;
@@ -124,12 +121,6 @@ public class OAuth2Controller {
 					log.error(e.getMessage(), e);
 				throw new OAuthError(OAuthError.INVALID_REQUEST, e.getLocalizedMessage());
 			}
-			result = new LinkedHashMap<>();
-			result.put("access_token", authorization.getAccessToken());
-			result.put("refresh_token", authorization.getRefreshToken());
-			result.put("expires_in", authorization.getExpiresIn());
-			eventPublisher.publish(new AuthorizeEvent(authorization.getGrantor(), request.getRemoteAddr(),
-					client.getName(), grant_type.name()), Scope.LOCAL);
 		} else if (grant_type == GrantType.client_credentials) {
 			client = new Client();
 			client.setId(client_id);
@@ -141,7 +132,6 @@ public class OAuth2Controller {
 						e.getClass().getName(), e.getLocalizedMessage());
 				throw new OAuthError(OAuthError.INVALID_REQUEST, e.getLocalizedMessage());
 			}
-			result = new LinkedHashMap<>();
 			result.put("access_token", authorization.getAccessToken());
 			result.put("refresh_token", authorization.getRefreshToken());
 			result.put("expires_in", authorization.getExpiresIn());
@@ -153,7 +143,6 @@ public class OAuth2Controller {
 			client.setSecret(client_secret);
 			try {
 				authorization = oauthManager.refresh(client, refresh_token);
-				result = new LinkedHashMap<>();
 				result.put("access_token", authorization.getAccessToken());
 				result.put("expires_in", authorization.getExpiresIn());
 				result.put("refresh_token", authorization.getRefreshToken());
@@ -175,7 +164,6 @@ public class OAuth2Controller {
 			client.setRedirectUri(redirect_uri);
 			try {
 				authorization = oauthManager.authenticate(code, client);
-				result = new LinkedHashMap<>();
 				result.put("access_token", authorization.getAccessToken());
 				result.put("expires_in", authorization.getExpiresIn());
 				result.put("refresh_token", authorization.getRefreshToken());
