@@ -94,7 +94,7 @@ public class DefaultOAuthManager extends AbstractOAuthManager {
 		auth.setLifetime(authorizationLifetime > 0 ? authorizationLifetime : DEFAULT_LIFE_TIME);
 		auth.setClient(client.getId());
 		auth.setGrantor(grantor);
-		auth.setRefreshToken(CodecUtils.nextId());
+		auth.setRefreshToken(CodecUtils.nextId(32));
 		auth.setResponseType(ResponseType.token);
 		auth.setGrantType(GrantType.password);
 		if (StringUtils.isNotBlank(deviceId)) {
