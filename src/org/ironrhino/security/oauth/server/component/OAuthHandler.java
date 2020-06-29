@@ -32,6 +32,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Component;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Component("oauthHandler")
@@ -52,7 +53,12 @@ public class OAuthHandler extends AccessHandler {
 	private boolean sessionFallback = true;
 
 	@Value("${oauth.api.jwtEnabled:false}")
+	@Getter
 	private boolean jwtEnabled;
+
+	@Value("${oauth.api.jwtExpiresIn:0}")
+	@Getter
+	private int jwtExpiresIn;
 
 	@Autowired
 	private OAuthAuthorizationService oauthAuthorizationService;

@@ -10,9 +10,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.metadata.Scope;
+import org.ironrhino.core.security.jwt.Jwt;
 import org.ironrhino.core.security.verfication.VerificationManager;
 import org.ironrhino.core.struts.I18N;
 import org.ironrhino.core.util.ExceptionUtils;
+import org.ironrhino.security.oauth.server.component.OAuthHandler;
 import org.ironrhino.security.oauth.server.domain.OAuthError;
 import org.ironrhino.security.oauth.server.enums.GrantType;
 import org.ironrhino.security.oauth.server.event.AuthorizeEvent;
@@ -52,6 +54,9 @@ public class OAuth2Controller {
 	@Autowired
 	private OAuthManager oauthManager;
 
+	@Autowired(required = false)
+	private OAuthHandler oauthHandler;
+
 	@Autowired
 	private UserDetailsService userDetailsService;
 
@@ -80,7 +85,8 @@ public class OAuth2Controller {
 		Client client;
 		Authorization authorization;
 		Map<String, Object> result = new LinkedHashMap<>();
-		if (grant_type == GrantType.password) {
+		if (grant_type == GrantType.password
+				|| grant_type == GrantType.jwt_bearer && oauthHandler != null && oauthHandler.isJwtEnabled()) {
 			client = oauthManager.findClientById(client_id);
 			try {
 				if (client == null)
@@ -105,10 +111,18 @@ public class OAuth2Controller {
 					throw new IllegalArgumentException(I18N.getText(failed.getClass().getName()), failed);
 				}
 				UserDetails ud = userDetailsService.loadUserByUsername(username);
-				authorization = oauthManager.grant(client, ud.getUsername(), device_id, device_name);
-				result.put("access_token", authorization.getAccessToken());
-				result.put("refresh_token", authorization.getRefreshToken());
-				result.put("expires_in", authorization.getExpiresIn());
+				if (grant_type == GrantType.jwt_bearer) {
+					int expiresIn = oauthHandler.getJwtExpiresIn();
+					String jwt = Jwt.createWithSubject(ud.getUsername(), ud.getPassword(), expiresIn);
+					result.put("access_token", jwt);
+					if (expiresIn > 0)
+						result.put("expires_in", expiresIn);
+				} else {
+					authorization = oauthManager.grant(client, ud.getUsername(), device_id, device_name);
+					result.put("access_token", authorization.getAccessToken());
+					result.put("refresh_token", authorization.getRefreshToken());
+					result.put("expires_in", authorization.getExpiresIn());
+				}
 				eventPublisher.publish(new AuthorizeEvent(ud.getUsername(), request.getRemoteAddr(), client.getName(),
 						grant_type.name()), Scope.LOCAL);
 			} catch (Exception e) {
