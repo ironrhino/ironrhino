@@ -88,15 +88,15 @@ public class OAuth2Controller {
 		if (grant_type == GrantType.password
 				|| grant_type == GrantType.jwt_bearer && oauthHandler != null && oauthHandler.isJwtEnabled()) {
 			client = oauthManager.findClientById(client_id);
+			if (client == null)
+				throw new OAuthError(OAuthError.INVALID_CLIENT, "client_id_not_exists");
+			if (!client.getSecret().equals(client_secret))
+				throw new OAuthError(OAuthError.INVALID_CLIENT, "client_secret_mismatch");
+			if (username == null)
+				throw new MissingServletRequestParameterException("username", String.class.getSimpleName());
+			if (password == null)
+				throw new MissingServletRequestParameterException("password", String.class.getSimpleName());
 			try {
-				if (client == null)
-					throw new OAuthError(OAuthError.INVALID_CLIENT, "client_id_not_exists");
-				if (!client.getSecret().equals(client_secret))
-					throw new OAuthError(OAuthError.INVALID_CLIENT, "client_secret_mismatch");
-				if (username == null)
-					throw new MissingServletRequestParameterException("username", String.class.getSimpleName());
-				if (password == null)
-					throw new MissingServletRequestParameterException("password", String.class.getSimpleName());
 				UsernamePasswordAuthenticationToken attempt = new UsernamePasswordAuthenticationToken(username,
 						password);
 				attempt.setDetails(authenticationDetailsSource.buildDetails(request));
@@ -126,8 +126,6 @@ public class OAuth2Controller {
 				eventPublisher.publish(new AuthorizeEvent(ud.getUsername(), request.getRemoteAddr(), client.getName(),
 						grant_type.name()), Scope.LOCAL);
 			} catch (Exception e) {
-				if (e instanceof MissingServletRequestParameterException)
-					throw e;
 				if (e.getCause() instanceof AuthenticationException)
 					log.error("Exchange token by password for \"{}\" failed with {}: {}", username,
 							e.getClass().getName(), e.getLocalizedMessage());
@@ -165,11 +163,7 @@ public class OAuth2Controller {
 						e.getLocalizedMessage());
 				throw new OAuthError(OAuthError.INVALID_REQUEST, e.getLocalizedMessage());
 			}
-		} else {
-			if (grant_type != GrantType.authorization_code) {
-				String message = "grant_type must be authorization_code";
-				throw new OAuthError(OAuthError.UNSUPPORTED_GRANT_TYPE, message);
-			}
+		} else if (grant_type == GrantType.authorization_code) {
 			if (code == null)
 				throw new MissingServletRequestParameterException("code", String.class.getSimpleName());
 			client = new Client();
@@ -188,6 +182,8 @@ public class OAuth2Controller {
 						e.getLocalizedMessage());
 				throw new OAuthError(OAuthError.INVALID_REQUEST, e.getLocalizedMessage());
 			}
+		} else {
+			throw new OAuthError(OAuthError.UNSUPPORTED_GRANT_TYPE);
 		}
 		return result;
 	}
