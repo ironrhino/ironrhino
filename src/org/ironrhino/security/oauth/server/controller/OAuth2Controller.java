@@ -54,7 +54,7 @@ public class OAuth2Controller {
 	@Autowired
 	private OAuthManager oauthManager;
 
-	@Autowired(required = false)
+	@Autowired
 	private OAuthHandler oauthHandler;
 
 	@Autowired

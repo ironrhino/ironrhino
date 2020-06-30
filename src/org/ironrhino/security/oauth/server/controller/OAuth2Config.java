@@ -39,7 +39,7 @@ public class OAuth2Config extends WebMvcConfigurationSupport {
 				try {
 					return GrantType.valueOf(input);
 				} catch (IllegalArgumentException e) {
-					if (input.equals("urn:ietf:params:oauth:grant-type:jwt-bearer"))
+					if (input.equals(GrantType.JWT_BEARER))
 						return GrantType.jwt_bearer;
 					throw e;
 				}
