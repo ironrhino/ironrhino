@@ -33,6 +33,9 @@ public class OAuthError extends RuntimeException {
 	public static final String ERROR_EXPIRED_TOKEN = "expired_token";
 	public static final String ERROR_KICKED_TOKEN = "kicked_token";
 	public static final String ERROR_INVALID_USER = "invalid_user";
+	public static final String ERROR_CLIENT_ID_NOT_EXISTS = "client_id_not_exists";
+	public static final String ERROR_CLIENT_SECRET_MISMATCH = "client_secret_mismatch";
+	public static final String ERROR_REVOKE_FAILED = "revoke_failed";
 
 	private final String error;
 

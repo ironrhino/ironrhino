@@ -89,9 +89,9 @@ public class OAuth2Controller {
 				|| grant_type == GrantType.jwt_bearer && oauthHandler != null && oauthHandler.isJwtEnabled()) {
 			client = oauthManager.findClientById(client_id);
 			if (client == null)
-				throw new OAuthError(OAuthError.INVALID_CLIENT, "client_id_not_exists");
+				throw new OAuthError(OAuthError.INVALID_CLIENT, OAuthError.ERROR_CLIENT_ID_NOT_EXISTS);
 			if (!client.getSecret().equals(client_secret))
-				throw new OAuthError(OAuthError.INVALID_CLIENT, "client_secret_mismatch");
+				throw new OAuthError(OAuthError.INVALID_CLIENT, OAuthError.ERROR_CLIENT_SECRET_MISMATCH);
 			if (username == null)
 				throw new MissingServletRequestParameterException("username", String.class.getSimpleName());
 			if (password == null)
@@ -195,7 +195,7 @@ public class OAuth2Controller {
 		if (authorization == null) {
 			throw new OAuthError(OAuthError.INVALID_TOKEN);
 		} else if (authorization.getExpiresIn() < 0) {
-			throw new OAuthError(OAuthError.INVALID_TOKEN, "expired_token");
+			throw new OAuthError(OAuthError.INVALID_TOKEN, OAuthError.ERROR_EXPIRED_TOKEN);
 		} else {
 			if (authorization.getClient() != null)
 				result.put("client_id", authorization.getClient());
@@ -212,7 +212,7 @@ public class OAuth2Controller {
 	public void revoke(@RequestParam String access_token) throws IOException {
 		boolean revoked = oauthManager.revoke(access_token);
 		if (!revoked) {
-			throw new OAuthError(OAuthError.INVALID_REQUEST, "revoke_failed");
+			throw new OAuthError(OAuthError.INVALID_REQUEST, OAuthError.ERROR_REVOKE_FAILED);
 		}
 	}
 
@@ -229,9 +229,9 @@ public class OAuth2Controller {
 		try {
 			Client client = oauthManager.findClientById(client_id);
 			if (client == null)
-				throw new IllegalArgumentException("client_id_not_exists");
+				throw new OAuthError(OAuthError.INVALID_CLIENT, OAuthError.ERROR_CLIENT_ID_NOT_EXISTS);
 			if (!client.getSecret().equals(client_secret))
-				throw new IllegalArgumentException("client_secret_mismatch");
+				throw new OAuthError(OAuthError.INVALID_CLIENT, OAuthError.ERROR_CLIENT_SECRET_MISMATCH);
 			if (StringUtils.isNotBlank(username)) {
 				verificationManager.send(username);
 				result = new LinkedHashMap<>();
