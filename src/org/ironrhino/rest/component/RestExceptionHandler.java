@@ -14,6 +14,7 @@ import javax.validation.ConstraintViolationException;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.rest.RestStatus;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -22,12 +23,12 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -58,7 +59,8 @@ public class RestExceptionHandler {
 		} else if (ex instanceof HttpRequestMethodNotSupportedException) {
 			response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 			return RestStatus.valueOf(RestStatus.CODE_FORBIDDEN, ex.getMessage());
-		} else if (ex instanceof MethodArgumentTypeMismatchException || ex instanceof IllegalArgumentException) {
+		} else if (ex instanceof ServletRequestBindingException || ex instanceof TypeMismatchException
+				|| ex instanceof IllegalArgumentException) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, ex.getMessage());
 		} else if (ex instanceof BindException || ex instanceof MethodArgumentNotValidException) {
