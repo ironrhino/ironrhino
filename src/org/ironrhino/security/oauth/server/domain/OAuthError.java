@@ -14,7 +14,7 @@ import lombok.Setter;
 @EqualsAndHashCode(callSuper = false)
 @RequiredArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties({ "localizedMessage", "cause", "stackTrace", "suppressed" })
+@JsonIgnoreProperties({ "localizedMessage", "message", "cause", "stackTrace", "suppressed" })
 public class OAuthError extends RuntimeException {
 
 	private static final long serialVersionUID = 8659734973845517719L;
