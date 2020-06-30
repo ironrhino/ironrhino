@@ -52,11 +52,11 @@ public class OAuthHandler extends AccessHandler {
 	@Value("${oauth.api.sessionFallback:true}")
 	private boolean sessionFallback = true;
 
-	@Value("${oauth.api.jwtEnabled:false}")
+	@Value("${oauth.token.jwtEnabled:false}")
 	@Getter
 	private boolean jwtEnabled;
 
-	@Value("${oauth.api.jwtExpiresIn:0}")
+	@Value("${oauth.token.jwtExpiresIn:0}")
 	@Getter
 	private int jwtExpiresIn;
 
