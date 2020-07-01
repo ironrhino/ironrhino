@@ -46,7 +46,7 @@ public class BatchedBalanceQueryControl extends BatchedPollingControl<BalanceQue
 	 */
 	@Override
 	protected Map<BalanceQuery, Result> handle(List<BalanceQuery> bqs) throws Exception {
-		Map<BalanceQuery, Result> result = new HashMap<>(bqs.size());
+		Map<BalanceQuery, Result> result = new HashMap<>(bqs.size(), 1);
 		for (BalanceQuery bq : bqs) {
 			try {
 				BigDecimal balance = queryBalance(bq.getAccountNo());
