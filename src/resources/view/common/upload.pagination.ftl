@@ -23,7 +23,7 @@
 	<#if pagedFiles.marker?has_content>
 		<#assign history=previousMarker?has_content?then(previousMarker+','+pagedFiles.marker,pagedFiles.marker)?split(',')/>
 		<#assign maxlength=5>
-		<#if history?size gt maxlength><#assign history=history[history?size-maxlength]></#if>
+		<#if history?size gt maxlength><#assign history=history[history?size-maxlength..]></#if>
 		<#assign _url+=('&previousMarker='+history?join(',')?url)/>
 	</#if>
 	<a class="ajax view" data-replacement="files" href="${_url}">${getText('nextpage')}</a>
