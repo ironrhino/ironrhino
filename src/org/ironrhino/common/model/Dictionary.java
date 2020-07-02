@@ -71,7 +71,7 @@ public class Dictionary extends BaseRecordableEntity {
 	@UiConfig(hidden = true)
 	@NotInCopy
 	public Map<String, String> getItemsAsMap() {
-		Map<String, String> map = new LinkedHashMap<>(items.size(), 1);
+		Map<String, String> map = new LinkedHashMap<>(items.size() / 3 * 4);
 		for (LabelValue lv : items)
 			if (StringUtils.isNotBlank(lv.getValue()))
 				map.put(lv.getValue(), StringUtils.isNotBlank(lv.getLabel()) ? lv.getLabel() : lv.getValue());
