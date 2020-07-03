@@ -42,7 +42,7 @@ public abstract class BucketFileStorage extends AbstractFileStorage {
 
 	@Override
 	public boolean mkdir(String path) {
-		if (path.isEmpty() || path.equals("/"))
+		if (path.isEmpty() || path.equals("/") || isDirectory(path))
 			return true;
 		path = normalizePath(path);
 		int lastIndex = path.lastIndexOf('/');
