@@ -2,6 +2,7 @@ package org.ironrhino.core.servlet;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServlet;
 
@@ -19,11 +20,16 @@ public class TestServlet extends HttpServlet {
 	public void init() {
 		final String url = getInitParameter("url");
 		new Thread(() -> {
+			try {
+				TimeUnit.SECONDS.sleep(1);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			if (StringUtils.isNotBlank(url)) {
 				if (test(url))
 					log.info("test succussful");
 				else
-					log.warn("test failed,no response,please check it");
+					log.warn("test failed, no response, please check it");
 			} else {
 				String context = getServletContext().getContextPath();
 				String format = "http://localhost%s%s/_ping?_internal_testing_";
@@ -40,7 +46,7 @@ public class TestServlet extends HttpServlet {
 						if (test(String.format(format, ":8080", context)))
 							log.info("test succussful");
 						else
-							log.warn("test failed,no response,please check it");
+							log.warn("test failed, no response, please check it");
 					}
 				}
 			}
