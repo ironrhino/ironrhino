@@ -97,14 +97,18 @@ public class MainContextLoaderListener extends ContextLoaderListener {
 	}
 
 	private void cancelTimer(Thread thread) throws Exception {
-		// Timer::cancel
 		Object queue = ReflectionUtils.getFieldValue(thread, "queue");
-		synchronized (queue) {
-			ReflectionUtils.setFieldValue(thread, "newTasksMayBeScheduled", false);
-			Method m = queue.getClass().getDeclaredMethod("clear");
-			m.setAccessible(true);
-			m.invoke(queue);
-			queue.notify();
+		Method m = queue.getClass().getDeclaredMethod("isEmpty");
+		m.setAccessible(true);
+		if ((boolean) m.invoke(queue)) {
+			// Timer::cancel
+			synchronized (queue) {
+				ReflectionUtils.setFieldValue(thread, "newTasksMayBeScheduled", false);
+				m = queue.getClass().getDeclaredMethod("clear");
+				m.setAccessible(true);
+				m.invoke(queue);
+				queue.notify();
+			}
 		}
 	}
 
