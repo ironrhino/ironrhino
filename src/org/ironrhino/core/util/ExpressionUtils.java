@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.expression.ExpressionException;
+import org.springframework.expression.spel.InternalParseException;
 
 import lombok.experimental.UtilityClass;
 
@@ -16,7 +18,7 @@ public class ExpressionUtils {
 			return expression;
 		try {
 			return ExpressionEngine.SPEL.evalExpression(expression, context);
-		} catch (Exception e) {
+		} catch (ExpressionException | InternalParseException | IllegalStateException e) {
 			return ExpressionEngine.MVEL.evalExpression(expression, context);
 		}
 	}
@@ -28,7 +30,7 @@ public class ExpressionUtils {
 			return ExpressionEngine.MVEL.eval(template, context);
 		try {
 			return ExpressionEngine.SPEL.eval(template, context);
-		} catch (Exception e) {
+		} catch (ExpressionException | InternalParseException | IllegalStateException e) {
 			return ExpressionEngine.MVEL.eval(template, context);
 		}
 	}
