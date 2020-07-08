@@ -31,6 +31,7 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.spring.FallbackSupportMethodInterceptorFactoryBean;
+import org.ironrhino.core.spring.http.client.LoggingClientHttpRequestInterceptor;
 import org.ironrhino.core.spring.http.client.PrependBaseUrlClientHttpRequestInterceptor;
 import org.ironrhino.core.throttle.CircuitBreakerRegistry;
 import org.ironrhino.core.tracing.Tracing;
@@ -45,6 +46,7 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Lookup;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -121,6 +123,9 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 	@Autowired(required = false)
 	private CircuitBreakerRegistry circuitBreakerRegistry;
 
+	@Value("${restApi.loggingBody:true}")
+	private boolean loggingBody = true;
+
 	public RestApiFactoryBean(Class<?> restApiClass) {
 		this(restApiClass, (RestTemplate) null);
 	}
@@ -162,6 +167,9 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 			}
 		}
 		this.restTemplate = restTemplate;
+		if (loggingBody && !this.restTemplate.getInterceptors().stream()
+				.anyMatch(LoggingClientHttpRequestInterceptor.class::isInstance))
+			this.restTemplate.getInterceptors().add(new LoggingClientHttpRequestInterceptor());
 		this.restApiBean = new ProxyFactory(restApiClass, this).getProxy(restApiClass.getClassLoader());
 		for (HttpMessageConverter<?> mc : restTemplate.getMessageConverters()) {
 			if (mc instanceof AbstractJackson2HttpMessageConverter) {
