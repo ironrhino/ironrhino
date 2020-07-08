@@ -148,6 +148,7 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 		this.requestHeaders = map != null ? map : Collections.emptyMap();
 		if (restTemplate == null) {
 			restTemplate = new org.ironrhino.core.spring.http.client.RestTemplate();
+			restTemplate.getInterceptors().add(new PrependBaseUrlClientHttpRequestInterceptor(() -> apiBaseUrl));
 			Iterator<HttpMessageConverter<?>> it = restTemplate.getMessageConverters().iterator();
 			while (it.hasNext()) {
 				HttpMessageConverter<?> converter = it.next();
@@ -161,7 +162,6 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 			}
 		}
 		this.restTemplate = restTemplate;
-		this.restTemplate.getInterceptors().add(new PrependBaseUrlClientHttpRequestInterceptor(() -> apiBaseUrl));
 		this.restApiBean = new ProxyFactory(restApiClass, this).getProxy(restApiClass.getClassLoader());
 		for (HttpMessageConverter<?> mc : restTemplate.getMessageConverters()) {
 			if (mc instanceof AbstractJackson2HttpMessageConverter) {
