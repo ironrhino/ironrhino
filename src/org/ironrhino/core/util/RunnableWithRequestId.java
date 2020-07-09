@@ -10,8 +10,10 @@ public class RunnableWithRequestId implements Runnable {
 
 	@Override
 	public void run() {
-		CodecUtils.putRequestIdIfAbsent();
+		boolean requestIdGenerated = CodecUtils.putRequestIdIfAbsent();
 		delegate.run();
+		if (requestIdGenerated)
+			CodecUtils.removeRequestId();
 	}
 
 }

@@ -22,6 +22,7 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.ironrhino.core.tracing.Tracing;
 import org.ironrhino.core.util.NameableThreadFactory;
 import org.ironrhino.core.util.ReflectionUtils;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -66,6 +67,7 @@ public abstract class MethodInterceptorFactoryBean implements MethodInterceptor,
 			Class<?> objectType = getObjectType();
 			return "Dynamic proxy for [" + (objectType != null ? objectType.getName() : "Unknown") + "]";
 		}
+		MDC.put("service", ReflectionUtils.stringify(method));
 		Object bean = getObject();
 		ExecutableValidator executableValidator = null;
 		Class<?>[] groups = null;

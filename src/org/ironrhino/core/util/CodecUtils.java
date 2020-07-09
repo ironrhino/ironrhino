@@ -313,13 +313,20 @@ public class CodecUtils {
 		return nextId();
 	}
 
-	public static void putRequestIdIfAbsent() {
+	public static boolean putRequestIdIfAbsent() {
 		String requestId = MDC.get(MDC_KEY_REQUEST_ID);
 		if (requestId == null) {
 			requestId = generateRequestId();
 			MDC.put(MDC_KEY_REQUEST_ID, requestId);
 			MDC.put(MDC_KEY_REQUEST, " request:" + requestId);
+			return true;
 		}
+		return false;
+	}
+
+	public static void removeRequestId() {
+		MDC.remove(MDC_KEY_REQUEST_ID);
+		MDC.remove(MDC_KEY_REQUEST);
 	}
 
 }

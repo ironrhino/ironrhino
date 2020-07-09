@@ -19,7 +19,6 @@ import org.ironrhino.core.remoting.ServiceNotFoundException;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializers;
 import org.ironrhino.core.remoting.stats.ServiceStats;
-import org.ironrhino.core.servlet.AccessFilter;
 import org.ironrhino.core.spring.FallbackSupportMethodInterceptorFactoryBean;
 import org.ironrhino.core.spring.RemotingClientProxy;
 import org.ironrhino.core.throttle.CircuitBreakerRegistry;
@@ -204,18 +203,9 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 
 	protected RemoteInvocationResult doExecuteRequest(RemoteInvocation invocation, MethodInvocation methodInvocation)
 			throws Exception {
-		String requestId = MDC.get(AccessFilter.MDC_KEY_REQUEST_ID);
-		boolean requestIdGenerated = false;
-		if (requestId == null) {
-			requestId = CodecUtils.generateRequestId();
-			MDC.put(AccessFilter.MDC_KEY_REQUEST_ID, requestId);
-			MDC.put("request", "request:" + requestId);
-			requestIdGenerated = true;
-		}
+		boolean requestIdGenerated = CodecUtils.putRequestIdIfAbsent();
 		Method method = methodInvocation.getMethod();
-		String service = ReflectionUtils.stringify(method);
 		MDC.put("role", "CLIENT");
-		MDC.put("service", service);
 		if (loggingPayload) {
 			Object payload;
 			Object[] arguments = methodInvocation.getArguments();
@@ -246,8 +236,7 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 
 		} finally {
 			if (requestIdGenerated) {
-				MDC.remove(AccessFilter.MDC_KEY_REQUEST_ID);
-				MDC.remove("request");
+				CodecUtils.removeRequestId();
 			}
 		}
 		return result;
