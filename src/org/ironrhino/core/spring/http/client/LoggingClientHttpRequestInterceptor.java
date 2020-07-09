@@ -17,10 +17,12 @@ import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.AllArgsConstructor;
 
-@Slf4j
+@AllArgsConstructor
 public class LoggingClientHttpRequestInterceptor implements ClientHttpRequestInterceptor {
+
+	private final Logger logger;
 
 	@Override
 	public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
@@ -30,9 +32,9 @@ public class LoggingClientHttpRequestInterceptor implements ClientHttpRequestInt
 			String str = new String(body, StandardCharsets.UTF_8);
 			if (AppInfo.getStage() != Stage.DEVELOPMENT && contentType.isCompatibleWith(MediaType.APPLICATION_JSON))
 				str = JsonDesensitizer.DEFAULT_INSTANCE.desensitize(str);
-			log.info("{} {} \n{}", request.getMethod(), request.getURI(), str);
+			logger.info("{} {} \n{}", request.getMethod(), request.getURI(), str);
 		} else {
-			log.info("{} {}", request.getMethod(), request.getURI());
+			logger.info("{} {}", request.getMethod(), request.getURI());
 		}
 		ClientHttpResponse response = execution.execute(request, body);
 		contentType = response.getHeaders().getContentType();
@@ -44,7 +46,7 @@ public class LoggingClientHttpRequestInterceptor implements ClientHttpRequestInt
 				@Override
 				public InputStream getBody() throws IOException {
 					if (is == null)
-						is = new ContentCachingInputStream(response, log);
+						is = new ContentCachingInputStream(response, logger);
 					return is;
 				}
 
@@ -75,14 +77,14 @@ public class LoggingClientHttpRequestInterceptor implements ClientHttpRequestInt
 							is.close();
 							is = null;
 						} catch (IOException e) {
-							log.error(e.getMessage(), e);
+							logger.error(e.getMessage(), e);
 						}
 					response.close();
 				}
 
 			};
 		} else {
-			log.info("Received status {} and content type \"{}\" with length {}", response.getRawStatusCode(),
+			logger.info("Received status {} and content type \"{}\" with length {}", response.getRawStatusCode(),
 					contentType, response.getHeaders().getContentLength());
 		}
 		return response;

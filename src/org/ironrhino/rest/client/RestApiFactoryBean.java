@@ -40,6 +40,7 @@ import org.ironrhino.core.util.GenericTypeResolver;
 import org.ironrhino.core.util.MaxAttemptsExceededException;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.rest.RestStatus;
+import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapperImpl;
@@ -169,7 +170,8 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 		this.restTemplate = restTemplate;
 		if (loggingBody && !this.restTemplate.getInterceptors().stream()
 				.anyMatch(LoggingClientHttpRequestInterceptor.class::isInstance))
-			this.restTemplate.getInterceptors().add(new LoggingClientHttpRequestInterceptor());
+			this.restTemplate.getInterceptors()
+					.add(new LoggingClientHttpRequestInterceptor(LoggerFactory.getLogger(restApiClass)));
 		this.restApiBean = new ProxyFactory(restApiClass, this).getProxy(restApiClass.getClassLoader());
 		for (HttpMessageConverter<?> mc : restTemplate.getMessageConverters()) {
 			if (mc instanceof AbstractJackson2HttpMessageConverter) {
