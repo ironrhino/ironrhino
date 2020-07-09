@@ -26,64 +26,64 @@ public class LoggingClientHttpRequestInterceptor implements ClientHttpRequestInt
 	public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
 			throws IOException {
 		MediaType contentType = request.getHeaders().getContentType();
-		if (body != null && body.length > 0 && contentType != null && supports(contentType)) {
+		if (body.length > 0 && contentType != null && supports(contentType)) {
 			String str = new String(body, StandardCharsets.UTF_8);
-			if (AppInfo.getStage() != Stage.DEVELOPMENT)
+			if (AppInfo.getStage() != Stage.DEVELOPMENT && contentType.isCompatibleWith(MediaType.APPLICATION_JSON))
 				str = JsonDesensitizer.DEFAULT_INSTANCE.desensitize(str);
 			log.info("{} {} \n{}", request.getMethod(), request.getURI(), str);
 		} else {
 			log.info("{} {}", request.getMethod(), request.getURI());
 		}
 		ClientHttpResponse response = execution.execute(request, body);
-		if (!response.getStatusCode().isError()) {
-			contentType = response.getHeaders().getContentType();
-			if (supports(contentType)) {
-				return new ClientHttpResponse() {
+		contentType = response.getHeaders().getContentType();
+		if (response.getHeaders().getContentLength() != 0 && supports(contentType)) {
+			return new ClientHttpResponse() {
 
-					InputStream is;
+				InputStream is;
 
-					@Override
-					public InputStream getBody() throws IOException {
-						if (is == null)
-							is = new ContentCachingInputStream(response, log);
-						return is;
-					}
+				@Override
+				public InputStream getBody() throws IOException {
+					if (is == null)
+						is = new ContentCachingInputStream(response, log);
+					return is;
+				}
 
-					@Override
-					public HttpHeaders getHeaders() {
-						return response.getHeaders();
-					}
+				@Override
+				public HttpHeaders getHeaders() {
+					return response.getHeaders();
+				}
 
-					@Override
-					public HttpStatus getStatusCode() throws IOException {
-						return response.getStatusCode();
-					}
+				@Override
+				public HttpStatus getStatusCode() throws IOException {
+					return response.getStatusCode();
+				}
 
-					@Override
-					public int getRawStatusCode() throws IOException {
-						return response.getRawStatusCode();
-					}
+				@Override
+				public int getRawStatusCode() throws IOException {
+					return response.getRawStatusCode();
+				}
 
-					@Override
-					public String getStatusText() throws IOException {
-						return response.getStatusText();
-					}
+				@Override
+				public String getStatusText() throws IOException {
+					return response.getStatusText();
+				}
 
-					@Override
-					public void close() {
-						if (is != null)
-							try {
-								is.close();
-								is = null;
-							} catch (IOException e) {
-								log.error(e.getMessage(), e);
-							}
-						response.close();
-					}
+				@Override
+				public void close() {
+					if (is != null)
+						try {
+							is.close();
+							is = null;
+						} catch (IOException e) {
+							log.error(e.getMessage(), e);
+						}
+					response.close();
+				}
 
-				};
-
-			}
+			};
+		} else {
+			log.info("Received status {} and content type \"{}\" with length {}", response.getRawStatusCode(),
+					contentType, response.getHeaders().getContentLength());
 		}
 		return response;
 	}
@@ -100,12 +100,15 @@ public class LoggingClientHttpRequestInterceptor implements ClientHttpRequestInt
 
 		private final InputStream is;
 
+		private final MediaType contentType;
+
 		private final Logger logger;
 
 		private ByteArrayOutputStream cachedContent;
 
 		public ContentCachingInputStream(ClientHttpResponse response, Logger logger) throws IOException {
 			this.is = response.getBody();
+			this.contentType = response.getHeaders().getContentType();
 			int contentLength = (int) response.getHeaders().getContentLength();
 			this.cachedContent = new ByteArrayOutputStream(contentLength >= 0 ? contentLength : 1024);
 			this.logger = logger;
@@ -145,7 +148,7 @@ public class LoggingClientHttpRequestInterceptor implements ClientHttpRequestInt
 				byte[] bytes = cachedContent.toByteArray();
 				cachedContent = null;
 				String str = new String(bytes, StandardCharsets.UTF_8);
-				if (AppInfo.getStage() != Stage.DEVELOPMENT)
+				if (AppInfo.getStage() != Stage.DEVELOPMENT && contentType.isCompatibleWith(MediaType.APPLICATION_JSON))
 					str = JsonDesensitizer.DEFAULT_INSTANCE.desensitize(str);
 				logger.info("Received:\n{}", str);
 			}
