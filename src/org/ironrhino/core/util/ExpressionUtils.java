@@ -16,9 +16,11 @@ public class ExpressionUtils {
 	public static Object evalExpression(String expression, Map<String, ?> context) {
 		if (StringUtils.isBlank(expression))
 			return expression;
+		if (expression.indexOf(';') > 0) // SPEL doesn't supports ';' as delimiter
+			return ExpressionEngine.MVEL.evalExpression(expression, context);
 		try {
 			return ExpressionEngine.SPEL.evalExpression(expression, context);
-		} catch (ExpressionException | InternalParseException | IllegalStateException e) {
+		} catch (ExpressionException | InternalParseException e) {
 			return ExpressionEngine.MVEL.evalExpression(expression, context);
 		}
 	}
@@ -26,11 +28,11 @@ public class ExpressionUtils {
 	public static Object eval(String template, Map<String, ?> context) {
 		if (StringUtils.isBlank(template))
 			return template;
-		if (template.contains("@{") || template.contains("@if{"))
+		if (template.contains("@{") || template.contains("@if{") || template.contains("${import "))
 			return ExpressionEngine.MVEL.eval(template, context);
 		try {
 			return ExpressionEngine.SPEL.eval(template, context);
-		} catch (ExpressionException | InternalParseException | IllegalStateException e) {
+		} catch (ExpressionException | InternalParseException e) {
 			return ExpressionEngine.MVEL.eval(template, context);
 		}
 	}
