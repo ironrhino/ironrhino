@@ -26,19 +26,18 @@ public class LoggingClientHttpRequestInterceptor implements ClientHttpRequestInt
 	public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
 			throws IOException {
 		MediaType contentType = request.getHeaders().getContentType();
-		if (body != null && body.length > 0 && contentType != null
-				&& contentType.isCompatibleWith(MediaType.APPLICATION_JSON)) {
+		if (body != null && body.length > 0 && contentType != null && supports(contentType)) {
 			String str = new String(body, StandardCharsets.UTF_8);
 			if (AppInfo.getStage() != Stage.DEVELOPMENT)
 				str = JsonDesensitizer.DEFAULT_INSTANCE.desensitize(str);
-			log.info("{} {} with:\n", request.getMethod(), request.getURI(), str);
+			log.info("{} {} \n{}", request.getMethod(), request.getURI(), str);
 		} else {
 			log.info("{} {}", request.getMethod(), request.getURI());
 		}
 		ClientHttpResponse response = execution.execute(request, body);
 		if (!response.getStatusCode().isError()) {
 			contentType = response.getHeaders().getContentType();
-			if (contentType != null && contentType.isCompatibleWith(MediaType.APPLICATION_JSON)) {
+			if (supports(contentType)) {
 				return new ClientHttpResponse() {
 
 					InputStream is;
@@ -87,6 +86,14 @@ public class LoggingClientHttpRequestInterceptor implements ClientHttpRequestInt
 			}
 		}
 		return response;
+	}
+
+	protected boolean supports(MediaType contentType) {
+		if (contentType == null)
+			return false;
+		return contentType.isCompatibleWith(MediaType.APPLICATION_FORM_URLENCODED)
+				|| contentType.isCompatibleWith(MediaType.APPLICATION_JSON)
+				|| contentType.isCompatibleWith(MediaType.APPLICATION_XML) || contentType.getType().equals("text");
 	}
 
 	private class ContentCachingInputStream extends InputStream {
