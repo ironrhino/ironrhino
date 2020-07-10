@@ -410,6 +410,9 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 				if (arr.length == 2)
 					headers.add(arr[0], arr[1]);
 			}
+			String[] consumes = classRequestMapping.consumes();
+			if (consumes.length > 0)
+				headers.setContentType(MediaType.parseMediaType(consumes[0]));
 		}
 		if (methodRequestMapping != null) {
 			for (String s : methodRequestMapping.headers()) {
@@ -417,6 +420,9 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 				if (arr.length == 2)
 					headers.add(arr[0], arr[1]);
 			}
+			String[] consumes = methodRequestMapping.consumes();
+			if (consumes.length > 0)
+				headers.setContentType(MediaType.parseMediaType(consumes[0]));
 		}
 		return headers;
 	}

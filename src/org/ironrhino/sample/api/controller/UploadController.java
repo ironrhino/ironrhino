@@ -22,12 +22,12 @@ public class UploadController {
 			MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.TEXT_PLAIN_VALUE,
 					MediaType.APPLICATION_JSON_VALUE })
 	public String upload(@RequestBody String string) {
-		return string;
+		return "text:" + string;
 	}
 
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
 	public String upload(@RequestBody byte[] bytes) {
-		return new String(bytes);
+		return "stream:" + new String(bytes);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

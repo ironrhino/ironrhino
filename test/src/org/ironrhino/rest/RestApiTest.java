@@ -140,13 +140,18 @@ public class RestApiTest {
 	}
 
 	@Test
+	public void testPostText() {
+		assertThat(uploadClient.uploadText("test".getBytes()), is("text:test"));
+	}
+
+	@Test
 	public void testPostStream() {
-		assertThat(uploadClient.upload(new ByteArrayInputStream("test".getBytes())), is("test"));
+		assertThat(uploadClient.uploadStream(new ByteArrayInputStream("test".getBytes())), is("stream:test"));
 	}
 
 	@Test
 	public void testPostByteArray() {
-		assertThat(uploadClient.upload("test".getBytes()), is("test"));
+		assertThat(uploadClient.uploadBytes("test".getBytes()), is("stream:test"));
 	}
 
 	@Test
