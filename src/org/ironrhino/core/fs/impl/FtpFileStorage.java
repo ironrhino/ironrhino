@@ -250,7 +250,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 				ftpClient.retrieveFile(pathname, bos);
 				return new ByteArrayInputStream(bos.toByteArray());
 			}
-			return new ProxyInputStream(ftpClient.retrieveFileStream(pathname)) {
+			return new FilterInputStream(ftpClient.retrieveFileStream(pathname)) {
 
 				private AtomicBoolean closed = new AtomicBoolean();
 
@@ -416,7 +416,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 			ftpClient = pool.borrowObject();
 			String workingDirectory = ftpClient.printWorkingDirectory();
 			T val = callback.doWithFTPClient(ftpClient);
-			if (!(val instanceof ProxyInputStream)) {
+			if (!(val instanceof FilterInputStream)) {
 				ftpClient.changeWorkingDirectory(workingDirectory);
 			} else {
 				deferReturn = true;
@@ -445,109 +445,6 @@ public class FtpFileStorage extends AbstractFileStorage {
 
 	interface Callback<T> {
 		T doWithFTPClient(FTPClient ftpClient) throws IOException;
-	}
-
-	static abstract class ProxyInputStream extends FilterInputStream {
-		public ProxyInputStream(InputStream proxy) {
-			super(proxy);
-		}
-
-		@Override
-		public int read() throws IOException {
-			try {
-				beforeRead(1);
-				int b = in.read();
-				afterRead(b != -1 ? 1 : -1);
-				return b;
-			} catch (IOException e) {
-				handleIOException(e);
-			}
-			return -1;
-		}
-
-		@Override
-		public int read(byte[] bts) throws IOException {
-			try {
-				beforeRead(bts != null ? bts.length : 0);
-				int n = in.read(bts);
-				afterRead(n);
-				return n;
-			} catch (IOException e) {
-				handleIOException(e);
-			}
-			return -1;
-		}
-
-		@Override
-		public int read(byte[] bts, int off, int len) throws IOException {
-			try {
-				beforeRead(len);
-				int n = in.read(bts, off, len);
-				afterRead(n);
-				return n;
-			} catch (IOException e) {
-				handleIOException(e);
-			}
-			return -1;
-		}
-
-		@Override
-		public long skip(long ln) throws IOException {
-			try {
-				return in.skip(ln);
-			} catch (IOException e) {
-				handleIOException(e);
-			}
-			return 0L;
-		}
-
-		@Override
-		public int available() throws IOException {
-			try {
-				return super.available();
-			} catch (IOException e) {
-				handleIOException(e);
-			}
-			return 0;
-		}
-
-		@Override
-		public void close() throws IOException {
-			try {
-				in.close();
-			} catch (IOException e) {
-				handleIOException(e);
-			}
-		}
-
-		@Override
-		public synchronized void mark(int readlimit) {
-			in.mark(readlimit);
-		}
-
-		@Override
-		public synchronized void reset() throws IOException {
-			try {
-				in.reset();
-			} catch (IOException e) {
-				handleIOException(e);
-			}
-		}
-
-		@Override
-		public boolean markSupported() {
-			return in.markSupported();
-		}
-
-		protected void beforeRead(int n) throws IOException {
-		}
-
-		protected void afterRead(int n) throws IOException {
-		}
-
-		protected void handleIOException(IOException e) throws IOException {
-			throw e;
-		}
 	}
 
 }
