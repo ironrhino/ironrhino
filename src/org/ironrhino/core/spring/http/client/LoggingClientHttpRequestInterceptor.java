@@ -1,6 +1,5 @@
 package org.ironrhino.core.spring.http.client;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -16,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.util.FastByteArrayOutputStream;
 
 import lombok.AllArgsConstructor;
 
@@ -106,13 +106,13 @@ public class LoggingClientHttpRequestInterceptor implements ClientHttpRequestInt
 
 		private final Logger logger;
 
-		private ByteArrayOutputStream cachedContent;
+		private FastByteArrayOutputStream cachedContent;
 
 		public ContentCachingInputStream(ClientHttpResponse response, Logger logger) throws IOException {
 			this.is = response.getBody();
 			this.contentType = response.getHeaders().getContentType();
 			int contentLength = (int) response.getHeaders().getContentLength();
-			this.cachedContent = new ByteArrayOutputStream(contentLength >= 0 ? contentLength : 1024);
+			this.cachedContent = new FastByteArrayOutputStream(contentLength >= 0 ? contentLength : 1024);
 			this.logger = logger;
 		}
 
@@ -131,7 +131,7 @@ public class LoggingClientHttpRequestInterceptor implements ClientHttpRequestInt
 			return ch;
 		}
 
-		private void cache(byte[] b, final int off, final int count) {
+		private void cache(byte[] b, final int off, final int count) throws IOException {
 			if (count != -1)
 				cachedContent.write(b, off, count);
 		}

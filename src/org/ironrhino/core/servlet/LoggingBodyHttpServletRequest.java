@@ -1,7 +1,6 @@
 package org.ironrhino.core.servlet;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -14,6 +13,7 @@ import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.JsonDesensitizer;
 import org.slf4j.Logger;
+import org.springframework.util.FastByteArrayOutputStream;
 import org.springframework.web.util.WebUtils;
 
 /**
@@ -27,12 +27,12 @@ public class LoggingBodyHttpServletRequest extends HttpServletRequestWrapper {
 
 	private final Logger logger;
 
-	private final ByteArrayOutputStream cachedContent;
+	private final FastByteArrayOutputStream cachedContent;
 
 	public LoggingBodyHttpServletRequest(HttpServletRequest request, Logger logger) {
 		super(request);
 		int contentLength = request.getContentLength();
-		this.cachedContent = new ByteArrayOutputStream(contentLength >= 0 ? contentLength : 1024);
+		this.cachedContent = new FastByteArrayOutputStream(contentLength >= 0 ? contentLength : 1024);
 		this.logger = logger;
 	}
 
@@ -88,7 +88,7 @@ public class LoggingBodyHttpServletRequest extends HttpServletRequestWrapper {
 			return count;
 		}
 
-		private void cache(byte[] b, final int off, final int count) {
+		private void cache(byte[] b, final int off, final int count) throws IOException {
 			if (count != -1)
 				cachedContent.write(b, off, count);
 		}
