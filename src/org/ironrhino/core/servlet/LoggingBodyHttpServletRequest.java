@@ -114,14 +114,17 @@ public class LoggingBodyHttpServletRequest extends HttpServletRequestWrapper {
 
 		@Override
 		public void close() throws IOException {
-			this.is.close();
-			if (cachedContent != null) {
-				byte[] bytes = cachedContent.toByteArray();
-				cachedContent = null;
-				String str = new String(bytes, 0, bytes.length, getCharacterEncoding());
-				if (AppInfo.getStage() != Stage.DEVELOPMENT)
-					str = JsonDesensitizer.DEFAULT_INSTANCE.desensitize(str);
-				logger.info("\n{}", str);
+			try {
+				this.is.close();
+			} finally {
+				if (cachedContent != null) {
+					byte[] bytes = cachedContent.toByteArray();
+					cachedContent = null;
+					String str = new String(bytes, 0, bytes.length, getCharacterEncoding());
+					if (AppInfo.getStage() != Stage.DEVELOPMENT)
+						str = JsonDesensitizer.DEFAULT_INSTANCE.desensitize(str);
+					logger.info("\n{}", str);
+				}
 			}
 		}
 	}

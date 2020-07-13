@@ -98,7 +98,7 @@ public class LoggingClientHttpRequestInterceptor implements ClientHttpRequestInt
 				|| contentType.isCompatibleWith(MediaType.APPLICATION_XML) || contentType.getType().equals("text");
 	}
 
-	private class ContentCachingInputStream extends InputStream {
+	private static class ContentCachingInputStream extends InputStream {
 
 		private final InputStream is;
 
@@ -138,14 +138,18 @@ public class LoggingClientHttpRequestInterceptor implements ClientHttpRequestInt
 
 		@Override
 		public void close() throws IOException {
-			this.is.close();
-			if (cachedContent != null) {
-				byte[] bytes = cachedContent.toByteArray();
-				cachedContent = null;
-				String str = new String(bytes, StandardCharsets.UTF_8);
-				if (AppInfo.getStage() != Stage.DEVELOPMENT && contentType.isCompatibleWith(MediaType.APPLICATION_JSON))
-					str = JsonDesensitizer.DEFAULT_INSTANCE.desensitize(str);
-				logger.info("Received:\n{}", str);
+			try {
+				this.is.close();
+			} finally {
+				if (cachedContent != null) {
+					byte[] bytes = cachedContent.toByteArray();
+					cachedContent = null;
+					String str = new String(bytes, StandardCharsets.UTF_8);
+					if (AppInfo.getStage() != Stage.DEVELOPMENT
+							&& contentType.isCompatibleWith(MediaType.APPLICATION_JSON))
+						str = JsonDesensitizer.DEFAULT_INSTANCE.desensitize(str);
+					logger.info("Received:\n{}", str);
+				}
 			}
 		}
 	}

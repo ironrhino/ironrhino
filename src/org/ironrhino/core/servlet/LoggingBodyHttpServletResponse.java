@@ -140,22 +140,25 @@ public class LoggingBodyHttpServletResponse extends HttpServletResponseWrapper {
 
 		@Override
 		public void close() throws IOException {
-			this.os.close();
-			if (cachedContent != null) {
-				byte[] bytes = cachedContent.toByteArray();
-				cachedContent = null;
-				if (bytes.length > 0) {
-					String encoding = getCharacterEncoding();
-					String str = new String(bytes, 0, bytes.length, encoding);
-					if (AppInfo.getStage() != Stage.DEVELOPMENT)
-						str = JsonDesensitizer.DEFAULT_INSTANCE.desensitize(str);
-					String method = MDC.get("method");
-					String url = MDC.get("url");
-					MDC.remove("method");
-					MDC.remove("url");
-					logger.info("\n{}", str);
-					MDC.put("method", method);
-					MDC.put("url", url);
+			try {
+				this.os.close();
+			} finally {
+				if (cachedContent != null) {
+					byte[] bytes = cachedContent.toByteArray();
+					cachedContent = null;
+					if (bytes.length > 0) {
+						String encoding = getCharacterEncoding();
+						String str = new String(bytes, 0, bytes.length, encoding);
+						if (AppInfo.getStage() != Stage.DEVELOPMENT)
+							str = JsonDesensitizer.DEFAULT_INSTANCE.desensitize(str);
+						String method = MDC.get("method");
+						String url = MDC.get("url");
+						MDC.remove("method");
+						MDC.remove("url");
+						logger.info("\n{}", str);
+						MDC.put("method", method);
+						MDC.put("url", url);
+					}
 				}
 			}
 		}
