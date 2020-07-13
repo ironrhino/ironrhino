@@ -401,9 +401,6 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 	private MultiValueMap<String, String> createHeaders(RequestMapping classRequestMapping,
 			RequestMapping methodRequestMapping) throws UnsupportedEncodingException {
 		HttpHeaders headers = new HttpHeaders();
-		requestHeaders.forEach((k, v) -> {
-			headers.set(k, v);
-		});
 		if (classRequestMapping != null) {
 			for (String s : classRequestMapping.headers()) {
 				String[] arr = s.split("=", 2);
@@ -424,6 +421,9 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 			if (consumes.length > 0 && consumes[0].indexOf('*') < 0)
 				headers.setContentType(MediaType.parseMediaType(consumes[0]));
 		}
+		requestHeaders.forEach((k, v) -> {
+			headers.set(k, v);
+		});
 		return headers;
 	}
 
