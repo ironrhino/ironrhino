@@ -117,13 +117,6 @@ public class LoggingClientHttpRequestInterceptor implements ClientHttpRequestInt
 		}
 
 		@Override
-		public int read(byte[] b) throws IOException {
-			int count = super.read(b);
-			cache(b, 0, count);
-			return count;
-		}
-
-		@Override
 		public int read(byte[] b, final int off, final int len) throws IOException {
 			int count = is.read(b, off, len);
 			cache(b, off, count);
