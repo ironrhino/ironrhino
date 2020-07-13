@@ -27,7 +27,7 @@ public class LoggingBodyHttpServletRequest extends HttpServletRequestWrapper {
 
 	private final Logger logger;
 
-	private final FastByteArrayOutputStream cachedContent;
+	private FastByteArrayOutputStream cachedContent;
 
 	public LoggingBodyHttpServletRequest(HttpServletRequest request, Logger logger) {
 		super(request);
@@ -60,10 +60,6 @@ public class LoggingBodyHttpServletRequest extends HttpServletRequestWrapper {
 			this.reader = new BufferedReader(new InputStreamReader(getInputStream(), getCharacterEncoding()));
 		}
 		return this.reader;
-	}
-
-	public byte[] getContentAsByteArray() {
-		return this.cachedContent.toByteArray();
 	}
 
 	private class ContentCachingInputStream extends ServletInputStream {
@@ -119,11 +115,14 @@ public class LoggingBodyHttpServletRequest extends HttpServletRequestWrapper {
 		@Override
 		public void close() throws IOException {
 			this.is.close();
-			byte[] bytes = getContentAsByteArray();
-			String str = new String(bytes, 0, bytes.length, getCharacterEncoding());
-			if (AppInfo.getStage() != Stage.DEVELOPMENT)
-				str = JsonDesensitizer.DEFAULT_INSTANCE.desensitize(str);
-			logger.info("\n{}", str);
+			if (cachedContent != null) {
+				byte[] bytes = cachedContent.toByteArray();
+				cachedContent = null;
+				String str = new String(bytes, 0, bytes.length, getCharacterEncoding());
+				if (AppInfo.getStage() != Stage.DEVELOPMENT)
+					str = JsonDesensitizer.DEFAULT_INSTANCE.desensitize(str);
+				logger.info("\n{}", str);
+			}
 		}
 	}
 

@@ -28,7 +28,7 @@ public class LoggingBodyHttpServletResponse extends HttpServletResponseWrapper {
 
 	private PrintWriter writer;
 
-	private final FastByteArrayOutputStream content = new FastByteArrayOutputStream(1024);
+	private FastByteArrayOutputStream cachedContent = new FastByteArrayOutputStream(1024);
 
 	public LoggingBodyHttpServletResponse(HttpServletResponse response, Logger logger) {
 		super(response);
@@ -44,8 +44,8 @@ public class LoggingBodyHttpServletResponse extends HttpServletResponseWrapper {
 	@Override
 	public void setContentLength(int len) {
 		super.setContentLength(len);
-		if (len > this.content.size()) {
-			this.content.resize(len);
+		if (len > this.cachedContent.size()) {
+			this.cachedContent.resize(len);
 		}
 	}
 
@@ -57,33 +57,29 @@ public class LoggingBodyHttpServletResponse extends HttpServletResponseWrapper {
 					+ Integer.MAX_VALUE + "): " + len);
 		}
 		int lenInt = (int) len;
-		if (lenInt > this.content.size()) {
-			this.content.resize(lenInt);
+		if (lenInt > this.cachedContent.size()) {
+			this.cachedContent.resize(lenInt);
 		}
 	}
 
 	@Override
 	public void setBufferSize(int size) {
 		super.setBufferSize(size);
-		if (size > this.content.size()) {
-			this.content.resize(size);
+		if (size > this.cachedContent.size()) {
+			this.cachedContent.resize(size);
 		}
 	}
 
 	@Override
 	public void resetBuffer() {
 		super.resetBuffer();
-		this.content.reset();
+		this.cachedContent.reset();
 	}
 
 	@Override
 	public void reset() {
 		super.reset();
-		this.content.reset();
-	}
-
-	public byte[] getContentAsByteArray() {
-		return this.content.toByteArray();
+		this.cachedContent.reset();
 	}
 
 	@Override
@@ -117,19 +113,19 @@ public class LoggingBodyHttpServletResponse extends HttpServletResponseWrapper {
 		@Override
 		public void write(int b) throws IOException {
 			this.os.write(b);
-			content.write(b);
+			cachedContent.write(b);
 		}
 
 		@Override
 		public void write(byte[] b, int off, int len) throws IOException {
 			this.os.write(b, off, len);
-			content.write(b, off, len);
+			cachedContent.write(b, off, len);
 		}
 
 		@Override
 		public void write(byte[] b) throws IOException {
 			this.os.write(b);
-			content.write(b);
+			cachedContent.write(b);
 		}
 
 		@Override
@@ -145,19 +141,22 @@ public class LoggingBodyHttpServletResponse extends HttpServletResponseWrapper {
 		@Override
 		public void close() throws IOException {
 			this.os.close();
-			byte[] bytes = getContentAsByteArray();
-			if (bytes.length > 0) {
-				String encoding = getCharacterEncoding();
-				String str = new String(bytes, 0, bytes.length, encoding);
-				if (AppInfo.getStage() != Stage.DEVELOPMENT)
-					str = JsonDesensitizer.DEFAULT_INSTANCE.desensitize(str);
-				String method = MDC.get("method");
-				String url = MDC.get("url");
-				MDC.remove("method");
-				MDC.remove("url");
-				logger.info("\n{}", str);
-				MDC.put("method", method);
-				MDC.put("url", url);
+			if (cachedContent != null) {
+				byte[] bytes = cachedContent.toByteArray();
+				cachedContent = null;
+				if (bytes.length > 0) {
+					String encoding = getCharacterEncoding();
+					String str = new String(bytes, 0, bytes.length, encoding);
+					if (AppInfo.getStage() != Stage.DEVELOPMENT)
+						str = JsonDesensitizer.DEFAULT_INSTANCE.desensitize(str);
+					String method = MDC.get("method");
+					String url = MDC.get("url");
+					MDC.remove("method");
+					MDC.remove("url");
+					logger.info("\n{}", str);
+					MDC.put("method", method);
+					MDC.put("url", url);
+				}
 			}
 		}
 	}
