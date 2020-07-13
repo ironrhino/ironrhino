@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -252,12 +251,13 @@ public class FtpFileStorage extends AbstractFileStorage {
 			}
 			return new FilterInputStream(ftpClient.retrieveFileStream(pathname)) {
 
-				private AtomicBoolean closed = new AtomicBoolean();
+				private boolean closed;
 
 				@Override
 				public void close() throws IOException {
-					if (!closed.compareAndSet(false, true))
+					if (closed)
 						return;
+					closed = true;
 					try {
 						super.close();
 					} finally {
