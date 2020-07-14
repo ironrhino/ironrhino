@@ -29,6 +29,8 @@ import org.springframework.util.ClassUtils;
 import com.zaxxer.hikari.HikariDataSource;
 
 import io.micrometer.core.instrument.Metrics;
+import io.opentracing.contrib.jdbc.TracingDataSource;
+import io.opentracing.contrib.jdbc.parser.URLParser;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -104,45 +106,40 @@ public class DataSourceConfiguration {
 			}
 		}
 		DatabaseProduct databaseProduct = DatabaseProduct.parse(jdbcUrl);
-		HikariDataSource ds = new HikariDataSource();
+		HikariDataSource hikari = new HikariDataSource();
 		if (StringUtils.isNotBlank(driverClass))
 			driverClassName = driverClass;
 		if (StringUtils.isNotBlank(driverClassName))
-			ds.setDriverClassName(driverClassName);
+			hikari.setDriverClassName(driverClassName);
 		else if (databaseProduct != null)
-			ds.setDriverClassName(databaseProduct.getDefaultDriverClass());
-		ds.setJdbcUrl(databaseProduct != null ? databaseProduct.polishJdbcUrl(jdbcUrl) : jdbcUrl);
-		ds.setUsername(username);
-		ds.setPassword(password);
-		ds.setMaximumPoolSize(maximumPoolSize);
-		ds.setMinimumIdle(minimumIdle);
-		ds.setConnectionTimeout(connectionTimeout);
-		ds.setIdleTimeout(idleTimeout);
-		ds.setMaxLifetime(maxLifetime);
-		ds.setAutoCommit(autoCommit);
-		ds.setRegisterMbeans(registerMbeans);
+			hikari.setDriverClassName(databaseProduct.getDefaultDriverClass());
+		hikari.setJdbcUrl(databaseProduct != null ? databaseProduct.polishJdbcUrl(jdbcUrl) : jdbcUrl);
+		hikari.setUsername(username);
+		hikari.setPassword(password);
+		hikari.setMaximumPoolSize(maximumPoolSize);
+		hikari.setMinimumIdle(minimumIdle);
+		hikari.setConnectionTimeout(connectionTimeout);
+		hikari.setIdleTimeout(idleTimeout);
+		hikari.setMaxLifetime(maxLifetime);
+		hikari.setAutoCommit(autoCommit);
+		hikari.setRegisterMbeans(registerMbeans);
 		if (StringUtils.isNotBlank(connectionTestQuery))
-			ds.setConnectionTestQuery(connectionTestQuery);
-		ds.setPoolName("HikariPool-" + AppInfo.getAppName());
-		log.info("Using {} to connect {}", ds.getClass().getName(), ds.getJdbcUrl());
+			hikari.setConnectionTestQuery(connectionTestQuery);
+		hikari.setPoolName("HikariPool-" + AppInfo.getAppName());
+		log.info("Using {} to connect {}", hikari.getClass().getName(), hikari.getJdbcUrl());
 
 		if (metricsConfiguration != null) {
-			ds.setMetricRegistry(Metrics.globalRegistry);
-		}
-
-		if (tracingConfiguration != null && tracingConfiguration.getTracer() != null) {
-			ds.setDriverClassName("io.opentracing.contrib.jdbc.TracingDriver");
-			String url = ds.getJdbcUrl();
-			if (url.startsWith("jdbc:"))
-				url = url.substring(5);
-			if (databaseProduct != null)
-				url = databaseProduct.appendJdbcUrlProperties(url,
-						Collections.singletonMap("traceWithActiveSpanOnly", "true"));
-			ds.setJdbcUrl("jdbc:tracing:" + url);
+			hikari.setMetricRegistry(Metrics.globalRegistry);
 		}
 
 		if (enableMigrations) {
-			Flyway.configure().baselineOnMigrate(true).dataSource(ds).load().migrate();
+			Flyway.configure().baselineOnMigrate(true).dataSource(hikari).load().migrate();
+		}
+
+		DataSource ds = hikari;
+		if (tracingConfiguration != null && tracingConfiguration.getTracer() != null) {
+			ds = new TracingDataSource(tracingConfiguration.getTracer(), hikari, URLParser.parse(jdbcUrl), true,
+					Collections.emptySet());
 		}
 
 		return ds;

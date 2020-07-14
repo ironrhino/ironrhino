@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Configuration;
 
 import io.jaegertracing.internal.Constants;
 import io.jaegertracing.internal.JaegerTracer;
+import io.jaegertracing.internal.MDCScopeManager;
 import io.jaegertracing.internal.propagation.TraceContextCodec;
 import io.jaegertracing.internal.reporters.RemoteReporter;
 import io.jaegertracing.internal.samplers.ConstSampler;
@@ -101,8 +102,9 @@ public class TracingConfiguration {
 			sampler = new ConstSampler(true);
 		}
 		Codec<TextMap> codec = new TraceContextCodec.Builder().build();
-		JaegerTracer.Builder builder = new JaegerTracer.Builder(AppInfo.getAppName()).withTraceId128Bit()
-				.withSampler(sampler).withReporter(reporter).withTag("java.version", System.getProperty("java.version"))
+		JaegerTracer.Builder builder = new JaegerTracer.Builder(AppInfo.getAppName())
+				.withScopeManager(new MDCScopeManager.Builder().build()).withTraceId128Bit().withSampler(sampler)
+				.withReporter(reporter).withTag("java.version", System.getProperty("java.version"))
 				.withTag("instance", AppInfo.getInstanceId())
 				.withTag(Constants.TRACER_HOSTNAME_TAG_KEY, AppInfo.getHostName())
 				.withTag(Constants.TRACER_IP_TAG_KEY, AppInfo.getHostAddress())
