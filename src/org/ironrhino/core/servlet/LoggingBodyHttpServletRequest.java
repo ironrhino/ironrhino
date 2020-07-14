@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
@@ -21,18 +22,14 @@ import org.springframework.web.util.WebUtils;
  */
 public class LoggingBodyHttpServletRequest extends HttpServletRequestWrapper {
 
+	private final Logger logger;
+
 	private volatile ServletInputStream servletInputStream;
 
 	private volatile BufferedReader reader;
 
-	private final Logger logger;
-
-	private FastByteArrayOutputStream cachedContent;
-
 	public LoggingBodyHttpServletRequest(HttpServletRequest request, Logger logger) {
 		super(request);
-		int contentLength = request.getContentLength();
-		this.cachedContent = new FastByteArrayOutputStream(contentLength >= 0 ? contentLength : 1024);
 		this.logger = logger;
 	}
 
@@ -47,8 +44,9 @@ public class LoggingBodyHttpServletRequest extends HttpServletRequestWrapper {
 		ServletInputStream temp = servletInputStream;
 		if (temp == null) {
 			synchronized (this) {
-				if ((temp = servletInputStream) == null)
-					servletInputStream = temp = new ContentCachingInputStream(super.getInputStream());
+				if ((temp = servletInputStream) == null) {
+					servletInputStream = temp = new ContentCachingInputStream(getRequest(), logger);
+				}
 			}
 		}
 		return temp;
@@ -62,12 +60,23 @@ public class LoggingBodyHttpServletRequest extends HttpServletRequestWrapper {
 		return this.reader;
 	}
 
-	private class ContentCachingInputStream extends ServletInputStream {
+	private static class ContentCachingInputStream extends ServletInputStream {
+
+		private final Logger logger;
 
 		private final ServletInputStream is;
 
-		public ContentCachingInputStream(ServletInputStream is) {
-			this.is = is;
+		private final String characterEncoding;
+
+		private FastByteArrayOutputStream cachedContent;
+
+		public ContentCachingInputStream(ServletRequest request, Logger logger) throws IOException {
+			this.logger = logger;
+			this.is = request.getInputStream();
+			this.characterEncoding = request.getCharacterEncoding();
+			int contentLength = request.getContentLength();
+			this.cachedContent = new FastByteArrayOutputStream(contentLength >= 0 ? contentLength : 1024);
+
 		}
 
 		@Override
@@ -120,7 +129,7 @@ public class LoggingBodyHttpServletRequest extends HttpServletRequestWrapper {
 				if (cachedContent != null) {
 					byte[] bytes = cachedContent.toByteArray();
 					cachedContent = null;
-					String str = new String(bytes, 0, bytes.length, getCharacterEncoding());
+					String str = new String(bytes, 0, bytes.length, characterEncoding);
 					if (AppInfo.getStage() != Stage.DEVELOPMENT)
 						str = JsonDesensitizer.DEFAULT_INSTANCE.desensitize(str);
 					logger.info("\n{}", str);
