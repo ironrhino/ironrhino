@@ -1,5 +1,6 @@
 package org.ironrhino.core.spring.http.client;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -98,9 +99,7 @@ public class LoggingClientHttpRequestInterceptor implements ClientHttpRequestInt
 				|| contentType.isCompatibleWith(MediaType.APPLICATION_XML) || contentType.getType().equals("text");
 	}
 
-	private static class ContentCachingInputStream extends InputStream {
-
-		private final InputStream is;
+	private static class ContentCachingInputStream extends FilterInputStream {
 
 		private final MediaType contentType;
 
@@ -109,7 +108,7 @@ public class LoggingClientHttpRequestInterceptor implements ClientHttpRequestInt
 		private FastByteArrayOutputStream cachedContent;
 
 		public ContentCachingInputStream(ClientHttpResponse response, Logger logger) throws IOException {
-			this.is = response.getBody();
+			super(response.getBody());
 			this.contentType = response.getHeaders().getContentType();
 			int contentLength = (int) response.getHeaders().getContentLength();
 			this.cachedContent = new FastByteArrayOutputStream(contentLength >= 0 ? contentLength : 1024);
@@ -118,17 +117,23 @@ public class LoggingClientHttpRequestInterceptor implements ClientHttpRequestInt
 
 		@Override
 		public int read(byte[] b, final int off, final int len) throws IOException {
-			int count = is.read(b, off, len);
+			int count = super.read(b, off, len);
 			cache(b, off, count);
 			return count;
 		}
 
 		@Override
 		public int read() throws IOException {
-			int ch = this.is.read();
+			int ch = super.read();
 			if (ch != -1)
 				cachedContent.write(ch);
 			return ch;
+		}
+
+		@Override
+		public void reset() throws IOException {
+			super.reset();
+			cachedContent.reset();
 		}
 
 		private void cache(byte[] b, final int off, final int count) throws IOException {
@@ -139,7 +144,7 @@ public class LoggingClientHttpRequestInterceptor implements ClientHttpRequestInt
 		@Override
 		public void close() throws IOException {
 			try {
-				this.is.close();
+				super.close();
 			} finally {
 				if (cachedContent != null) {
 					byte[] bytes = cachedContent.toByteArray();
