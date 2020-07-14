@@ -116,13 +116,6 @@ public class LoggingClientHttpRequestInterceptor implements ClientHttpRequestInt
 		}
 
 		@Override
-		public int read(byte[] b, final int off, final int len) throws IOException {
-			int count = super.read(b, off, len);
-			cache(b, off, count);
-			return count;
-		}
-
-		@Override
 		public int read() throws IOException {
 			int ch = super.read();
 			if (ch != -1)
@@ -131,14 +124,17 @@ public class LoggingClientHttpRequestInterceptor implements ClientHttpRequestInt
 		}
 
 		@Override
+		public int read(byte[] b, final int off, final int len) throws IOException {
+			int count = super.read(b, off, len);
+			if (count != -1)
+				cachedContent.write(b, off, count);
+			return count;
+		}
+
+		@Override
 		public void reset() throws IOException {
 			super.reset();
 			cachedContent.reset();
-		}
-
-		private void cache(byte[] b, final int off, final int count) throws IOException {
-			if (count != -1)
-				cachedContent.write(b, off, count);
 		}
 
 		@Override

@@ -134,12 +134,6 @@ public class LoggingBodyHttpServletResponse extends HttpServletResponseWrapper {
 		}
 
 		@Override
-		public void write(byte[] b) throws IOException {
-			this.os.write(b);
-			cachedContent.write(b);
-		}
-
-		@Override
 		public boolean isReady() {
 			return this.os.isReady();
 		}
