@@ -22,17 +22,31 @@ public class ExpressionUtils {
 			return ExpressionEngine.SPEL.evalExpression(expression, context);
 		} catch (ExpressionException | InternalParseException e) {
 			return ExpressionEngine.MVEL.evalExpression(expression, context);
+		} catch (IllegalStateException e) {
+			String message = e.getMessage();
+			// org.springframework.expression.spel.standard.Tokenizer.process(Tokenizer.java)
+			if (message == null || !message.startsWith("Cannot handle ("))
+				throw e;
+			return ExpressionEngine.MVEL.evalExpression(expression, context);
 		}
 	}
 
 	public static Object eval(String template, Map<String, ?> context) {
 		if (StringUtils.isBlank(template))
 			return template;
-		if (template.contains("@{") || template.contains("@if{") || template.contains("${import "))
+		int start = template.indexOf('{');
+		int end = template.indexOf('}');
+		int index = template.indexOf(';');
+		if (index > start && index < end || template.contains("@{") || template.contains("@if{"))
 			return ExpressionEngine.MVEL.eval(template, context);
 		try {
 			return ExpressionEngine.SPEL.eval(template, context);
 		} catch (ExpressionException | InternalParseException e) {
+			return ExpressionEngine.MVEL.eval(template, context);
+		} catch (IllegalStateException e) {
+			String message = e.getMessage();
+			if (message == null || !message.startsWith("Cannot handle ("))
+				throw e;
 			return ExpressionEngine.MVEL.eval(template, context);
 		}
 	}

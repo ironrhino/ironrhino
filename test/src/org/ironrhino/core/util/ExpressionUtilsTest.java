@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -146,6 +147,7 @@ public class ExpressionUtilsTest {
 	@Test
 	public void testEvalList() {
 		Map<String, Object> context = new HashMap<>();
+		context.put("users", Arrays.asList("a", "b"));
 		context.put("string", "STRING");
 		List<String> result = ExpressionUtils.evalList("${[string,'STRING2']}", context);
 		assertThat(result.size(), equalTo(2));
@@ -155,6 +157,11 @@ public class ExpressionUtilsTest {
 		assertThat(result.size(), equalTo(2));
 		assertThat(result.get(0), equalTo("STRING2"));
 		assertThat(result.get(1), equalTo("STRING"));
+		result = ExpressionUtils.evalList("${key = []; foreach (user : users) { key.add(user); } return key;}",
+				context);
+		assertThat(result.size(), equalTo(2));
+		assertThat(result.get(0), equalTo("a"));
+		assertThat(result.get(1), equalTo("b"));
 		result = ExpressionUtils.evalList("${string}", context);
 		assertThat(result.size(), equalTo(1));
 		assertThat(result.get(0), equalTo("STRING"));
