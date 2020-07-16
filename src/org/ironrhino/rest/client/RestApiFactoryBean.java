@@ -399,27 +399,19 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 	}
 
 	private MultiValueMap<String, String> createHeaders(RequestMapping classRequestMapping,
-			RequestMapping methodRequestMapping) throws UnsupportedEncodingException {
+			RequestMapping methodRequestMapping) {
 		HttpHeaders headers = new HttpHeaders();
-		if (classRequestMapping != null) {
-			for (String s : classRequestMapping.headers()) {
-				String[] arr = s.split("=", 2);
-				if (arr.length == 2 && arr[1].indexOf('*') < 0)
+		for (RequestMapping mapping : new RequestMapping[] { classRequestMapping, methodRequestMapping }) {
+			if (mapping != null) {
+				Stream.of(mapping.headers()).filter(s -> s.indexOf('=') > 0 && !s.contains("!=")).forEach(s -> {
+					String[] arr = s.split("=", 2);
 					headers.add(arr[0], arr[1]);
+				});
+				Stream.of(mapping.consumes()).filter(s -> !s.startsWith("!") && s.indexOf('*') < 0).findAny()
+						.ifPresent(s -> headers.setContentType(MediaType.parseMediaType(s)));
+				Stream.of(mapping.produces()).filter(s -> !s.startsWith("!") && s.indexOf('*') < 0).findAny()
+						.ifPresent(s -> headers.setAccept(Collections.singletonList(MediaType.parseMediaType(s))));
 			}
-			String[] consumes = classRequestMapping.consumes();
-			if (consumes.length > 0 && consumes[0].indexOf('*') < 0)
-				headers.setContentType(MediaType.parseMediaType(consumes[0]));
-		}
-		if (methodRequestMapping != null) {
-			for (String s : methodRequestMapping.headers()) {
-				String[] arr = s.split("=", 2);
-				if (arr.length == 2 && arr[1].indexOf('*') < 0)
-					headers.add(arr[0], arr[1]);
-			}
-			String[] consumes = methodRequestMapping.consumes();
-			if (consumes.length > 0 && consumes[0].indexOf('*') < 0)
-				headers.setContentType(MediaType.parseMediaType(consumes[0]));
 		}
 		requestHeaders.forEach((k, v) -> {
 			headers.set(k, v);
