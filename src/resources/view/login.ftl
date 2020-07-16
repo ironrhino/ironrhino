@@ -19,7 +19,8 @@
 	<div class="span6 offset3">
 	<h2 class="caption">${getText('login')}</h2>
 	<div class="hero-unit">
-	<@s.form id="login" action=request.requestURI+request.queryString???then('?'+request.queryString,'') method="post" class="ajax focus form-horizontal well">
+	<@s.form id="login" action=request.requestURI method="post" class="ajax focus form-horizontal well">
+		<#if targetUrl?has_content><@s.hidden name="targetUrl" /></#if>
 		<#assign verificationCodeRequirement = beans['verificationCodeRequirementService'].getVerificationRequirement(username)!>
 		<#assign dynamicAttributes={}>
 		<#if (verificationCodeRequirement.required)!false>
