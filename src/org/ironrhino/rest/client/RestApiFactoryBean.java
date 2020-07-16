@@ -255,7 +255,7 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 		String requestMethod = getRequestMethod(classRequestMapping, methodRequestMapping);
 
 		Map<String, Object> pathVariables = new HashMap<>(8);
-		MultiValueMap<String, String> headers = createHeaders(classRequestMapping, methodRequestMapping);
+		HttpHeaders headers = createHeaders(classRequestMapping, methodRequestMapping);
 		MultiValueMap<String, Object> requestParams = null;
 		Map<String, String> cookieValues = null;
 		List<Object> requestParamsObjectCandidates = new ArrayList<>(1);
@@ -398,8 +398,7 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 		return (baseUrl + pathFromClass + pathFromMethod).trim();
 	}
 
-	private MultiValueMap<String, String> createHeaders(RequestMapping classRequestMapping,
-			RequestMapping methodRequestMapping) {
+	private HttpHeaders createHeaders(RequestMapping classRequestMapping, RequestMapping methodRequestMapping) {
 		HttpHeaders headers = new HttpHeaders();
 		for (RequestMapping mapping : new RequestMapping[] { classRequestMapping, methodRequestMapping }) {
 			if (mapping != null) {
@@ -442,8 +441,8 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 		return url;
 	}
 
-	private MultiValueMap<String, String> addCookies(MultiValueMap<String, String> headers,
-			Map<String, String> cookieValues) throws UnsupportedEncodingException {
+	private HttpHeaders addCookies(HttpHeaders headers, Map<String, String> cookieValues)
+			throws UnsupportedEncodingException {
 		if (cookieValues != null && !cookieValues.isEmpty()) {
 			StringBuilder cookie = new StringBuilder();
 			for (Map.Entry<String, String> entry : cookieValues.entrySet())
@@ -454,9 +453,8 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 		return headers;
 	}
 
-	private RequestEntity<Object> createRequestEntity(String url, String requestMethod,
-			MultiValueMap<String, String> headers, MultiValueMap<String, Object> requestParams, Object body)
-			throws UnsupportedEncodingException {
+	private RequestEntity<Object> createRequestEntity(String url, String requestMethod, HttpHeaders headers,
+			MultiValueMap<String, Object> requestParams, Object body) throws UnsupportedEncodingException {
 		if (requestParams != null) {
 			if (body == null && requestMethod.startsWith("P")) {
 				boolean multipart = requestParams.entrySet().stream().flatMap(entry -> entry.getValue().stream())
