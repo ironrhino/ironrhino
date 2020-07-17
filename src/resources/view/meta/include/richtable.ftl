@@ -82,7 +82,7 @@
 <#if request.queryString?has_content>
 <#list request.queryString?split('&') as pair>
 	<#local name=pair?keep_before('=')>
-	<#if name!='_'&&name!='pn'&&(!(showPageSize&&name=='ps'))&&!name?starts_with('resultPage.')&&name!='keyword'&&!formHeader?contains(' name="'+name+'" ')>
+	<#if name!='_'&&name!='tab'&&name!='pn'&&(!(showPageSize&&name=='ps'))&&!name?starts_with('resultPage.')&&name!='keyword'&&!formHeader?contains(' name="'+name+'" ')>
 		<#local action+=action?contains('?')?then('&','?')+pair>
 		<#local parameterNamesInQueryString+=[name]>
 	</#if>
