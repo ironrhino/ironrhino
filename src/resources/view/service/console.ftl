@@ -66,7 +66,7 @@ $(document).click(function(e){
 <hr/>
 <#list serviceRegistry.getAllAppNames() as appName>
 <#assign services = serviceRegistry.getExportedServicesByAppName(appName)>
-<#if services?size gt 0>
+<#if services?has_content>
 <h3 class="center">${appName}</h3>
 <div class="services">
 	<ul class="thumbnails">

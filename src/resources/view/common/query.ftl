@@ -104,7 +104,7 @@ $(function(){
 	</div>
 	<@s.submit label=getText('submit') class="btn-primary"/>
 	<#if (resultPage.result)??>
-	<#if resultPage.result?size gt 0>
+	<#if resultPage.result?has_content>
 	<#assign map=resultPage.result[0]/>
 	<div id="result">
 		<table class="pin table table-hover table-striped table-bordered sortable filtercolumn resizable middle" style="white-space: nowrap;">

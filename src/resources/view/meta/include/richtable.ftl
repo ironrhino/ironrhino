@@ -16,7 +16,7 @@
 <#if (resultPage.result)??><#local list=resultPage.result></#if>
 <#if !list??><#stop "No variable 'resultPage' or 'list' found"></#if>
 <#local sumColumns={}>
-<#if list?size gt 0>
+<#if list?has_content>
 <#list columns as name,config>
 	<#if config['showSum']!false>
 		<#local sumColumns+={name:{"template":config['template']!}}>
@@ -200,10 +200,10 @@ ${formHeader!}
 <#if !propertyNamesInCriteria?? && entityClass??>
 <#local propertyNamesInCriteria=statics['org.ironrhino.core.struts.EntityClassHelper'].getPropertyNamesInCriteria(entityClass)>
 </#if>
-<#local filterable=propertyNamesInCriteria??&&propertyNamesInCriteria?size gt 0>
+<#local filterable=propertyNamesInCriteria?has_content>
 </#if>
 </tbody>
-<#if sumColumns?keys?size gt 0>
+<#if sumColumns?has_content>
 <tfoot>
 <tr>
 <#if showCheckColumn><td class="center">∑</td></#if>

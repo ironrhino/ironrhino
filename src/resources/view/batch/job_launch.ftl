@@ -8,7 +8,7 @@
 <@s.form action="${actionBaseUrl}/launch" method="post" class="form-horizontal ajax">
 	<@s.hidden name="id"/>
 	<#if params??>
-	<#if params?size gt 0>
+	<#if params?has_content>
 	<#list params as param>
 	<#assign index = param?index/>
 	<div id="params_${index}">

@@ -2,7 +2,7 @@
 	<#local schemaManager=beans['schemaManager']/>
 	<#if schemaName?is_string>
 		<#local schema=schemaManager.findOne(true,[schemaName])!>
-	<#elseif schemaName?is_indexable && schemaName?size gt 0>
+	<#elseif schemaName?is_indexable && schemaName?has_content>
 		<#if schemaName?size == 1>
 			<#local schema=schemaManager.findOne(true,schemaName)!>
 		<#else>
@@ -32,7 +32,7 @@
 			</#if>
 		</#if>
 	</#if>
-	<#if !ignoreIfNotFound || schema??&&schema.fields??&&schema.fields?size gt 0>
+	<#if !ignoreIfNotFound || schema??&&schema.fields??&&schema.fields?has_content>
 	<input type="hidden" name="__datagrid_${parameterNamePrefix}attributes"/>
 	<table class="datagrid adaptive table table-condensed nullable">
 		<thead>
@@ -192,7 +192,7 @@
 	<#local schemaManager=beans['schemaManager']/>
 	<#if schemaName?is_string>
 		<#local schema=schemaManager.findOne(true,[schemaName])!>
-	<#elseif schemaName?is_indexable && schemaName?size gt 0>
+	<#elseif schemaName?is_indexable && schemaName?has_content>
 		<#if schemaName?size == 1>
 			<#local schema=schemaManager.findOne(true,schemaName)!>
 		<#else>

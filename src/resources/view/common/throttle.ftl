@@ -26,7 +26,7 @@
 <body>
 <#if beans['circuitBreakerRegistry']??>
 <#assign circuitBreakers = beans['circuitBreakerRegistry'].circuitBreakers>
-<#if circuitBreakers?size gt 0>
+<#if circuitBreakers?has_content>
 <h3 class="center">${getText('circuitBreaker')}</h3>
 <ul class="thumbnails">
 <#list circuitBreakers as key,value>
@@ -54,7 +54,7 @@
 
 <#if beans['rateLimiterRegistry']??>
 <#assign rateLimiters = beans['rateLimiterRegistry'].rateLimiters>
-<#if rateLimiters?size gt 0>
+<#if rateLimiters?has_content>
 <h3 class="center">${getText('rateLimiter')}</h3>
 <ul class="thumbnails">
 <#list rateLimiters as key,value>
@@ -83,7 +83,7 @@
 
 <#if beans['bulkheadRegistry']??>
 <#assign bulkheads = beans['bulkheadRegistry'].bulkheads>
-<#if bulkheads?size gt 0>
+<#if bulkheads?has_content>
 <h3 class="center">${getText('bulkhead')}</h3>
 <ul class="thumbnails">
 <#list bulkheads as key,value>

@@ -79,7 +79,7 @@
 		-->
 		<#if !hidden>
 			<#assign columns+=[key]>
-			<#if ((resultPage.result)!list)?size gt 0 && config['showSum']>
+			<#if ((resultPage.result)!list)?has_content && config['showSum']>
 				<#assign sumColumns+={key:{"value":0,"template":config['listTemplate']!}}>
 			</#if>
 			<#assign label=key>

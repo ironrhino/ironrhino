@@ -14,7 +14,7 @@
 	</#if>
 </#list>
 </#if>
-<#if hotspots?size gt 0>
+<#if hotspots?has_content>
 	<table class="table table-hover table-striped table-bordered sortable resizable" style="white-space: nowrap;">
 		<caption><h4>${getText('hotspots')}</h4></caption>
 		<thead>

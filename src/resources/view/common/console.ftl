@@ -72,7 +72,7 @@ $(function(){
 <hr/>
 
 <#assign triggers = beans['applicationContextConsole'].triggers>
-<#if triggers?size gt 0>
+<#if triggers?has_content>
 <div id="trigger">
 	<ul class="thumbnails">
 	<#list triggers as key,value>
@@ -86,7 +86,7 @@ $(function(){
 </#if>
 
 <#assign lifecycleBeans = beans['applicationContextConsole'].lifecycleBeans>
-<#if lifecycleBeans?size gt 0>
+<#if lifecycleBeans?has_content>
 <@s.form id="lifecycle-form" action=actionBaseUrl method="post" class="form-horizontal ajax view">
 <@s.hidden name="scope" value="APPLICATION"/>
 <div>
@@ -110,7 +110,7 @@ $(function(){
 
 <#if printSetting??>
 <#assign settings = beans['settingControl'].getAllBooleanSettings()>
-<#if settings?size gt 0>
+<#if settings?has_content>
 <div id="switch">
 	<ul class="thumbnails">
 	<#list settings as setting>

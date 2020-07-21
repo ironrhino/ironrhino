@@ -95,7 +95,7 @@
 				</thead>
 				<tbody>
 					<#local size=0>
-					<#if entity.attributes??&&entity.attributes?size gt 0><#local size=entity.attributes?size-1></#if>
+					<#if entity.attributes?has_content><#local size=entity.attributes?size-1></#if>
 					<#list 0..size as index>
 					<tr>
 						<td><@s.textfield theme="simple" name="${entityName}.attributes[${index}].name"/></td>
@@ -157,7 +157,7 @@
 					</tr>
 				</thead>
 				<tbody>
-				<#list 0..((value?is_collection&&value?size gt 0)?then(value?size-1,0)) as index>
+				<#list 0..((value?is_collection&&value?has_content)?then(value?size-1,0)) as index>
 					<tr>
 						<#list config.embeddedUiConfigs as nestedKey,config>
 						<#local hidden=config.hiddenInInput.value>

@@ -14,7 +14,7 @@
 	</#if>
 </#list>
 </#if>
-<#if warnings?size gt 0>
+<#if warnings?has_content>
 	<table class="table table-hover table-bordered sortable resizable" style="white-space: nowrap;">
 		<caption><h4>${getText('warnings')}</h4></caption>
 		<thead>
