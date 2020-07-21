@@ -36,6 +36,7 @@ public class StrutsBeanDefinitionRegistryPostProcessor implements BeanDefinition
 		for (Class<?> resultClass : resultClasses) {
 			if (isQualified(resultClass)) {
 				RootBeanDefinition beanDefinition = new RootBeanDefinition(resultClass);
+				beanDefinition.setScope(BeanDefinition.SCOPE_PROTOTYPE);
 				beanDefinition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_NAME);
 				registry.registerBeanDefinition(resultClass.getName(), beanDefinition);
 			}
