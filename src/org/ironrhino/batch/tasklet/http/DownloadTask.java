@@ -40,8 +40,12 @@ public class DownloadTask implements Tasklet {
 		try (InputStream is = success ? conn.getInputStream() : conn.getErrorStream();
 				OutputStream os = new FileOutputStream(temp)) {
 			size = StreamUtils.copy(is, os);
-			if (success)
-				temp.renameTo(file);
+			if (success) {
+				file.delete();
+				if (!temp.renameTo(file))
+					throw new UnexpectedJobExecutionException(
+							String.format("Unable to rename %s to %s", temp.toString(), file.toString()));
+			}
 		} finally {
 			conn.disconnect();
 		}

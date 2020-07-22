@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -69,7 +70,10 @@ public class MoveLastLinesToFirstTask implements Tasklet {
 				}
 			}
 		}
-		temp.renameTo(file);
+		file.delete();
+		if (!temp.renameTo(file))
+			throw new UnexpectedJobExecutionException(
+					String.format("Unable to rename %s to %s", temp.toString(), file.toString()));
 		return RepeatStatus.FINISHED;
 	}
 

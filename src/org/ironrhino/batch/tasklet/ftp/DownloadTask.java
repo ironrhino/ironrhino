@@ -29,7 +29,10 @@ public class DownloadTask extends AbstractFtpTask {
 				if (!b)
 					throw new UnexpectedJobExecutionException("Failed to download file from path: " + path);
 			}
-			temp.renameTo(file);
+			file.delete();
+			if (!temp.renameTo(file))
+				throw new UnexpectedJobExecutionException(
+						String.format("Unable to rename %s to %s", temp.toString(), file.toString()));
 			return null;
 		});
 		return RepeatStatus.FINISHED;

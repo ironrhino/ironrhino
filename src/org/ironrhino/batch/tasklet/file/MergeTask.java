@@ -52,7 +52,10 @@ public class MergeTask implements Tasklet {
 				}
 			}
 		}
-		temp.renameTo(target);
+		target.delete();
+		if (!temp.renameTo(target))
+			throw new UnexpectedJobExecutionException(
+					String.format("Unable to rename %s to %s", temp.toString(), target.toString()));
 		log.info("Merge {} files total {} lines to {}", sources.length, lines, target);
 		return RepeatStatus.FINISHED;
 	}
