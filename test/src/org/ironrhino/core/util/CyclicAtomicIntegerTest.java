@@ -134,4 +134,13 @@ public class CyclicAtomicIntegerTest {
 		assertThat(arr2, equalTo(arr));
 	}
 
+	@Test
+	public void testMaxValue() {
+		CyclicAtomicInteger cai = new CyclicAtomicInteger(Integer.MAX_VALUE - 1, 1, Integer.MAX_VALUE);
+		int[] arr = new int[] { Integer.MAX_VALUE - 1, 1, 2, 3, 4 };
+		int[] arr2 = new int[arr.length];
+		for (int i = 0; i < arr2.length; i++)
+			arr2[i] = cai.getAndAdd(1);
+		assertThat(arr2, equalTo(arr));
+	}
 }
