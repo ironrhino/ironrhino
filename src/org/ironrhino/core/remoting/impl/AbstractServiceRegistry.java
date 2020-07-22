@@ -23,6 +23,7 @@ import org.ironrhino.core.remoting.ServiceNotFoundException;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.ReflectionUtils;
+import org.ironrhino.core.util.CounterUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.PropertyValue;
@@ -198,12 +199,7 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 		int size = list.size();
 		AtomicInteger counter = counters.computeIfAbsent(serviceName,
 				s -> new AtomicInteger(ThreadLocalRandom.current().nextInt(size)));
-		int current, next;
-		do {
-			current = counter.get();
-			next = ((current != Integer.MAX_VALUE ? current : -1) + 1) % size;
-		} while (!counter.compareAndSet(current, next));
-		String host = list.get((next - 1 + size) % size); // list.get(next);
+		String host = list.get(CounterUtils.getAndIncrement(counter, size)); // list.get(next);
 		return normalizeHost(host);
 	}
 
