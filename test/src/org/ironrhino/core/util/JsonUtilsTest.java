@@ -43,6 +43,7 @@ public class JsonUtilsTest {
 
 	static enum Status {
 		ACTIVE, DISABLED;
+
 		@Override
 		public String toString() {
 			return name().toLowerCase(Locale.ROOT);
@@ -239,7 +240,7 @@ public class JsonUtilsTest {
 		u.setDepartment(department);
 		u.getDepartments().add(department);
 		u.getDepartments().add(department2);
-		u.setDepts(u.getDepartments().toArray(new Department[0]));
+		u.setDepts(u.getDepartments().toArray(new Department[u.getDepartments().size()]));
 		String json = JsonUtils.toJson(u);
 		JsonNode root = JsonUtils.fromJson(json, JsonNode.class);
 		JsonNode node = root.get("department");

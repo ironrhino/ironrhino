@@ -43,7 +43,8 @@ public class AuthzUtilsTest {
 		assertThat(AuthzUtils.authorizeRoles(roles, String.join(",", ifAllGranted), null, null), equalTo(true));
 		assertThat(AuthzUtils.authorizeRoles(roles, null, String.join(",", ifAnyGranted), null), equalTo(true));
 		assertThat(AuthzUtils.authorizeRoles(roles, null, null, String.join(",", ifNotGranted)), equalTo(true));
-		assertThat(AuthzUtils.authorizeRoles(roles, ifAllGranted.toArray(new String[0]), null, null), equalTo(true));
+		assertThat(AuthzUtils.authorizeRoles(roles, ifAllGranted.toArray(new String[ifAllGranted.size()]), null, null),
+				equalTo(true));
 		assertThat(AuthzUtils.authorizeRoles(roles, null, ifAnyGranted.toArray(new String[0]), null), equalTo(true));
 		assertThat(AuthzUtils.authorizeRoles(roles, null, null, ifNotGranted.toArray(new String[0])), equalTo(true));
 		ifAllGranted = Arrays.asList("A,B,C,D".split(","));
@@ -52,21 +53,30 @@ public class AuthzUtilsTest {
 		assertThat(AuthzUtils.authorizeRoles(roles, String.join(",", ifAllGranted), null, null), equalTo(false));
 		assertThat(AuthzUtils.authorizeRoles(roles, null, String.join(",", ifAnyGranted), null), equalTo(false));
 		assertThat(AuthzUtils.authorizeRoles(roles, null, null, String.join(",", ifNotGranted)), equalTo(false));
-		assertThat(AuthzUtils.authorizeRoles(roles, ifAllGranted.toArray(new String[0]), null, null), equalTo(false));
-		assertThat(AuthzUtils.authorizeRoles(roles, null, ifAnyGranted.toArray(new String[0]), null), equalTo(false));
-		assertThat(AuthzUtils.authorizeRoles(roles, null, null, ifNotGranted.toArray(new String[0])), equalTo(false));
+		assertThat(AuthzUtils.authorizeRoles(roles, ifAllGranted.toArray(new String[ifAllGranted.size()]), null, null),
+				equalTo(false));
+		assertThat(AuthzUtils.authorizeRoles(roles, null, ifAnyGranted.toArray(new String[ifAnyGranted.size()]), null),
+				equalTo(false));
+		assertThat(AuthzUtils.authorizeRoles(roles, null, null, ifNotGranted.toArray(new String[ifNotGranted.size()])),
+				equalTo(false));
 		ifAllGranted = Arrays.asList("A,B C".split("\\s"));
 		ifAnyGranted = Arrays.asList("C,D".split("\\s"));
 		ifNotGranted = Arrays.asList("D,E".split("\\s"));
-		assertThat(AuthzUtils.authorizeRoles(roles, ifAllGranted.toArray(new String[0]), null, null), equalTo(true));
-		assertThat(AuthzUtils.authorizeRoles(roles, null, ifAnyGranted.toArray(new String[0]), null), equalTo(true));
-		assertThat(AuthzUtils.authorizeRoles(roles, null, null, ifNotGranted.toArray(new String[0])), equalTo(true));
+		assertThat(AuthzUtils.authorizeRoles(roles, ifAllGranted.toArray(new String[ifAllGranted.size()]), null, null),
+				equalTo(true));
+		assertThat(AuthzUtils.authorizeRoles(roles, null, ifAnyGranted.toArray(new String[ifAnyGranted.size()]), null),
+				equalTo(true));
+		assertThat(AuthzUtils.authorizeRoles(roles, null, null, ifNotGranted.toArray(new String[ifNotGranted.size()])),
+				equalTo(true));
 		ifAllGranted = Arrays.asList("A,B C,D".split("\\s"));
 		ifAnyGranted = Arrays.asList("D,E".split("\\s"));
 		ifNotGranted = Arrays.asList("C,D".split("\\s"));
-		assertThat(AuthzUtils.authorizeRoles(roles, ifAllGranted.toArray(new String[0]), null, null), equalTo(false));
-		assertThat(AuthzUtils.authorizeRoles(roles, null, ifAnyGranted.toArray(new String[0]), null), equalTo(false));
-		assertThat(AuthzUtils.authorizeRoles(roles, null, null, ifNotGranted.toArray(new String[0])), equalTo(false));
+		assertThat(AuthzUtils.authorizeRoles(roles, ifAllGranted.toArray(new String[ifAllGranted.size()]), null, null),
+				equalTo(false));
+		assertThat(AuthzUtils.authorizeRoles(roles, null, ifAnyGranted.toArray(new String[ifAnyGranted.size()]), null),
+				equalTo(false));
+		assertThat(AuthzUtils.authorizeRoles(roles, null, null, ifNotGranted.toArray(new String[ifNotGranted.size()])),
+				equalTo(false));
 	}
 
 }

@@ -37,7 +37,7 @@ public class ClassScannerTest {
 		assertThat(classes, is(notNullValue()));
 		assertThat(classes.size(), is(2));
 
-		Class<?>[] arr = classes.toArray(new Class<?>[0]);
+		Class<?>[] arr = classes.toArray(new Class<?>[classes.size()]);
 		assertThat(arr[0] == TestBean.class, is(true));
 		assertThat(arr[1] == SubclassOfTestBean.class, is(true));
 	}
@@ -48,7 +48,7 @@ public class ClassScannerTest {
 		assertThat(classes, is(notNullValue()));
 		assertThat(classes.size(), is(3));
 
-		Class<?>[] arr = classes.toArray(new Class<?>[0]);
+		Class<?>[] arr = classes.toArray(new Class<?>[classes.size()]);
 		assertThat(arr[0] == ITestBean.class, is(true));
 		assertThat(arr[1] == TestBean.class, is(true));
 		assertThat(arr[2] == SubclassOfTestBean.class, is(true));
