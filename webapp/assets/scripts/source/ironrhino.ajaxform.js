@@ -148,12 +148,10 @@
 		}
 		var ignoreBlank = $t.hasClass('ignore-blank')
 			|| $f.hasClass('ignore-blank');
-		if ($t.hasClass('not-ignore-blank')) {
+		if ($f.find('[name="' + n + '"]').filter(function() { return $(this).val() }).length)
 			ignoreBlank = false;
-		} else if ($t.hasClass('ignore-if-all-blank')) {
-			if ($f.find('[name="' + n + '"]').filter(function() { return $(this).val() }).length)
-				ignoreBlank = false;
-		}
+		if ($t.hasClass('not-ignore-blank'))
+			ignoreBlank = false;
 		if (ignoreBlank && !value)
 			return null;
 		if (n.endsWith('-op') && $f.is('.query')) {
@@ -162,12 +160,10 @@
 				+ '"]');
 			ignoreBlank = $t2.hasClass('ignore-blank')
 				|| $f.hasClass('ignore-blank');
-			if ($t2.hasClass('not-ignore-blank')) {
+			if ($f.find('[name="' + n2 + '"]').filter(function() { return $(this).val() }).length)
 				ignoreBlank = false;
-			} else if ($t2.hasClass('ignore-if-all-blank')) {
-				if ($f.find('[name="' + n2 + '"]').filter(function() { return $(this).val() }).length)
-					ignoreBlank = false;
-			}
+			if ($t2.hasClass('not-ignore-blank'))
+				ignoreBlank = false;
 			if (ignoreBlank && !$t2.val())
 				return null;
 		}
