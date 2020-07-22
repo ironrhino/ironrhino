@@ -519,7 +519,7 @@ ${formFooter!}
 				</div>
 			</div>
 		<#elseif config.type=='input'>
-			<#if !disabled && config.queryWithRange><#local cssClass+=' not-ignore-blank'/></#if>
+			<#if !disabled && config.queryWithRange><#local cssClass+=' ignore-if-all-blank'/></#if>
 			<@s.textfield disabled=disabled id=id label=label name=key value=value! type=config.inputType class=cssClass maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" dynamicAttributes=dynamicAttributes>
 			<#if !disabled>
 				<#if config.queryMatchMode?? && config.propertyType.simpleName=='String' && 'EXACT'!=(config.queryMatchMode.name())!>

@@ -3,12 +3,12 @@
 	$.fn.ajaxsubmit = function(options) {
 
 		var url = this.find('.clicked:submit').attr('formaction')
-				|| this.formAction();
+			|| this.formAction();
 
 		options = $.extend(true, {
-					url : url,
-					type : this.attr('method') || 'GET'
-				}, options);
+			url: url,
+			type: this.attr('method') || 'GET'
+		}, options);
 
 		// hook for manipulating the form data before it is extracted;
 		// convenient for use with rich editors like tinyMCE or FCKEditor
@@ -20,7 +20,7 @@
 
 		// provide opportunity to alter form data before it is serialized
 		if (options.beforeSerialize
-				&& options.beforeSerialize(this, options) === false) {
+			&& options.beforeSerialize(this, options) === false) {
 			return this;
 		}
 
@@ -33,7 +33,7 @@
 
 		// give pre-submit callback an opportunity to abort the submit
 		if (options.beforeSubmit
-				&& options.beforeSubmit(a, this, options) === false) {
+			&& options.beforeSubmit(a, this, options) === false) {
 			return this;
 		}
 
@@ -47,9 +47,9 @@
 		var fileselector = 'input[name][type="file"]:enabled';
 		var hasfile = false;
 		$form.find(fileselector).each(function() {
-					if (this.value)
-						hasfile = true;
-				});
+			if (this.value)
+				hasfile = true;
+		});
 		if (hasfile) {
 			var formdata = new FormData();
 			for (var i = 0; i < a.length; i++)
@@ -60,13 +60,13 @@
 			options.data = formdata;
 			var files = [];
 			$form.find(fileselector).each(function() {
-						var fs = this.files;
-						for (var i = 0; i < fs.length; i++)
-							files.push({
-										name : this.name,
-										value : fs[i]
-									});
+				var fs = this.files;
+				for (var i = 0; i < fs.length; i++)
+					files.push({
+						name: this.name,
+						value: fs[i]
 					});
+			});
 			$.ajaxupload(files, options);
 		} else {
 			var q = $.param(a, traditional);
@@ -94,17 +94,17 @@
 			if (v && v.constructor == Array) {
 				for (var j = 0; j < v.length; j++) {
 					a.push({
-								name : n,
-								type : el.type,
-								value : v[j]
-							});
+						name: n,
+						type: el.type,
+						value: v[j]
+					});
 				}
 			} else if (v !== null && typeof v != 'undefined') {
 				a.push({
-							name : n,
-							value : v,
-							type : el.type
-						});
+					name: n,
+					value: v,
+					type: el.type
+				});
 			}
 		}
 		return a;
@@ -112,11 +112,11 @@
 
 	$.fieldValue = function(el) {
 		var n = el.name, t = el.type, tag = el.tagName.toLowerCase(), $t = $(el), $f = $t
-				.closest('form');
+			.closest('form');
 		if (!n || el.disabled || t == 'reset' || t == 'button' || t == 'file'
-				|| (t == 'checkbox' || t == 'radio') && !el.checked
-				|| (t == 'submit' || t == 'image') && !$t.hasClass('clicked')
-				|| tag == 'select' && el.selectedIndex < 0) {
+			|| (t == 'checkbox' || t == 'radio') && !el.checked
+			|| (t == 'submit' || t == 'image') && !$t.hasClass('clicked')
+			|| tag == 'select' && el.selectedIndex < 0) {
 			return null;
 		}
 		var value;
@@ -131,8 +131,8 @@
 					var v = op.value;
 					if (!v) { // extra pain for IE...
 						v = (op.attributes && op.attributes['value'] && !(op.attributes['value'].specified))
-								? op.text
-								: op.value;
+							? op.text
+							: op.value;
 					}
 					if (one) {
 						value = v;
@@ -147,16 +147,27 @@
 			value = $t.val();
 		}
 		var ignoreBlank = $t.hasClass('ignore-blank')
-				|| !$t.hasClass('not-ignore-blank')
-				&& $f.hasClass('ignore-blank');
+			|| $f.hasClass('ignore-blank');
+		if ($t.hasClass('not-ignore-blank')) {
+			ignoreBlank = false;
+		} else if ($t.hasClass('ignore-if-all-blank')) {
+			if ($f.find('[name="' + n + '"]').filter(function() { return $(this).val() }).length)
+				ignoreBlank = false;
+		}
 		if (ignoreBlank && !value)
 			return null;
 		if (n.endsWith('-op') && $f.is('.query')) {
-			var $t2 = $f.find('[name="' + n.substring(0, n.lastIndexOf('-'))
-					+ '"]');
+			var n2 = n.substring(0, n.lastIndexOf('-'));
+			var $t2 = $f.find('[name="' + n2
+				+ '"]');
 			ignoreBlank = $t2.hasClass('ignore-blank')
-					|| !$t2.hasClass('not-ignore-blank')
-					&& $f.hasClass('ignore-blank');
+				|| $f.hasClass('ignore-blank');
+			if ($t2.hasClass('not-ignore-blank')) {
+				ignoreBlank = false;
+			} else if ($t2.hasClass('ignore-if-all-blank')) {
+				if ($f.find('[name="' + n2 + '"]').filter(function() { return $(this).val() }).length)
+					ignoreBlank = false;
+			}
 			if (ignoreBlank && !$t2.val())
 				return null;
 		}
