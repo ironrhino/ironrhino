@@ -57,7 +57,7 @@ public class AuditEvent extends BaseEntity {
 	@SearchableProperty
 	private String address;
 
-	@UiConfig(template = "${entity.displayEvent!}")
+	@UiConfig(template = "${entity.displayEvent!}", csvTemplate = "${entity.displayEvent!}")
 	@SearchableProperty
 	@Column(name = "event", nullable = false)
 	private String event;
