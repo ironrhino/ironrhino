@@ -278,10 +278,10 @@ public class DefaultFactory extends BaseFactory {
             String key = (String) entry.getKey();
             int idx;
             while ((idx = str.indexOf(key)) >= 0) {
-                StringBuffer buf = new StringBuffer(100);
-                buf.append(str.substring(0, idx));
+                StringBuilder buf = new StringBuilder(100);
+                buf.append(str, 0, idx);
                 buf.append(entry.getValue());
-                buf.append(str.substring(idx + key.length()));
+                buf.append(str, idx + key.length(), str.length());
                 str = buf.toString();
             }
         }

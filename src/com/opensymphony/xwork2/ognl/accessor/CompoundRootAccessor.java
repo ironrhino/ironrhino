@@ -188,7 +188,7 @@ public class CompoundRootAccessor implements PropertyAccessor, MethodAccessor, C
                 }
 
                 SortedSet<String> set = new TreeSet<String>();
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
                 for (PropertyDescriptor pd : descriptors.values()) {
 
                     sb.append(pd.getName()).append(": ");
@@ -199,10 +199,10 @@ public class CompoundRootAccessor implements PropertyAccessor, MethodAccessor, C
                     sb.append(pd.getPropertyType().getName());
                     set.add(sb.toString());
 
-                    sb = new StringBuffer();
+                    sb = new StringBuilder();
                 }
 
-                sb = new StringBuffer();
+                sb = new StringBuilder();
                 for (Object aSet : set) {
                     String s = (String) aSet;
                     sb.append(s).append("\n");

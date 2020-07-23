@@ -24,7 +24,7 @@ public class StringUtils {
 			}
 
 			int length = str.length();
-			StringBuffer buffer = new StringBuffer(length);
+			StringBuilder buffer = new StringBuilder(length);
 
 			for (int index = 0; index < length; index++) {
 				char ch = str.charAt(index);
@@ -83,7 +83,7 @@ public class StringUtils {
 			return buffer.toString();
 		}
 
-		private int parseUpperCaseWord(StringBuffer buffer, String str, int index, int length) {
+		private int parseUpperCaseWord(StringBuilder buffer, String str, int index, int length) {
 			char ch = str.charAt(index++);
 
 			// 首字母，必然存在且为大写。
@@ -102,7 +102,7 @@ public class StringUtils {
 			return index - 1;
 		}
 
-		private int parseLowerCaseWord(StringBuffer buffer, String str, int index) {
+		private int parseLowerCaseWord(StringBuilder buffer, String str, int index) {
 			char ch = str.charAt(index++);
 
 			// 首字母，必然存在且为小写。
@@ -128,7 +128,7 @@ public class StringUtils {
 			return index - 1;
 		}
 
-		private int parseTitleCaseWord(StringBuffer buffer, String str, int index) {
+		private int parseTitleCaseWord(StringBuilder buffer, String str, int index) {
 			char ch = str.charAt(index++);
 
 			// 首字母，必然存在且为大写。
@@ -154,7 +154,7 @@ public class StringUtils {
 			return index - 1;
 		}
 
-		private int parseDigitWord(StringBuffer buffer, String str, int index) {
+		private int parseDigitWord(StringBuilder buffer, String str, int index) {
 			char ch = str.charAt(index++);
 
 			// 首字符，必然存在且为数字。
@@ -184,30 +184,30 @@ public class StringUtils {
 			return !Character.isUpperCase(ch) && !Character.isLowerCase(ch) && !Character.isDigit(ch);
 		}
 
-		protected abstract void startSentence(StringBuffer buffer, char ch);
+		protected abstract void startSentence(StringBuilder buffer, char ch);
 
-		protected abstract void startWord(StringBuffer buffer, char ch);
+		protected abstract void startWord(StringBuilder buffer, char ch);
 
-		protected abstract void inWord(StringBuffer buffer, char ch);
+		protected abstract void inWord(StringBuilder buffer, char ch);
 
-		protected abstract void startDigitSentence(StringBuffer buffer, char ch);
+		protected abstract void startDigitSentence(StringBuilder buffer, char ch);
 
-		protected abstract void startDigitWord(StringBuffer buffer, char ch);
+		protected abstract void startDigitWord(StringBuilder buffer, char ch);
 
-		protected abstract void inDigitWord(StringBuffer buffer, char ch);
+		protected abstract void inDigitWord(StringBuilder buffer, char ch);
 
-		protected abstract void inDelimiter(StringBuffer buffer, char ch);
+		protected abstract void inDelimiter(StringBuilder buffer, char ch);
 	}
 
 	private static final WordTokenizer CAMEL_CASE_TOKENIZER = new WordTokenizer() {
 
 		@Override
-		protected void startSentence(StringBuffer buffer, char ch) {
+		protected void startSentence(StringBuilder buffer, char ch) {
 			buffer.append(Character.toLowerCase(ch));
 		}
 
 		@Override
-		protected void startWord(StringBuffer buffer, char ch) {
+		protected void startWord(StringBuilder buffer, char ch) {
 			if (!isDelimiter(buffer.charAt(buffer.length() - 1))) {
 				buffer.append(Character.toUpperCase(ch));
 			} else {
@@ -216,27 +216,27 @@ public class StringUtils {
 		}
 
 		@Override
-		protected void inWord(StringBuffer buffer, char ch) {
+		protected void inWord(StringBuilder buffer, char ch) {
 			buffer.append(Character.toLowerCase(ch));
 		}
 
 		@Override
-		protected void startDigitSentence(StringBuffer buffer, char ch) {
+		protected void startDigitSentence(StringBuilder buffer, char ch) {
 			buffer.append(ch);
 		}
 
 		@Override
-		protected void startDigitWord(StringBuffer buffer, char ch) {
+		protected void startDigitWord(StringBuilder buffer, char ch) {
 			buffer.append(ch);
 		}
 
 		@Override
-		protected void inDigitWord(StringBuffer buffer, char ch) {
+		protected void inDigitWord(StringBuilder buffer, char ch) {
 			buffer.append(ch);
 		}
 
 		@Override
-		protected void inDelimiter(StringBuffer buffer, char ch) {
+		protected void inDelimiter(StringBuilder buffer, char ch) {
 			if (ch != UNDERSCORE) {
 				buffer.append(ch);
 			}
@@ -246,12 +246,12 @@ public class StringUtils {
 	private static final WordTokenizer UPPER_CASE_WITH_UNDERSCORES_TOKENIZER = new WordTokenizer() {
 
 		@Override
-		protected void startSentence(StringBuffer buffer, char ch) {
+		protected void startSentence(StringBuilder buffer, char ch) {
 			buffer.append(Character.toUpperCase(ch));
 		}
 
 		@Override
-		protected void startWord(StringBuffer buffer, char ch) {
+		protected void startWord(StringBuilder buffer, char ch) {
 			if (!isDelimiter(buffer.charAt(buffer.length() - 1))) {
 				buffer.append(UNDERSCORE);
 			}
@@ -260,17 +260,17 @@ public class StringUtils {
 		}
 
 		@Override
-		protected void inWord(StringBuffer buffer, char ch) {
+		protected void inWord(StringBuilder buffer, char ch) {
 			buffer.append(Character.toUpperCase(ch));
 		}
 
 		@Override
-		protected void startDigitSentence(StringBuffer buffer, char ch) {
+		protected void startDigitSentence(StringBuilder buffer, char ch) {
 			buffer.append(ch);
 		}
 
 		@Override
-		protected void startDigitWord(StringBuffer buffer, char ch) {
+		protected void startDigitWord(StringBuilder buffer, char ch) {
 			if (!isDelimiter(buffer.charAt(buffer.length() - 1))) {
 				buffer.append(UNDERSCORE);
 			}
@@ -279,12 +279,12 @@ public class StringUtils {
 		}
 
 		@Override
-		protected void inDigitWord(StringBuffer buffer, char ch) {
+		protected void inDigitWord(StringBuilder buffer, char ch) {
 			buffer.append(ch);
 		}
 
 		@Override
-		protected void inDelimiter(StringBuffer buffer, char ch) {
+		protected void inDelimiter(StringBuilder buffer, char ch) {
 			buffer.append(ch);
 		}
 	};

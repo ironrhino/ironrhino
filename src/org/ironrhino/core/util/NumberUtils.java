@@ -166,7 +166,7 @@ public class NumberUtils {
 	}
 
 	private static String _getChineseUpperCaseInteger(int[] integers, boolean isMust5) {
-		StringBuffer chineseInteger = new StringBuffer("");
+		StringBuilder chineseInteger = new StringBuilder();
 		int length = integers.length;
 		for (int i = 0; i < length; i++) {
 			String key = "";
@@ -188,7 +188,7 @@ public class NumberUtils {
 	}
 
 	private static String _getChineseUpperCaseDecimal(int[] decimals) {
-		StringBuffer chineseDecimal = new StringBuffer("");
+		StringBuilder chineseDecimal = new StringBuilder();
 		for (int i = 0; i < decimals.length; i++) {
 			if (i == 3)
 				break;
