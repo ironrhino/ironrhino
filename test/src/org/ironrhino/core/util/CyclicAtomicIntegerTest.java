@@ -143,4 +143,21 @@ public class CyclicAtomicIntegerTest {
 			arr2[i] = cai.getAndAdd(1);
 		assertThat(arr2, equalTo(arr));
 	}
+
+	@Test
+	public void testGetAndDecrement() {
+		CyclicAtomicInteger cai = new CyclicAtomicInteger(4, 4, 10);
+		int[] arr = new int[] { 4, 9, 8, 7, 6, 5, 4, 9 };
+		int[] arr2 = new int[arr.length];
+		for (int i = 0; i < arr2.length; i++)
+			arr2[i] = cai.getAndDecrement();
+		assertThat(arr2, equalTo(arr));
+
+		cai.set(9);
+		arr = new int[] { 9, 8, 7, 6, 5, 4, 9 };
+		arr2 = new int[arr.length];
+		for (int i = 0; i < arr2.length; i++)
+			arr2[i] = cai.getAndDecrement();
+		assertThat(arr2, equalTo(arr));
+	}
 }

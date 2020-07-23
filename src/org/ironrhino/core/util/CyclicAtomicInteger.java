@@ -76,6 +76,8 @@ public class CyclicAtomicInteger extends Number implements java.io.Serializable 
 		do {
 			i = counter.get();
 			j = (i + delta) % bound;
+			if (j < 0)
+				j += bound;
 		} while (!counter.compareAndSet(i, j));
 		return (getBeforeSet ? i : j) + offset;
 	}
