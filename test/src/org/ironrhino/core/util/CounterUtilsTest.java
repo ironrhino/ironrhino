@@ -39,6 +39,20 @@ public class CounterUtilsTest {
 		int mod = 5;
 		int[] expected = new int[] { 4, 0, 1, 2, 3, 4, 0, 1, 2, 3 };
 		verify(counter, mod, false, expected);
+		counter = new AtomicInteger(Integer.MAX_VALUE);
+		expected = new int[] { 0, 1, 2, 3, 4, 0, 1, 2, 3 };
+		verify(counter, mod, true, expected);
+	}
+
+	@Test
+	public void testNegativeValue() {
+		AtomicInteger counter = new AtomicInteger(-4);
+		int mod = 5;
+		int[] expected = new int[] { 1, 2, 3, 4, 0, 1, 2, 3 };
+		verify(counter, mod, false, expected);
+		counter = new AtomicInteger(-4);
+		expected = new int[] { 2, 3, 4, 0, 1, 2, 3, 4 };
+		verify(counter, mod, true, expected);
 	}
 
 	private void verify(AtomicInteger counter, int mod, boolean incrementAndGet, int[] expected) {

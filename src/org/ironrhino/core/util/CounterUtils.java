@@ -8,20 +8,19 @@ import lombok.experimental.UtilityClass;
 public class CounterUtils {
 
 	public static int getAndIncrement(AtomicInteger counter, int mod) {
-		return increment(counter, mod, false);
+		int value = incrementAndGet(counter, mod) - 1;
+		return value < 0 ? value + mod : value;
 	}
 
 	public static int incrementAndGet(AtomicInteger counter, int mod) {
-		return increment(counter, mod, true);
-	}
-
-	private static int increment(AtomicInteger counter, int mod, boolean incrementAndGet) {
 		int current, next;
 		do {
 			current = counter.get();
 			next = ((current != Integer.MAX_VALUE ? current : -1) + 1) % mod;
+			if (next < 0)
+				next += mod;
 		} while (!counter.compareAndSet(current, next));
-		return (next + mod + (incrementAndGet ? 0 : -1)) % mod;
+		return next;
 	}
 
 }
