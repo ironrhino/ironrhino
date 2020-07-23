@@ -29,7 +29,7 @@ public class JettyLauncher {
 		if (p == null)
 			p = System.getProperty("jetty.http.port");
 		if (p != null && p.trim().length() > 0)
-			port = Integer.valueOf(p);
+			port = Integer.parseInt(p);
 		if (port == -1) {
 			port = 8080;
 			if (System.getenv("CONTAINER") == null) {

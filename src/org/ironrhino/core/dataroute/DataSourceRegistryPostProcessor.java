@@ -84,12 +84,12 @@ public class DataSourceRegistryPostProcessor implements BeanDefinitionRegistryPo
 		Assert.notEmpty(shardingHosts, "shardingHosts shouldn't be empty");
 		str = env.getProperty(KEY_SHARDINGS_PER_HOST);
 		if (str != null)
-			shardingsPerHost = Integer.valueOf(str);
+			shardingsPerHost = Integer.parseInt(str);
 		if (shardingsPerHost <= 0)
 			shardingsPerHost = 1;
 		str = env.getProperty(KEY_SHARDING_VERSION);
 		if (str != null)
-			shardingGeneration = Integer.valueOf(str);
+			shardingGeneration = Integer.parseInt(str);
 		str = env.getProperty(KEY_JDBC_URL_FORMAT);
 		if (str != null)
 			jdbcUrlFormat = str;

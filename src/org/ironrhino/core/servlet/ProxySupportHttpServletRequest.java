@@ -145,14 +145,14 @@ public class ProxySupportHttpServletRequest extends HttpServletRequestWrapper {
 	public int getServerPort() {
 		String port = getHeader(HEADER_NAME_X_FORWARDED_PORT);
 		if (StringUtils.isNumeric(port))
-			return Integer.valueOf(port);
+			return Integer.parseInt(port);
 		String host = getHeader("Host");
 		if (StringUtils.isNotBlank(host)) {
 			int index = host.lastIndexOf(':');
 			if (index > 0) {
 				port = host.substring(index + 1);
 				if (StringUtils.isNumeric(port))
-					return Integer.valueOf(port);
+					return Integer.parseInt(port);
 				else
 					return isSecure() ? 443 : 80;
 			} else {

@@ -111,7 +111,7 @@ public class OptimizeTrafficFilter implements Filter {
 		if ("false".equals(filterConfig.getInitParameter("compress")))
 			compress = false;
 		if (filterConfig.getInitParameter("cacheSeconds") != null)
-			cacheSeconds = Integer.valueOf(filterConfig.getInitParameter("cacheSeconds"));
+			cacheSeconds = Integer.parseInt(filterConfig.getInitParameter("cacheSeconds"));
 	}
 
 	@Override

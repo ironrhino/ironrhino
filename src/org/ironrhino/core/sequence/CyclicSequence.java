@@ -9,7 +9,7 @@ public interface CyclicSequence extends Sequence {
 
 	@Override
 	default int nextIntValue() {
-		return Integer.valueOf(nextStringValue().substring(getCycleType().getPattern().length()));
+		return Integer.parseInt(nextStringValue().substring(getCycleType().getPattern().length()));
 	}
 
 	CycleType getCycleType();

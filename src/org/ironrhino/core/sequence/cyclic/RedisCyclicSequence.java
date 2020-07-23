@@ -62,15 +62,15 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 			Calendar cal = Calendar.getInstance();
 			CycleType cycleType = getCycleType();
 			if (cycleType.ordinal() <= CycleType.MINUTE.ordinal())
-				cal.set(Calendar.MINUTE, Integer.valueOf(stringValue.substring(10, 12)));
+				cal.set(Calendar.MINUTE, Integer.parseInt(stringValue.substring(10, 12)));
 			if (cycleType.ordinal() <= CycleType.HOUR.ordinal())
-				cal.set(Calendar.HOUR_OF_DAY, Integer.valueOf(stringValue.substring(8, 10)));
+				cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(stringValue.substring(8, 10)));
 			if (cycleType.ordinal() <= CycleType.DAY.ordinal())
-				cal.set(Calendar.DAY_OF_MONTH, Integer.valueOf(stringValue.substring(6, 8)));
+				cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(stringValue.substring(6, 8)));
 			if (cycleType.ordinal() <= CycleType.MONTH.ordinal())
-				cal.set(Calendar.MONTH, Integer.valueOf(stringValue.substring(4, 6)) - 1);
+				cal.set(Calendar.MONTH, Integer.parseInt(stringValue.substring(4, 6)) - 1);
 			if (cycleType.ordinal() <= CycleType.YEAR.ordinal())
-				cal.set(Calendar.YEAR, Integer.valueOf(stringValue.substring(0, 4)));
+				cal.set(Calendar.YEAR, Integer.parseInt(stringValue.substring(0, 4)));
 			Date d = cal.getTime();
 			if (getCycleType().isSameCycle(d, now))
 				return stringValue;

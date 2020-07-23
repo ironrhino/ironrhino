@@ -51,7 +51,7 @@ public class XWorkListPropertyAccessor extends ListPropertyAccessor {
 
     @Inject(value = "xwork.autoGrowCollectionLimit", required = false)
 	public void setAutoGrowCollectionLimit(String value) {
-		this.autoGrowCollectionLimit = Integer.valueOf(value);
+		this.autoGrowCollectionLimit = Integer.parseInt(value);
 	}
     
     @Inject("java.util.Collection")

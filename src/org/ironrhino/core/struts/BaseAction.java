@@ -386,7 +386,7 @@ public class BaseAction extends ActionSupport {
 			return;
 		HttpSession session = request.getSession();
 		String currentPasswordThreshold = (String) session.getAttribute(SESSION_KEY_CURRENT_PASSWORD_THRESHOLD);
-		int threshold = StringUtils.isNumeric(currentPasswordThreshold) ? Integer.valueOf(currentPasswordThreshold) : 0;
+		int threshold = StringUtils.isNumeric(currentPasswordThreshold) ? Integer.parseInt(currentPasswordThreshold) : 0;
 		String currentPassword = request.getParameter(CurrentPassword.PARAMETER_NAME_CURRENT_PASSWORD);
 		if (currentPassword == null) {
 			response.setHeader("X-Current-Password", "1");

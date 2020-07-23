@@ -172,7 +172,7 @@ public class JdbcUpdateService {
 						|| error.indexOf("double precision") > 0 || error.indexOf("money") > 0
 						|| error.indexOf("timestamp") > 0 || error.indexOf("date") > 0 || error.indexOf("time") > 0)
 						&& error.indexOf("character varying") > 0 && error.indexOf("：") > 0) {
-					int location = Integer.valueOf(error.substring(error.lastIndexOf("：") + 1).trim());
+					int location = Integer.parseInt(error.substring(error.lastIndexOf("：") + 1).trim());
 					String paramName = sql.substring(location);
 					paramName = paramName.substring(paramName.indexOf(":") + 1);
 					paramName = paramName.split("\\s")[0].split("\\)")[0];

@@ -376,12 +376,12 @@ public class AppInfo {
 		if (StringUtils.isBlank(p))
 			p = System.getenv("VCAP_APP_PORT");
 		if (StringUtils.isNotBlank(p) && StringUtils.isNumeric(p))
-			httpPort = Integer.valueOf(p);
+			httpPort = Integer.parseInt(p);
 		p = System.getProperty("port.https");
 		if (StringUtils.isBlank(p))
 			p = System.getProperty("port.http.ssl");
 		if (StringUtils.isNotBlank(p) && StringUtils.isNumeric(p))
-			httpsPort = Integer.valueOf(p);
+			httpsPort = Integer.parseInt(p);
 
 		System.setProperty(AppInfo.KEY_STAGE, AppInfo.getStage().name());
 		System.setProperty(AppInfo.KEY_APP_HOME, AppInfo.getAppHome());

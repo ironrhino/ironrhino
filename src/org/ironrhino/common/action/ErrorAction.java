@@ -93,7 +93,7 @@ public class ErrorAction extends ActionSupport {
 					log.error(exception.getMessage(), exception);
 			}
 			try {
-				errorcode = Integer.valueOf(getUid());
+				errorcode = Integer.parseInt(getUid());
 			} catch (Exception e) {
 
 			}

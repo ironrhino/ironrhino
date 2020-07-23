@@ -34,7 +34,7 @@ public class NestedPathMapSqlParameterSource extends MapSqlParameterSource {
 			if (topValue instanceof Object[]) {
 				if (!StringUtils.isNumeric(sub))
 					return false;
-				int index = Integer.valueOf(sub);
+				int index = Integer.parseInt(sub);
 				Object[] array = (Object[]) topValue;
 				if (index < 0 || index >= array.length)
 					return false;
@@ -42,7 +42,7 @@ public class NestedPathMapSqlParameterSource extends MapSqlParameterSource {
 			} else if (topValue instanceof Collection) {
 				if (!StringUtils.isNumeric(sub))
 					return false;
-				int index = Integer.valueOf(sub);
+				int index = Integer.parseInt(sub);
 				Collection<?> collection = (Collection<?>) topValue;
 				if (index < 0 || index >= collection.size())
 					return false;
@@ -107,7 +107,7 @@ public class NestedPathMapSqlParameterSource extends MapSqlParameterSource {
 			if (topValue instanceof Object[]) {
 				if (!StringUtils.isNumeric(sub))
 					return false;
-				int index = Integer.valueOf(sub);
+				int index = Integer.parseInt(sub);
 				Object[] array = (Object[]) topValue;
 				if (index < 0 || index >= array.length)
 					throw new IllegalArgumentException("Invalid index: " + sub);
@@ -115,7 +115,7 @@ public class NestedPathMapSqlParameterSource extends MapSqlParameterSource {
 			} else if (topValue instanceof Collection) {
 				if (!StringUtils.isNumeric(sub))
 					return false;
-				int index = Integer.valueOf(sub);
+				int index = Integer.parseInt(sub);
 				Collection<?> collection = (Collection<?>) topValue;
 				if (index < 0 || index >= collection.size())
 					throw new IllegalArgumentException("Invalid index: " + sub);

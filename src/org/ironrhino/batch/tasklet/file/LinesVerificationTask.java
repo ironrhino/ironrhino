@@ -38,7 +38,7 @@ public class LinesVerificationTask implements Tasklet {
 							"First line of " + resource + " doesn't matches " + extractLinesPattern.pattern());
 				count = m.group(1);
 			}
-			expectedLines = Integer.valueOf(count);
+			expectedLines = Integer.parseInt(count);
 		}
 		try (BufferedReader br = createReader()) {
 			long actualLines = br.lines().count() - 1;

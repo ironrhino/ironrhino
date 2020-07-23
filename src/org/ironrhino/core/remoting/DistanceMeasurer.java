@@ -13,9 +13,9 @@ public interface DistanceMeasurer {
 	DistanceMeasurer DEFAULT = (from, to) -> {
 		String[] arr1 = from.split("\\.");
 		String[] arr2 = to.split("\\.");
-		return Math.abs(Integer.valueOf(arr1[0]) - Integer.valueOf(arr2[0])) * 256 * 256
-				+ Math.abs(Integer.valueOf(arr1[1]) - Integer.valueOf(arr2[1])) * 256
-				+ Math.abs(Integer.valueOf(arr1[2]) - Integer.valueOf(arr2[2]));
+		return Math.abs(Integer.parseInt(arr1[0]) - Integer.parseInt(arr2[0])) * 256 * 256
+				+ Math.abs(Integer.parseInt(arr1[1]) - Integer.parseInt(arr2[1])) * 256
+				+ Math.abs(Integer.parseInt(arr1[2]) - Integer.parseInt(arr2[2]));
 	};
 
 	Pattern pattern = Pattern.compile("((\\d+\\.){3}\\d+)");

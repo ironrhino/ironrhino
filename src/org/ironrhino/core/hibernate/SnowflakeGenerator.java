@@ -26,7 +26,7 @@ public class SnowflakeGenerator implements IdentifierGenerator {
 			id = ip.substring(ip.lastIndexOf('.') + 1);
 		}
 		if (StringUtils.isNumeric(id)) {
-			workerId = Integer.valueOf(id);
+			workerId = Integer.parseInt(id);
 		}
 		log.info("Snowflake worker id is {}", workerId);
 		snowflake = new Snowflake(workerId);

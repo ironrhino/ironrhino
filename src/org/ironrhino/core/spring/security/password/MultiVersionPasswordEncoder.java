@@ -48,7 +48,7 @@ public class MultiVersionPasswordEncoder implements PasswordEncoder {
 		int i = encodedPassword.indexOf('#');
 		int version = 1;
 		if (i > 0) {
-			version = Integer.valueOf(encodedPassword.substring(i + 1));
+			version = Integer.parseInt(encodedPassword.substring(i + 1));
 			encodedPassword = encodedPassword.substring(0, i);
 		}
 		VersionedPasswordEncoder pd = map.get(version);
@@ -64,7 +64,7 @@ public class MultiVersionPasswordEncoder implements PasswordEncoder {
 		int version = 1;
 		int i = encPass.indexOf('#');
 		if (i > 0)
-			version = Integer.valueOf(encPass.substring(i + 1));
+			version = Integer.parseInt(encPass.substring(i + 1));
 		return version == lastVersion;
 	}
 

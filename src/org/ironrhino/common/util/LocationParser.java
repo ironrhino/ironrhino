@@ -54,8 +54,8 @@ public class LocationParser {
 		String[] arr = input.split("\\.");
 		if (arr.length != 4)
 			return null;
-		long ip = ((((Integer.valueOf(arr[0]) << 24) & 0xFF000000) | ((Integer.valueOf(arr[1]) << 16) & 0x00FF0000)
-				| ((Integer.valueOf(arr[2]) << 8) & 0x0000FF00) | ((Integer.valueOf(arr[3]) << 0) & 0x000000FF))
+		long ip = ((((Integer.parseInt(arr[0]) << 24) & 0xFF000000) | ((Integer.parseInt(arr[1]) << 16) & 0x00FF0000)
+				| ((Integer.parseInt(arr[2]) << 8) & 0x0000FF00) | ((Integer.parseInt(arr[3]) << 0) & 0x000000FF))
 				& 0xFFFFFFFFL);
 
 		int l = 0, h = totalIndexBlocks;

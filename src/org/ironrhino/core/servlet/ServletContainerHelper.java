@@ -118,7 +118,7 @@ public class ServletContainerHelper {
 				if (ssl) {
 					String port = System.getProperty("jetty.ssl.port");
 					if (StringUtils.isNotBlank(port))
-						return Integer.valueOf(port);
+						return Integer.parseInt(port);
 					else
 						return 0;
 				}
