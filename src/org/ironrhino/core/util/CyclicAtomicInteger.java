@@ -73,6 +73,7 @@ public class CyclicAtomicInteger extends Number implements java.io.Serializable 
 
 	private int cas(boolean getBeforeSet, int delta) {
 		int i, j;
+		delta %= bound;
 		do {
 			i = counter.get();
 			j = (i + delta) % bound;
