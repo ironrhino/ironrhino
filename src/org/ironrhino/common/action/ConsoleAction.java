@@ -85,4 +85,8 @@ public class ConsoleAction extends BaseAction {
 		}
 		return JSON;
 	}
+
+	public String interactive() {
+		return "interactive";
+	}
 }

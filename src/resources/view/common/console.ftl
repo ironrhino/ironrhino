@@ -67,7 +67,11 @@ $(function(){
 	<@s.select name="scope" class="input-medium" list="@org.ironrhino.core.metadata.Scope@values()" listKey="name" listValue="displayName"/>
 	</div>
 	</div>
-	<@s.submit label=getText('submit') class="btn-primary"/>
+	<@s.submit label=getText('submit') class="btn-primary">
+	<@s.param name="after">
+		<a href="${actionBaseUrl}/interactive" class="btn" style="margin-left:-150px;"><i class="fa fa-terminal"></i></a>
+	</@s.param>
+	</@s.submit>
 </@s.form>
 <hr/>
 
