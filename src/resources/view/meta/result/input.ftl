@@ -13,7 +13,6 @@
 		<#local name=entityName+'.'+key+'.'+nestedKey>
 		<#local value=(entity[key][nestedKey])!>
 	</#if>
-	<#local group=getText(config.group)>
 	<#local hidden=config.hiddenInInput.value>
 	<#if !hidden && config.hiddenInInput.expression?has_content>
 		<#if config.hiddenInInput.expression?eval>
