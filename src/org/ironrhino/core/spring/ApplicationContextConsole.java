@@ -104,6 +104,8 @@ public class ApplicationContextConsole {
 
 	public Object execute(String expression, Scope scope) throws Exception {
 		expression = expression.trim();
+		if (expression.endsWith(";"))
+			expression = expression.substring(0, expression.length() - 1);
 		Object value = null;
 		try {
 			if (expression.matches(SET_PROPERTY_EXPRESSION_PATTERN)) {
