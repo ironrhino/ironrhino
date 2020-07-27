@@ -18,6 +18,7 @@ import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.AppInfo;
+import org.ironrhino.core.util.FileUtils;
 
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
@@ -31,10 +32,12 @@ public class LogAction extends BaseAction {
 	}
 
 	public String download() {
-		File file = new File(AppInfo.getAppHome() + File.separator + "logs", getUid());
+		String filename = getUid();
+		filename = FileUtils.normalizePath(filename);
+		File file = new File(AppInfo.getAppHome() + File.separator + "logs", filename);
 		if (file.exists()) {
 			HttpServletResponse response = ServletActionContext.getResponse();
-			response.addHeader("Content-Disposition", "attachment;filename=" + getUid());
+			response.addHeader("Content-Disposition", "attachment;filename=" + filename);
 			response.setContentType("application/octet-stream");
 			try {
 				FileInputStream fis = new FileInputStream(file);
@@ -76,7 +79,9 @@ public class LogAction extends BaseAction {
 		final HttpServletResponse response = ServletActionContext.getResponse();
 		response.setContentType("text/event-stream");
 		response.setHeader("Cache-Control", "no-cache");
-		File file = new File(AppInfo.getAppHome() + File.separator + "logs", getUid());
+		String filename = getUid();
+		filename = FileUtils.normalizePath(filename);
+		File file = new File(AppInfo.getAppHome() + File.separator + "logs", filename);
 		try {
 			Writer w = response.getWriter();
 			w.write("retry: 5000\n\n");
