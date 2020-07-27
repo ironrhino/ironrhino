@@ -59,7 +59,7 @@ public class JsonResult implements Result {
 			JsonConfig jsonConfig = method.getAnnotation(JsonConfig.class);
 			if (jsonConfig != null && StringUtils.isNotBlank(jsonConfig.root())) {
 				Object value = invocation.getStack().findValue(jsonConfig.root());
-				return value != null ? JsonUtils.toJson(value) : "{}";
+				return JsonUtils.toJson(value);
 			}
 			if (jsonConfig == null || jsonConfig.propertyName() == null || jsonConfig.propertyName().length == 0) {
 				return JsonUtils.toJson(map);
