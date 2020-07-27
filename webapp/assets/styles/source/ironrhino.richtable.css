@@ -34,7 +34,7 @@ table.richtable th.checkbox , table.richtable th.radio {
 }
 
 table.richtable td {
-	word-wrap: break-all;
+	word-break: break-all;
 	white-space: pre-wrap;
 	position: relative;
 }
