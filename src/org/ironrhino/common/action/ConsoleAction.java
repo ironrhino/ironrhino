@@ -51,6 +51,7 @@ public class ConsoleAction extends BaseAction {
 	@Valid
 	@InputConfig(resultName = SUCCESS)
 	public String execute() throws Exception {
+		log.info("Executing: {}", expression);
 		try {
 			result = applicationContextConsole.execute(expression, scope);
 			addActionMessage(getText("operate.success") + (result != null ? (":" + JsonUtils.toJson(result)) : ""));
@@ -71,6 +72,7 @@ public class ConsoleAction extends BaseAction {
 	@InputConfig(resultName = SUCCESS)
 	@JsonConfig(root = "result")
 	public String executeJson() {
+		log.info("Executing: {}", expression);
 		try {
 			result = applicationContextConsole.execute(expression, scope);
 		} catch (Throwable throwable) {
