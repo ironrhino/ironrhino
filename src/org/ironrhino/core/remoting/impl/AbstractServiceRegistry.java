@@ -108,7 +108,9 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 			} else {
 				if (IS_SERVER_PRESENT && !skipExport) {
 					Class<?> clazz = ctx.getBean(beanName).getClass();
-					tryExport(clazz, beanName, beanClassName != null ? beanClassName : clazz.getName());
+					if (beanClassName == null)
+						beanClassName = ReflectionUtils.getActualClass(clazz).getName();
+					tryExport(clazz, beanName, beanClassName);
 				}
 			}
 		}

@@ -94,6 +94,7 @@ public class CommonConfiguration {
 		MethodValidationPostProcessor postProcessor = new MethodValidationPostProcessor();
 		postProcessor.setValidator(validator);
 		postProcessor.setOrder(Ordered.HIGHEST_PRECEDENCE);
+		postProcessor.setProxyTargetClass(true);
 		return postProcessor;
 	}
 
