@@ -122,6 +122,8 @@ public class ReflectionUtils {
 	}
 
 	public static Class<?> getActualClass(Class<?> clazz) {
+		if (Proxy.isProxyClass(clazz))
+			return clazz.getInterfaces()[0];
 		if (ProxyObject.class.isAssignableFrom(clazz) || HibernateProxy.class.isAssignableFrom(clazz)
 				|| SpringProxy.class.isAssignableFrom(clazz) || clazz.getName().contains("$$EnhancerBySpringCGLIB$$")) {
 			clazz = clazz.getSuperclass();
