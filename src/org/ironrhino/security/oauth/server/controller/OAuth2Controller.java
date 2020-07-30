@@ -1,6 +1,5 @@
 package org.ironrhino.security.oauth.server.controller;
 
-import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -33,7 +32,6 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -47,6 +45,8 @@ import lombok.extern.slf4j.Slf4j;
 @Validated
 @RequestMapping("/oauth2")
 public class OAuth2Controller {
+
+	private static final String TOKEN_PATH = "/token";
 
 	@Autowired
 	private EventPublisher eventPublisher;
@@ -75,128 +75,97 @@ public class OAuth2Controller {
 	@Autowired(required = false)
 	private VerificationManager verificationManager;
 
-	@RequestMapping(value = "/token", method = { RequestMethod.GET, RequestMethod.POST })
-	public Map<String, Object> token(HttpServletRequest request, HttpServletResponse response,
-			@RequestParam GrantType grant_type, @RequestParam String client_id, @RequestParam String client_secret,
-			@RequestParam(required = false) String username, @RequestParam(required = false) String password,
-			@RequestParam(required = false) String device_id, @RequestParam(required = false) String device_name,
-			@RequestParam(required = false) String code, @RequestParam(required = false) String redirect_uri,
-			@RequestParam(required = false) String refresh_token) throws Exception {
-		Client client;
-		Authorization authorization;
-		Map<String, Object> result = new LinkedHashMap<>();
-		if (grant_type == GrantType.password
-				|| grant_type == GrantType.jwt_bearer && oauthHandler != null && oauthHandler.isJwtEnabled()) {
-			client = oauthManager.findClientById(client_id);
-			if (client == null)
-				throw new OAuthError(OAuthError.INVALID_CLIENT, OAuthError.ERROR_CLIENT_ID_NOT_EXISTS);
-			if (!client.getSecret().equals(client_secret))
-				throw new OAuthError(OAuthError.INVALID_CLIENT, OAuthError.ERROR_CLIENT_SECRET_MISMATCH);
-			if (username == null)
-				throw new MissingServletRequestParameterException("username", String.class.getSimpleName());
-			if (password == null)
-				throw new MissingServletRequestParameterException("password", String.class.getSimpleName());
-			try {
-				UsernamePasswordAuthenticationToken attempt = new UsernamePasswordAuthenticationToken(username,
-						password);
-				attempt.setDetails(authenticationDetailsSource.buildDetails(request));
-				try {
-					Authentication authResult = authenticationManager.authenticate(attempt);
-					if (authResult != null)
-						authenticationSuccessHandler.onAuthenticationSuccess(request, response, authResult);
-				} catch (InternalAuthenticationServiceException failed) {
-					throw new IllegalArgumentException(ExceptionUtils.getRootMessage(failed));
-				} catch (AuthenticationException failed) {
-					authenticationFailureHandler.onAuthenticationFailure(request, response, failed);
-					throw new IllegalArgumentException(I18N.getText(failed.getClass().getName()), failed);
-				}
-				UserDetails ud = userDetailsService.loadUserByUsername(username);
-				if (grant_type == GrantType.jwt_bearer) {
-					int expiresIn = oauthHandler.getJwtExpiresIn();
-					String jwt = Jwt.createWithSubject(ud.getUsername(), ud.getPassword(), expiresIn);
-					result.put("access_token", jwt);
-					if (expiresIn > 0)
-						result.put("expires_in", expiresIn);
-				} else {
-					authorization = oauthManager.grant(client, ud.getUsername(), device_id, device_name);
-					result.put("access_token", authorization.getAccessToken());
-					result.put("refresh_token", authorization.getRefreshToken());
-					result.put("expires_in", authorization.getExpiresIn());
-				}
-				eventPublisher.publish(new AuthorizeEvent(ud.getUsername(), request.getRemoteAddr(), client.getName(),
-						grant_type.name()), Scope.LOCAL);
-			} catch (Exception e) {
-				if (e.getCause() instanceof AuthenticationException)
-					log.error("Exchange token by password for \"{}\" failed with {}: {}", username,
-							e.getClass().getName(), e.getLocalizedMessage());
-				else
-					log.error(e.getMessage(), e);
-				throw new OAuthError(OAuthError.INVALID_REQUEST, e.getLocalizedMessage());
-			}
-		} else if (grant_type == GrantType.client_credentials) {
-			client = new Client();
-			client.setId(client_id);
-			client.setSecret(client_secret);
-			try {
-				authorization = oauthManager.grant(client, device_id, device_name);
-			} catch (Exception e) {
-				log.error("Exchange token by client_credentials for \"{}\" failed with {}: {}", client_id,
-						e.getClass().getName(), e.getLocalizedMessage());
-				throw new OAuthError(OAuthError.INVALID_REQUEST, e.getLocalizedMessage());
-			}
-			result.put("access_token", authorization.getAccessToken());
-			result.put("refresh_token", authorization.getRefreshToken());
-			result.put("expires_in", authorization.getExpiresIn());
-		} else if (grant_type == GrantType.refresh_token) {
-			if (refresh_token == null)
-				throw new MissingServletRequestParameterException("refresh_token", String.class.getSimpleName());
-			client = new Client();
-			client.setId(client_id);
-			client.setSecret(client_secret);
-			try {
-				authorization = oauthManager.refresh(client, refresh_token);
-				result.put("access_token", authorization.getAccessToken());
-				result.put("expires_in", authorization.getExpiresIn());
-				result.put("refresh_token", authorization.getRefreshToken());
-			} catch (Exception e) {
-				log.error("Refresh token \"{}\" failed with {}: {}", refresh_token, e.getClass().getName(),
-						e.getLocalizedMessage());
-				throw new OAuthError(OAuthError.INVALID_REQUEST, e.getLocalizedMessage());
-			}
-		} else if (grant_type == GrantType.authorization_code) {
-			if (code == null)
-				throw new MissingServletRequestParameterException("code", String.class.getSimpleName());
-			client = new Client();
-			client.setId(client_id);
-			client.setSecret(client_secret);
-			client.setRedirectUri(redirect_uri);
-			try {
-				authorization = oauthManager.authenticate(code, client);
-				result.put("access_token", authorization.getAccessToken());
-				result.put("expires_in", authorization.getExpiresIn());
-				result.put("refresh_token", authorization.getRefreshToken());
-				eventPublisher.publish(new AuthorizeEvent(authorization.getGrantor(), request.getRemoteAddr(),
-						client.getName(), grant_type.name()), Scope.LOCAL);
-			} catch (Exception e) {
-				log.error("Exchange token by code for \"{}\" failed with {}: {}", code, e.getClass().getName(),
-						e.getLocalizedMessage());
-				throw new OAuthError(OAuthError.INVALID_REQUEST, e.getLocalizedMessage());
-			}
-		} else {
-			throw new OAuthError(OAuthError.UNSUPPORTED_GRANT_TYPE);
-		}
-		return result;
+	@RequestMapping(path = TOKEN_PATH, params = "grant_type=password", method = { RequestMethod.GET,
+			RequestMethod.POST })
+	public Map<String, Object> password(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam String client_id, @RequestParam String client_secret, @RequestParam String username,
+			@RequestParam String password, @RequestParam(required = false) String device_id,
+			@RequestParam(required = false) String device_name) {
+		return exchange(request, response, GrantType.password, client_id, client_secret, username, password, device_id,
+				device_name);
 	}
 
-	@GetMapping(value = "/info")
-	public Map<String, Object> info(@RequestParam String access_token) throws IOException {
-		Map<String, Object> result = new LinkedHashMap<>();
+	@RequestMapping(path = TOKEN_PATH, params = "grant_type=" + GrantType.JWT_BEARER, method = { RequestMethod.GET,
+			RequestMethod.POST })
+	public Map<String, Object> jwt_bear(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam String client_id, @RequestParam String client_secret, @RequestParam String username,
+			@RequestParam String password, @RequestParam(required = false) String device_id,
+			@RequestParam(required = false) String device_name) {
+		if (oauthHandler == null || !oauthHandler.isJwtEnabled())
+			throw new OAuthError(OAuthError.UNSUPPORTED_GRANT_TYPE);
+		return exchange(request, response, GrantType.jwt_bearer, client_id, client_secret, username, password,
+				device_id, device_name);
+	}
+
+	@RequestMapping(path = TOKEN_PATH, params = "grant_type=client_credentials", method = { RequestMethod.GET,
+			RequestMethod.POST })
+	public Map<String, Object> client_credentials(@RequestParam String client_id, @RequestParam String client_secret,
+			@RequestParam(required = false) String device_id, @RequestParam(required = false) String device_name) {
+		Client client = new Client();
+		client.setId(client_id);
+		client.setSecret(client_secret);
+		try {
+			Authorization authorization = oauthManager.grant(client, device_id, device_name);
+			return convert(authorization);
+		} catch (Exception e) {
+			log.error("Exchange token by client_credentials for \"{}\" failed with {}: {}", client_id,
+					e.getClass().getName(), e.getLocalizedMessage());
+			throw new OAuthError(OAuthError.INVALID_REQUEST, e.getLocalizedMessage());
+		}
+	}
+
+	@RequestMapping(path = TOKEN_PATH, params = "grant_type=authorization_code", method = { RequestMethod.GET,
+			RequestMethod.POST })
+	public Map<String, Object> authorization_code(HttpServletRequest request, @RequestParam String client_id,
+			@RequestParam String client_secret, @RequestParam String code,
+			@RequestParam(required = false) String redirect_uri) {
+		Client client = new Client();
+		client.setId(client_id);
+		client.setSecret(client_secret);
+		client.setRedirectUri(redirect_uri);
+		try {
+			Authorization authorization = oauthManager.authenticate(code, client);
+			eventPublisher.publish(new AuthorizeEvent(authorization.getGrantor(), request.getRemoteAddr(),
+					client.getName(), GrantType.authorization_code.name()), Scope.LOCAL);
+			return convert(authorization);
+		} catch (Exception e) {
+			log.error("Exchange token by code for \"{}\" failed with {}: {}", code, e.getClass().getName(),
+					e.getLocalizedMessage());
+			throw new OAuthError(OAuthError.INVALID_REQUEST, e.getLocalizedMessage());
+		}
+	}
+
+	@RequestMapping(path = TOKEN_PATH, params = "grant_type=refresh_token", method = { RequestMethod.GET,
+			RequestMethod.POST })
+	public Map<String, Object> refresh_token(@RequestParam String client_id, @RequestParam String client_secret,
+			@RequestParam String refresh_token) {
+		Client client = new Client();
+		client.setId(client_id);
+		client.setSecret(client_secret);
+		try {
+			Authorization authorization = oauthManager.refresh(client, refresh_token);
+			return convert(authorization);
+		} catch (Exception e) {
+			log.error("Refresh token \"{}\" failed with {}: {}", refresh_token, e.getClass().getName(),
+					e.getLocalizedMessage());
+			throw new OAuthError(OAuthError.INVALID_REQUEST, e.getLocalizedMessage());
+		}
+	}
+
+	@RequestMapping(path = TOKEN_PATH, method = { RequestMethod.GET, RequestMethod.POST })
+	public void unsupported(@RequestParam GrantType grant_type) {
+		throw new OAuthError(OAuthError.UNSUPPORTED_GRANT_TYPE);
+	}
+
+	@GetMapping(path = "/info")
+	public Map<String, Object> info(@RequestParam String access_token) {
 		Authorization authorization = oauthManager.retrieve(access_token);
 		if (authorization == null) {
 			throw new OAuthError(OAuthError.INVALID_TOKEN);
 		} else if (authorization.getExpiresIn() < 0) {
 			throw new OAuthError(OAuthError.INVALID_TOKEN, OAuthError.ERROR_EXPIRED_TOKEN);
 		} else {
+			Map<String, Object> result = new LinkedHashMap<>();
 			if (authorization.getClient() != null)
 				result.put("client_id", authorization.getClient());
 			if (authorization.getGrantor() != null)
@@ -204,21 +173,21 @@ public class OAuth2Controller {
 			result.put("expires_in", authorization.getExpiresIn());
 			if (authorization.getScope() != null)
 				result.put("scope", authorization.getScope());
+			return result;
 		}
-		return result;
 	}
 
-	@RequestMapping(value = "/revoke", method = { RequestMethod.GET, RequestMethod.POST })
-	public void revoke(@RequestParam String access_token) throws IOException {
+	@RequestMapping(path = "/revoke", method = { RequestMethod.GET, RequestMethod.POST })
+	public void revoke(@RequestParam String access_token) {
 		boolean revoked = oauthManager.revoke(access_token);
 		if (!revoked) {
 			throw new OAuthError(OAuthError.INVALID_REQUEST, OAuthError.ERROR_REVOKE_FAILED);
 		}
 	}
 
-	@RequestMapping(value = "/sendVerificationCode", method = { RequestMethod.GET, RequestMethod.POST })
+	@RequestMapping(path = "/sendVerificationCode", method = { RequestMethod.GET, RequestMethod.POST })
 	public Map<String, Object> sendVerificationCode(@RequestParam String client_id, @RequestParam String client_secret,
-			@RequestParam String username) throws IOException {
+			@RequestParam String username) {
 		Map<String, Object> result = null;
 		if (verificationManager == null) {
 			result = new LinkedHashMap<>();
@@ -243,6 +212,61 @@ public class OAuth2Controller {
 					e.getLocalizedMessage());
 			throw new OAuthError(OAuthError.INVALID_REQUEST, e.getLocalizedMessage());
 		}
+		return result;
+	}
+
+	private Map<String, Object> exchange(HttpServletRequest request, HttpServletResponse response, GrantType grant_type,
+			String client_id, String client_secret, String username, String password, String device_id,
+			String device_name) {
+		Client client = oauthManager.findClientById(client_id);
+		if (client == null)
+			throw new OAuthError(OAuthError.INVALID_CLIENT, OAuthError.ERROR_CLIENT_ID_NOT_EXISTS);
+		if (!client.getSecret().equals(client_secret))
+			throw new OAuthError(OAuthError.INVALID_CLIENT, OAuthError.ERROR_CLIENT_SECRET_MISMATCH);
+		try {
+			UsernamePasswordAuthenticationToken attempt = new UsernamePasswordAuthenticationToken(username, password);
+			attempt.setDetails(authenticationDetailsSource.buildDetails(request));
+			try {
+				Authentication authResult = authenticationManager.authenticate(attempt);
+				if (authResult != null)
+					authenticationSuccessHandler.onAuthenticationSuccess(request, response, authResult);
+			} catch (InternalAuthenticationServiceException failed) {
+				throw new IllegalArgumentException(ExceptionUtils.getRootMessage(failed));
+			} catch (AuthenticationException failed) {
+				authenticationFailureHandler.onAuthenticationFailure(request, response, failed);
+				throw new IllegalArgumentException(I18N.getText(failed.getClass().getName()), failed);
+			}
+			UserDetails ud = userDetailsService.loadUserByUsername(username);
+			eventPublisher.publish(
+					new AuthorizeEvent(ud.getUsername(), request.getRemoteAddr(), client.getName(), grant_type.name()),
+					Scope.LOCAL);
+			if (grant_type == GrantType.jwt_bearer) {
+				Map<String, Object> result = new LinkedHashMap<>();
+				int expiresIn = oauthHandler.getJwtExpiresIn();
+				String jwt = Jwt.createWithSubject(ud.getUsername(), ud.getPassword(), expiresIn);
+				result.put("access_token", jwt);
+				if (expiresIn > 0)
+					result.put("expires_in", expiresIn);
+				return result;
+			} else {
+				Authorization authorization = oauthManager.grant(client, ud.getUsername(), device_id, device_name);
+				return convert(authorization);
+			}
+		} catch (Exception e) {
+			if (e.getCause() instanceof AuthenticationException)
+				log.error("Exchange token by password for \"{}\" failed with {}: {}", username, e.getClass().getName(),
+						e.getLocalizedMessage());
+			else
+				log.error(e.getMessage(), e);
+			throw new OAuthError(OAuthError.INVALID_REQUEST, e.getLocalizedMessage());
+		}
+	}
+
+	private Map<String, Object> convert(Authorization authorization) {
+		Map<String, Object> result = new LinkedHashMap<>();
+		result.put("access_token", authorization.getAccessToken());
+		result.put("refresh_token", authorization.getRefreshToken());
+		result.put("expires_in", authorization.getExpiresIn());
 		return result;
 	}
 

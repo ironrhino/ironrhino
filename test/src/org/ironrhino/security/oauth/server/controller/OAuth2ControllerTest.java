@@ -16,7 +16,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Locale;
 
-import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.security.jwt.Jwt;
 import org.ironrhino.core.security.verfication.VerificationManager;
@@ -36,9 +35,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.format.support.DefaultFormattingConversionService;
-import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -340,28 +336,6 @@ public class OAuth2ControllerTest {
 
 	@EnableWebMvc
 	static class OAuth2Configuration extends AbstractMockMvcConfigurer {
-
-		@Bean
-		public FormattingConversionService mvcConversionService() {
-			DefaultFormattingConversionService defaultFormattingConversionService = new DefaultFormattingConversionService();
-			defaultFormattingConversionService.addConverter(new Converter<String, GrantType>() {
-
-				@Override
-				public GrantType convert(String input) {
-					if (StringUtils.isBlank(input))
-						return null;
-					try {
-						return GrantType.valueOf(input);
-					} catch (IllegalArgumentException e) {
-						if (input.equals(GrantType.JWT_BEARER))
-							return GrantType.jwt_bearer;
-						throw e;
-					}
-				}
-
-			});
-			return defaultFormattingConversionService;
-		}
 
 		@Bean
 		@Override
