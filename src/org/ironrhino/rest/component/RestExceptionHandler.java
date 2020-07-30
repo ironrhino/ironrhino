@@ -22,7 +22,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -63,11 +62,10 @@ public class RestExceptionHandler {
 				|| ex instanceof IllegalArgumentException) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID, ex.getMessage());
-		} else if (ex instanceof BindException || ex instanceof MethodArgumentNotValidException) {
+		} else if (ex instanceof BindException) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			RestStatus rs = RestStatus.valueOf(RestStatus.CODE_FIELD_INVALID);
-			BindingResult bindingResult = ex instanceof BindException ? (BindException) ex
-					: ((MethodArgumentNotValidException) ex).getBindingResult();
+			BindingResult bindingResult = ((BindException) ex).getBindingResult();
 			List<String> messages = new ArrayList<>();
 			if (bindingResult.hasGlobalErrors())
 				for (ObjectError oe : bindingResult.getGlobalErrors()) {
