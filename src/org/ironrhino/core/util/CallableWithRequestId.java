@@ -12,8 +12,13 @@ public class CallableWithRequestId<V> implements Callable<V> {
 
 	@Override
 	public V call() throws Exception {
-		CodecUtils.putRequestIdIfAbsent();
-		return delegate.call();
+		boolean requestIdGenerated = CodecUtils.putRequestIdIfAbsent();
+		try {
+			return delegate.call();
+		} finally {
+			if (requestIdGenerated)
+				CodecUtils.removeRequestId();
+		}
 	}
 
 }
