@@ -13,14 +13,12 @@ public class CounterUtils {
 	}
 
 	public static int incrementAndGet(AtomicInteger counter, int mod) {
-		int current, next;
-		do {
-			current = counter.get();
-			next = ((current != Integer.MAX_VALUE ? current : -1) + 1) % mod;
+		return counter.updateAndGet(prev -> {
+			int next = ((prev != Integer.MAX_VALUE ? prev : -1) + 1) % mod;
 			if (next < 0)
 				next += mod;
-		} while (!counter.compareAndSet(current, next));
-		return next;
+			return next;
+		});
 	}
 
 }
