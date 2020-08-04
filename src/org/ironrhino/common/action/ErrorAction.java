@@ -59,7 +59,8 @@ public class ErrorAction extends ActionSupport {
 		HttpServletResponse response = ServletActionContext.getResponse();
 		String result = BaseAction.NOTFOUND;
 		int errorcode = 404;
-		if (request.getDispatcherType() == DispatcherType.ERROR) {
+		if (request.getDispatcherType() == DispatcherType.ERROR
+				|| request.getDispatcherType() == DispatcherType.FORWARD) {
 			exception = (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 			if (exception instanceof ErrorMessage) {
 				response.setStatus(HttpServletResponse.SC_OK);
@@ -99,10 +100,8 @@ public class ErrorAction extends ActionSupport {
 			}
 			switch (errorcode) {
 			case HttpServletResponse.SC_UNAUTHORIZED:
-				result = BaseAction.ACCESSDENIED;
-				break;
 			case HttpServletResponse.SC_FORBIDDEN:
-				result = ERROR;
+				result = BaseAction.ACCESSDENIED;
 				break;
 			case HttpServletResponse.SC_NOT_FOUND:
 				result = BaseAction.NOTFOUND;
