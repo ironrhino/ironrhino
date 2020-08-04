@@ -287,6 +287,18 @@ public class BeanUtilsTest {
 		assertThat(BeanUtils.getPropertyDescriptor(User.class, "team"), notNullValue());
 		assertThat(BeanUtils.getPropertyDescriptor(User.class, "team.owner.id"), notNullValue());
 	}
+	
+	@Test
+	public void testGetPropertyType() {
+		assertThat(BeanUtils.getPropertyType(Team2.class, "none"), nullValue());
+		assertThat(BeanUtils.getPropertyType(Team2.class, "team.none"), nullValue());
+		assertThat(BeanUtils.getPropertyType(Team2.class, "name"), equalTo(String.class));
+		assertThat(BeanUtils.getPropertyType(Team2.class, "owner"), equalTo(User2.class));
+		assertThat(BeanUtils.getPropertyType(Team2.class, "owner.username"), equalTo(String.class));
+		assertThat(BeanUtils.getPropertyType(Team2.class, "users[0]"), equalTo(User2.class));
+		assertThat(BeanUtils.getPropertyType(Team2.class, "users[0].username"), equalTo(String.class));
+	}
+
 
 	@Test
 	public void testSetPropertyValue() {

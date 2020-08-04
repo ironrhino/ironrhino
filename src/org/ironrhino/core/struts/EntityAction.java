@@ -84,6 +84,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.InvalidPropertyException;
+import org.springframework.beans.NullValueInNestedPathException;
 import org.springframework.beans.PropertyAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -747,7 +748,21 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			String propertyName = parameterName;
 			if (propertyName.startsWith(getEntityName() + "."))
 				propertyName = propertyName.substring(propertyName.indexOf('.') + 1);
-			if (propertyName.indexOf('.') > 0) {
+			if (propertyName.indexOf('[') > 0
+					&& editablePropertyNames.contains(propertyName.substring(0, propertyName.indexOf('[')))) {
+				// entity.list[0].name
+				String parameterValue = ServletActionContext.getRequest().getParameter(parameterName);
+				Class type = BeanUtils.getPropertyType(bw.getRootClass(), propertyName);
+				if (Persistable.class.isAssignableFrom(type)) {
+					BeanWrapperImpl bw2 = new BeanWrapperImpl(type);
+					bw2.setConversionService(conversionService);
+					safeSetPropertyValue(bw2, "id", parameterValue);
+					safeSetPropertyValue(bw, propertyName,
+							getEntityManager(type).get((Serializable) bw2.getPropertyValue("id")));
+				} else {
+					safeSetPropertyValue(bw, propertyName, parameterValue);
+				}
+			} else if (propertyName.indexOf('.') > 0) {
 				String subPropertyName = propertyName.substring(propertyName.indexOf('.') + 1);
 				propertyName = propertyName.substring(0, propertyName.indexOf('.'));
 				if (editablePropertyNames.contains(propertyName)) {
@@ -1995,6 +2010,24 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			bw.setPropertyValue(name, value);
 		} catch (PropertyAccessException e) {
 			logger.error(e.getMessage(), e);
+		} catch (InvalidPropertyException e) {
+			Throwable cause = e.getCause();
+			if (cause instanceof NullValueInNestedPathException) {
+				BeanUtils.createParentIfNull(bw.getRootInstance(), name);
+				safeSetPropertyValue(bw, name, value);
+				return;
+			}
+			if (cause instanceof IndexOutOfBoundsException) {
+				int index = Integer.parseInt(name.substring(name.lastIndexOf('[') + 1, name.lastIndexOf(']')));
+				if (index <= autoGrowCollectionLimit) {
+					Collection coll = (Collection) bw.getPropertyValue(name.substring(0, name.lastIndexOf('[')));
+					coll.add(org.springframework.beans.BeanUtils.instantiateClass(
+							BeanUtils.getPropertyType(bw.getRootClass(), name.substring(0, name.lastIndexOf(']')))));
+					safeSetPropertyValue(bw, name, value);
+					return;
+				}
+			}
+			logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -2003,5 +2036,12 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	@Inject
 	private FreemarkerManager freemarkerManager;
+
+	private int autoGrowCollectionLimit = 255;
+
+	@Inject(value = "xwork.autoGrowCollectionLimit", required = false)
+	public void setAutoGrowCollectionLimit(String value) {
+		this.autoGrowCollectionLimit = Integer.parseInt(value);
+	}
 
 }

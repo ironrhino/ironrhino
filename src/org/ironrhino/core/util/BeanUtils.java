@@ -3,10 +3,12 @@ package org.ironrhino.core.util;
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -153,6 +155,31 @@ public class BeanUtils {
 		return bw.getPropertyValue(propertyName);
 	}
 
+	public static Class<?> getPropertyType(Class<?> beanClass, String propertyName) {
+		if (beanClass == null || propertyName == null)
+			return null;
+		if (propertyName.indexOf('.') == -1) {
+			int index = propertyName.indexOf('[');
+			if (index < 0) {
+				PropertyDescriptor pd = org.springframework.beans.BeanUtils.getPropertyDescriptor(beanClass,
+						propertyName);
+				return pd != null ? pd.getPropertyType() : null;
+			} else {
+				Method m = org.springframework.beans.BeanUtils
+						.getPropertyDescriptor(beanClass, propertyName.substring(0, index)).getReadMethod();
+				Type type = m.getGenericReturnType();
+				if (type instanceof ParameterizedType) {
+					type = ((ParameterizedType) type).getActualTypeArguments()[0];
+					if (type instanceof Class)
+						return (Class<?>) type;
+				}
+				return m.getReturnType();
+			}
+		}
+		return getPropertyType(getPropertyType(beanClass, propertyName.substring(0, propertyName.indexOf('.'))),
+				propertyName.substring(propertyName.indexOf('.') + 1));
+	}
+
 	public static PropertyDescriptor getPropertyDescriptor(Class<?> beanClass, String propertyName) {
 		if (propertyName.indexOf('.') == -1)
 			return org.springframework.beans.BeanUtils.getPropertyDescriptor(beanClass, propertyName);
@@ -256,14 +283,22 @@ public class BeanUtils {
 			}
 			Class<?> type = pd.getPropertyType();
 			Object value;
-			if (Map.class.isAssignableFrom(type))
-				value = new HashMap<>();
-			else if (Set.class.isAssignableFrom(type))
+			if (Map.class.isAssignableFrom(type)) {
 				value = new LinkedHashMap<>();
-			else if (Collection.class.isAssignableFrom(type))
-				value = new ArrayList<>();
-			else
+			} else if (Collection.class.isAssignableFrom(type)) {
+				Collection<Object> coll = Set.class.isAssignableFrom(type) ? new LinkedHashSet<>() : new ArrayList<>();
+				if (nestedPath.endsWith("[0]")) {
+					Type returnType = pd.getReadMethod().getGenericReturnType();
+					if (returnType instanceof ParameterizedType) {
+						Type t = ((ParameterizedType) returnType).getActualTypeArguments()[0];
+						if (t instanceof Class)
+							coll.add(org.springframework.beans.BeanUtils.instantiateClass((Class<?>) t));
+					}
+				}
+				value = coll;
+			} else {
 				value = org.springframework.beans.BeanUtils.instantiateClass(type);
+			}
 			bw.setPropertyValue(s, value);
 			if (end < 0)
 				break;
