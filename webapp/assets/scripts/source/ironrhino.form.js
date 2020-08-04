@@ -265,6 +265,8 @@ Observation.form = function(container) {
 	$$(':input.conjunct', container).on('conjunct', function() {
 		var t = $(this);
 		var f = $(this).closest('form');
+		if (!f.length)
+			return;
 		var data = {};
 		var url = f.formAction();
 		if (url.indexOf('/') > -1) {
