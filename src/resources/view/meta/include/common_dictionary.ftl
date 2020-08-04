@@ -10,7 +10,7 @@
 			<#local items = dictionary.items/>
 			<#if !dictionary.groupable>
 				<#list items as lv>
-				<option value="${lv.value}"<#if value?has_content&&(!value?is_sequence&&value?string==lv.value||value?is_sequence&&value?seq_contains(lv.value))><#local exists=true> selected="selected"</#if>>${lv.label?has_content?then(lv.label,lv.value!)}</option><#lt>
+				<option value="${lv.value}"<#if value?has_content&&(!value?is_sequence&&value?string==lv.value||value?is_sequence&&value?seq_contains(lv.value))><#local exists=true> selected</#if>>${lv.label?has_content?then(lv.label,lv.value!)}</option><#lt>
 				</#list>
 			<#else>
 				<#local group = ""/>
@@ -30,7 +30,7 @@
 							</#if>
 						</#if>
 					<#else>
-						<option value="${lv.value}"<#if value?string==lv.value><#local exists=true> selected="selected"</#if>>${lv.label?has_content?then(lv.label,lv.value!)}</option><#lt>
+						<option value="${lv.value}"<#if value?string==lv.value><#local exists=true> selected</#if>>${lv.label?has_content?then(lv.label,lv.value!)}</option><#lt>
 						<#if group?has_content && !lv?has_next>
 						</optgroup><#lt>
 						</#if>
@@ -41,10 +41,10 @@
 		<#if !exists&&value?has_content>
 		<#if value?is_sequence>
 			<#list value as v>
-			<option value="${v}"selected="selected">${v}</option><#lt>
+			<option value="${v}" selected>${v}</option><#lt>
 			</#list>
 		<#else>
-			<option value="${value}"selected="selected">${value}</option><#lt>
+			<option value="${value}" selected>${value}</option><#lt>
 		</#if>
 		</#if>
 	</select><#lt>
