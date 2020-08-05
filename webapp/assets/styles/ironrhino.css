@@ -10363,7 +10363,7 @@ th.radio input[type="radio"] , th.checkbox input[type="checkbox"] , td.radio inp
 	margin: 0;
 }
 
-input.integer , input.long , input.double , input.date , input.datetime , input.time , input.yearmonth {
+input.integer , input.long , input.double , input.date , input.datetime , input.time , input.yearmonth , input.monthday {
 	font-family: Arial;
 }
 
@@ -10387,7 +10387,7 @@ input.datetime {
 	width: 125px ! important;
 }
 
-input.time , input.yearmonth {
+input.time , input.yearmonth , input.monthday {
 	width: 50px ! important;
 }
 

@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.MonthDay;
 import java.time.OffsetDateTime;
 import java.time.YearMonth;
 import java.time.ZonedDateTime;
@@ -539,7 +540,7 @@ public class EntityClassHelper {
 							}
 						}
 					} else if (Date.class.isAssignableFrom(returnType)
-							|| java.time.temporal.Temporal.class.isAssignableFrom(returnType)) {
+							|| java.time.temporal.TemporalAccessor.class.isAssignableFrom(returnType)) {
 						String temporalType = "date";
 						if (Date.class.isAssignableFrom(returnType)) {
 							Temporal temporal = findAnnotation(readMethod, declaredField, Temporal.class);
@@ -552,8 +553,11 @@ public class EntityClassHelper {
 							temporalType = returnType == Duration.class ? "duration"
 									: returnType == LocalTime.class ? "time"
 											: (returnType == LocalDateTime.class || returnType == ZonedDateTime.class
-													|| returnType == OffsetDateTime.class) ? "datetime"
-															: returnType == YearMonth.class ? "yearmonth" : "date";
+													|| returnType == OffsetDateTime.class)
+															? "datetime"
+															: returnType == YearMonth.class ? "yearmonth"
+																	: returnType == MonthDay.class ? "monthday"
+																			: "date";
 						}
 						uci.addCssClass(temporalType);
 						// uci.setInputType(temporalType);

@@ -1,5 +1,6 @@
 package org.ironrhino.sample.crud;
 
+import java.time.MonthDay;
 import java.time.YearMonth;
 
 import javax.persistence.Column;
@@ -50,6 +51,10 @@ public class Employee implements Persistable<String> {
 	@Column(length = 7)
 	@PastOrPresent
 	private YearMonth since;
+
+	@UiConfig(width = "120px", alias = "生日")
+	@Column(length = 7)
+	private MonthDay birthday;
 
 	@Lob
 	@UiConfig(type = "textarea")

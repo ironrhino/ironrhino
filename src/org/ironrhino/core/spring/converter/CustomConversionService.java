@@ -19,6 +19,7 @@ public class CustomConversionService extends DefaultConversionService {
 		addConverter(new ZonedDateTimeConverter());
 		addConverter(new OffsetDateTimeConverter());
 		addConverter(new YearMonthConverter());
+		addConverter(new MonthDayConverter());
 		addConverter(new DurationConverter());
 		addConverter(new EnumToEnumConverter());
 		addConverter(new SerializableToSerializableConverter());

@@ -101,8 +101,9 @@ Richtable = {
 											|| $(this).hasClass('date')
 											|| $(this).hasClass('datetime')
 											|| $(this).hasClass('time')
-											|| $(this).hasClass('yearmonth') || $(this)
-											.is('button'));
+											|| $(this).hasClass('yearmonth')
+											|| $(this).hasClass('monthday') 
+											|| $(this).is('button'));
 						}).eq(0).focus();
 					if (!inputform.hasClass('keepopen')
 							&& !inputform.hasClass('richtable')) {
@@ -507,7 +508,7 @@ Richtable = {
 						Richtable.updateCell(this);
 				});
 		if (type == 'date' || type == 'datetime' || type == 'time'
-				|| type == 'yearmonth') {
+				|| type == 'yearmonth' || type == 'monthday') {
 			var option = {
 				language : MessageBundle.lang().replace('_', '-')
 			};
@@ -518,6 +519,11 @@ Richtable = {
 				option.pickDate = false;
 			} else if (type == 'yearmonth') {
 				option.format = input.data('format') || 'yyyy-MM';
+				option.minViewMode = 'months';
+				option.viewMode = 'months';
+				option.pickTime = false;
+			} else if (type == 'monthday') {
+				option.format = input.data('format') || '--MM-dd';
 				option.pickTime = false;
 			} else {
 				option.format = input.data('format') || 'yyyy-MM-dd';

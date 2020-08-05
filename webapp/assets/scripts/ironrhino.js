@@ -36892,7 +36892,7 @@ Observation.form = function(container) {
 							t.attr('maxlength', '19');
 						else if (t.hasClass('time'))
 							t.attr('maxlength', '8');
-						else if (t.hasClass('yearmonth'))
+						else if (t.hasClass('yearmonth') || t.hasClass('monthday'))
 							t.attr('maxlength', '7');
 						else if (t.hasClass('integer'))
 							t.attr('maxlength', t.hasClass('positive')
@@ -37106,7 +37106,7 @@ Observation.form = function(container) {
 							});
 		});
 	if (typeof $.fn.datetimepicker != 'undefined')
-		$$('input.date,input.datetime,input.time,input.yearmonth', container)
+		$$('input.date,input.datetime,input.time,input.yearmonth,input.monthday', container)
 				.not('[readonly]').not('[disabled]').each(function() {
 					var t = $(this);
 					var option = {
@@ -37122,6 +37122,9 @@ Observation.form = function(container) {
 						option.format = t.data('format') || 'yyyy-MM';
 						option.minViewMode = 'months';
 						option.viewMode = 'months';
+						option.pickTime = false;
+					} else if (t.hasClass('monthday')) {
+						option.format = t.data('format') || '--MM-dd';
 						option.pickTime = false;
 					} else {
 						option.format = t.data('format') || 'yyyy-MM-dd';
@@ -38579,8 +38582,9 @@ Richtable = {
 											|| $(this).hasClass('date')
 											|| $(this).hasClass('datetime')
 											|| $(this).hasClass('time')
-											|| $(this).hasClass('yearmonth') || $(this)
-											.is('button'));
+											|| $(this).hasClass('yearmonth')
+											|| $(this).hasClass('monthday') 
+											|| $(this).is('button'));
 						}).eq(0).focus();
 					if (!inputform.hasClass('keepopen')
 							&& !inputform.hasClass('richtable')) {
@@ -38985,7 +38989,7 @@ Richtable = {
 						Richtable.updateCell(this);
 				});
 		if (type == 'date' || type == 'datetime' || type == 'time'
-				|| type == 'yearmonth') {
+				|| type == 'yearmonth' || type == 'monthday') {
 			var option = {
 				language : MessageBundle.lang().replace('_', '-')
 			};
@@ -38996,6 +39000,11 @@ Richtable = {
 				option.pickDate = false;
 			} else if (type == 'yearmonth') {
 				option.format = input.data('format') || 'yyyy-MM';
+				option.minViewMode = 'months';
+				option.viewMode = 'months';
+				option.pickTime = false;
+			} else if (type == 'monthday') {
+				option.format = input.data('format') || '--MM-dd';
 				option.pickTime = false;
 			} else {
 				option.format = input.data('format') || 'yyyy-MM-dd';
