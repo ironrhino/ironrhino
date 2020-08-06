@@ -165,6 +165,22 @@ public class ExpressionUtilsTest {
 		result = ExpressionUtils.evalList("${string}", context);
 		assertThat(result.size(), equalTo(1));
 		assertThat(result.get(0), equalTo("STRING"));
+
+		result = ExpressionUtils.evalList("${[string+'1']}", context);
+		assertThat(result.size(), equalTo(1));
+		assertThat(result.get(0), equalTo("STRING1"));
+		result = ExpressionUtils.evalList("${[string+'1',string+'2']}", context);
+		assertThat(result.size(), equalTo(2));
+		assertThat(result.get(0), equalTo("STRING1"));
+		assertThat(result.get(1), equalTo("STRING2"));
+
+		result = ExpressionUtils.evalList("${{string+'1'}}", context);
+		assertThat(result.size(), equalTo(1));
+		assertThat(result.get(0), equalTo("STRING1"));
+		result = ExpressionUtils.evalList("${{string+'1',string+'2'}}", context);
+		assertThat(result.size(), equalTo(2));
+		assertThat(result.get(0), equalTo("STRING1"));
+		assertThat(result.get(1), equalTo("STRING2"));
 	}
 
 }

@@ -16,7 +16,9 @@ public class ExpressionUtils {
 	public static Object evalExpression(String expression, Map<String, ?> context) {
 		if (StringUtils.isBlank(expression))
 			return expression;
-		if (expression.indexOf(';') > 0) // SPEL doesn't supports ';' as delimiter
+		if (expression.indexOf(';') > 0 || expression.indexOf('[') > -1)
+			// SPEL doesn't supports ';' as delimiter
+			// SPEL use '{}' instead of '[]' as inline list
 			return ExpressionEngine.MVEL.evalExpression(expression, context);
 		try {
 			return ExpressionEngine.SPEL.evalExpression(expression, context);
@@ -36,8 +38,10 @@ public class ExpressionUtils {
 			return template;
 		int start = template.indexOf('{');
 		int end = template.indexOf('}');
-		int index = template.indexOf(';');
-		if (index > start && index < end || template.contains("@{") || template.contains("@if{"))
+		int index1 = template.indexOf(';');
+		int index2 = template.indexOf('[');
+		if (index1 > start && index1 < end || index2 > start && index2 < end || template.contains("@{")
+				|| template.contains("@if{"))
 			return ExpressionEngine.MVEL.eval(template, context);
 		try {
 			return ExpressionEngine.SPEL.eval(template, context);
