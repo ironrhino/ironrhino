@@ -45,6 +45,7 @@ public class JettyLauncher {
 		Configuration.ClassList classlist = Configuration.ClassList.setServerDefault(server);
 		classlist.addBefore(JettyWebXmlConfiguration.class.getName(), AnnotationConfiguration.class.getName());
 		WebAppContext context = new WebAppContext();
+		context.getSessionHandler().setSessionCookie("$IAMNOTEXIST$"); // override JSESSIONID
 		String webInfoJarPattern = System.getProperty(WebInfConfiguration.WEBINF_JAR_PATTERN);
 		if (webInfoJarPattern == null)
 			webInfoJarPattern = ".*/ironrhino-[^/]*\\.jar$";
