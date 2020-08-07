@@ -4,17 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URL;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
+import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.SessionIdManager;
 import org.eclipse.jetty.server.handler.StatisticsHandler;
-import org.eclipse.jetty.server.session.HouseKeeper;
-import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.DefaultServlet;
+import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
+import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHandler.Default404Servlet;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.JettyWebXmlConfiguration;
@@ -41,11 +38,10 @@ public class JettyLauncher {
 		File tempDir = getTempDirectory(port);
 		tempDir.mkdirs();
 		Server server = new Server(port);
-		server.setSessionIdManager(new DummySessionIdManager());
 		Configuration.ClassList classlist = Configuration.ClassList.setServerDefault(server);
 		classlist.addBefore(JettyWebXmlConfiguration.class.getName(), AnnotationConfiguration.class.getName());
-		WebAppContext context = new WebAppContext();
-		context.getSessionHandler().setSessionCookie("$IAMNOTEXIST$"); // override JSESSIONID
+		WebAppContext context = new WebAppContext(null, new ConstraintSecurityHandler(), new ServletHandler(),
+				new ErrorPageErrorHandler());
 		String webInfoJarPattern = System.getProperty(WebInfConfiguration.WEBINF_JAR_PATTERN);
 		if (webInfoJarPattern == null)
 			webInfoJarPattern = ".*/ironrhino-[^/]*\\.jar$";
@@ -96,109 +92,6 @@ public class JettyLauncher {
 			}
 		}
 		return false;
-	}
-
-	static class DummySessionIdManager implements SessionIdManager {
-
-		@Override
-		public void start() throws Exception {
-		}
-
-		@Override
-		public void stop() throws Exception {
-		}
-
-		@Override
-		public boolean isRunning() {
-			return false;
-		}
-
-		@Override
-		public boolean isStarted() {
-			return false;
-		}
-
-		@Override
-		public boolean isStarting() {
-			return false;
-		}
-
-		@Override
-		public boolean isStopping() {
-			return false;
-		}
-
-		@Override
-		public boolean isStopped() {
-			return false;
-		}
-
-		@Override
-		public boolean isFailed() {
-			return false;
-		}
-
-		@Override
-		public void addLifeCycleListener(Listener listener) {
-		}
-
-		@Override
-		public void removeLifeCycleListener(Listener listener) {
-		}
-
-		@Override
-		public boolean isIdInUse(String id) {
-			return false;
-		}
-
-		@Override
-		public void expireAll(String id) {
-		}
-
-		@Override
-		public void invalidateAll(String id) {
-		}
-
-		@Override
-		public String newSessionId(HttpServletRequest request, long created) {
-			return null;
-		}
-
-		@Override
-		public String getWorkerName() {
-			return null;
-		}
-
-		@Override
-		public String getId(String extendedId) {
-			return null;
-		}
-
-		@Override
-		public String getExtendedId(String clusterId, HttpServletRequest request) {
-			return null;
-		}
-
-		@Override
-		public String renewSessionId(String oldClusterId, String oldNodeId, HttpServletRequest request) {
-			return null;
-		}
-
-		@Override
-		public Set<SessionHandler> getSessionHandlers() {
-			return null;
-		}
-
-		@Override
-		public void setSessionHouseKeeper(HouseKeeper houseKeeper) {
-
-		}
-
-		@Override
-		public HouseKeeper getSessionHouseKeeper() {
-			return null;
-		}
-
 	}
 
 }
