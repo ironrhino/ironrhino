@@ -64,7 +64,7 @@ public class HttpSender extends ThriftSender {
 		HttpPost post = new HttpPost(collectorUrl);
 		post.setEntity(new ByteArrayEntity(bytes, CONTENT_TYPE_THRIFT));
 		try (CloseableHttpResponse response = httpClient.execute(post)) {
-			if (response.getStatusLine().getStatusCode() != 200) {
+			if (response.getStatusLine().getStatusCode() >= 300) {
 				String responseBody;
 				try {
 					responseBody = EntityUtils.toString(response.getEntity());
