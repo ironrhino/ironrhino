@@ -13,6 +13,7 @@ import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHandler.Default404Servlet;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.JettyWebXmlConfiguration;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -38,6 +39,7 @@ public class JettyLauncher {
 		File tempDir = getTempDirectory(port);
 		tempDir.mkdirs();
 		Server server = new Server(port);
+		server.addBean(new QueuedThreadPool(Integer.getInteger("jetty.maxThreads", 200)));
 		Configuration.ClassList classlist = Configuration.ClassList.setServerDefault(server);
 		classlist.addBefore(JettyWebXmlConfiguration.class.getName(), AnnotationConfiguration.class.getName());
 		WebAppContext context = new WebAppContext(null, new ConstraintSecurityHandler(), new ServletHandler(),
@@ -59,10 +61,8 @@ public class JettyLauncher {
 			System.setProperty("executable-war", warUrl.getPath());
 		}
 		context.setTempDirectory(tempDir);
-		context.addServlet(Default404Servlet.class, "*.class");
-		context.addServlet(Default404Servlet.class, "/BOOT-INF/*");
+		context.addServlet(context.addServlet(Default404Servlet.class, "*.class"), "/BOOT-INF/*");
 		context.setServer(server);
-
 		StatisticsHandler statisticsHandler = new StatisticsHandler();
 		statisticsHandler.setHandler(context);
 		server.setHandler(statisticsHandler);
