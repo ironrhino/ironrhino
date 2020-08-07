@@ -227,7 +227,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 		String actionName = arr[1];
 		String actionClass = arr[2];
 		String packageName;
-		if (!"".equals(namespace)) {
+		if (!namespace.isEmpty()) {
 			packageName = namespace.substring(1);
 			packageName = packageName.replace('/', '_');
 		} else {

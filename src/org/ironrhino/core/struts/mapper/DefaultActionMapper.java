@@ -94,7 +94,7 @@ public class DefaultActionMapper extends AbstractActionMapper {
 			if (uri.startsWith(ns)) {
 				if (namespace == null || (namespace != null && ns.length() >= namespace.length())) {
 					String temp = uri.substring(ns.length());
-					if ("".equals(temp) || "/".equals(temp)) {
+					if (temp.isEmpty() || "/".equals(temp)) {
 						if (uri.endsWith("/")) {
 							name = DEFAULT_ACTION_NAME;
 							namespace = ns;

@@ -155,7 +155,7 @@ public class RequestUtils {
 	public static void saveCookie(HttpServletRequest request, HttpServletResponse response, String cookieName,
 			String cookieValue, int maxAge, boolean global, boolean httpOnly) {
 		String domain = null;
-		String path = "".equals(request.getContextPath()) ? "/" : request.getContextPath();
+		String path = request.getContextPath().isEmpty() ? "/" : request.getContextPath();
 		if (global) {
 			domain = getDomainRoot(request.getServerName());
 			path = "/";
@@ -184,8 +184,8 @@ public class RequestUtils {
 
 	public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String cookieName,
 			boolean global) {
-		deleteCookie(request, response, cookieName,
-				"".equals(request.getContextPath()) ? "/" : request.getContextPath(), global);
+		deleteCookie(request, response, cookieName, request.getContextPath().isEmpty() ? "/" : request.getContextPath(),
+				global);
 	}
 
 	public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String cookieName,

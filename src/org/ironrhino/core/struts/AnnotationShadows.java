@@ -236,7 +236,7 @@ public class AnnotationShadows {
 		}
 
 		public boolean isDefaultOptions() {
-			return !value && "".equals(expression) && !deletable;
+			return !value && expression.isEmpty() && !deletable;
 		}
 
 	}
@@ -264,7 +264,7 @@ public class AnnotationShadows {
 		}
 
 		public boolean isDefaultOptions() {
-			return !value && "".equals(expression);
+			return !value && expression.isEmpty();
 		}
 
 	}
