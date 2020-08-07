@@ -200,7 +200,7 @@ public class AccessFilter implements Filter {
 					response.setHeader(HTTP_HEADER_REQUEST_ID, requestId);
 					requestChain = requestId.substring(14);
 				}
-				if (sessionId != null && !requestId.startsWith(sessionId + '.'))
+				if (requestId.indexOf('.') < 0 && sessionId != null)
 					requestId = new StringBuilder(sessionId).append('.').append(requestId).toString();
 				request.setAttribute(HTTP_HEADER_REQUEST_ID, requestId);
 			}
