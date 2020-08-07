@@ -30,7 +30,7 @@ public class JettyLauncher {
 		if (port == -1) {
 			port = 8080;
 			if (System.getenv("CONTAINER") == null) {
-				while (getTempDirectory(port).exists() || !available(port))
+				while (getTempDirectory(port).exists() || !isAvailable(port))
 					port++;
 				System.setProperty("port.http", String.valueOf(port));
 			}
@@ -75,23 +75,12 @@ public class JettyLauncher {
 		return new File(new File(System.getProperty("user.home")), ".jetty" + port);
 	}
 
-	private static boolean available(int port) {
-		ServerSocket ss = null;
-		try {
-			ss = new ServerSocket(port);
-			ss.setReuseAddress(true);
+	private static boolean isAvailable(int port) {
+		try (ServerSocket ignored = new ServerSocket(port)) {
 			return true;
 		} catch (IOException e) {
-		} finally {
-			if (ss != null) {
-				try {
-					ss.close();
-				} catch (IOException e) {
-					/* should not be thrown */
-				}
-			}
+			return false;
 		}
-		return false;
 	}
 
 }

@@ -3,7 +3,6 @@ package org.ironrhino.core.spring.configuration;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketAddress;
 
 import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.ironrhino.core.util.AppInfo;
@@ -106,22 +105,11 @@ public class AddressAvailabilityCondition extends SimpleCondition<AddressAvailab
 			host = address.substring(0, index);
 			port = Integer.parseInt(address.substring(index + 1));
 		}
-		Socket s = null;
-		try {
-			s = new Socket();
-			s.setReuseAddress(true);
-			SocketAddress sa = new InetSocketAddress(host, port);
-			s.connect(sa, timeout);
+		try (Socket s = new Socket()) {
+			s.connect(new InetSocketAddress(host, port), timeout);
 			return true;
 		} catch (IOException e) {
 			return false;
-		} finally {
-			if (s != null) {
-				try {
-					s.close();
-				} catch (IOException e) {
-				}
-			}
 		}
 	}
 
