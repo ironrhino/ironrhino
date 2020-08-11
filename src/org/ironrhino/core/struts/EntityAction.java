@@ -43,6 +43,7 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.query.Query;
+import org.hibernate.sql.JoinType;
 import org.ironrhino.core.hibernate.CriteriaState;
 import org.ironrhino.core.hibernate.CriterionUtils;
 import org.ironrhino.core.metadata.AppendOnly;
@@ -614,7 +615,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 								alias = key + "_";
 								while (criteriaState.getAliases().containsValue(alias))
 									alias += "_";
-								dc.createAlias(key, alias);
+								dc.createAlias(key, alias, JoinType.LEFT_OUTER_JOIN);
 								criteriaState.getAliases().put(key, alias);
 							}
 							for (String s : nestSearchableProperties) {
