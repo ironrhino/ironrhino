@@ -61,7 +61,6 @@ public enum CriterionOperator implements Displayable {
 	NEQ(1) {
 		@Override
 		boolean supports(Type type) {
-
 			return EQ.supports(type);
 		}
 
@@ -76,18 +75,17 @@ public enum CriterionOperator implements Displayable {
 			if (value == null)
 				return null;
 			if (value instanceof Date && DateUtils.isBeginOfDay((Date) value))
-				return Restrictions.or(Restrictions.isNull(name), Restrictions.or(Restrictions.lt(name, value),
-						Restrictions.gt(name, DateUtils.endOfDay((Date) value))));
+				return orNull(name, Restrictions.lt(name, value),
+						Restrictions.gt(name, DateUtils.endOfDay((Date) value)));
 			else if (value instanceof LocalDateTime) {
 				LocalDateTime datetime = ((LocalDateTime) value);
 				if (datetime.getHour() == 0 && datetime.getMinute() == 0 && datetime.getSecond() == 0
 						&& datetime.getNano() == 0) {
-					return Restrictions.or(Restrictions.isNull(name),
-							Restrictions.or(Restrictions.lt(name, datetime), Restrictions.gt(name,
-									datetime.withHour(23).withMinute(59).withSecond(59).withNano(99999))));
+					return orNull(name, Restrictions.lt(name, datetime),
+							Restrictions.gt(name, datetime.withHour(23).withMinute(59).withSecond(59).withNano(99999)));
 				}
 			}
-			return Restrictions.or(Restrictions.ne(name, value), Restrictions.isNull(name));
+			return orNull(name, Restrictions.ne(name, value));
 		}
 	},
 	START(1) {
@@ -111,7 +109,7 @@ public enum CriterionOperator implements Displayable {
 
 		@Override
 		public Criterion operator(String name, Type type, Object... values) {
-			return Restrictions.not(START.operator(name, type, values));
+			return orNull(name, Restrictions.not(START.operator(name, type, values)));
 		}
 	},
 	END(1) {
@@ -135,7 +133,7 @@ public enum CriterionOperator implements Displayable {
 
 		@Override
 		public Criterion operator(String name, Type type, Object... values) {
-			return Restrictions.not(END.operator(name, type, values));
+			return orNull(name, Restrictions.not(END.operator(name, type, values)));
 		}
 	},
 	INCLUDE(1) {
@@ -160,7 +158,7 @@ public enum CriterionOperator implements Displayable {
 
 		@Override
 		public Criterion operator(String name, Type type, Object... values) {
-			return Restrictions.or(Restrictions.isNull(name), Restrictions.not(INCLUDE.operator(name, type, values)));
+			return orNull(name, Restrictions.not(INCLUDE.operator(name, type, values)));
 		}
 	},
 	CONTAINS(1) {
@@ -188,7 +186,7 @@ public enum CriterionOperator implements Displayable {
 
 		@Override
 		public Criterion operator(String name, Type type, Object... values) {
-			return Restrictions.not(CONTAINS.operator(name, type, values));
+			return orNull(name, Restrictions.not(CONTAINS.operator(name, type, values)));
 		}
 	},
 	LT(1) {
@@ -316,7 +314,7 @@ public enum CriterionOperator implements Displayable {
 				}
 			}
 			if (value1 != null && value2 != null)
-				return Restrictions.or(Restrictions.lt(name, value1), Restrictions.gt(name, value2));
+				return orNull(name, Restrictions.lt(name, value1), Restrictions.gt(name, value2));
 			else if (value1 != null)
 				return Restrictions.lt(name, value1);
 			else if (value2 != null)
@@ -359,7 +357,7 @@ public enum CriterionOperator implements Displayable {
 
 		@Override
 		public Criterion operator(String name, Type type, Object... values) {
-			return Restrictions.not(Restrictions.or(Restrictions.isNull(name), Restrictions.eq(name, "")));
+			return Restrictions.not(orNull(name, Restrictions.eq(name, "")));
 		}
 	},
 	ISEMPTY(0) {
@@ -371,7 +369,7 @@ public enum CriterionOperator implements Displayable {
 
 		@Override
 		public Criterion operator(String name, Type type, Object... values) {
-			return Restrictions.or(Restrictions.isNull(name), Restrictions.eq(name, ""));
+			return orNull(name, Restrictions.eq(name, ""));
 		}
 	},
 	ISTRUE(0) {
@@ -416,7 +414,7 @@ public enum CriterionOperator implements Displayable {
 
 		@Override
 		public Criterion operator(String name, Type type, Object... values) {
-			return Restrictions.or(Restrictions.isNull(name), Restrictions.not(Restrictions.in(name, values)));
+			return orNull(name, Restrictions.not(Restrictions.in(name, values)));
 		}
 	};
 
@@ -471,6 +469,13 @@ public enum CriterionOperator implements Displayable {
 			return Collections.emptyList();
 		}
 		return getSupportedOperators(clazz);
+	}
+
+	private static Criterion orNull(String name, Criterion... criteria) {
+		Criterion result = Restrictions.isNull(name);
+		for (Criterion c : criteria)
+			result = Restrictions.or(result, c);
+		return result;
 	}
 
 	@Override
