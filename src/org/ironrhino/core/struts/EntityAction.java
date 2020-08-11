@@ -603,12 +603,9 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			Map<String, MatchMode> propertyNamesInLike = new LinkedHashMap<>();
 			getUiConfigs().forEach((key, config) -> {
 				if (config.isSearchable() && !config.isExcludedFromLike()) {
-					if (String.class.equals(config.getPropertyType())) {
+					if (String.class.equals(config.getPropertyType()) && !config.isMultiple()) {
 						propertyNamesInLike.put(key,
 								config.isExactMatch() ? MatchMode.EXACT : config.getQueryMatchMode());
-					} else if (String.class.equals(config.getElementType())) {
-						propertyNamesInLike.put(key, null);
-						// null marks as tag
 					} else if (Persistable.class.isAssignableFrom(config.getPropertyType())) {
 						Set<String> nestSearchableProperties = config.getNestSearchableProperties();
 						if (nestSearchableProperties != null && nestSearchableProperties.size() > 0) {
