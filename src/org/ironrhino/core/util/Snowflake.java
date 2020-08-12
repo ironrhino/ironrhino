@@ -1,8 +1,11 @@
 package org.ironrhino.core.util;
 
+import java.util.Random;
+
 public class Snowflake {
 
 	private final static long EPOCH = 1556150400000L;
+	private final static Random RANDOM = new Random();
 
 	private final int workerId;
 	private final long workerIdBits;
@@ -39,7 +42,7 @@ public class Snowflake {
 				}
 			}
 		} else if (timestamp > lastTimestamp) {
-			sequence = 0;
+			sequence = RANDOM.nextInt(2);
 		} else {
 			throw new IllegalStateException(String.format(
 					"Clock moved backwards. Refusing to generate id for %d milliseconds", lastTimestamp - timestamp));

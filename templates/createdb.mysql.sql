@@ -81,7 +81,7 @@ begin
     if @last_ts = current_ts then
         set @sequence = @sequence + 1;
     else
-        set @sequence = 0;
+        set @sequence = ceiling(rand()*10)%2;
     end if;
     set @last_ts = current_ts;
 return (current_ts - epoch) << (sequence_length + worker_id_length) | (worker_id << sequence_length) | @sequence;
