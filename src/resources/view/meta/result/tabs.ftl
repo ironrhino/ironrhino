@@ -54,7 +54,7 @@
 	<#elseif config.type=='dictionary'>
 	<#assign map=beans['dictionaryControl'].getItemsAsMap(config.templateName!propertyName)>
 	<#list map as key,value>
-	<div id="${propertyName+'-'+key}" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?then('&','?')}<#if tabImplicit>tab=${propertyName}&</#if>${propertyName}=${key?url}"></div>
+	<div id="${propertyName+'-'+key}" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?then('&','?')}<#if tabImplicit>tab=${propertyName}&</#if>${propertyName}=${key?url}<#if config.multiple>&${propertyName}-op=CONTAINS</#if>"></div>
 	</#list>
 	<#elseif config.type=='checkbox'>
 	<div id="${propertyName}-true" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?then('&','?')}<#if tabImplicit>tab=${propertyName}&</#if>${propertyName}=true"></div>
