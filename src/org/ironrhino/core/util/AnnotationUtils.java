@@ -63,18 +63,18 @@ public class AnnotationUtils {
 					// super class
 					if (m.getAnnotation(annotationClass) != null) {
 						int mod = m.getModifiers();
-						if (Modifier.isStatic(mod) || Modifier.isAbstract(mod))
+						if (Modifier.isStatic(mod))
 							continue;
 						Order o = m.getAnnotation(Order.class);
 						map.put(m, o != null ? o.value() : 0);
 					}
 				}
-				for (Class<?> c = clazz; c != Object.class; c = c.getSuperclass()) {
+				for (Class<?> c = clazz; c != null && c != Object.class; c = c.getSuperclass()) {
 					for (Method m : c.getDeclaredMethods()) {
 						// protected and private methods on super class
 						if (m.getAnnotation(annotationClass) != null) {
 							int mod = m.getModifiers();
-							if (Modifier.isStatic(mod) || Modifier.isAbstract(mod) || Modifier.isPublic(mod))
+							if (Modifier.isStatic(mod) || Modifier.isPublic(mod))
 								continue;
 							m.setAccessible(true);
 							Order o = m.getAnnotation(Order.class);

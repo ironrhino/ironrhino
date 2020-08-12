@@ -101,6 +101,22 @@ public class AnnotationUtilsTest {
 
 	}
 
+	interface A {
+		@PrePersist
+		default void a() {
+		}
+	}
+
+	interface B {
+		@PrePersist
+		void b();
+	}
+
+	interface C extends A, B {
+		@PrePersist
+		void c();
+	}
+
 	@Test
 	public void testGetAnnotatedMethod() {
 		for (int i = 0; i < 100; i++)
@@ -122,6 +138,9 @@ public class AnnotationUtilsTest {
 	public void doTestGetAnnotatedMethods() {
 		assertThat(AnnotationUtils.getAnnotatedMethods(User.class, PrePersist.class).size(), equalTo(4));
 		assertThat(AnnotationUtils.getAnnotatedMethods(User.class, Trigger.class).isEmpty(), equalTo(true));
+		assertThat(AnnotationUtils.getAnnotatedMethods(A.class, PrePersist.class).size(), equalTo(1));
+		assertThat(AnnotationUtils.getAnnotatedMethods(B.class, PrePersist.class).size(), equalTo(1));
+		assertThat(AnnotationUtils.getAnnotatedMethods(C.class, PrePersist.class).size(), equalTo(3));
 	}
 
 	@Test
