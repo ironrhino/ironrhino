@@ -82,7 +82,7 @@
 <#if request.queryString?has_content>
 <#list request.queryString?split('&') as pair>
 	<#local name=pair?keep_before('=')>
-	<#local excludedNames=['_','tab','keyword','pn','ps','m','bm']>
+	<#local excludedNames=['_','keyword','pn','ps','m','bm']>
 	<#if !(excludedNames?seq_contains(name)||name?starts_with('resultPage.')||formHeader?contains(' name="'+name+'" '))>
 		<#local action+=action?contains('?')?then('&','?')+pair>
 		<#local parameterNamesInQueryString+=[name]>
@@ -90,7 +90,7 @@
 </#list>
 </#if>
 </#if>
-<form id="<#if formid?has_content>${formid}<#else>${entityName}<#if Parameters.tab?? && Parameters[Parameters.tab]??>_${Parameters.tab?html+'_'+Parameters[Parameters.tab]?html}</#if>_form</#if>" action="${action}" method="post" class="richtable ajax view ${dynamicAttributes['class']!}<#if formCssClass?index_of('nohistory') lt 0 && 'treeview'!=Parameters.view!?html> history</#if> ${formCssClass}"<#if actionBaseUrl!=action&&!action?starts_with(actionBaseUrl+'?')> data-actionbaseurl="${actionBaseUrl}"</#if><@dynAttrs value=dynamicAttributes exclude='class'/>>
+<form id="<#if formid?has_content>${formid}<#else>${entityName}<#if request.queryString??&&request.queryString?contains('tab=')&&request.queryString?contains('&'+Parameters.tab+'=')>_${Parameters.tab?html+'_'+Parameters[Parameters.tab]?html}</#if>_form</#if>" action="${action}" method="post" class="richtable ajax view ${dynamicAttributes['class']!}<#if formCssClass?index_of('nohistory') lt 0 && 'treeview'!=Parameters.view!?html> history</#if> ${formCssClass}"<#if actionBaseUrl!=action&&!action?starts_with(actionBaseUrl+'?')> data-actionbaseurl="${actionBaseUrl}"</#if><@dynAttrs value=dynamicAttributes exclude='class'/>>
 ${formHeader!}
 <#nested/>
 <#if includeParameters>
