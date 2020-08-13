@@ -20,7 +20,9 @@ import io.jaegertracing.thrift.internal.senders.ThriftSender;
 import io.jaegertracing.thriftjava.Batch;
 import io.jaegertracing.thriftjava.Process;
 import io.jaegertracing.thriftjava.Span;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class HttpSender extends ThriftSender {
 
 	private static final String HTTP_COLLECTOR_JAEGER_THRIFT_FORMAT_PARAM = "format=jaeger.thrift";
@@ -34,6 +36,10 @@ public class HttpSender extends ThriftSender {
 	private final CloseableHttpClient httpClient;
 
 	private final String collectorUrl;
+
+	private boolean serverFailureOccurred;
+
+	private boolean ioErrorOccurred;
 
 	public HttpSender(String endpoint) {
 		this(endpoint, 0);
@@ -71,13 +77,30 @@ public class HttpSender extends ThriftSender {
 				} catch (IOException e) {
 					responseBody = "unable to read response";
 				}
+				if (!serverFailureOccurred) {
+					serverFailureOccurred = true;
+					log.error("Server failure with response code {} and body: {}",
+							response.getStatusLine().getStatusCode(), responseBody);
+				}
 				String exceptionMessage = String.format("Could not send %d spans, response %d: %s", spans.size(),
 						response.getStatusLine().getStatusCode(), responseBody);
 				throw new SenderException(exceptionMessage, null, spans.size());
 			} else {
+				if (serverFailureOccurred) {
+					serverFailureOccurred = false;
+					log.info("Recovered from server failure");
+				}
+				if (ioErrorOccurred) {
+					log.info("Recovered from IO error");
+					ioErrorOccurred = false;
+				}
 				EntityUtils.consume(response.getEntity());
 			}
 		} catch (IOException e) {
+			if (!ioErrorOccurred) {
+				ioErrorOccurred = true;
+				log.error(e.getMessage(), e);
+			}
 			throw new SenderException(String.format("Could not send %d spans", spans.size()), e, spans.size());
 		}
 	}
