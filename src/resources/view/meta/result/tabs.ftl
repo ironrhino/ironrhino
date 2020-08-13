@@ -49,7 +49,7 @@
 	<div id="all" class="tab-pane ajaxpanel active" data-url="${dataurl}"></div>
 	<#if config.type=='enum'>
 	<#list values as value>
-	<div id="${propertyName+'-'+value.name()}" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?then('&','?')}<#if tabImplicit>tab=${propertyName}&</#if>${propertyName}=${value.name()}"></div>
+	<div id="${propertyName+'-'+value.name()}" class="tab-pane ajaxpanel manual" data-url="${dataurl+dataurl?contains('?')?then('&','?')}<#if tabImplicit>tab=${propertyName}&</#if>${propertyName}=${value.name()}<#if config.multiple>&${propertyName}-op=CONTAINS</#if>"></div>
 	</#list>
 	<#elseif config.type=='dictionary'>
 	<#assign map=beans['dictionaryControl'].getItemsAsMap(config.templateName!propertyName)>
