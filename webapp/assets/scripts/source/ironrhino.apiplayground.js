@@ -97,7 +97,8 @@ Initialization.apiplayground = function() {
 				form.find('.responseStatus').html(xhr.status + ' '
 						+ xhr.statusText + ' <span class="badge">'
 						+ (new Date().getTime() - startTime) + 'ms</span>');
-				form.find('.responseHeaders').text(xhr.getAllResponseHeaders());
+				var rh = form.find('.responseHeaders');
+				rh.text(xhr.getAllResponseHeaders());
 				var rb = form.find('.responseBody');
 				if (!rb.text()) { // maybe read from response by options.error
 					var responseType = xhr.getResponseHeader('Content-Type');
@@ -111,6 +112,9 @@ Initialization.apiplayground = function() {
 						}
 					}
 					rb.text(responseText);
+					$('html,body').animate({
+						scrollTop : (responseText? rb: rh).offset().top - 50
+					}, 100);
 				}
 			}
 		};
