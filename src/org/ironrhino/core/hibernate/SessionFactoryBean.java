@@ -323,10 +323,11 @@ public class SessionFactoryBean extends LocalSessionFactoryBean implements Defau
 		SessionFactory sessionFactory = super.buildSessionFactory(sfb);
 		EventListenerRegistry registry = ((SessionFactoryImplementor) sessionFactory).getServiceRegistry()
 				.getService(EventListenerRegistry.class);
-		registry.prependListeners(EventType.SAVE, new SimpleSaveOrUpdateEventListener());
+		SimpleSaveOrUpdateEventListener saveOrUpdate = new SimpleSaveOrUpdateEventListener();
+		registry.prependListeners(EventType.SAVE, saveOrUpdate);
+		registry.prependListeners(EventType.SAVE_UPDATE, saveOrUpdate);
 		registry.prependListeners(EventType.PERSIST, new SimplePersistEventListener());
 		registry.prependListeners(EventType.MERGE, new SimpleMergeEventListener());
-		registry.prependListeners(EventType.SAVE_UPDATE, new SimpleSaveOrUpdateEventListener());
 		registry.prependListeners(EventType.FLUSH_ENTITY, new SimpleFlushEntityEventListener());
 		registry.prependListeners(EventType.DELETE, new SimpleDeleteEventListener());
 		registry.appendListeners(EventType.PRE_INSERT, preInsertEventListeners);
