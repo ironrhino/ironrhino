@@ -7,7 +7,6 @@ import org.ironrhino.core.remoting.client.HttpInvokerClient;
 import org.ironrhino.core.tracing.Tracing;
 import org.ironrhino.core.tracing.TracingConfiguration;
 import org.ironrhino.core.util.AppInfo;
-import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.rest.client.RestClientConfiguration;
 import org.ironrhino.rest.client.UserClient;
 import org.ironrhino.sample.remoting.TestService;
@@ -19,7 +18,6 @@ import org.springframework.context.annotation.Configuration;
 public class Main {
 
 	public static void main(String[] args) throws InterruptedException {
-		System.setProperty(AppInfo.KEY_STAGE, Stage.DEVELOPMENT.name());
 		AppInfo.initialize();
 		AppInfo.setAppName("ironrino-client");
 		ExecutorService es = Executors.newFixedThreadPool(1);

@@ -101,6 +101,7 @@ public class Tracing {
 	public static <T> Callable<T> wrapAsync(String operationName, Callable<T> callable, Serializable... tags) {
 		if (!enabled || shouldSkip(tags))
 			return callable;
+		ensureReportingActiveSpan();
 		Span span = buildSpan(operationName, tags);
 		span.setTag("async", true);
 		return () -> {
@@ -118,6 +119,7 @@ public class Tracing {
 	public static <T> Runnable wrapAsync(String operationName, Runnable runnable, Serializable... tags) {
 		if (!enabled || shouldSkip(tags))
 			return runnable;
+		ensureReportingActiveSpan();
 		Span span = buildSpan(operationName, tags);
 		span.setTag("async", true);
 		return () -> {
@@ -136,6 +138,7 @@ public class Tracing {
 			CheckedCallable<T, E> callable, Serializable... tags) {
 		if (!enabled || shouldSkip(tags))
 			return callable;
+		ensureReportingActiveSpan();
 		Span span = buildSpan(operationName, tags);
 		span.setTag("async", true);
 		return () -> {
@@ -154,6 +157,7 @@ public class Tracing {
 			CheckedRunnable<E> runnable, Serializable... tags) {
 		if (!enabled || shouldSkip(tags))
 			return runnable;
+		ensureReportingActiveSpan();
 		Span span = buildSpan(operationName, tags);
 		span.setTag("async", true);
 		return () -> {
@@ -225,6 +229,15 @@ public class Tracing {
 					span.setTag(name, String.valueOf(value));
 			}
 		}
+	}
+
+	public static void ensureReportingActiveSpan() {
+		// ensure current span be reported
+		// see also org.ironrhino.core.tracing.DelegatingReporter
+		Tracer tracer = GlobalTracer.get();
+		Span current = tracer.activeSpan();
+		if (current != null)
+			Tags.SAMPLING_PRIORITY.set(current, 1);
 	}
 
 	public static void setTags(Serializable... tags) {
