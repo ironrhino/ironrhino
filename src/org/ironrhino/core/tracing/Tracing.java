@@ -39,9 +39,8 @@ public class Tracing {
 	public static <T> T execute(String operationName, Callable<T> callable, Serializable... tags) throws Exception {
 		if (!enabled || shouldSkip(tags))
 			return callable.call();
-		Tracer tracer = GlobalTracer.get();
 		Span span = buildSpan(operationName, tags);
-		try (Scope scope = tracer.activateSpan(span)) {
+		try (Scope scope = GlobalTracer.get().activateSpan(span)) {
 			return callable.call();
 		} catch (Exception ex) {
 			logError(ex);
@@ -56,9 +55,8 @@ public class Tracing {
 			runnable.run();
 			return;
 		}
-		Tracer tracer = GlobalTracer.get();
 		Span span = buildSpan(operationName, tags);
-		try (Scope scope = tracer.activateSpan(span)) {
+		try (Scope scope = GlobalTracer.get().activateSpan(span)) {
 			runnable.run();
 		} catch (Exception ex) {
 			logError(ex);
@@ -72,9 +70,8 @@ public class Tracing {
 			CheckedCallable<T, E> callable, Serializable... tags) throws E {
 		if (!enabled || shouldSkip(tags))
 			return callable.call();
-		Tracer tracer = GlobalTracer.get();
 		Span span = buildSpan(operationName, tags);
-		try (Scope scope = tracer.activateSpan(span)) {
+		try (Scope scope = GlobalTracer.get().activateSpan(span)) {
 			return callable.call();
 		} catch (Throwable ex) {
 			logError(ex);
@@ -90,9 +87,8 @@ public class Tracing {
 			runnable.run();
 			return;
 		}
-		Tracer tracer = GlobalTracer.get();
 		Span span = buildSpan(operationName, tags);
-		try (Scope scope = tracer.activateSpan(span)) {
+		try (Scope scope = GlobalTracer.get().activateSpan(span)) {
 			runnable.run();
 		} catch (Exception ex) {
 			logError(ex);
@@ -100,6 +96,76 @@ public class Tracing {
 		} finally {
 			span.finish();
 		}
+	}
+
+	public static <T> Callable<T> wrapAsync(String operationName, Callable<T> callable, Serializable... tags) {
+		if (!enabled || shouldSkip(tags))
+			return callable;
+		Span span = buildSpan(operationName, tags);
+		span.setTag("async", true);
+		return () -> {
+			try (Scope scope = GlobalTracer.get().activateSpan(span)) {
+				return callable.call();
+			} catch (Exception ex) {
+				logError(ex);
+				throw ex;
+			} finally {
+				span.finish();
+			}
+		};
+	}
+
+	public static <T> Runnable wrapAsync(String operationName, Runnable runnable, Serializable... tags) {
+		if (!enabled || shouldSkip(tags))
+			return runnable;
+		Span span = buildSpan(operationName, tags);
+		span.setTag("async", true);
+		return () -> {
+			try (Scope scope = GlobalTracer.get().activateSpan(span)) {
+				runnable.run();
+			} catch (Exception ex) {
+				logError(ex);
+				throw ex;
+			} finally {
+				span.finish();
+			}
+		};
+	}
+
+	public static <T, E extends Throwable> CheckedCallable<T, E> wrapAsyncCheckedCallable(String operationName,
+			CheckedCallable<T, E> callable, Serializable... tags) {
+		if (!enabled || shouldSkip(tags))
+			return callable;
+		Span span = buildSpan(operationName, tags);
+		span.setTag("async", true);
+		return () -> {
+			try (Scope scope = GlobalTracer.get().activateSpan(span)) {
+				return callable.call();
+			} catch (Exception ex) {
+				logError(ex);
+				throw ex;
+			} finally {
+				span.finish();
+			}
+		};
+	}
+
+	public static <E extends Throwable> CheckedRunnable<E> wrapAsyncCheckedRunnable(String operationName,
+			CheckedRunnable<E> runnable, Serializable... tags) {
+		if (!enabled || shouldSkip(tags))
+			return runnable;
+		Span span = buildSpan(operationName, tags);
+		span.setTag("async", true);
+		return () -> {
+			try (Scope scope = GlobalTracer.get().activateSpan(span)) {
+				runnable.run();
+			} catch (Exception ex) {
+				logError(ex);
+				throw ex;
+			} finally {
+				span.finish();
+			}
+		};
 	}
 
 	public static void logError(Throwable ex) {

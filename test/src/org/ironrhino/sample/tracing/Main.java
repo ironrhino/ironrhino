@@ -1,9 +1,13 @@
 package org.ironrhino.sample.tracing;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.ironrhino.core.remoting.client.HttpInvokerClient;
 import org.ironrhino.core.tracing.Tracing;
 import org.ironrhino.core.tracing.TracingConfiguration;
 import org.ironrhino.core.util.AppInfo;
+import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.rest.client.RestClientConfiguration;
 import org.ironrhino.rest.client.UserClient;
 import org.ironrhino.sample.remoting.TestService;
@@ -15,8 +19,10 @@ import org.springframework.context.annotation.Configuration;
 public class Main {
 
 	public static void main(String[] args) throws InterruptedException {
+		System.setProperty(AppInfo.KEY_STAGE, Stage.DEVELOPMENT.name());
 		AppInfo.initialize();
 		AppInfo.setAppName("ironrino-client");
+		ExecutorService es = Executors.newFixedThreadPool(1);
 		AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(
 				RemotingClientConfiguration.class, RestClientConfiguration.class, TracingConfiguration.class);
 		try {
@@ -37,9 +43,14 @@ public class Main {
 				UserClient userClient = ctx.getBean(UserClient.class);
 				System.out.println(userClient.get("admin").getUsername());
 			});
+			Tracing.execute("testAsync", () -> es.execute(Tracing.wrapAsync("testAsyncRunnable", () -> {
+				UserService userService = ctx.getBean(UserService.class);
+				System.out.println(userService.loadUserByUsername("admin").getUsername());
+			})));
 		} finally {
 			Thread.sleep(2000);
 			ctx.close();
+			es.shutdown();
 		}
 	}
 

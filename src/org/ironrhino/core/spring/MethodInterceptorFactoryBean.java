@@ -31,9 +31,6 @@ import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureTask;
 import org.springframework.validation.annotation.Validated;
 
-import io.opentracing.Scope;
-import io.opentracing.Span;
-import io.opentracing.util.GlobalTracer;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -102,37 +99,23 @@ public abstract class MethodInterceptorFactoryBean implements MethodInterceptor,
 			if (returnType == Callable.class) {
 				return callable;
 			}
-			Span asyncSpan = Tracing.isEnabled() ? GlobalTracer.get().buildSpan("async").withTag("async", true).start()
-					: null;
-			try (Scope scope = asyncSpan != null ? GlobalTracer.get().activateSpan(asyncSpan) : null) {
-				Callable<Object> decoratedCallable = new Callable<Object>() {
-					@Override
-					public Object call() throws Exception {
-						try (Scope s = (asyncSpan != null ? GlobalTracer.get().activateSpan(asyncSpan) : null)) {
-							return callable.call();
-						}
+			Callable<Object> wrappedCallable = Tracing.wrapAsync("async", callable);
+			if (returnType == ListenableFuture.class) {
+				ListenableFutureTask<Object> future = new ListenableFutureTask<>(wrappedCallable);
+				getExecutorService().execute(future);
+				return future;
+			}
+			if (returnType == CompletableFuture.class || returnType == CompletionStage.class) {
+				return CompletableFuture.supplyAsync(() -> {
+					try {
+						return wrappedCallable.call();
+					} catch (Exception e) {
+						throw new RuntimeException(e);
 					}
-				};
-				if (returnType == ListenableFuture.class) {
-					ListenableFutureTask<Object> future = new ListenableFutureTask<>(decoratedCallable);
-					getExecutorService().execute(future);
-					return future;
-				}
-				if (returnType == CompletableFuture.class || returnType == CompletionStage.class) {
-					return CompletableFuture.supplyAsync(() -> {
-						try {
-							return callable.call();
-						} catch (Exception e) {
-							throw new RuntimeException(e);
-						}
-					}, getExecutorService());
-				}
-				if (returnType == Future.class) {
-					return getExecutorService().submit(decoratedCallable);
-				}
-			} finally {
-				if (asyncSpan != null)
-					asyncSpan.finish();
+				}, getExecutorService());
+			}
+			if (returnType == Future.class) {
+				return getExecutorService().submit(wrappedCallable);
 			}
 		}
 		Object returnValue;
