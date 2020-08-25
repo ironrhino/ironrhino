@@ -250,7 +250,7 @@ public class Tracing {
 	}
 
 	public static void inject(HttpMessage httpMessage) throws Exception {
-		if (Tracing.isEnabled()) {
+		if (enabled) {
 			Tracer tracer = GlobalTracer.get();
 			Span span = tracer.activeSpan();
 			if (span != null)
@@ -259,7 +259,7 @@ public class Tracing {
 	}
 
 	public static void inject(org.apache.http.HttpMessage httpMessage) {
-		if (Tracing.isEnabled()) {
+		if (enabled) {
 			Tracer tracer = GlobalTracer.get();
 			Span span = tracer.activeSpan();
 			if (span != null)
@@ -269,7 +269,7 @@ public class Tracing {
 	}
 
 	public static void inject(HttpURLConnection connection) {
-		if (Tracing.isEnabled()) {
+		if (enabled) {
 			Tracer tracer = GlobalTracer.get();
 			Span span = tracer.activeSpan();
 			if (span != null)
