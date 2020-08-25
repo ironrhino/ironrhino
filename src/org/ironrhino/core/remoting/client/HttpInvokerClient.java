@@ -193,12 +193,10 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 
 	protected RemoteInvocationResult executeRequest(RemoteInvocation invocation, MethodInvocation methodInvocation)
 			throws Throwable {
-		return Tracing.executeCheckedCallable(ReflectionUtils.stringify(methodInvocation.getMethod()),
-				() -> circuitBreakerRegistry != null
-						? circuitBreakerRegistry.of(getServiceInterface().getName(), ex -> ex instanceof IOException)
-								.executeCheckedSupplier(() -> doExecuteRequest(invocation, methodInvocation))
-						: doExecuteRequest(invocation, methodInvocation),
-				"span.kind", "client", "component", "remoting");
+		return circuitBreakerRegistry != null
+				? circuitBreakerRegistry.of(getServiceInterface().getName(), ex -> ex instanceof IOException)
+						.executeCheckedSupplier(() -> doExecuteRequest(invocation, methodInvocation))
+				: doExecuteRequest(invocation, methodInvocation);
 	}
 
 	protected RemoteInvocationResult doExecuteRequest(RemoteInvocation invocation, MethodInvocation methodInvocation)
@@ -253,8 +251,12 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 			String targetDiscoveredHost = discoveredHost;
 			long time = System.nanoTime();
 			try {
-				RemoteInvocationResult result = httpInvokerRequestExecutor.executeRequest(targetServiceUrl, invocation,
-						methodInvocation);
+				RemoteInvocation actualInvocation = invocation;
+				RemoteInvocationResult result = Tracing.executeCheckedCallable(
+						ReflectionUtils.stringify(methodInvocation.getMethod()),
+						() -> httpInvokerRequestExecutor.executeRequest(targetServiceUrl, actualInvocation,
+								methodInvocation),
+						"span.kind", "client", "component", "remoting", "peer.address", targetServiceUrl);
 				if (urlFromDiscovery) {
 					time = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - time);
 					remotingLogger.info("Invoked to {} success in {}ms", targetDiscoveredHost, time);

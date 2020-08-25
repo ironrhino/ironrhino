@@ -222,7 +222,8 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 			int remainingAttempts = maxAttempts;
 			do {
 				try {
-					return actualInvoke(methodInvocation);
+					return Tracing.execute(ReflectionUtils.stringify(methodInvocation.getMethod()),
+							() -> actualInvoke(methodInvocation), "span.kind", "client", "component", "rest");
 				} catch (Exception e) {
 					if (!IO_ERROR_PREDICATE.test(e) || NOT_RETRYABLE_PREDICATE.test(methodInvocation)
 							|| remainingAttempts <= 1)
@@ -231,9 +232,6 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 			} while (--remainingAttempts > 0);
 			throw new MaxAttemptsExceededException(maxAttempts);
 		};
-		Callable<Object> old = callable;
-		callable = () -> Tracing.execute(ReflectionUtils.stringify(methodInvocation.getMethod()), old, "span.kind",
-				"client", "component", "rest");
 		return circuitBreakerRegistry != null
 				? circuitBreakerRegistry.of(restApiClass.getName(), IO_ERROR_PREDICATE).executeCallable(callable)
 				: callable.call();
