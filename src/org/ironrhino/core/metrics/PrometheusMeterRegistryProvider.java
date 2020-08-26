@@ -42,7 +42,7 @@ public class PrometheusMeterRegistryProvider extends AccessHandler implements Me
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
-		response.getWriter().write(prometheusMeterRegistry.scrape());
+		prometheusMeterRegistry.scrape(response.getWriter());
 		return true;
 	}
 
