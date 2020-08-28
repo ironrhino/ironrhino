@@ -5,7 +5,7 @@
 	</#if>
 	<select<#if name?has_content><#if disabled> disabled</#if> name="${name}"</#if> class="<#if required && !(dynamicAttributes['class']!)?contains('required')>required </#if><#if !strict>combobox </#if>${dynamicAttributes['class']!}"<#if multiple> multiple</#if><@dynAttrs value=dynamicAttributes exclude='class'/>><#lt>
 		<#if showHeader><option value="${headerKey}">${headerValue}</option><#lt></#if>
-		<#local exists=false>
+		<#local exists=true>
 		<#if (dictionary.items)?has_content>
 			<#local items = dictionary.items/>
 			<#if !dictionary.groupable>
@@ -30,7 +30,7 @@
 							</#if>
 						</#if>
 					<#else>
-						<option value="${lv.value}"<#if value?string==lv.value><#local exists=true> selected</#if>>${lv.label?has_content?then(lv.label,lv.value!)}</option><#lt>
+						<option value="${lv.value}"<#if value?has_content&&(!value?is_sequence&&value?string==lv.value||value?is_sequence&&value?seq_contains(lv.value))><#local exists=true> selected</#if>>${lv.label?has_content?then(lv.label,lv.value!)}</option><#lt>
 						<#if group?has_content && !lv?has_next>
 						</optgroup><#lt>
 						</#if>
