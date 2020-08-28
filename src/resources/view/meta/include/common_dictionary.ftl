@@ -48,6 +48,7 @@
 		</#if>
 		</#if>
 	</select><#lt>
+	<#if !disabled && name?has_content && multiple><input type="hidden" name="__multiselect_${name?html}"></#if>
 </#macro>
 
 <#function getDictionaryLabel dictionaryName value="">
@@ -166,4 +167,5 @@ ${getDictionaryLabel(dictionaryName,value?string)}<#t>
 		</label><#t>
 		<#local index = index+1/>
 		</#if>
+		<#if !disabled && name?has_content && multiple><input type="hidden" name="__checkbox_${name?html}"></#if>
 </#macro>
