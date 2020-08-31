@@ -35,6 +35,7 @@ import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.StrutsStatics;
 import org.apache.struts2.dispatcher.StrutsResultSupport;
 import org.apache.struts2.views.freemarker.FreemarkerManager;
+import org.ironrhino.core.tracing.Tracing;
 
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
@@ -157,7 +158,7 @@ public class FreemarkerResult extends StrutsResultSupport {
 	 * calling the hooks for preTemplateProcess and postTemplateProcess
 	 */
 	@Override
-	public void doExecute(String locationArg, ActionInvocation invocation) throws IOException, TemplateException {
+	public void doExecute(String locationArg, ActionInvocation invocation) throws Exception {
 		this.location = locationArg;
 		this.invocation = invocation;
 		this.configuration = getConfiguration();
@@ -201,7 +202,10 @@ public class FreemarkerResult extends StrutsResultSupport {
 					}
 
 					try {
-						template.process(model, parentCharArrayWriter);
+						CharArrayWriter temp = parentCharArrayWriter;
+						Tracing.executeCheckedRunnable("freemarker.template.process", () -> {
+							template.process(model, temp);
+						}, "template", template.getName());
 						if (isTopTemplate) {
 							parentCharArrayWriter.flush();
 							parentCharArrayWriter.writeTo(writer);
@@ -213,7 +217,9 @@ public class FreemarkerResult extends StrutsResultSupport {
 						}
 					}
 				} else {
-					template.process(model, writer);
+					Tracing.executeCheckedRunnable("freemarker.template.process", () -> {
+						template.process(model, writer);
+					}, "template", template.getName());
 				}
 			} finally {
 				// Give subclasses a chance to hook into postprocessing
