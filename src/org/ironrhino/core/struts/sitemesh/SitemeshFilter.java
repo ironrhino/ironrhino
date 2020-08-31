@@ -33,6 +33,7 @@ import com.opensymphony.sitemesh.compatability.PageParser2ContentProcessor;
 import com.opensymphony.sitemesh.webapp.ContainerTweaks;
 import com.opensymphony.sitemesh.webapp.ContentBufferingResponse;
 import com.opensymphony.sitemesh.webapp.SiteMeshWebAppContext;
+import com.opensymphony.sitemesh.webapp.decorator.NoDecorator;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.inject.Inject;
 
@@ -131,10 +132,13 @@ public class SitemeshFilter implements Filter {
 			}
 
 			Decorator decorator = decoratorSelector.selectDecorator(content, webAppContext);
-			Tracing.execute(decorator.getClass().getName() + ".render(Content,SiteMeshContext)", () -> {
+			if (decorator instanceof NoDecorator) {
 				decorator.render(content, webAppContext);
-			}, "component", "decorator");
-
+			} else {
+				Tracing.execute(decorator.getClass().getName() + ".render(Content,SiteMeshContext)", () -> {
+					decorator.render(content, webAppContext);
+				}, "component", "decorator");
+			}
 		} catch (IllegalStateException e) {
 			if (!containerTweaks.shouldIgnoreIllegalStateExceptionOnErrorPage()) {
 				throw e;
