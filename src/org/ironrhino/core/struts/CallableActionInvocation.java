@@ -153,17 +153,17 @@ public class CallableActionInvocation extends DefaultActionInvocation {
 			else
 				return;
 		}
-		Tracing.execute(result.getClass().getName() + ".execute(ActionInvocation)", () -> {
+		Tracing.execute("struts.result.execute", () -> {
 			result.execute(this);
 			return null;
-		}, "component", "result");
+		}, "component", "result", "result", result.getClass().getName());
 	}
 
 	@Override
 	protected String invokeAction(Object action, ActionConfig actionConfig) throws Exception {
-		return Tracing.execute(action.getClass().getName() + "." + proxy.getMethod() + "()", () -> {
+		return Tracing.execute("struts.action.execute", () -> {
 			return super.invokeAction(action, actionConfig);
-		}, "component", "action");
+		}, "component", "action", "action", action.getClass().getName(), "method", proxy.getMethod());
 	}
 
 	protected void reset() {

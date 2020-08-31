@@ -117,7 +117,7 @@ public class AccessFilter implements Filter {
 		Scope scope = null;
 		if (!uri.startsWith("/assets/") && Tracing.isEnabled()) {
 			Tracer tracer = GlobalTracer.get();
-			SpanBuilder spanBuilder = tracer.buildSpan("http:" + request.getMethod().toLowerCase() + ":" + uri)
+			SpanBuilder spanBuilder = tracer.buildSpan(request.getMethod().toLowerCase() + ":" + uri)
 					.asChildOf(tracer.extract(Format.Builtin.HTTP_HEADERS, new HttpServletRequestTextMap(request)));
 			span = spanBuilder.start();
 			Tags.HTTP_URL.set(span, request.getRequestURL().toString());

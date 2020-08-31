@@ -135,9 +135,9 @@ public class SitemeshFilter implements Filter {
 			if (decorator instanceof NoDecorator) {
 				decorator.render(content, webAppContext);
 			} else {
-				Tracing.execute(decorator.getClass().getName() + ".render(Content,SiteMeshContext)", () -> {
+				Tracing.execute("sitemesh.decorator.render", () -> {
 					decorator.render(content, webAppContext);
-				}, "component", "decorator");
+				}, "component", "decorator", "decorator", decorator.getClass().getName());
 			}
 		} catch (IllegalStateException e) {
 			if (!containerTweaks.shouldIgnoreIllegalStateExceptionOnErrorPage()) {
