@@ -42,6 +42,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.ironrhino.core.util.GenericTypeResolver;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -370,8 +371,11 @@ public class JdbcRepositoryFactoryBean extends MethodInterceptorFactoryBean
 								Type t = types[index];
 								if (t instanceof ParameterizedType) {
 									t = ((ParameterizedType) t).getActualTypeArguments()[0];
-									if (t instanceof Class && Number.class.isAssignableFrom((Class<?>) t))
-										((Consumer<Number>) arg).accept(key);
+									if (t instanceof Class
+											&& Number.class.isAssignableFrom((Class<? extends Number>) t)) {
+										((Consumer<? super Number>) arg).accept(DefaultConversionService
+												.getSharedInstance().convert(key, (Class<? extends Number>) t));
+									}
 								}
 								continue;
 							}
