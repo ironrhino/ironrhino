@@ -93,8 +93,8 @@ public class OAuth2ControllerTest {
 		MockHttpServletRequestBuilder request = get("/oauth2/token").param("client_id", clientId).param("client_secret",
 				clientSecret);
 		mockMvc.perform(request).andExpect(status().isBadRequest())
-				.andExpect(jsonPoint("/error").value("invalid_request")).andExpect(
-						jsonPoint("/error_message").value("Required GrantType parameter 'grant_type' is not present"));
+				.andExpect(jsonPoint("/error").value("invalid_request")).andExpect(jsonPoint("/error_message").value(
+						"Required request parameter 'grant_type' for method parameter type GrantType is not present"));
 	}
 
 	@Test
@@ -102,8 +102,8 @@ public class OAuth2ControllerTest {
 		MockHttpServletRequestBuilder request = get("/oauth2/token").param("grant_type", "authorization_code")
 				.param("client_secret", clientSecret);
 		mockMvc.perform(request).andExpect(status().isBadRequest())
-				.andExpect(jsonPoint("/error").value("invalid_request"))
-				.andExpect(jsonPoint("/error_message").value("Required String parameter 'client_id' is not present"));
+				.andExpect(jsonPoint("/error").value("invalid_request")).andExpect(jsonPoint("/error_message").value(
+						"Required request parameter 'client_id' for method parameter type String is not present"));
 	}
 
 	@Test
@@ -111,8 +111,8 @@ public class OAuth2ControllerTest {
 		MockHttpServletRequestBuilder request = get("/oauth2/token")
 				.param("grant_type", GrantType.authorization_code.name()).param("client_id", clientId);
 		mockMvc.perform(request).andExpect(status().isBadRequest())
-				.andExpect(jsonPoint("/error").value("invalid_request")).andExpect(
-						jsonPoint("/error_message").value("Required String parameter 'client_secret' is not present"));
+				.andExpect(jsonPoint("/error").value("invalid_request")).andExpect(jsonPoint("/error_message").value(
+						"Required request parameter 'client_secret' for method parameter type String is not present"));
 	}
 
 	@Test
@@ -180,8 +180,8 @@ public class OAuth2ControllerTest {
 				.param("client_id", clientId).param("client_secret", clientSecret);
 		mockClient();
 		mockMvc.perform(request).andExpect(status().isBadRequest())
-				.andExpect(jsonPoint("/error").value("invalid_request"))
-				.andExpect(jsonPoint("/error_message").value("Required String parameter 'username' is not present"));
+				.andExpect(jsonPoint("/error").value("invalid_request")).andExpect(jsonPoint("/error_message").value(
+						"Required request parameter 'username' for method parameter type String is not present"));
 	}
 
 	@Test
@@ -190,8 +190,8 @@ public class OAuth2ControllerTest {
 				.param("client_id", clientId).param("client_secret", clientSecret).param("username", username);
 		mockClient();
 		mockMvc.perform(request).andExpect(status().isBadRequest())
-				.andExpect(jsonPoint("/error").value("invalid_request"))
-				.andExpect(jsonPoint("/error_message").value("Required String parameter 'password' is not present"));
+				.andExpect(jsonPoint("/error").value("invalid_request")).andExpect(jsonPoint("/error_message").value(
+						"Required request parameter 'password' for method parameter type String is not present"));
 	}
 
 	@Test
@@ -255,8 +255,8 @@ public class OAuth2ControllerTest {
 				.param("grant_type", GrantType.authorization_code.name()).param("client_id", clientId)
 				.param("client_secret", clientSecret);
 		mockMvc.perform(request).andExpect(status().isBadRequest())
-				.andExpect(jsonPoint("/error").value("invalid_request"))
-				.andExpect(jsonPoint("/error_message").value("Required String parameter 'code' is not present"));
+				.andExpect(jsonPoint("/error").value("invalid_request")).andExpect(jsonPoint("/error_message")
+						.value("Required request parameter 'code' for method parameter type String is not present"));
 	}
 
 	@Test

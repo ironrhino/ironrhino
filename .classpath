@@ -44,8 +44,8 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jboss-logging-annotations-2.1.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jericho-html-3.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jsoup-1.12.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/kafka-clients-2.3.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lettuce-core-5.2.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/kafka-clients-2.8.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/lettuce-core-6.1.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-api-2.14.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-core-2.14.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/log4j-jcl-2.14.1.jar"/>
@@ -67,31 +67,32 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/sitemesh-2.4.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/slf4j-api-1.7.30.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/snakeyaml-1.29.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-aop-5.2.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-batch-core-4.2.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-batch-infrastructure-4.2.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-beans-5.2.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-context-5.2.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-context-support-5.2.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-core-5.2.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-data-commons-2.2.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-data-keyvalue-2.2.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-data-redis-2.2.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-expression-5.2.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-jdbc-5.2.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-jms-5.2.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-kafka-2.3.4.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-messaging-5.2.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-orm-5.2.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-retry-1.2.4.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-security-config-5.2.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-security-core-5.2.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-security-web-5.2.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-tx-5.2.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-web-5.2.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-webflux-5.2.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-webmvc-5.2.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-websocket-5.2.2.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-aop-5.3.9.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-batch-core-4.3.3.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-batch-infrastructure-4.3.3.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-beans-5.3.9.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-context-5.3.9.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-context-support-5.3.9.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-core-5.3.9.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-data-commons-2.5.3.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-data-keyvalue-2.5.3.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-data-redis-2.5.3.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-expression-5.3.9.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-jdbc-5.3.9.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-jms-5.3.9.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-kafka-2.7.3.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-messaging-5.3.9.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-orm-5.3.9.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-retry-1.3.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-security-config-5.5.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-security-core-5.5.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-security-crypto-5.5.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-security-web-5.5.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-tx-5.3.9.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-web-5.3.9.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-webflux-5.3.9.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-webmvc-5.3.9.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/spring-websocket-5.3.9.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/struts2-core-2.4.16.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/transaction-api-1.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/validation-api-2.0.1.jar"/>
@@ -109,9 +110,9 @@
 	<classpathentry kind="lib" path="lib/mockito-core-3.11.2.jar"/>
 	<classpathentry kind="lib" path="lib/reactor-test-3.3.5.jar"/>
 	<classpathentry kind="lib" path="lib/servlet-api-4.0.0.jar"/>
-	<classpathentry kind="lib" path="lib/spring-batch-test-4.2.1.jar"/>
-	<classpathentry kind="lib" path="lib/spring-security-test-5.2.1.jar"/>
-	<classpathentry kind="lib" path="lib/spring-test-5.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/spring-batch-test-4.3.3.jar"/>
+	<classpathentry kind="lib" path="lib/spring-security-test-5.5.1.jar"/>
+	<classpathentry kind="lib" path="lib/spring-test-5.3.9.jar"/>
 	<classpathentry kind="lib" path="lib/websocket-api-1.0.jar"/>
 	<classpathentry kind="output" path="webapp/WEB-INF/classes"/>
 </classpath>

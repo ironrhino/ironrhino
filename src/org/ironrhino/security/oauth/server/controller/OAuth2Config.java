@@ -1,5 +1,7 @@
 package org.ironrhino.security.oauth.server.controller;
 
+import java.util.Collections;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +18,8 @@ public class OAuth2Config extends WebMvcConfigurationSupport {
 	@Override
 	protected void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
 		configurer.defaultContentType(MediaType.APPLICATION_JSON);
-		configurer.favorPathExtension(false);
+		configurer.useRegisteredExtensionsOnly(true);
+		configurer.replaceMediaTypes(Collections.emptyMap());
 	}
 
 	@Bean

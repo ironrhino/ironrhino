@@ -383,7 +383,7 @@ public class ApplicationContextInspector {
 						version = connection.info().getProperty("redis_version");
 					} finally {
 						if (connection != null)
-							RedisConnectionUtils.releaseConnection(connection, cf, false);
+							RedisConnectionUtils.releaseConnection(connection, cf);
 					}
 					sm.getServices().add(new Service(type, version, address));
 				}

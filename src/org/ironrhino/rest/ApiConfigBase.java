@@ -2,6 +2,7 @@ package org.ironrhino.rest;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,6 +119,7 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 		return objectMapper;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void configurePathMatch(PathMatchConfigurer configurer) {
 		configurer.setUseSuffixPatternMatch(false);
@@ -127,7 +129,8 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 	@Override
 	protected void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
 		configurer.defaultContentType(MediaType.APPLICATION_JSON);
-		configurer.favorPathExtension(false);
+		configurer.useRegisteredExtensionsOnly(true);
+		configurer.replaceMediaTypes(Collections.emptyMap());
 	}
 
 	@Override
