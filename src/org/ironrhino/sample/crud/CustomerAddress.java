@@ -20,7 +20,7 @@ public class CustomerAddress implements Serializable {
 
 	private static final long serialVersionUID = -2175577393105618397L;
 
-	@UiConfig(width = "150px", cssClass = "input-medium decrease")
+	@UiConfig(width = "150px", cssClass = "input-medium decrease conjunct", dynamicAttributes = "{\"data-replacement\":\"customer-addresses[${index}].description\"}")
 	@Column(nullable = false)
 	private AddressType type;
 
@@ -45,4 +45,10 @@ public class CustomerAddress implements Serializable {
 	@UiConfig(width = "80px")
 	private boolean active;
 
+	@UiConfig(inputTemplate = "<span class=\"info\"><#if (element.type)??>${element.type} : ${element.mobile!}</#if></span>")
+	public String getDescription() {
+		if (type != null)
+			return type + " : " + (mobile != null ? mobile : "");
+		return null;
+	}
 }
