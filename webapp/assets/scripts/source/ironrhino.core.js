@@ -780,8 +780,12 @@ Ajax = {
 				}
 				var rep = div.find('#' + replacement[key].replace(/(:|\.|\[|\]|,|=|@)/g, '\\$1'));
 				if (rep.length) {
-					r.replaceWith(rep);
-					_observe(rep);
+					var replaceable = !(rep.is('div:empty') && r.is('td'));
+					//placeholder for X-Exact-Fragment
+					if (replaceable) {
+						r.replaceWith(rep);
+						_observe(rep);
+					}
 				} else {
 					if (div.find('#content').length)
 						r.html(div.find('#content').html());
