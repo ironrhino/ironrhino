@@ -157,6 +157,9 @@
 				</thead>
 				<tbody>
 				<#list 0..((value?is_collection&&value?has_content)?then(value?size-1,0)) as index>
+					<#-- expose index,element for template -->
+					<#assign index=index>
+					<#if value?has_content><#assign element=entity[key][index]></#if>
 					<tr>
 						<#list config.embeddedUiConfigs as nestedKey,config>
 						<#local hidden=config.hiddenInInput.value>
@@ -164,7 +167,7 @@
 						<#if !hidden>
 						<td id="${id}[${index}].${nestedKey}">
 						<#local name=entityName+'.'+key+'['+index+'].'+nestedKey>
-						<#local value=(entity[key][index][nestedKey])!>
+						<#local value=(element[nestedKey])!>
 						<#local readonly=config.readonly.value||config.readonly.expression?has_content&&config.readonly.expression?eval>
 						<#local templateName><@config.templateName?interpret/></#local><#local templateName=templateName?markup_string/>
 						<#local pickUrl><@config.pickUrl?interpret/></#local><#local pickUrl=pickUrl?markup_string/>
