@@ -39,6 +39,9 @@
 			return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
 		};
 	}
+	$.byId = function(id) {
+		return $('#' + id.replace(/(:|\.|\[|\]|,|=|@)/g, '\\$1'));
+	};
 	$.fn.formAction = function() {
 		var t = $(this);
 		if (!t.is('form'))
@@ -353,11 +356,11 @@ Message = {
 				if (!$(target).attr('id'))
 					$(target).attr('id', 'form' + new Date().getTime());
 				var fid = $(target).attr('id');
-				if ($('#' + fid + '_message').length == 0)
+				if ($.byId(fid + '_message').length == 0)
 					$('<div id="' + fid
 							+ '_message" class="message-container"></div>')
 							.insertBefore(target);
-				msg = $('#' + fid + '_message');
+				msg = $.byId(fid + '_message');
 			}
 			msg.html(html);
 			_observe(msg);
@@ -762,7 +765,7 @@ Ajax = {
 				replacement = map;
 			}
 			for (var key in replacement) {
-				var r = $('#' + key);
+				var r = $.byId(key);
 				if (key == Ajax.defaultRepacement && !r.length)
 					r = $('body');
 				$('.intervaled', r).each(function() {
@@ -775,7 +778,7 @@ Ajax = {
 								scrollTop : top - 50
 							}, 100);
 				}
-				var rep = div.find('#' + replacement[key]);
+				var rep = div.find('#' + replacement[key].replace(/(:|\.|\[|\]|,|=|@)/g, '\\$1'));
 				if (rep.length) {
 					r.replaceWith(rep);
 					_observe(rep);
@@ -1184,7 +1187,7 @@ if (HISTORY_ENABLED) {
 												if (v.indexOf(':') > -1)
 													v = v.substring(0,
 															v.indexOf(':'));
-												$('#' + v).mask();
+												$.byId(v).mask();
 											});
 								}
 							},
@@ -1197,7 +1200,7 @@ if (HISTORY_ENABLED) {
 												if (v.indexOf(':') > -1)
 													v = v.substring(0,
 															v.indexOf(':'));
-												$('#' + v).unmask();
+												$.byId(v).unmask();
 											});
 								}
 							}
@@ -1310,10 +1313,10 @@ Observation.common = function(container) {
 		if (id.indexOf('/') > -1)
 			id = id.substring(id.lastIndexOf('/') + 1);
 		id += '_modal';
-		while ($('#' + id).length)
+		while ($.byId(id).length)
 			id += '_';
 		t.click(function(e) {
-			if (!$('#' + id).length) {
+			if (!$.byId(id).length) {
 				$.get(t.prop('href'), function(data) {
 					if (typeof data == 'object') {
 						if (data.actionErrors) {
@@ -1356,7 +1359,7 @@ Observation.common = function(container) {
 					}
 				});
 			} else {
-				$('#' + id).modal('show');
+				$.byId(id).modal('show');
 			}
 			return false;
 		});
@@ -1501,7 +1504,7 @@ Observation.common = function(container) {
 									function(i, v) {
 										if (v.indexOf(':') > -1)
 											v = v.substring(0, v.indexOf(':'));
-										$('#' + v).mask();
+										$.byId(v).mask();
 									});
 							$(target).addClass('loading');
 						} else {
@@ -1563,7 +1566,7 @@ Observation.common = function(container) {
 									function(i, v) {
 										if (v.indexOf(':') > -1)
 											v = v.substring(0, v.indexOf(':'));
-										$('#' + v).unmask();
+										$.byId(v).unmask();
 									});
 							$(target).removeClass('loading');
 						} else {
@@ -1669,7 +1672,7 @@ Observation.common = function(container) {
 									function(i, v) {
 										if (v.indexOf(':') > -1)
 											v = v.substring(0, v.indexOf(':'));
-										$('#' + v).mask();
+										$.byId(v).mask();
 									});
 						}
 						t.addClass('loading');
@@ -1685,7 +1688,7 @@ Observation.common = function(container) {
 								&& t.hasClass('view') && !t.data('quiet')) {
 							$.each((replacement || Ajax.defaultRepacement).split(/\s*,\s*/),
 									function(i, v) {
-										$('#' + v).unmask();
+										$.byId(v).unmask();
 									});
 						}
 						t.removeClass('loading');
