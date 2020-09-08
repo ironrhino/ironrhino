@@ -162,7 +162,7 @@
 						<#local hidden=config.hiddenInInput.value>
 						<#if !hidden&&config.hiddenInInput.expression?has_content><#local hidden=config.hiddenInInput.expression?eval></#if>
 						<#if !hidden>
-						<td>
+						<td id="${id}[${index}].${nestedKey}">
 						<#local name=entityName+'.'+key+'['+index+'].'+nestedKey>
 						<#local value=(entity[key][index][nestedKey])!>
 						<#local readonly=config.readonly.value||config.readonly.expression?has_content&&config.readonly.expression?eval>

@@ -37635,7 +37635,7 @@ Observation.sortableTable = function(container) {
 		if (r.is(':hidden'))
 			r.show().find('._disabled:input').removeClass('_disabled').prop(
 					'disabled', false);
-		$('*', r).removeAttr('id');
+		$('*', r).not('td').removeAttr('id');
 		$('.resettable', r).html('');
 		$('span.info', r).html('');
 		$(':input[type!=checkbox][type!=radio]:not(.fixedvalue)', r).val('')
@@ -37766,19 +37766,29 @@ Observation.sortableTable = function(container) {
 	};
 	var rename = function(tbody) {
 		var level = $(tbody).parents('table.datagrided').length;
-		$(tbody).children('tr').each(function(i) {
+		$(tbody).children('tr').each(function(index) {
+			$('td', this).each(function() {
+				rn(this, 'id', level, index);
+			});
 			$(':input', this).each(function() {
-				var name = $(this).prop('name');
-				var j = -1;
-				for (var k = 0; k < level; k++)
-					j = name.indexOf('[', j + 1);
-				if (j < 0)
-					return;
-				name = name.substring(0, j + 1) + i
-						+ name.substring(name.indexOf(']', j));
-				$(this).prop('name', name);
+				rn(this, 'name', level, index);
+				rn(this, 'data-replacement', level, index);
 			});
 		}).closest('form').addClass('dirty');
+	}
+	var rn = function(ele, name, level, index) {
+		var value = $(ele).attr(name);
+		if (value) {
+			var j = -1;
+			for (var k = 0; k < level; k++)
+				j = value.indexOf('[', j + 1);
+			if (j > 0)
+				value = value.substring(0, j + 1) + index
+					+ value.substring(value.indexOf(']', j));
+			$(ele).attr(name, value);
+			if (name.indexOf('data-') == 0)
+				$(ele).data(name.substring(5), value);
+		}
 	}
 })(jQuery);
 
