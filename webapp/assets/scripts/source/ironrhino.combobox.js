@@ -6,33 +6,33 @@
 		if (val) {
 			var exists = false;
 			$('li', menu).each(function() {
-						if ($(this).text() == val) {
-							$(this).addClass('active');
-							exists = true;
-						} else
-							$(this).removeClass('active');
-					});
+				if ($(this).text() == val) {
+					$(this).addClass('active');
+					exists = true;
+				} else
+					$(this).removeClass('active');
+			});
 			if (!exists)
 				$('<li class="active"><a href="#">' + val + '</a></li>')
-						.appendTo(menu);
+					.appendTo(menu);
 		}
 		menu.width(input.closest('.combobox').width() - 2).toggle();
 	}).on('click', '.combobox .combobox-menu a', function(e) {
-				e.preventDefault();
-				if (!$(this).parent('li.group').length) {
-					var input = $('input', $(e.target).closest('.combobox'));
-					var menu = $('.combobox-menu', $(e.target)
-									.closest('.combobox'));
-					input.val($(this).text());
-					input.trigger('change').trigger('blur');
-					menu.hide();
-				}
-				return false;
-			}).on('mouseenter', '.combobox .combobox-menu', function(e) {
-				e.preventDefault();
-				$('li', this).removeClass('active');
-				return false;
-			});
+		e.preventDefault();
+		if (!$(this).parent('li.group').length) {
+			var input = $('input', $(e.target).closest('.combobox'));
+			var menu = $('.combobox-menu', $(e.target)
+				.closest('.combobox'));
+			input.val($(this).text());
+			input.trigger('change').trigger('blur');
+			menu.hide();
+		}
+		return false;
+	}).on('mouseenter', '.combobox .combobox-menu', function(e) {
+		e.preventDefault();
+		$('li', this).removeClass('active');
+		return false;
+	});
 	$.fn.combobox = function() {
 		$(this).each(function() {
 			var t = $(this);
@@ -41,11 +41,11 @@
 				var div = t.next('div.combobox');
 				if (!div.length) {
 					var div = $('<div class="input-append combobox"><ul class="dropdown-menu combobox-menu" role="menu"></ul><input type="text" name="'
-							+ t.attr('name')
-							+ '" value="'
-							+ t.val()
-							+ '"><span class="add-on clickable"><i class="glyphicon glyphicon-chevron-down"></i></span></div>')
-							.insertAfter(t);
+						+ t.attr('name')
+						+ '" value="'
+						+ t.val()
+						+ '"><span class="add-on clickable"><i class="glyphicon glyphicon-chevron-down"></i></span></div>')
+						.insertAfter(t);
 					var input = $('input', div);
 					input.width(t.width() - 27);
 					if (t.hasClass('required'))
@@ -58,15 +58,15 @@
 				t.children().each(function(i, v) {
 					if ($(v).is('option') && $(v).attr('value')) {
 						$('<li><a href="#">' + $(v).attr('value') + '</a></li>')
-								.appendTo(_menu);
+							.appendTo(_menu);
 					} else if ($(v).is('optgroup')) {
 						var label = $(v).attr('label');
 						var group = $('<li class="group"><a href="#">' + label
-								+ '</a><ul></ul></li>').appendTo(_menu);
+							+ '</a><ul></ul></li>').appendTo(_menu);
 						group = $('ul', group);
 						$(v).children('option').each(function(i, v) {
 							$('<li><a href="#">' + $(v).attr('value')
-									+ '</a></li>').appendTo(group);
+								+ '</a></li>').appendTo(group);
 						});
 					}
 				});
@@ -77,22 +77,22 @@
 			}
 			var arr = [];
 			$('.combobox-menu li:not(.group)', t).each(function() {
-						arr.push($(this).text());
-					});
+				arr.push($(this).text());
+			});
 			$('input', t).attr('data-provide', 'typeahead').attr('data-source',
-					JSON.stringify(arr));
+				JSON.stringify(arr));
 			var menu = $('.combobox-menu', t);
 			$('li.group ul', menu).addClass('unstyled');
 			$('li.group > a ', menu).css({
-						'font-weight' : 'bold'
-					});
+				'font-weight': 'bold'
+			});
 			$('li.group li a', menu).css({
-						'padding-left' : '25px'
-					});
+				'padding-left': '25px'
+			});
 			t.css({
-						'display' : 'inline-block',
-						'position' : 'relative'
-					});
+				'display': 'inline-block',
+				'position': 'relative'
+			});
 		});
 		return this;
 	}

@@ -7,7 +7,7 @@ Initialization.apiplayground = function() {
 		form.find('table.requestHeaders tr').each(function(i, v) {
 			var row = $(this);
 			var name = row.find(':input:eq(1)').attr('name')
-					|| row.find('input:eq(0)').val();
+				|| row.find('input:eq(0)').val();
 			var value = row.find(':input:eq(1)').val();
 			if (name)
 				headers[name] = value;
@@ -25,21 +25,21 @@ Initialization.apiplayground = function() {
 		if (form.find('table.requestParams input[type="file"]').length) {
 			var formdata = new FormData();
 			form.find('table.requestParams tr').each(function(i, v) {
-						var row = $(this);
-						var input = row.find(':input:eq(1)');
-						var name = input.attr('name')
-								|| row.find('input:eq(0)').val();
-						if (!name)
-							return;
-						if (input.attr('type') == 'file') {
-							var files = input[0].files;
-							for (var n = 0; n < files.length; n++)
-								formdata.append(name, files[n]);
-						} else {
-							formdata.append(name, input.val());
-						}
+				var row = $(this);
+				var input = row.find(':input:eq(1)');
+				var name = input.attr('name')
+					|| row.find('input:eq(0)').val();
+				if (!name)
+					return;
+				if (input.attr('type') == 'file') {
+					var files = input[0].files;
+					for (var n = 0; n < files.length; n++)
+						formdata.append(name, files[n]);
+				} else {
+					formdata.append(name, input.val());
+				}
 
-					});
+			});
 			data = formdata;
 			processData = false;
 		} else {
@@ -56,11 +56,11 @@ Initialization.apiplayground = function() {
 			form.find('table.requestParams tr').each(function(i, v) {
 				var row = $(this);
 				var name = row.find(':input:eq(1)').attr('name')
-						|| row.find('input:eq(0)').val();
+					|| row.find('input:eq(0)').val();
 				var value = row.find(':input:eq(1)').val();
 				if (name)
 					params.push(encodeURIComponent(name) + '='
-							+ encodeURIComponent(value));
+						+ encodeURIComponent(value));
 			});
 			params = params.join('&');
 			if (params.length) {
@@ -74,29 +74,29 @@ Initialization.apiplayground = function() {
 		}
 		var startTime = new Date().getTime();
 		var options = {
-			global : false,
-			url : url,
-			data : data,
-			contentType : contentType,
-			processData : processData,
-			method : method,
-			headers : headers,
-			beforeSend : function() {
+			global: false,
+			url: url,
+			data: data,
+			contentType: contentType,
+			processData: processData,
+			method: method,
+			headers: headers,
+			beforeSend: function() {
 				form.find('.responseStatus,.responseHeaders,.responseBody')
-						.text('');
+					.text('');
 				if (typeof $.fn.mask != 'undefined')
 					form.mask();
 				else
 					form.addClass('loading');
 			},
-			complete : function(xhr) {
+			complete: function(xhr) {
 				if (typeof $.fn.mask != 'undefined')
 					form.unmask();
 				else
 					form.removeClass('loading');
 				form.find('.responseStatus').html(xhr.status + ' '
-						+ xhr.statusText + ' <span class="badge">'
-						+ (new Date().getTime() - startTime) + 'ms</span>');
+					+ xhr.statusText + ' <span class="badge">'
+					+ (new Date().getTime() - startTime) + 'ms</span>');
 				var rh = form.find('.responseHeaders');
 				rh.text(xhr.getAllResponseHeaders());
 				var rb = form.find('.responseBody');
@@ -104,16 +104,16 @@ Initialization.apiplayground = function() {
 					var responseType = xhr.getResponseHeader('Content-Type');
 					var responseText = xhr.responseText;
 					if (responseText && responseType
-							&& responseType.indexOf('application/json') == 0) {
+						&& responseType.indexOf('application/json') == 0) {
 						try {
 							responseText = JSON.stringify(JSON
-											.parse(responseText), null, '   ');
+								.parse(responseText), null, '   ');
 						} catch (e) {
 						}
 					}
 					rb.text(responseText);
 					$('html,body').animate({
-						scrollTop : (responseText? rb: rh).offset().top - 50
+						scrollTop: (responseText ? rb : rh).offset().top - 50
 					}, 100);
 				}
 			}
@@ -129,21 +129,21 @@ Initialization.apiplayground = function() {
 				var rb = form.find('.responseBody');
 				var reader = new FileReader();
 				reader.addEventListener('loadend', function(e) {
-							var responseType = xhr
-									.getResponseHeader('Content-Type');
-							var responseText = e.srcElement.result;
-							if (responseText
-									&& responseType
-									&& responseType.indexOf('application/json') == 0) {
-								try {
-									responseText = JSON.stringify(JSON
-													.parse(responseText), null,
-											'   ');
-								} catch (e) {
-								}
-							}
-							rb.text(responseText);
-						});
+					var responseType = xhr
+						.getResponseHeader('Content-Type');
+					var responseText = e.srcElement.result;
+					if (responseText
+						&& responseType
+						&& responseType.indexOf('application/json') == 0) {
+						try {
+							responseText = JSON.stringify(JSON
+								.parse(responseText), null,
+								'   ');
+						} catch (e) {
+						}
+					}
+					rb.text(responseText);
+				});
 				reader.readAsText(xhr.response);
 			};
 			options.success = function(data, status, xhr) {
@@ -163,10 +163,10 @@ Initialization.apiplayground = function() {
 					}
 				}
 				var url = URL.createObjectURL(data, {
-							type : xhr.getResponseHeader('Content-Type')
-						});
+					type: xhr.getResponseHeader('Content-Type')
+				});
 				var link = $('<a/>').appendTo(document.body).attr('download',
-						filename).attr('href', url);
+					filename).attr('href', url);
 				link[0].click(); // jquery click doesn't works
 				URL.revokeObjectURL(url);
 				link.remove();
@@ -181,89 +181,89 @@ Initialization.apiplayground = function() {
 		if (hidden.length) {
 			options.dataType = 'custom';
 			options.converters = {
-				'text custom' : function(result) {
+				'text custom': function(result) {
 					return result;
 				}
 			};
 			options.accepts = {
-				custom : hidden.val()
+				custom: hidden.val()
 			};
 		}
 		$.ajax(options);
 		return false;
 	}).on('click', 'form.api-playground .last-accessToken', function() {
-				var accessToken = localStorage.getItem('accessToken');
-				if (!accessToken)
-					alert("Not Found");
-				else
-					$(this).prev('[name="accessToken"]').val(accessToken);
-			}).on('click', 'form.api-playground .fetch-accessToken',
-			function() {
-				$(this).next('.fetch-accessToken-form').toggle();
-			}).on('change',
+		var accessToken = localStorage.getItem('accessToken');
+		if (!accessToken)
+			alert("Not Found");
+		else
+			$(this).prev('[name="accessToken"]').val(accessToken);
+	}).on('click', 'form.api-playground .fetch-accessToken',
+		function() {
+			$(this).next('.fetch-accessToken-form').toggle();
+		}).on('change',
 			'form.api-playground .fetch-accessToken-form [name="grant_type"]',
 			function() {
 				var div = $(this).closest('.fetch-accessToken-form')
-						.find('.grant-type-password');
+					.find('.grant-type-password');
 				if ('password' == $(this).val()) {
 					div.show();
 				} else {
 					div.hide();
 				}
 			}).on('click',
-			'form.api-playground .fetch-accessToken-form button', function() {
-				var f = $(this).closest('.fetch-accessToken-form');
-				var valid = true;
-				var data = {};
-				var fields = f.find(':input:visible');
-				for (var i = 0; i < fields.length; i++) {
-					var field = fields[i];
-					if (!Form.validate(field))
-						valid = false;
-					else if (field.name)
-						data[field.name] = field.value;
-				}
-				if (!valid)
-					return;
-				var options = {
-					global : false,
-					url : f.data('endpoint'),
-					method : 'GET',
-					data : data,
-					beforeSend : function() {
-						if (typeof $.fn.mask != 'undefined')
-							f.mask();
-						else
-							f.addClass('loading');
-					},
-					success : function(data) {
-						if (data.access_token)
-							f.closest('.api-playground')
+				'form.api-playground .fetch-accessToken-form button', function() {
+					var f = $(this).closest('.fetch-accessToken-form');
+					var valid = true;
+					var data = {};
+					var fields = f.find(':input:visible');
+					for (var i = 0; i < fields.length; i++) {
+						var field = fields[i];
+						if (!Form.validate(field))
+							valid = false;
+						else if (field.name)
+							data[field.name] = field.value;
+					}
+					if (!valid)
+						return;
+					var options = {
+						global: false,
+						url: f.data('endpoint'),
+						method: 'GET',
+						data: data,
+						beforeSend: function() {
+							if (typeof $.fn.mask != 'undefined')
+								f.mask();
+							else
+								f.addClass('loading');
+						},
+						success: function(data) {
+							if (data.access_token)
+								f.closest('.api-playground')
 									.find('[name="accessToken"]')
 									.val(data.access_token);
-						f.hide();
-					},
-					complete : function(xhr) {
-						if (typeof $.fn.mask != 'undefined')
-							f.unmask();
-						else
-							f.removeClass('loading');
-						if (xhr.status != 200)
-							alert(xhr.responseText);
-					}
-				};
-				$.ajax(options);
-			});
+							f.hide();
+						},
+						complete: function(xhr) {
+							if (typeof $.fn.mask != 'undefined')
+								f.unmask();
+							else
+								f.removeClass('loading');
+							if (xhr.status != 200)
+								alert(xhr.responseText);
+						}
+					};
+					$.ajax(options);
+				});
 };
 Observation.formatJson = function(container) {
 	$$('code.json.block').each(function() {
-				var t = $(this);
-				if (t.text()) {
-					try {
-						t.text(JSON
-								.stringify(JSON.parse(t.text()), null, '   '));
-					} catch (e) {
-					}
-				}
-			});
+		var t = $(this);
+		if (t.text()) {
+			try {
+				t.text(JSON
+					.stringify(JSON.parse(t.text()), null, '   '));
+			} catch (e) {
+			}
+		}
+	});
 }

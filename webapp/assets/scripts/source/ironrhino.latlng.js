@@ -9,32 +9,32 @@
 		var anchor;
 		if (t.is('[type="hidden"]')) {
 			anchor = $('<i class="glyphicon glyphicon-map-marker clickable"></i>')
-					.insertAfter(t);
+				.insertAfter(t);
 		} else {
 			if (!t.parent('.input-append').length)
 				t
-						.wrap('<div class="input-append"></div>')
-						.after('<span class="add-on clickable"><i class="glyphicon glyphicon-map-marker"></i></span>');
+					.wrap('<div class="input-append"></div>')
+					.after('<span class="add-on clickable"><i class="glyphicon glyphicon-map-marker"></i></span>');
 			anchor = $('.clickable', t.parent());
 		}
 		anchor.click(function() {
 			window.latlng_input = t;
 			if (!$('#_maps_window').length) {
 				var win = $('<div id="_maps_window" title="'
-						+ MessageBundle.get('select')
-						+ '"><div id="_maps_container" style="width:500px;height:400px;"></div></div>')
-						.appendTo(document.body).dialog({
-									minWidth : 520,
-									minHeight : 400
-								});
+					+ MessageBundle.get('select')
+					+ '"><div id="_maps_container" style="width:500px;height:400px;"></div></div>')
+					.appendTo(document.body).dialog({
+						minWidth: 520,
+						minHeight: 400
+					});
 				win.closest('.ui-dialog').css('z-index', 2500);
 				if (typeof AMap == 'undefined') {
 					var script = document.createElement('script');
 					script.src = 'http://webapi.amap.com/maps?v=1.3&callback=latlng_initMaps&key='
-							+ key;
+						+ key;
 					script.type = 'text/javascript';
 					document.getElementsByTagName("head")[0]
-							.appendChild(script);
+						.appendChild(script);
 				}
 
 			} else {
@@ -50,13 +50,13 @@
 					var arr = value.split(/\s*,\s*/);
 					value = arr[1] + ',' + arr[0];
 					holder
-							.html('<img src="http://restapi.amap.com/v3/staticmap?location='
-									+ value
-									+ '&zoom='
-									+ (t.data('zoom') || 13)
-									+ '&size='
-									+ (t.data('size') || '200*200')
-									+ '&key=' + key + '">');
+						.html('<img src="http://restapi.amap.com/v3/staticmap?location='
+							+ value
+							+ '&zoom='
+							+ (t.data('zoom') || 13)
+							+ '&size='
+							+ (t.data('size') || '200*200')
+							+ '&key=' + key + '">');
 				} else {
 					holder.html('');
 				}
@@ -73,20 +73,20 @@ var latlng_marker;
 
 function latlng_initMaps() {
 	latlng_map = new AMap.Map('_maps_container', {
-				center : [104.0967, 35.6622],
-				zoom : 3
-			});
+		center: [104.0967, 35.6622],
+		zoom: 3
+	});
 	latlng_map.on('click', function(event) {
-				latlng_createOrMoveMarker(event.lnglat);
-				latlng_setLatLng(event.lnglat);
-			});
+		latlng_createOrMoveMarker(event.lnglat);
+		latlng_setLatLng(event.lnglat);
+	});
 	latlng_map.on('rightclick', function(event) {
-				latlng_setLatLng(event.lnglat);
-				$('#_maps_window').dialog('close');
-			});
+		latlng_setLatLng(event.lnglat);
+		$('#_maps_window').dialog('close');
+	});
 	AMap.service(['AMap.Geocoder'], function() {
-				geocoder = new AMap.Geocoder();
-			});
+		geocoder = new AMap.Geocoder();
+	});
 	latlng_getLatLng();
 }
 function latlng_resetMaps() {
@@ -106,13 +106,13 @@ function latlng_createOrMoveMarker(latLng) {
 	}
 	if (latlng_marker == null) {
 		latlng_marker = new AMap.Marker({
-					position : latLng,
-					draggable : true,
-					map : latlng_map
-				});
+			position: latLng,
+			draggable: true,
+			map: latlng_map
+		});
 		latlng_marker.on('dragend', function(event) {
-					latlng_setLatLng(event.lnglat);
-				});
+			latlng_setLatLng(event.lnglat);
+		});
 	} else {
 		latlng_marker.setPosition(latLng);
 	}
@@ -123,7 +123,7 @@ function latlng_createOrMoveMarker(latLng) {
 }
 function latlng_setLatLng(latLng) {
 	$(latlng_input).val(latLng.getLat().toFixed(6) + ','
-			+ latLng.getLng().toFixed(6)).trigger('change').trigger('validate');
+		+ latLng.getLng().toFixed(6)).trigger('change').trigger('validate');
 }
 function latlng_getLatLng() {
 	latlng_resetMaps();
@@ -132,26 +132,26 @@ function latlng_getLatLng() {
 			latlng_createOrMoveMarker(latlng_input.val());
 		} else if (latlng_input.data('address') && geocoder) {
 			geocoder.getLocation(latlng_input.data('address'), function(status,
-							result) {
-						if (status == 'complete') {
-							if (result.info == 'OK') {
-								var geocodes = result.geocodes;
-								if (geocodes && geocodes.length) {
-									var pos = geocodes[0].location;
-									latlng_setLatLng(pos);
-									latlng_createOrMoveMarker(pos);
-								} else {
-									latlng_resetMaps();
-								}
-							} else {
-								latlng_resetMaps();
-							}
+				result) {
+				if (status == 'complete') {
+					if (result.info == 'OK') {
+						var geocodes = result.geocodes;
+						if (geocodes && geocodes.length) {
+							var pos = geocodes[0].location;
+							latlng_setLatLng(pos);
+							latlng_createOrMoveMarker(pos);
+						} else {
+							latlng_resetMaps();
 						}
-					});
+					} else {
+						latlng_resetMaps();
+					}
+				}
+			});
 		} else if (latlng_input.data('regionselector')) {
 			var coordinate;
 			var region = $(latlng_input.data('regionselector'))
-					.data('treenode');
+				.data('treenode');
 			var zoom = latlng_input.data('zoom') || 8;
 			if (region) {
 				var coordinate = region.coordinate;
@@ -164,8 +164,8 @@ function latlng_getLatLng() {
 			}
 			if (coordinate) {
 				latlng_map
-						.setCenter(new AMap.LngLat(region.coordinate.longitude,
-								region.coordinate.latitude));
+					.setCenter(new AMap.LngLat(region.coordinate.longitude,
+						region.coordinate.latitude));
 				latlng_map.setZoom(zoom);
 			}
 		}

@@ -7,41 +7,41 @@
 			if (!$('[data-group]', t).length)
 				return;
 			$(':input[data-group]', t).each(function() {
-						var t = $(this);
-						var cg = t.closest('.control-group');
-						if (cg.length) {
-							cg.attr('data-group', t.attr('data-group'));
-							t.removeAttr('data-group');
-						}
-					});
+				var t = $(this);
+				var cg = t.closest('.control-group');
+				if (cg.length) {
+					cg.attr('data-group', t.attr('data-group'));
+					t.removeAttr('data-group');
+				}
+			});
 			var groups = {};
 			$('[data-group],.control-group', t).each(function() {
-						var ct = $(this);
-						var group = ct.data('group')
-								|| MessageBundle.get('other');
-						var cts = groups[group];
-						if (!cts) {
-							cts = [];
-							groups[group] = cts;
-						}
-						cts.push(ct);
-					});
+				var ct = $(this);
+				var group = ct.data('group')
+					|| MessageBundle.get('other');
+				var cts = groups[group];
+				if (!cts) {
+					cts = [];
+					groups[group] = cts;
+				}
+				cts.push(ct);
+			});
 			$('<ul class="nav nav-tabs"></ul><div class="tab-content"></div>')
-					.prependTo($('.form-actions', t).length ? $(
-							'.form-actions', t).parent() : t);
+				.prependTo($('.form-actions', t).length ? $(
+					'.form-actions', t).parent() : t);
 			var navtabs = $('.nav-tabs', t);
 			var tabcontent = $('.tab-content', t);
 			var index = 0;
 			var prefix = t.attr('id')
-					|| ('a' + (Math.random())).replace('.', '').substring(0, 5);
+				|| ('a' + (Math.random())).replace('.', '').substring(0, 5);
 			for (var key in groups) {
 				var id = prefix + index;
 				var tab = $('<li><a href="#' + id + '" data-toggle="tab">'
-						+ key + '</a></li>').appendTo(navtabs);
+					+ key + '</a></li>').appendTo(navtabs);
 				if (index == 0)
 					tab.addClass('active');
 				var pane = $('<div class="tab-pane" id="' + id + '"></div>')
-						.appendTo(tabcontent);
+					.appendTo(tabcontent);
 				if (index == 0)
 					pane.addClass('active');
 				var cts = groups[key];
@@ -55,17 +55,17 @@
 
 	$.fn.groupColumns = function() {
 		this.each(function() {
-					var t = $(this);
-					var columns = parseInt(t.data('columns'));
-					var intab = t.find('.tab-pane > .control-group').length > 0;
-					if (intab) {
-						t.find('.tab-pane').each(function() {
-									transform($(this), columns);
-								});
-					} else {
-						transform(t, columns);
-					}
+			var t = $(this);
+			var columns = parseInt(t.data('columns'));
+			var intab = t.find('.tab-pane > .control-group').length > 0;
+			if (intab) {
+				t.find('.tab-pane').each(function() {
+					transform($(this), columns);
 				});
+			} else {
+				transform(t, columns);
+			}
+		});
 		return this;
 	}
 
@@ -77,27 +77,27 @@
 			con.children('input[type="hidden"]').prependTo(con);
 		}
 		var rowclass = container.parents('.container-fluid').length
-				|| container.parents('.ui-dialog-content')
-				&& $('#content.container-fluid').length ? 'row-fluid' : 'row';
+			|| container.parents('.ui-dialog-content')
+			&& $('#content.container-fluid').length ? 'row-fluid' : 'row';
 		var span = 'span' + (12 / columns);
 		var current = 0;
 		container.find('.control-group').filter(function(i) {
-					return !$(this).parent('[class*="span"]').length;
-				}).each(function(i, v) {
+			return !$(this).parent('[class*="span"]').length;
+		}).each(function(i, v) {
 			var t = $(v);
 			if (t.find('.controls')
-					.find('textarea,table,p,.input-xxlarge,.newline').length) {
+				.find('textarea,table,p,.input-xxlarge,.newline').length) {
 				t.wrap('<div class="' + rowclass
-						+ '"><div class="span12"></div></div>');
+					+ '"><div class="span12"></div></div>');
 				current = 0;
 			} else {
 				if (current % columns == 0) {
 					t.wrap('<div class="' + rowclass + '"><div class="' + span
-							+ '"></div></div>');
+						+ '"></div></div>');
 				} else {
 					var prev = t.prev('.' + rowclass);
 					t.wrap('<div class="' + span + '"/>').parent()
-							.appendTo(prev);
+						.appendTo(prev);
 				}
 				current++;
 			}

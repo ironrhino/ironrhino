@@ -1,50 +1,50 @@
 (function($) {
 	$.fn.checkavailable = function() {
 		this.each(function() {
-					var t = $(this);
-					t.on('checkavailable', function() {
-						if (!t.val())
-							return;
-						var inputs = $('input[type=hidden],:input.id:not(:disabled)',
-								t.closest('form')).not('[name^="__"]')
-								.not('.nocheck').filter(function(i, v) {
-											return $(v).val() && (v != t[0])
-										}).add(t);
-						if (t.data('checkwith')) {
-							$.each(t.data('checkwith').split(/\s*,\s*/),
-									function(i, v) {
-										var ele = $(':input[name="' + v + '"]',
-												t.closest('form'));
-										inputs = inputs.add(ele);
-									});
-						}
-						var url = t.data('checkurl');
-						if (!url) {
-							url = t.closest('form').formAction();
-							url = url.substring(0, url.lastIndexOf('/'))
-									+ '/checkavailable';
-						}
-						ajax({
-									global : false,
-									preflight : true,
-									headers : {
-										'X-Target-Field' : t.attr('name')
-									},
-									target : t.closest('form')[0],
-									url : url,
-									data : inputs.serialize()
-								});
+			var t = $(this);
+			t.on('checkavailable', function() {
+				if (!t.val())
+					return;
+				var inputs = $('input[type=hidden],:input.id:not(:disabled)',
+					t.closest('form')).not('[name^="__"]')
+					.not('.nocheck').filter(function(i, v) {
+						return $(v).val() && (v != t[0])
+					}).add(t);
+				if (t.data('checkwith')) {
+					$.each(t.data('checkwith').split(/\s*,\s*/),
+						function(i, v) {
+							var ele = $(':input[name="' + v + '"]',
+								t.closest('form'));
+							inputs = inputs.add(ele);
+						});
+				}
+				var url = t.data('checkurl');
+				if (!url) {
+					url = t.closest('form').formAction();
+					url = url.substring(0, url.lastIndexOf('/'))
+						+ '/checkavailable';
+				}
+				ajax({
+					global: false,
+					preflight: true,
+					headers: {
+						'X-Target-Field': t.attr('name')
+					},
+					target: t.closest('form')[0],
+					url: url,
+					data: inputs.serialize()
+				});
 
-					}).change(function() {
-								t.addClass('dirty');
-								if (t.is('select,[type=hidden]'))
-									t.trigger('checkavailable');
-							}).blur(function() {
-						if (t.hasClass('dirty')
-								&& !t.next('.field-error').length)
-							t.trigger('checkavailable');
-					});
-				})
+			}).change(function() {
+				t.addClass('dirty');
+				if (t.is('select,[type=hidden]'))
+					t.trigger('checkavailable');
+			}).blur(function() {
+				if (t.hasClass('dirty')
+					&& !t.next('.field-error').length)
+					t.trigger('checkavailable');
+			});
+		})
 		return this;
 	};
 })(jQuery);

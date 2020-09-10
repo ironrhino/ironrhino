@@ -1,6 +1,5 @@
 div.jHtmlArea { display: inline block; }
 div.jHtmlArea div { padding: 0px; margin: 0px; }
-div.jHtmlArea .ToolBar { }
 div.jHtmlArea .ToolBar ul { border: solid 1px #ccc; margin: 1px; padding: 1px; float: left; background: #fff;}
 div.jHtmlArea .ToolBar ul li { list-style-type: none; float: left; border: none; padding: 1px; margin: 1px; }
 div.jHtmlArea .ToolBar ul li:hover { border: solid 1px #ccc; background: #ddd; padding: 0; }
@@ -9,7 +8,6 @@ div.jHtmlArea .ToolBar ul li a.highlighted { border: solid 1px #aaa; background-
 div.jHtmlArea .ToolBar ul li.separator {height: 16px; margin: 0 2px 0 3px; border-left: 1px solid #ccc;}
 div.jHtmlArea .ToolBar ul li.separator:hover { padding: 1px; background-color: #fff; border-top:none; border-bottom:none; border-right:none;}
 
-div.jHtmlArea .ToolBar ul li a:hover { }
 div.jHtmlArea .ToolBar ul li a.bold { background-position: 0 0; }
 div.jHtmlArea .ToolBar ul li a.italic { background-position: -16px 0; }
 div.jHtmlArea .ToolBar ul li a.underline { background-position: -32px 0; }

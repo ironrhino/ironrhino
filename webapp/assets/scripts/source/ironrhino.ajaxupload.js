@@ -18,21 +18,21 @@
 		if (Array.isArray(files)) {
 			// for $.fn.ajaxsubmit
 			$.each(files, function(i, v) {
-						if (v.name && v.value)
-							formdata.append(v.name, v.value);
-						else
-							formdata.append(options.name || 'file', v);
-					});
+				if (v.name && v.value)
+					formdata.append(v.name, v.value);
+				else
+					formdata.append(options.name || 'file', v);
+			});
 		} else {
 			for (var i = 0; i < files.length; i++)
 				formdata.append(options.name || 'file', files[i]);
 		}
 		options.data = formdata;
 		$.ajax($.extend(options, {
-					contentType : false,
-					processData : false,
-					cache : false,
-					type : 'POST'
-				}));
+			contentType: false,
+			processData: false,
+			cache: false,
+			type: 'POST'
+		}));
 	}
 })(jQuery);

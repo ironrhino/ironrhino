@@ -31,16 +31,16 @@
 						} else {
 							if (val === null && !t.is('td')) {
 								t
-										.html('<i class="glyphicon glyphicon-list"></i>');
+									.html('<i class="glyphicon glyphicon-list"></i>');
 							} else if (Array.isArray(val)
-									&& t.is('td')
-									&& (!t.text() || t.find('.tag-label').length)) {
+								&& t.is('td')
+								&& (!t.text() || t.find('.tag-label').length)) {
 								var newlabels = [];
 								$.each(val, function(i, v) {
 									newlabels
-											.push('<div class="tag"><span class="tag-label">'
-													+ v
-													+ '</span><span class="tag-remove"></span></div>');
+										.push('<div class="tag"><span class="tag-label">'
+											+ v
+											+ '</span><span class="tag-remove"></span></div>');
 								});
 								t.html(newlabels.join(''));
 							} else {
@@ -56,9 +56,9 @@
 			} else {
 				var selector = expr.substring(0, i);
 				var ele = selector == 'this' ? $(container) : $(selector,
-						container);
+					container);
 				if (ele.parents('.richtable').length && ele.is('td')
-						&& expr.indexOf('data-cellvalue') > -1)
+					&& expr.indexOf('data-cellvalue') > -1)
 					Richtable.updateValue(ele, val);
 				else
 					ele.attr(expr.substring(i + 1), val);
@@ -78,8 +78,8 @@
 						if (ele.hasClass('tags')) {
 							var arr = [];
 							ele.find('.tag-label').each(function() {
-										arr.push($(this).text())
-									});
+								arr.push($(this).text())
+							});
 							return arr.join(', ');
 						} else {
 							return ele.text();
@@ -87,13 +87,13 @@
 					} else if (ele.is('td') && ele.find('.tag-label').length) {
 						var arr = [];
 						ele.find('.tag-label').each(function() {
-									arr.push($(this).text())
-								});
+							arr.push($(this).text())
+						});
 						return arr.join(', ');
 					} else {
 						return ele.contents().filter(function() {
-									return this.nodeType == 3;
-								}).text();
+							return this.nodeType == 3;
+						}).text();
 					}
 				}
 			} else if (i == 0) {
@@ -101,7 +101,7 @@
 			} else {
 				var selector = expr.substring(0, i);
 				var ele = selector == 'this' ? $(container) : $(selector,
-						container);
+					container);
 				return ele.attr(expr.substring(i + 1));
 			}
 		}
@@ -128,14 +128,14 @@
 		$(this).each(function() {
 			var current = $(this);
 			var options = {
-				id : '.listpick-id',
-				name : '.listpick-name',
-				idindex : 0,
-				nameindex : 1,
-				multiple : false
+				id: '.listpick-id',
+				name: '.listpick-name',
+				idindex: 0,
+				nameindex: 1,
+				multiple: false
 			}
 			$.extend(options, (new Function("return "
-							+ (current.data('options') || '{}')))());
+				+ (current.data('options') || '{}')))());
 			current.data('_options', options);
 			if (options.name) {
 				var nametarget = find(options.name, current);
@@ -147,15 +147,15 @@
 					if (labels.length) {
 						textArr = [];
 						labels.each(function() {
-									textArr.push($(this).text());
-								});
+							textArr.push($(this).text());
+						});
 					}
 					var txt = nametarget
-							.addClass('listpick-handle')
-							.html('<div class="text resettable"></div>'
-									+ '<i class="indicator glyphicon glyphicon-list"></i>'
-									+ '<i class="remove glyphicon glyphicon-remove-sign"></i>')
-							.find('.text');
+						.addClass('listpick-handle')
+						.html('<div class="text resettable"></div>'
+							+ '<i class="indicator glyphicon glyphicon-list"></i>'
+							+ '<i class="remove glyphicon glyphicon-remove-sign"></i>')
+						.find('.text');
 					if (options.multiple) {
 						if (!textArr)
 							textArr = text.split(/\s*,\s*/);
@@ -163,8 +163,8 @@
 						if (text)
 							$.each(textArr, function(i, v) {
 								$('<div class="tag"><span class="tag-label"></span><span class="tag-remove"></span></div>')
-										.appendTo(txt).find('.tag-label')
-										.text(v);
+									.appendTo(txt).find('.tag-label')
+									.text(v);
 							});
 					} else {
 						txt.text(text);
@@ -174,43 +174,43 @@
 					if (current.hasClass('readonly'))
 						nametarget.addClass('readonly').removeAttr('tabindex');
 					var input = current
-							.find('input.listpick-id[type="hidden"]');
+						.find('input.listpick-id[type="hidden"]');
 					if (input.length) {
 						input.prependTo(nametarget);
 						if (input.prop('disabled'))
 							nametarget.addClass('disabled')
-									.removeAttr('tabindex');
+								.removeAttr('tabindex');
 						if (input.prop('readonly'))
 							nametarget.addClass('readonly')
-									.removeAttr('tabindex');
+								.removeAttr('tabindex');
 						nametarget.attr('id', input.attr('id'));
 						input.removeAttr('id');
-						$.each(	$.grep(input.attr('class').split(' '),
-										function(v) {
-											return v.indexOf('input-') == 0
-													|| v.indexOf('span') == 0;
-										}), function(k, v) {
-									input.removeClass(v);
-									nametarget.addClass(v);
-								});
+						$.each($.grep(input.attr('class').split(' '),
+							function(v) {
+								return v.indexOf('input-') == 0
+									|| v.indexOf('span') == 0;
+							}), function(k, v) {
+								input.removeClass(v);
+								nametarget.addClass(v);
+							});
 					}
 				} else if (!current.is('.readonly,.disabled')) {
 					if (!current.is('td') || current.text()
-							&& !current.find('.tag-label').length) {
+						&& !current.find('.tag-label').length) {
 						var remove = nametarget.children('a.remove');
 						if (remove.length) {
 							remove.click(removeAction);
 						} else {
 							var text = val(options.name, current);
 							var viewlink = current
-									.find('a.view[rel="richtable"]');
+								.find('a.view[rel="richtable"]');
 							if (current.is('td') && viewlink.length)
 								text = viewlink.text();
 							if (text) {
 								if (text.indexOf('...') < 0)
 									$('<a class="remove" href="#"/>')
-											.appendTo(nametarget)
-											.click(removeAction);
+										.appendTo(nametarget)
+										.click(removeAction);
 							} else {
 								val(options.name, current, null);
 							}
@@ -221,12 +221,12 @@
 			var func = function(event) {
 				var t = $(event.target);
 				if (t.is('.remove') || t.is('.tag-remove')
-						|| t.is('a.view[rel="richtable"]'))
+					|| t.is('a.view[rel="richtable"]'))
 					return true;
 				var current = t.closest('.listpick');
 				if (current.is('.disabled,.readonly')
-						|| current.find('.listpick-name')
-								.is('.disabled,.readonly'))
+					|| current.find('.listpick-name')
+						.is('.disabled,.readonly'))
 					return false;
 				var options = current.data('_options');
 				var winid = current.data('winid');
@@ -240,15 +240,15 @@
 					current.data('winid', winid);
 				}
 				var win = $('<div id="' + winid + '" title="'
-						+ MessageBundle.get('select')
-						+ '" class="window-listpick"></div>')
-						.appendTo(document.body).dialog({
-									width : options.width || 800,
-									minHeight : options.minHeight || 500,
-									close : function() {
-										win.html('').dialog('destroy').remove();
-									}
-								});
+					+ MessageBundle.get('select')
+					+ '" class="window-listpick"></div>')
+					.appendTo(document.body).dialog({
+						width: options.width || 800,
+						minHeight: options.minHeight || 500,
+						close: function() {
+							win.html('').dialog('destroy').remove();
+						}
+					});
 				win.data('windowoptions', options);
 				win.data('selected', val(options.id, current) || '');
 				win.closest('.ui-dialog').css('z-index', 2000);
@@ -256,7 +256,7 @@
 					win.mask();
 				else
 					win.html('<div style="text-align:center;">'
-							+ MessageBundle.get('ajax.loading') + '</div>');
+						+ MessageBundle.get('ajax.loading') + '</div>');
 				var target = win.get(0);
 				target.onsuccess = function() {
 					win.data('listpick', current);
@@ -267,44 +267,44 @@
 						win.on('click', 'tbody input[type=radio]', function() {
 							var cell = $($(this).closest('tr')[0].cells[options.idindex]);
 							var id = options.idindex == 0
-									? $(this).val()
-									: cell.data('cellvalue') || cell.text();
+								? $(this).val()
+								: cell.data('cellvalue') || cell.text();
 							cell = $($(this).closest('tr')[0].cells[options.nameindex]);
 							var name = cell.data('cellvalue') || cell.text();
 							if (options.name) {
 								var nametarget = find(options.name, win
-												.data('listpick'));
+									.data('listpick'));
 								var viewlink = nametarget
-										.find('a.view[rel="richtable"]');
+									.find('a.view[rel="richtable"]');
 								if (nametarget.is('td') && viewlink.length) {
 									var href = viewlink.attr('href');
 									viewlink.attr('href', href.substring(0,
-													href.lastIndexOf('/') + 1)
-													+ id);
+										href.lastIndexOf('/') + 1)
+										+ id);
 									viewlink.text(name);
 								} else
 									val(options.name, win.data('listpick'),
-											name);
+										name);
 								nametarget.each(function() {
 									var t = $(this);
 									if (!t.is(':input')
-											&& !t.find('.remove').length)
+										&& !t.find('.remove').length)
 										$('<a class="remove" href="#"/>')
-												.appendTo(t)
-												.click(removeAction);
+											.appendTo(t)
+											.click(removeAction);
 								});
 							}
 							if (options.id) {
 								val(options.id, win.data('listpick'), id);
 								var idtarget = find(options.id, win
-												.data('listpick'));
+									.data('listpick'));
 							}
 							if (options.mapping) {
 								for (var k in options.mapping) {
 									cell = $($(this).closest('tr')[0].cells[options.mapping[k]]);
 									val(k, win.data('listpick'), cell
-													.data('cellvalue')
-													|| cell.text());
+										.data('cellvalue')
+										|| cell.text());
 								}
 							}
 							win.dialog('close');
@@ -319,47 +319,47 @@
 							var uncheckedIds = [];
 							var uncheckedNames = [];
 							$('table.richtable tbody input[type="checkbox"]',
-									target).each(function() {
-								var cell = $($(this).closest('tr')[0].cells[options.idindex]);
-								var id = options.idindex == 0
+								target).each(function() {
+									var cell = $($(this).closest('tr')[0].cells[options.idindex]);
+									var id = options.idindex == 0
 										? $(this).val()
 										: cell.data('cellvalue') || cell.text();
-								cell = $($(this).closest('tr')[0].cells[options.nameindex]);
-								var name = cell.data('cellvalue')
+									cell = $($(this).closest('tr')[0].cells[options.nameindex]);
+									var name = cell.data('cellvalue')
 										|| cell.text();
-								if (this.checked) {
-									checked[id] = name
-								} else {
-									uncheckedIds.push(id);
-									uncheckedNames.push(name);
-								};
-							});
+									if (this.checked) {
+										checked[id] = name
+									} else {
+										uncheckedIds.push(id);
+										uncheckedNames.push(name);
+									};
+								});
 							var selectedIds = [];
 							if (options.id) {
 								var v = win.data('selected')
-										|| val(options.id, win.data('listpick'));
+									|| val(options.id, win.data('listpick'));
 								if (v)
 									selectedIds = v.split(idSeparator);
 							}
 							var selectedNames = [];
 							if (options.name) {
 								var v = win.data('selectednames')
-										|| val(options.name, win
-														.data('listpick'));
+									|| val(options.name, win
+										.data('listpick'));
 								if (v)
 									selectedNames = v.split(nameSeparator);
 								if (options.id) {
 									if (selectedNames.length)
 										$.each(uncheckedIds, function(i, v) {
-													var index = selectedIds
-															.indexOf(v);
-													if (index > -1) {
-														selectedIds.splice(
-																index, 1);
-														selectedNames.splice(
-																index, 1);
-													}
-												});
+											var index = selectedIds
+												.indexOf(v);
+											if (index > -1) {
+												selectedIds.splice(
+													index, 1);
+												selectedNames.splice(
+													index, 1);
+											}
+										});
 									for (var key in checked) {
 										if (selectedIds.indexOf(key) < 0) {
 											selectedIds.push(key);
@@ -369,12 +369,12 @@
 								} else {
 									if (selectedNames.length)
 										$.each(uncheckedNames, function(i, v) {
-													var index = uncheckedNames
-															.indexOf(v);
-													if (index > -1)
-														selectedNames.splice(
-																index, 1);
-												});
+											var index = uncheckedNames
+												.indexOf(v);
+											if (index > -1)
+												selectedNames.splice(
+													index, 1);
+										});
 									for (var key in checked)
 										if (selectedNames.indexOf(checked[key]) < 0)
 											selectedNames.push(checked[key]);
@@ -383,12 +383,12 @@
 							if (options.id && !options.name) {
 								if (selectedIds.length)
 									$.each(uncheckedIds, function(i, v) {
-												var index = selectedIds
-														.indexOf(v);
-												if (index > -1)
-													selectedIds
-															.splice(index, 1);
-											});
+										var index = selectedIds
+											.indexOf(v);
+										if (index > -1)
+											selectedIds
+												.splice(index, 1);
+									});
 								for (var key in checked)
 									if (selectedIds.indexOf(key) < 0)
 										selectedIds.push(key);
@@ -396,67 +396,67 @@
 							if (options.id) {
 								if (keepopen)
 									win.data('selected', selectedIds
-													.join(idSeparator));
+										.join(idSeparator));
 								else
 									find(options.id, win.data('listpick'))
-											.each(function() {
-												var t = $(this);
-												val(
-														options.id,
-														win.data('listpick'),
-														selectedIds
-																.join(idSeparator));
-											});
+										.each(function() {
+											var t = $(this);
+											val(
+												options.id,
+												win.data('listpick'),
+												selectedIds
+													.join(idSeparator));
+										});
 
 							}
 							if (options.name) {
 								if (keepopen)
 									win.data('selectednames', selectedNames
-													.join(nameSeparator));
+										.join(nameSeparator));
 								else
 									find(options.name, win.data('listpick'))
-											.each(function() {
-												var t = $(this);
-												if (t.is('.input-pseudo')) {
-													var arr = [];
-													for (var i = 0; i < selectedIds.length; i++)
-														arr.push({
-															key : selectedIds[i],
-															value : selectedNames[i]
-														});
-													t.trigger('val', [arr]);
-												} else if (t.is('td')
-														&& (!t.text() || t
-																.find('.tag-label').length)) {
+										.each(function() {
+											var t = $(this);
+											if (t.is('.input-pseudo')) {
+												var arr = [];
+												for (var i = 0; i < selectedIds.length; i++)
+													arr.push({
+														key: selectedIds[i],
+														value: selectedNames[i]
+													});
+												t.trigger('val', [arr]);
+											} else if (t.is('td')
+												&& (!t.text() || t
+													.find('.tag-label').length)) {
+												val(
+													options.name,
+													win
+														.data('listpick'),
+													selectedNames);
+											} else {
+												if (selectedNames.length) {
 													val(
-															options.name,
-															win
-																	.data('listpick'),
-															selectedNames);
+														options.name,
+														win
+															.data('listpick'),
+														selectedNames
+															.join(nameSeparator));
+													if (!t.is(':input')
+														&& !t
+															.find('.remove').length)
+														$('<a class="remove" href="#"/>')
+															.appendTo(t)
+															.click(removeAction);
 												} else {
-													if (selectedNames.length) {
-														val(
-																options.name,
-																win
-																		.data('listpick'),
-																selectedNames
-																		.join(nameSeparator));
-														if (!t.is(':input')
-																&& !t
-																		.find('.remove').length)
-															$('<a class="remove" href="#"/>')
-																	.appendTo(t)
-																	.click(removeAction);
+													if (!t.is(':input')) {
+														t.find('.remove')
+															.click();
 													} else {
-														if (!t.is(':input')) {
-															t.find('.remove')
-																	.click();
-														} else {
-															t.val('');
-														}
+														t.val('');
 													}
 												}
-											});
+											}
+										});
 							}
 							if (!keepopen)
 								win.dialog('close');
@@ -468,12 +468,12 @@
 				if (url.indexOf('multiple') < 0 && options.multiple)
 					url += (url.indexOf('?') > 0 ? '&' : '?') + 'multiple=true'
 				ajax({
-							url : url,
-							cache : false,
-							target : target,
-							replacement : winid + ':content',
-							quiet : true
-						});
+					url: url,
+					cache: false,
+					target: target,
+					replacement: winid + ':content',
+					quiet: true
+				});
 
 			};
 			var handle = current.find('.listpick-handle');
@@ -481,12 +481,12 @@
 				handle = current;
 			if (!current.is('.readonly,.disabled'))
 				handle.css('cursor', 'pointer').click(func).keydown(
-						function(event) {
-							if (event.keyCode == 13) {
-								func(event);
-								return false;
-							}
-						});
+					function(event) {
+						if (event.keyCode == 13) {
+							func(event);
+							return false;
+						}
+					});
 		});
 		return this;
 	};
@@ -496,21 +496,21 @@
 Observation.listpick = function(container) {
 	$$('.listpick', container).listpick();
 	$$('form.pick.richtable', container).each(function() {
-				var t = $(this);
-				var selected = t.closest('.window-listpick').data('selected');
-				if (selected) {
-					var arr = selected.split(/\s*,\s*/);
-					$('input[type="checkbox"]', t).each(function() {
-								if ($.inArray(this.value, arr) > -1)
-									$(this).click();
-							});
-					$('input[type="radio"]', t).each(function() {
-								if (this.value == selected)
-									this.checked = true;
-							});
-				}
-				t.on('click', '.pagination a', function() {
-							t.find('button.pick').trigger('click', 'keepopen');
-						});
+		var t = $(this);
+		var selected = t.closest('.window-listpick').data('selected');
+		if (selected) {
+			var arr = selected.split(/\s*,\s*/);
+			$('input[type="checkbox"]', t).each(function() {
+				if ($.inArray(this.value, arr) > -1)
+					$(this).click();
 			});
+			$('input[type="radio"]', t).each(function() {
+				if (this.value == selected)
+					this.checked = true;
+			});
+		}
+		t.on('click', '.pagination a', function() {
+			t.find('button.pick').trigger('click', 'keepopen');
+		});
+	});
 };

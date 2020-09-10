@@ -1,8 +1,8 @@
 (function($) {
 	$.fn.editme = function() {
 		return $(this).attr('contenteditable', 'true').keyup(function() {
-					$(this).addClass('edited')
-				}).blur(blur);
+			$(this).addClass('edited')
+		}).blur(blur);
 	};
 	function blur() {
 		var t = $(this);
@@ -13,25 +13,25 @@
 		if (t.hasClass('edited')) {
 			var func = function() {
 				ajax({
-							url : url,
-							type : 'POST',
-							data : data,
-							global : false,
-							success : function() {
-								t.removeClass('edited');
-							}
-						});
+					url: url,
+					type: 'POST',
+					data: data,
+					global: false,
+					success: function() {
+						t.removeClass('edited');
+					}
+				});
 			}
 			if (VERBOSE_MODE != 'LOW') {
 				$.alerts({
-							type : 'confirm',
-							message : MessageBundle.get('confirm.save'),
-							callback : function(b) {
-								if (b) {
-									func();
-								}
-							}
-						});
+					type: 'confirm',
+					message: MessageBundle.get('confirm.save'),
+					callback: function(b) {
+						if (b) {
+							func();
+						}
+					}
+				});
 			} else {
 				func();
 			}

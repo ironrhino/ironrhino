@@ -18,56 +18,56 @@
 			if (!t.data('attachmentsfield'))
 				t.data('attachmentsfield', folder + '.attachments');
 			var formactions = $('.form-actions', t)
-					.append($(' <button type="button" class="btn upload">'
-							+ MessageBundle.get('upload')
-							+ '</button> <button type="button" class="btn snapshot">'
-							+ MessageBundle.get('snapshot') + '</button>'));
+				.append($(' <button type="button" class="btn upload">'
+					+ MessageBundle.get('upload')
+					+ '</button> <button type="button" class="btn snapshot">'
+					+ MessageBundle.get('snapshot') + '</button>'));
 			formactions.find('.btn[type="submit"]').addClass('btn-primary');
 			if (!$('ul.attachments.thumbnails', t).length)
 				formactions
-						.before('<div style="padding: 10px 50px;"><ul class="attachments resettable thumbnails" style="min-height:50px;"></ul></div>');
+					.before('<div style="padding: 10px 50px;"><ul class="attachments resettable thumbnails" style="min-height:50px;"></ul></div>');
 			t.find('button.upload').click(function() {
 				$('<input type="file" multiple>').appendTo(t).hide().change(
-						function() {
-							upload(this.files, null, t);
-							$(this).remove();
-						}).click();
+					function() {
+						upload(this.files, null, t);
+						$(this).remove();
+					}).click();
 				$(this).blur();
 			});
 			t.find('button.snapshot').click(function() {
 				$.snapshot({
-							onsnapshot : function(canvas, timestamp) {
-								var filename = $.format.date(
-										new Date(timestamp),
-										'yyyyMMddHHmmssSSS')
-										+ '.png';
-								var file;
-								if (canvas && canvas.toBlob)
-									canvas.toBlob(function(blob) {
-												upload([blob], [filename], t);
-											}, 'image/png');
-							},
-							onerror : function(msg) {
-								Message.showError(msg);
-							}
-						});
+					onsnapshot: function(canvas, timestamp) {
+						var filename = $.format.date(
+							new Date(timestamp),
+							'yyyyMMddHHmmssSSS')
+							+ '.png';
+						var file;
+						if (canvas && canvas.toBlob)
+							canvas.toBlob(function(blob) {
+								upload([blob], [filename], t);
+							}, 'image/png');
+					},
+					onerror: function(msg) {
+						Message.showError(msg);
+					}
+				});
 				$(this).blur();
 			});
 			var ul = t.find('ul.attachments').on('dragover', function(e) {
-						$(this).addClass('drophover');
-						return false;
-					}).on('dragleave', function(e) {
-						$(this).removeClass('drophover');
-						return false;
-					}).on('drop', function(e) {
-						e.preventDefault();
-						$(this).removeClass('drophover');
-						upload(e.originalEvent.dataTransfer.files, null, t);
-						return true;
-					}).on('click', 'li .remove', function() {
-						$(this).closest('li').remove();
-						return false;
-					});
+				$(this).addClass('drophover');
+				return false;
+			}).on('dragleave', function(e) {
+				$(this).removeClass('drophover');
+				return false;
+			}).on('drop', function(e) {
+				e.preventDefault();
+				$(this).removeClass('drophover');
+				upload(e.originalEvent.dataTransfer.files, null, t);
+				return true;
+			}).on('click', 'li .remove', function() {
+				$(this).closest('li').remove();
+				return false;
+			});
 			appendAttachments(t, t.data('attachments'));
 		});
 		return this;
@@ -76,22 +76,22 @@
 	function upload(files, filenames, form) {
 		if (files && files.length) {
 			var data = {
-				folder : form.data('folder'),
-				autorename : true,
-				json : true
+				folder: form.data('folder'),
+				autorename: true,
+				json: true
 			};
 			if (filenames && filenames.length) {
 				data.filename = filenames;
 			}
 			return $.ajaxupload(files, ajaxOptions({
-								url : CONTEXT_PATH + '/common/upload',
-								name : 'file',
-								data : data,
-								dataType: 'json',
-								success : function(data) {
-									appendAttachments(form, data);
-								}
-							}));
+				url: CONTEXT_PATH + '/common/upload',
+				name: 'file',
+				data: data,
+				dataType: 'json',
+				success: function(data) {
+					appendAttachments(form, data);
+				}
+			}));
 		}
 	}
 
@@ -112,19 +112,19 @@
 				if (index > 0) {
 					var suffix = uri.substring(index + 1).toLowerCase();
 					image = suffix == 'jpg' || suffix == 'png'
-							|| suffix == 'gif' || suffix == 'bmp'
-							|| suffix == 'webp';
+						|| suffix == 'gif' || suffix == 'bmp'
+						|| suffix == 'webp';
 				}
 				$('<li class="span2"><a class="remove" href="#"></a><input type="hidden" name="'
-						+ form.data('attachmentsfield')
-						+ '" value="'
-						+ path
-						+ '"><div class="thumbnail"><a href="'
-						+ uri
-						+ '" target="_blank">'
-						+ (image ? '<img src="' + uri + '">' : '<span>'
-								+ filename + '</span>') + '</a></div></li>')
-						.appendTo(ul);
+					+ form.data('attachmentsfield')
+					+ '" value="'
+					+ path
+					+ '"><div class="thumbnail"><a href="'
+					+ uri
+					+ '" target="_blank">'
+					+ (image ? '<img src="' + uri + '">' : '<span>'
+						+ filename + '</span>') + '</a></div></li>')
+					.appendTo(ul);
 			}
 	}
 

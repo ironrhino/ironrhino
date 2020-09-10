@@ -31,16 +31,16 @@
 						} else {
 							if (val === null && !t.is('td')) {
 								t
-										.html('<i class="glyphicon glyphicon-list"></i>');
+									.html('<i class="glyphicon glyphicon-list"></i>');
 							} else if (Array.isArray(val)
-									&& t.is('td')
-									&& (!t.text() || t.find('.tag-label').length)) {
+								&& t.is('td')
+								&& (!t.text() || t.find('.tag-label').length)) {
 								var newlabels = [];
 								$.each(val, function(i, v) {
 									newlabels
-											.push('<div class="tag"><span class="tag-label">'
-													+ v
-													+ '</span><span class="tag-remove"></span></div>');
+										.push('<div class="tag"><span class="tag-label">'
+											+ v
+											+ '</span><span class="tag-remove"></span></div>');
 								});
 								t.html(newlabels.join(''));
 							} else {
@@ -56,9 +56,9 @@
 			} else {
 				var selector = expr.substring(0, i);
 				var ele = selector == 'this' ? $(container) : $(selector,
-						container);
+					container);
 				if (ele.parents('.richtable').length && ele.is('td')
-						&& expr.indexOf('data-cellvalue') > -1)
+					&& expr.indexOf('data-cellvalue') > -1)
 					Richtable.updateValue(ele, val);
 				else
 					ele.attr(expr.substring(i + 1), val);
@@ -78,8 +78,8 @@
 						if (ele.hasClass('tags')) {
 							var arr = [];
 							ele.find('.tag-label').each(function() {
-										arr.push($(this).text())
-									});
+								arr.push($(this).text())
+							});
 							return arr.join(', ');
 						} else {
 							return ele.text();
@@ -87,13 +87,13 @@
 					} else if (ele.is('td') && ele.find('.tag-label').length) {
 						var arr = [];
 						ele.find('.tag-label').each(function() {
-									arr.push($(this).text())
-								});
+							arr.push($(this).text())
+						});
 						return arr.join(', ');
 					} else {
 						return ele.contents().filter(function() {
-									return this.nodeType == 3;
-								}).text();
+							return this.nodeType == 3;
+						}).text();
 					}
 				}
 			} else if (i == 0) {
@@ -101,7 +101,7 @@
 			} else {
 				var selector = expr.substring(0, i);
 				var ele = selector == 'this' ? $(container) : $(selector,
-						container);
+					container);
 				return ele.attr(expr.substring(i + 1));
 			}
 		}
@@ -129,14 +129,14 @@
 		$(this).each(function() {
 			var current = $(this);
 			var options = {
-				idproperty : 'id',
-				separator : '',
-				id : '.treeselect-id',
-				name : '.treeselect-name',
-				full : true
+				idproperty: 'id',
+				separator: '',
+				id: '.treeselect-id',
+				name: '.treeselect-name',
+				full: true
 			}
 			$.extend(options, (new Function("return "
-							+ (current.data('options') || '{}')))());
+				+ (current.data('options') || '{}')))());
 			current.data('_options', options);
 			var nametarget = null;
 			if (options.name) {
@@ -149,15 +149,15 @@
 					if (labels.length) {
 						textArr = [];
 						labels.each(function() {
-									textArr.push($(this).text());
-								});
+							textArr.push($(this).text());
+						});
 					}
 					var txt = nametarget
-							.addClass('treeselect-handle')
-							.html('<div class="text resettable"></div>'
-									+ '<i class="indicator glyphicon glyphicon-list"></i>'
-									+ '<i class="remove glyphicon glyphicon-remove-sign"></i>')
-							.find('.text');
+						.addClass('treeselect-handle')
+						.html('<div class="text resettable"></div>'
+							+ '<i class="indicator glyphicon glyphicon-list"></i>'
+							+ '<i class="remove glyphicon glyphicon-remove-sign"></i>')
+						.find('.text');
 					if (options.multiple) {
 						if (!textArr)
 							textArr = text.split(/\s*,\s*/);
@@ -165,8 +165,8 @@
 						if (text)
 							$.each(textArr, function(i, v) {
 								$('<div class="tag"><span class="tag-label"></span><span class="tag-remove"></span></div>')
-										.appendTo(txt).find('.tag-label')
-										.text(v);
+									.appendTo(txt).find('.tag-label')
+									.text(v);
 							});
 					} else {
 						txt.text(text);
@@ -176,43 +176,43 @@
 					if (current.hasClass('readonly'))
 						nametarget.addClass('readonly').removeAttr('tabindex');
 					var input = current
-							.find('input.treeselect-id[type="hidden"]');
+						.find('input.treeselect-id[type="hidden"]');
 					if (input.length) {
 						input.prependTo(nametarget);
 						if (input.prop('disabled'))
 							nametarget.addClass('disabled')
-									.removeAttr('tabindex');
+								.removeAttr('tabindex');
 						if (input.prop('readonly'))
 							nametarget.addClass('readonly')
-									.removeAttr('tabindex');
+								.removeAttr('tabindex');
 						nametarget.attr('id', input.attr('id'));
 						input.removeAttr('id');
-						$.each(	$.grep(input.attr('class').split(' '),
-										function(v) {
-											return v.indexOf('input-') == 0
-													|| v.indexOf('span') == 0;
-										}), function(k, v) {
-									input.removeClass(v);
-									nametarget.addClass(v);
-								});
+						$.each($.grep(input.attr('class').split(' '),
+							function(v) {
+								return v.indexOf('input-') == 0
+									|| v.indexOf('span') == 0;
+							}), function(k, v) {
+								input.removeClass(v);
+								nametarget.addClass(v);
+							});
 					}
 				} else if (!current.is('.readonly,.disabled')) {
 					if (!current.is('td') || current.text()
-							&& !current.find('.tag-label').length) {
+						&& !current.find('.tag-label').length) {
 						var remove = nametarget.children('a.remove');
 						if (remove.length) {
 							remove.click(removeAction);
 						} else {
 							var text = val(options.name, current);
 							var viewlink = current
-									.find('a.view[rel="richtable"]');
+								.find('a.view[rel="richtable"]');
 							if (current.is('td') && viewlink.length)
 								text = viewlink.text();
 							if (text) {
 								if (text.indexOf('...') < 0)
 									$('<a class="remove" href="#"/>')
-											.appendTo(nametarget)
-											.click(removeAction);
+										.appendTo(nametarget)
+										.click(removeAction);
 							} else {
 								val(options.name, current, null);
 							}
@@ -223,91 +223,91 @@
 			var func = function(event) {
 				var t = $(event.target);
 				if (t.is('.remove') || t.is('.tag-remove')
-						|| t.is('a.view[rel="richtable"]'))
+					|| t.is('a.view[rel="richtable"]'))
 					return true;
 				var current = t.closest('.treeselect');
 				if (current.is('.disabled,.readonly')
-						|| current.find('.treeselect-name')
-								.is('.disabled,.readonly'))
+					|| current.find('.treeselect-name')
+						.is('.disabled,.readonly'))
 					return false;
 				var winid = '_tree_window';
 				current.data('winid', winid);
 				$('#' + winid).remove();
 				var win = $('<div id="' + winid + '" title="'
-						+ MessageBundle.get('select')
-						+ '"><div class="tree"></div></div>')
-						.appendTo(document.body);
+					+ MessageBundle.get('select')
+					+ '"><div class="tree"></div></div>')
+					.appendTo(document.body);
 				win.dialog({
-							width : current.data('_options').width || 500,
-							minHeight : current.data('_options').minHeight
-									|| 500,
-							close : function() {
-								win.html('').dialog('destroy').remove();
-							}
-						});
+					width: current.data('_options').width || 500,
+					minHeight: current.data('_options').minHeight
+						|| 500,
+					close: function() {
+						win.html('').dialog('destroy').remove();
+					}
+				});
 				win.closest('.ui-dialog').css('z-index', 2500);
 				if (nametarget && nametarget.length)
 					options.value = val(options.name, current) || '';
 				if (options.multiple) {
 					var treeviewoptions = {
-						url : options.url,
-						collapsed : true,
-						template : '<a><input id="cb-{{id}}" type="checkbox" value="{{id}}"> <label for="cb-{{id}}">{{name}}</label></a>',
-						placeholder : MessageBundle.get('ajax.loading'),
-						unique : true,
-						separator : options.separator,
-						root : options.root
+						url: options.url,
+						collapsed: true,
+						template: '<a><input id="cb-{{id}}" type="checkbox" value="{{id}}"> <label for="cb-{{id}}">{{name}}</label></a>',
+						placeholder: MessageBundle.get('ajax.loading'),
+						unique: true,
+						separator: options.separator,
+						root: options.root
 					};
 					win.find('.tree').data('selected',
-							val(options.id, current) || '')
-							.treeview(treeviewoptions);
+						val(options.id, current) || '')
+						.treeview(treeviewoptions);
 					$('<div style="text-align:center;"><button class="btn btn-primary pick">'
-							+ MessageBundle.get('confirm') + '</button></div>')
-							.appendTo(win).click(function() {
-								var ids = [], names = [];
-								$('input:checked', win).each(function() {
-									ids.push(this.value);
-									names.push($(this).closest('li')
-											.find('label[for]:first').text());
-								});
-								if (options.name) {
-									var separator = ', ';
-									var nametarget = find(options.name, current);
-									nametarget.each(function() {
-										var t = $(this);
-										if (t.is('.input-pseudo')) {
-											var arr = [];
-											for (var i = 0; i < ids.length; i++)
-												arr.push({
-															key : ids[i],
-															value : names[i]
-														});
-											t.trigger('val', [arr]);
-										} else if (t.is('td')
-												&& (!t.text() || t
-														.find('.tag-label').length)) {
-											val(options.name, current, names);
-										} else {
-											val(options.name, current, names
-															.join(separator));
-											if (!t.is(':input')) {
-												if (!t.find('.remove').length)
-													$('<a class="remove" href="#"/>')
-															.appendTo(t)
-															.click(removeAction);
-												if (!names.length)
-													t.find('.remove').click();
-											}
-										}
-									});
-								}
-								if (options.id) {
-									var separator = ',';
-									val(options.id, current, ids
-													.join(separator));
-								}
-								win.dialog('close');
+						+ MessageBundle.get('confirm') + '</button></div>')
+						.appendTo(win).click(function() {
+							var ids = [], names = [];
+							$('input:checked', win).each(function() {
+								ids.push(this.value);
+								names.push($(this).closest('li')
+									.find('label[for]:first').text());
 							});
+							if (options.name) {
+								var separator = ', ';
+								var nametarget = find(options.name, current);
+								nametarget.each(function() {
+									var t = $(this);
+									if (t.is('.input-pseudo')) {
+										var arr = [];
+										for (var i = 0; i < ids.length; i++)
+											arr.push({
+												key: ids[i],
+												value: names[i]
+											});
+										t.trigger('val', [arr]);
+									} else if (t.is('td')
+										&& (!t.text() || t
+											.find('.tag-label').length)) {
+										val(options.name, current, names);
+									} else {
+										val(options.name, current, names
+											.join(separator));
+										if (!t.is(':input')) {
+											if (!t.find('.remove').length)
+												$('<a class="remove" href="#"/>')
+													.appendTo(t)
+													.click(removeAction);
+											if (!names.length)
+												t.find('.remove').click();
+										}
+									}
+								});
+							}
+							if (options.id) {
+								var separator = ',';
+								val(options.id, current, ids
+									.join(separator));
+							}
+							win.dialog('close');
+						});
 
 				} else {
 					if (options.type == 'treearea') {
@@ -317,18 +317,18 @@
 						win.find('.tree').treearea(options);
 					} else {
 						var treeviewoptions = {
-							url : options.url,
-							click : function() {
+							url: options.url,
+							click: function() {
 								var treenode = $(this).closest('li')
-										.data('treenode');
+									.data('treenode');
 								doclick(current, treenode, options);
 							},
-							collapsed : true,
-							placeholder : MessageBundle.get('ajax.loading'),
-							unique : true,
-							separator : options.separator,
-							value : options.value,
-							root : options.root
+							collapsed: true,
+							placeholder: MessageBundle.get('ajax.loading'),
+							unique: true,
+							separator: options.separator,
+							value: options.value,
+							root: options.root
 						};
 						win.find('.tree').treeview(treeviewoptions);
 					}
@@ -340,12 +340,12 @@
 				handle = current;
 			if (!current.is('.readonly,.disabled'))
 				handle.css('cursor', 'pointer').click(func).keydown(
-						function(event) {
-							if (event.keyCode == 13) {
-								func(event);
-								return false;
-							}
-						});
+					function(event) {
+						if (event.keyCode == 13) {
+							func(event);
+							return false;
+						}
+					});
 		});
 		return this;
 	};
@@ -355,27 +355,27 @@
 			var nametarget = find(options.name, current);
 			var name = options.full ? treenode.fullname : treenode.name;
 			nametarget.each(function() {
-						var viewlink = nametarget
-								.find('a.view[rel="richtable"]');
-						if (nametarget.is('td') && viewlink.length) {
-							var href = viewlink.attr('href');
-							viewlink.attr('href', href.substring(0, href
-													.lastIndexOf('/')
-													+ 1)
-											+ treenode.id);
-							viewlink.text(name);
-							if (!viewlink.next('.remove').length)
-								$('<a class="remove" href="#"/>')
-										.insertAfter(viewlink)
-										.click(removeAction);
-						} else {
-							val(options.name, current, name);
-							var t = $(this);
-							if (!t.is(':input') && !t.find('.remove').length)
-								$('<a class="remove" href="#"/>')
-										.appendTo(t).click(removeAction);
-						}
-					});
+				var viewlink = nametarget
+					.find('a.view[rel="richtable"]');
+				if (nametarget.is('td') && viewlink.length) {
+					var href = viewlink.attr('href');
+					viewlink.attr('href', href.substring(0, href
+						.lastIndexOf('/')
+						+ 1)
+						+ treenode.id);
+					viewlink.text(name);
+					if (!viewlink.next('.remove').length)
+						$('<a class="remove" href="#"/>')
+							.insertAfter(viewlink)
+							.click(removeAction);
+				} else {
+					val(options.name, current, name);
+					var t = $(this);
+					if (!t.is(':input') && !t.find('.remove').length)
+						$('<a class="remove" href="#"/>')
+							.appendTo(t).click(removeAction);
+				}
+			});
 		}
 		if (options.id) {
 			var idtarget = find(options.id, current);
@@ -399,9 +399,9 @@ Observation.treeselect = function(container) {
 		if (selected) {
 			var arr = selected.split(/\s*,\s*/);
 			$('input[type="checkbox"]', t).each(function() {
-						if ($.inArray(this.value, arr) > -1)
-							$(this).click();
-					});
+				if ($.inArray(this.value, arr) > -1)
+					$(this).click();
+			});
 		}
 	}
 };

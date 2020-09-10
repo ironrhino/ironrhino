@@ -3,7 +3,7 @@
 		treeoptions = treeoptions || {};
 		this.addClass('treearea').each(function() {
 			_treeoptions = $.extend(treeoptions, (new Function("return "
-							+ ($(this).data('options') || '{}')))());
+				+ ($(this).data('options') || '{}')))());
 			var treearea = $(this);
 			var fullname = _treeoptions.value;
 			var i = 0;
@@ -16,12 +16,12 @@
 					if (!match) {
 						var name = $(this).text();
 						if (fullname == name
-								|| fullname.indexOf(name
-										+ _treeoptions.separator) == 0) {
+							|| fullname.indexOf(name
+								+ _treeoptions.separator) == 0) {
 							match = true;
 							target = $(this);
 							fullname = fullname.substring(name.length
-									+ _treeoptions.separator.length);
+								+ _treeoptions.separator.length);
 							id = target.data('treenode').id;
 						}
 					}
@@ -31,7 +31,7 @@
 						expand(_treeoptions, treearea, target, callback);
 					} else {
 						$('span', target.closest('.area'))
-								.removeClass('selected');
+							.removeClass('selected');
 						target.addClass('selected');
 					}
 			} : null;
@@ -51,22 +51,22 @@
 		}
 		if (id > 0)
 			areas.each(function(i) {
-						var index = i + 1;
-						var match = false;
-						$('span', this).each(function() {
-									if ($(this).data('treenode').id == id)
-										match = true;
-								});
-						if (match)
-							level = index;
-					});
+				var index = i + 1;
+				var match = false;
+				$('span', this).each(function() {
+					if ($(this).data('treenode').id == id)
+						match = true;
+				});
+				if (match)
+					level = index;
+			});
 		for (var i = areas.length - 1; i > level; i--)
 			areas.eq(i).fadeOut().remove();
 		areas = $('.area', treearea);
 		var area = level + 1 == areas.length
-				? areas.eq(level).html('')
-				: $('<div/>').addClass('clearfix').addClass('area')
-						.appendTo(treearea);
+			? areas.eq(level).html('')
+			: $('<div/>').addClass('clearfix').addClass('area')
+				.appendTo(treearea);
 		var url = treeoptions.url;
 		if (id > 0)
 			url += '?parent=' + id;
@@ -80,9 +80,9 @@
 					$('span', this).each(function() {
 						if ($(this).hasClass('selected')) {
 							fullname += (fullname
-									? (treeoptions.separator || '')
-									: '')
-									+ $(this).text();
+								? (treeoptions.separator || '')
+								: '')
+								+ $(this).text();
 							parent = $(this).data('treenode');
 						}
 					});
@@ -90,23 +90,23 @@
 				this.parent = parent;
 				if (!this.fullname)
 					this.fullname = fullname
-							+ (fullname ? (treeoptions.separator || '') : '')
-							+ this.name;
+						+ (fullname ? (treeoptions.separator || '') : '')
+						+ this.name;
 				var span = $('<span/>').text(this.name).data('treenode', this)
-						.appendTo(area).click(function(ev) {
-							var target = $(ev.target);
-							if ((!target.hasClass('hasChildren') || (!treeoptions.leafonly && target
-									.hasClass('selected')))
-									&& treeoptions.click) {
-								$('span', target.closest('.area'))
-										.removeClass('selected');
-								target.addClass('selected');
-								treeoptions.click(target.data('treenode'));
-							} else
-								expand(treeoptions,
-										target.closest('.treearea'), target,
-										callback);
-						});
+					.appendTo(area).click(function(ev) {
+						var target = $(ev.target);
+						if ((!target.hasClass('hasChildren') || (!treeoptions.leafonly && target
+							.hasClass('selected')))
+							&& treeoptions.click) {
+							$('span', target.closest('.area'))
+								.removeClass('selected');
+							target.addClass('selected');
+							treeoptions.click(target.data('treenode'));
+						} else
+							expand(treeoptions,
+								target.closest('.treearea'), target,
+								callback);
+					});
 				if (this.hasChildren)
 					span.addClass('hasChildren');
 

@@ -2,45 +2,45 @@
 
 	$.fn.concatimage = function() {
 		this.each(function() {
-					var t = $(this);
-					var target = t.data('target') ? document.getElementById(t
-							.data('target')) : this.parentNode();
-					$(target).data('original-width', $(target).innerWidth());
-					var field = document.getElementById(t.data('field'));
-					var maximum = parseInt(t.data('maximum'));
-					t.click(function() {
-								$('<input type="file" accept="image/*" multiple>')
-										.appendTo(target).hide().change(
-												function() {
-													concatenateImages(
-															this.files, target,
-															field, maximum,
-															t.data('error'));
-													$(this).remove();
-												}).click();
-							});
-					$(target).on('dragover', function(e) {
-								$(this).addClass('drophover');
-								return false;
-							}).on('dragleave', function(e) {
-								$(this).removeClass('drophover');
-								return false;
-							}).on('drop', function(e) {
-						e.preventDefault();
-						$(this).removeClass('drophover');
-						concatenateImages(e.originalEvent.dataTransfer.files,
-								target, field, maximum, t.data('error'));
-						return true;
-					});
-				});
+			var t = $(this);
+			var target = t.data('target') ? document.getElementById(t
+				.data('target')) : this.parentNode();
+			$(target).data('original-width', $(target).innerWidth());
+			var field = document.getElementById(t.data('field'));
+			var maximum = parseInt(t.data('maximum'));
+			t.click(function() {
+				$('<input type="file" accept="image/*" multiple>')
+					.appendTo(target).hide().change(
+						function() {
+							concatenateImages(
+								this.files, target,
+								field, maximum,
+								t.data('error'));
+							$(this).remove();
+						}).click();
+			});
+			$(target).on('dragover', function(e) {
+				$(this).addClass('drophover');
+				return false;
+			}).on('dragleave', function(e) {
+				$(this).removeClass('drophover');
+				return false;
+			}).on('drop', function(e) {
+				e.preventDefault();
+				$(this).removeClass('drophover');
+				concatenateImages(e.originalEvent.dataTransfer.files,
+					target, field, maximum, t.data('error'));
+				return true;
+			});
+		});
 		return this;
 	}
 
 	function concatenateImages(files, target, field, maximum, error) {
 		if (files.length > maximum) {
 			Message.showActionError(MessageBundle.get(error
-									|| 'maximum.exceeded', files.length,
-							maximum), $(target).closest('form'));
+				|| 'maximum.exceeded', files.length,
+				maximum), $(target).closest('form'));
 			return;
 		}
 		window.URL = window.URL || window.webkitURL || window.mozURL;
@@ -103,7 +103,7 @@
 			}
 			var data = canvas.toDataURL();
 			var maxlength = parseInt($(field).data('maximum'))
-					|| parseInt($(field).attr('maxlength'));
+				|| parseInt($(field).attr('maxlength'));
 			var times = 4;
 			while (data.length > maxlength && times > 0) {
 				scale(canvas, 0.9);
@@ -112,8 +112,8 @@
 			}
 			if (data.length > maxlength) {
 				Message.showActionError(MessageBundle.get($(field)
-								.data('error')
-								|| 'maximum.exceeded', data.length, maxlength));
+					.data('error')
+					|| 'maximum.exceeded', data.length, maxlength));
 				canvas.parentNode.removeChild(canvas);
 				$(target).data('count', '0');
 			} else {
@@ -136,7 +136,7 @@
 		var width = canvas.width = Math.floor(copy.width * stretchRatio);
 		var height = canvas.height = Math.floor(copy.height * stretchRatio);
 		context.drawImage(copy, 0, 0, copy.width, copy.height, 0, 0, width,
-				height);
+			height);
 		copy = null;
 	};
 })(jQuery);
