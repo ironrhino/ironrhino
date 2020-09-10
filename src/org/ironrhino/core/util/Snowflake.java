@@ -2,6 +2,11 @@ package org.ironrhino.core.util;
 
 import java.util.Random;
 
+import org.apache.commons.lang3.StringUtils;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class Snowflake {
 
 	private final static long EPOCH = 1556150400000L;
@@ -14,6 +19,22 @@ public class Snowflake {
 
 	private long sequence = 0L;
 	private long lastTimestamp = -1L;
+
+	public static final Snowflake DEFAULT_INSTANCE;
+
+	static {
+		int workerId = 0;
+		String id = AppInfo.getEnv("worker.id");
+		if (id == null) {
+			String ip = AppInfo.getHostAddress();
+			id = ip.substring(ip.lastIndexOf('.') + 1);
+		}
+		if (StringUtils.isNumeric(id)) {
+			workerId = Integer.parseInt(id);
+		}
+		log.info("Snowflake default instance worker id is {}", workerId);
+		DEFAULT_INSTANCE = new Snowflake(workerId);
+	}
 
 	public Snowflake(int workerId) {
 		this(workerId, 8, 10);
