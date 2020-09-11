@@ -37,6 +37,7 @@ import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.internal.CriteriaImpl.OrderEntry;
 import org.hibernate.query.Query;
 import org.hibernate.transform.ResultTransformer;
+import org.hibernate.type.Type;
 import org.ironrhino.core.hibernate.IgnoreCaseSimpleExpression;
 import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.model.Ordered;
@@ -331,7 +332,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	public boolean existsCriteria(DetachedCriteria dc) {
 		Criteria c = dc.getExecutableCriteria(sessionFactory.getCurrentSession());
 		c.setMaxResults(1);
-		c.setProjection(Projections.id());
+		c.setProjection(Projections.sqlProjection("1", new String[0], new Type[0]));
 		try {
 			return c.uniqueResult() != null;
 		} finally {
@@ -446,7 +447,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 		if (c == null)
 			return false;
 		c.setMaxResults(1);
-		c.setProjection(Projections.id());
+		c.setProjection(Projections.sqlProjection("1", new String[0], new Type[0]));
 		return c.uniqueResult() != null;
 	}
 
@@ -483,7 +484,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 		if (c == null)
 			return false;
 		c.setMaxResults(1);
-		c.setProjection(Projections.id());
+		c.setProjection(Projections.sqlProjection("1", new String[0], new Type[0]));
 		return c.uniqueResult() != null;
 	}
 
