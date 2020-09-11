@@ -116,13 +116,20 @@ public class TracingConfiguration {
 		if (StringUtils.isNotBlank(server))
 			builder.withTag("server", server);
 		tracer = builder.build();
-		GlobalTracer.registerIfAbsent(tracer);
-		log.info("Register jaeger tracer with {}", uri);
+		if (GlobalTracer.registerIfAbsent(tracer))
+			log.info("Register jaeger tracer with {}", uri);
+		else
+			log.warn("Global tracer already registered by {}", GlobalTracer.get());
 	}
 
 	@Bean
 	public TracingAspect tracingAspect() {
 		return new TracingAspect();
+	}
+
+	@Bean
+	public static TracingTransactionManagerBeanFactoryPostProcessor tracingTransactionManagerBeanFactoryPostProcessor() {
+		return new TracingTransactionManagerBeanFactoryPostProcessor();
 	}
 
 	@PreDestroy
