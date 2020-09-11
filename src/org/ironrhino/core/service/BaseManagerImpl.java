@@ -445,8 +445,9 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 		Criteria c = constructCriteria(true, objects);
 		if (c == null)
 			return false;
-		c.setProjection(Projections.rowCount());
-		return ((Long) c.uniqueResult()) > 0;
+		c.setMaxResults(1);
+		c.setProjection(Projections.id());
+		return c.uniqueResult() != null;
 	}
 
 	@Override
@@ -462,11 +463,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	@Transactional(readOnly = true)
 	public boolean existsOne(Serializable... objects) {
-		Criteria c = constructCriteria(false, objects);
-		if (c == null)
-			return false;
-		c.setProjection(Projections.rowCount());
-		return ((Long) c.uniqueResult()) > 0;
+		return existsOne(false, objects);
 	}
 
 	@Override
@@ -485,8 +482,9 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 		Criteria c = constructCriteria(false, caseInsensitive, objects);
 		if (c == null)
 			return false;
-		c.setProjection(Projections.rowCount());
-		return ((Long) c.uniqueResult()) > 0;
+		c.setMaxResults(1);
+		c.setProjection(Projections.id());
+		return c.uniqueResult() != null;
 	}
 
 	private static Serializable[] transform(Serializable... objects) {
