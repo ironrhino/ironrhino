@@ -328,6 +328,19 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 
 	@Override
 	@Transactional(readOnly = true)
+	public boolean existsCriteria(DetachedCriteria dc) {
+		Criteria c = dc.getExecutableCriteria(sessionFactory.getCurrentSession());
+		c.setMaxResults(1);
+		c.setProjection(Projections.id());
+		try {
+			return c.uniqueResult() != null;
+		} finally {
+			c.setProjection(null);
+		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
 	public List<T> findListByCriteria(DetachedCriteria dc) {
 		Criteria c = dc.getExecutableCriteria(sessionFactory.getCurrentSession());
 		c.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);

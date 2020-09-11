@@ -48,6 +48,8 @@ public interface BaseManager<T extends Persistable<?>> {
 
 	T findByCriteria(DetachedCriteria dc);
 
+	boolean existsCriteria(DetachedCriteria dc);
+
 	List<T> findListByCriteria(DetachedCriteria dc);
 
 	List<T> findBetweenListByCriteria(DetachedCriteria dc, int from, int end);

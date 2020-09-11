@@ -178,8 +178,16 @@ public class EntityManagerTest {
 		assertThat(entityManager.countByCriteria(dc), is(1L));
 		dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("name", "test"));
+		assertThat(entityManager.existsCriteria(dc), is(true));
 		Person person2 = entityManager.findByCriteria(dc);
 		assertThat(person2.getName(), is("test"));
+		dc = entityManager.detachedCriteria();
+		dc.add(Restrictions.eq("gender", Gender.MALE));
+		dc.add(Restrictions.eq("name", "test"));
+		assertThat(entityManager.existsCriteria(dc), is(true));
+		dc = entityManager.detachedCriteria();
+		dc.add(Restrictions.eq("gender", Gender.FEMALE));
+		assertThat(entityManager.existsCriteria(dc), is(false));
 		entityManager.delete(person);
 	}
 
