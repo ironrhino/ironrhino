@@ -1,9 +1,11 @@
 package org.ironrhino.core.tracing;
 
 import java.net.URI;
+import java.util.Collections;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.spring.configuration.AddressAvailabilityCondition;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
@@ -37,6 +40,7 @@ import io.jaegertracing.spi.Sampler;
 import io.jaegertracing.spi.Sender;
 import io.jaegertracing.thrift.internal.senders.UdpSender;
 import io.opentracing.Tracer;
+import io.opentracing.contrib.jdbc.TracingDataSource;
 import io.opentracing.propagation.Format.Builtin;
 import io.opentracing.propagation.TextMap;
 import io.opentracing.util.GlobalTracer;
@@ -152,6 +156,30 @@ public class TracingConfiguration {
 					throws BeansException {
 				if (enabled) {
 					try {
+						String beanName = "dataSource";
+						BeanDefinition oldBd = beanDefinitionRegistry.getBeanDefinition(beanName);
+						beanDefinitionRegistry.removeBeanDefinition(beanName);
+						RootBeanDefinition newBd = new RootBeanDefinition(TracingDataSource.class);
+						newBd.setTargetType(DataSource.class);
+						newBd.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_NO);
+						newBd.getConstructorArgumentValues().addIndexedArgumentValue(0,
+								new ConstructorArgumentValues.ValueHolder(GlobalTracer.get()));
+						newBd.getConstructorArgumentValues().addIndexedArgumentValue(1, oldBd);
+						newBd.getConstructorArgumentValues().addIndexedArgumentValue(2,
+								new ConstructorArgumentValues.ValueHolder(null));
+						newBd.getConstructorArgumentValues().addIndexedArgumentValue(3,
+								new ConstructorArgumentValues.ValueHolder(true));
+						newBd.getConstructorArgumentValues().addIndexedArgumentValue(4,
+								new ConstructorArgumentValues.ValueHolder(Collections.emptySet()));
+						if (oldBd.isPrimary()) {
+							newBd.setPrimary(true);
+							oldBd.setPrimary(false);
+						}
+						beanDefinitionRegistry.registerBeanDefinition(beanName, newBd);
+						log.info("Wrapped DataSource with {}", newBd.getBeanClassName());
+					} catch (NoSuchBeanDefinitionException ignored) {
+					}
+					try {
 						String beanName = "transactionManager";
 						BeanDefinition oldBd = beanDefinitionRegistry.getBeanDefinition(beanName);
 						beanDefinitionRegistry.removeBeanDefinition(beanName);
@@ -164,10 +192,8 @@ public class TracingConfiguration {
 							oldBd.setPrimary(false);
 						}
 						beanDefinitionRegistry.registerBeanDefinition(beanName, newBd);
-						log.info("Wrapped PlatformTransactionManager {} with {}", oldBd.getBeanClassName(),
-								newBd.getBeanClassName());
-					} catch (NoSuchBeanDefinitionException e) {
-						// ignore
+						log.info("Wrapped PlatformTransactionManager with {}", newBd.getBeanClassName());
+					} catch (NoSuchBeanDefinitionException ignored) {
 					}
 				}
 			}

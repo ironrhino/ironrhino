@@ -1,7 +1,5 @@
 package org.ironrhino.core.spring.configuration;
 
-import java.util.Collections;
-
 import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
@@ -9,7 +7,6 @@ import org.flywaydb.core.Flyway;
 import org.ironrhino.core.hibernate.HibernateEnabled;
 import org.ironrhino.core.jdbc.DatabaseProduct;
 import org.ironrhino.core.metrics.MetricsConfiguration;
-import org.ironrhino.core.tracing.TracingConfiguration;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +26,6 @@ import org.springframework.util.ClassUtils;
 import com.zaxxer.hikari.HikariDataSource;
 
 import io.micrometer.core.instrument.Metrics;
-import io.opentracing.contrib.jdbc.TracingDataSource;
-import io.opentracing.contrib.jdbc.parser.URLParser;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -93,9 +88,6 @@ public class DataSourceConfiguration {
 	@Autowired(required = false)
 	private MetricsConfiguration metricsConfiguration;
 
-	@Autowired(required = false)
-	private TracingConfiguration tracingConfiguration;
-
 	protected DataSource createDataSource() {
 		if (AppInfo.getStage() == Stage.DEVELOPMENT && StringUtils.isBlank(env.getProperty("jdbc.url"))) {
 			boolean available = AddressAvailabilityCondition.check(jdbcUrl, 5000);
@@ -136,13 +128,7 @@ public class DataSourceConfiguration {
 			Flyway.configure().baselineOnMigrate(true).dataSource(hikari).load().migrate();
 		}
 
-		DataSource ds = hikari;
-		if (tracingConfiguration != null && tracingConfiguration.getTracer() != null) {
-			ds = new TracingDataSource(tracingConfiguration.getTracer(), hikari, URLParser.parse(jdbcUrl), true,
-					Collections.emptySet());
-		}
-
-		return ds;
+		return hikari;
 	}
 
 	@Bean(autowireCandidate = false)
