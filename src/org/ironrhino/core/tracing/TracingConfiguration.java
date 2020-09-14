@@ -10,9 +10,20 @@ import org.ironrhino.core.spring.configuration.AddressAvailabilityCondition;
 import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import io.jaegertracing.internal.Constants;
 import io.jaegertracing.internal.JaegerTracer;
@@ -38,9 +49,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TracingConfiguration {
 
+	static final String KEY_JAEGER_COLLECTOR_URI = "jaeger.collector.uri";
+	static final String DEFAULT_JAEGER_COLLECTOR_URI = "http://localhost:14268";
+
 	private static final int ONE_MB_IN_BYTES = 1048576;
 
-	@Value("${jaeger.collector.uri:http://localhost:14268}")
+	@Value("${" + KEY_JAEGER_COLLECTOR_URI + ":" + DEFAULT_JAEGER_COLLECTOR_URI + "}")
 	private URI uri;
 
 	@Value("${jaeger.reporter.flushInterval:5000}")
@@ -69,10 +83,8 @@ public class TracingConfiguration {
 
 	@PostConstruct
 	public void init() {
-		if (uri == null) {
-			Tracing.disable();
+		if (!Tracing.isEnabled())
 			return;
-		}
 		String scheme = uri.getScheme();
 		if (scheme == null || !scheme.equals("udp") && !scheme.equals("http") && !scheme.equals("https"))
 			throw new IllegalArgumentException("uri scheme should be one of udp http https");
@@ -83,11 +95,6 @@ public class TracingConfiguration {
 			String s = uri.toString();
 			if (!s.endsWith("/api/traces"))
 				s += "/api/traces";
-			if (!AddressAvailabilityCondition.check(s, 2000)) {
-				log.warn("Skip jaeger tracer with {}", s);
-				Tracing.disable();
-				return;
-			}
 			sender = new HttpSender(s, ONE_MB_IN_BYTES);
 		}
 		boolean production = AppInfo.getStage() == Stage.PRODUCTION;
@@ -128,8 +135,45 @@ public class TracingConfiguration {
 	}
 
 	@Bean
-	public static TracingTransactionManagerBeanFactoryPostProcessor tracingTransactionManagerBeanFactoryPostProcessor() {
-		return new TracingTransactionManagerBeanFactoryPostProcessor();
+	protected static BeanDefinitionRegistryPostProcessor tracingBeanDefinitionRegistryPostProcessor(Environment env) {
+		String uri = env.getProperty(KEY_JAEGER_COLLECTOR_URI, DEFAULT_JAEGER_COLLECTOR_URI);
+		boolean enabled = uri.startsWith("udp://") || AddressAvailabilityCondition.check(uri, 2000);
+		if (!enabled) {
+			log.warn("Skip jaeger tracer with {}", uri);
+			Tracing.disable();
+		}
+		return new BeanDefinitionRegistryPostProcessor() {
+			@Override
+			public void postProcessBeanFactory(ConfigurableListableBeanFactory configurableListableBeanFactory)
+					throws BeansException {
+			}
+
+			@Override
+			public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry beanDefinitionRegistry)
+					throws BeansException {
+				if (enabled) {
+					try {
+						String beanName = "transactionManager";
+						String actualBeanName = "actualTransactionManager";
+						BeanDefinition oldBd = beanDefinitionRegistry.getBeanDefinition(beanName);
+						beanDefinitionRegistry.removeBeanDefinition(beanName);
+						beanDefinitionRegistry.registerBeanDefinition(actualBeanName, oldBd);
+						RootBeanDefinition newBd = new RootBeanDefinition(TracingTransactionManager.class);
+						newBd.setPrimary(true);
+						newBd.setTargetType(PlatformTransactionManager.class);
+						newBd.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_NO);
+						newBd.getConstructorArgumentValues().addIndexedArgumentValue(0,
+								new RuntimeBeanReference(actualBeanName));
+						beanDefinitionRegistry.registerBeanDefinition(beanName, newBd);
+						log.info("Wrapped PlatformTransactionManager {} with {}", oldBd.getBeanClassName(),
+								newBd.getBeanClassName());
+					} catch (NoSuchBeanDefinitionException e) {
+						// ignore
+					}
+				}
+			}
+		};
+
 	}
 
 	@PreDestroy
