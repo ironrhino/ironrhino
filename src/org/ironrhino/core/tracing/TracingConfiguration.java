@@ -15,7 +15,6 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
@@ -154,16 +153,16 @@ public class TracingConfiguration {
 				if (enabled) {
 					try {
 						String beanName = "transactionManager";
-						String actualBeanName = "actualTransactionManager";
 						BeanDefinition oldBd = beanDefinitionRegistry.getBeanDefinition(beanName);
 						beanDefinitionRegistry.removeBeanDefinition(beanName);
-						beanDefinitionRegistry.registerBeanDefinition(actualBeanName, oldBd);
 						RootBeanDefinition newBd = new RootBeanDefinition(TracingTransactionManager.class);
-						newBd.setPrimary(true);
 						newBd.setTargetType(PlatformTransactionManager.class);
 						newBd.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_NO);
-						newBd.getConstructorArgumentValues().addIndexedArgumentValue(0,
-								new RuntimeBeanReference(actualBeanName));
+						newBd.getConstructorArgumentValues().addIndexedArgumentValue(0, oldBd);
+						if (oldBd.isPrimary()) {
+							newBd.setPrimary(true);
+							oldBd.setPrimary(false);
+						}
 						beanDefinitionRegistry.registerBeanDefinition(beanName, newBd);
 						log.info("Wrapped PlatformTransactionManager {} with {}", oldBd.getBeanClassName(),
 								newBd.getBeanClassName());
