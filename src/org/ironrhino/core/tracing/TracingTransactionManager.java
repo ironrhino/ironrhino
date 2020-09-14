@@ -21,12 +21,14 @@ public class TracingTransactionManager implements PlatformTransactionManager {
 
 	@Override
 	public void commit(TransactionStatus transactionStatus) throws TransactionException {
-		Tracing.executeCheckedRunnable("transactionManager.commit", () -> underlying.commit(transactionStatus));
+		Tracing.executeCheckedRunnable("transactionManager.commit", () -> underlying.commit(transactionStatus),
+				"component", "tx");
 	}
 
 	@Override
 	public void rollback(TransactionStatus transactionStatus) throws TransactionException {
-		Tracing.executeCheckedRunnable("transactionManager.rollback", () -> underlying.rollback(transactionStatus));
+		Tracing.executeCheckedRunnable("transactionManager.rollback", () -> underlying.rollback(transactionStatus),
+				"component", "tx");
 	}
 
 }
