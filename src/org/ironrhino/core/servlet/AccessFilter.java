@@ -215,7 +215,8 @@ public class AccessFilter implements Filter {
 				sb.append(" chain:");
 				sb.append(requestChain);
 			}
-			MDC.put(MDC_KEY_REQUEST_CHAIN, requestChain);
+			if (requestChain != null)
+				MDC.put(MDC_KEY_REQUEST_CHAIN, requestChain);
 			String requestFrom = request.getHeader(HTTP_HEADER_REQUEST_FROM);
 			if (requestFrom != null) {
 				// sb.append(" from:");
