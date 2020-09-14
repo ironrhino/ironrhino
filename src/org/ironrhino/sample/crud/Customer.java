@@ -28,6 +28,8 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Formula;
@@ -55,6 +57,8 @@ import lombok.Setter;
 @AutoConfig
 @Table(name = "sample_customer")
 @Entity
+@DynamicInsert
+@DynamicUpdate
 @Richtable(gridColumns = 3, celleditable = false, readonly = @Readonly(expression = "entity.balance<10", deletable = true), showQueryForm = true)
 @Getter
 @Setter
