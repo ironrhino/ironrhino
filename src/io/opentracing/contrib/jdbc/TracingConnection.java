@@ -39,15 +39,15 @@ public class TracingConnection implements Connection {
   private final Connection connection;
   private final ConnectionInfo connectionInfo;
   private final boolean withActiveSpanOnly;
-  private final Set<String> ignoredStatements;
+  private final Set<String> ignoreStatements;
   private final Tracer tracer;
 
   public TracingConnection(Connection connection, ConnectionInfo connectionInfo,
-      boolean withActiveSpanOnly, Set<String> ignoredStatements, Tracer tracer) {
+      boolean withActiveSpanOnly, Set<String> ignoreStatements, Tracer tracer) {
     this.connection = connection;
     this.connectionInfo = connectionInfo;
     this.withActiveSpanOnly = withActiveSpanOnly;
-    this.ignoredStatements = ignoredStatements;
+    this.ignoreStatements = ignoreStatements;
     this.tracer = tracer;
   }
 
@@ -56,14 +56,14 @@ public class TracingConnection implements Connection {
     final Statement statement = connection.createStatement();
     return WrapperProxy
         .wrap(statement, new TracingStatement(statement, connectionInfo, withActiveSpanOnly,
-            ignoredStatements, tracer));
+            ignoreStatements, tracer));
   }
 
   @Override
   public PreparedStatement prepareStatement(String sql) throws SQLException {
     final PreparedStatement statement = connection.prepareStatement(sql);
     return WrapperProxy.wrap(statement, new TracingPreparedStatement(statement, sql, connectionInfo,
-        withActiveSpanOnly, ignoredStatements, tracer));
+        withActiveSpanOnly, ignoreStatements, tracer));
   }
 
   @Override
@@ -71,7 +71,7 @@ public class TracingConnection implements Connection {
     final CallableStatement statement = connection.prepareCall(sql);
     return WrapperProxy.wrap(statement,
         new TracingCallableStatement(connection.prepareCall(sql), sql, connectionInfo,
-            withActiveSpanOnly, ignoredStatements, tracer));
+            withActiveSpanOnly, ignoreStatements, tracer));
   }
 
   @Override
@@ -91,20 +91,20 @@ public class TracingConnection implements Connection {
 
   @Override
   public void commit() throws SQLException {
-    JdbcTracingUtils.execute("Commit", () -> connection.commit(),
-        connectionInfo, withActiveSpanOnly, tracer);
+    JdbcTracingUtils.execute("Commit", connection::commit, null,
+        connectionInfo, withActiveSpanOnly, null, tracer);
   }
 
   @Override
   public void rollback() throws SQLException {
-    JdbcTracingUtils.execute("Rollback", () -> connection.rollback(),
-        connectionInfo, withActiveSpanOnly, tracer);
+    JdbcTracingUtils.execute("Rollback", connection::rollback, null,
+        connectionInfo, withActiveSpanOnly, null, tracer);
   }
 
   @Override
   public void close() throws SQLException {
-    JdbcTracingUtils.execute("Close", () -> connection.close(),
-        connectionInfo, withActiveSpanOnly, tracer);
+    JdbcTracingUtils.execute("Close", connection::close, null,
+        connectionInfo, withActiveSpanOnly, null, tracer);
   }
 
   @Override
@@ -162,7 +162,7 @@ public class TracingConnection implements Connection {
       throws SQLException {
     final Statement statement = connection.createStatement(resultSetType, resultSetConcurrency);
     return WrapperProxy.wrap(statement, new TracingStatement(statement,
-        connectionInfo, withActiveSpanOnly, ignoredStatements, tracer));
+        connectionInfo, withActiveSpanOnly, ignoreStatements, tracer));
   }
 
   @Override
@@ -171,7 +171,7 @@ public class TracingConnection implements Connection {
     final PreparedStatement statement = connection
         .prepareStatement(sql, resultSetType, resultSetConcurrency);
     return WrapperProxy.wrap(statement, new TracingPreparedStatement(statement, sql, connectionInfo,
-        withActiveSpanOnly, ignoredStatements, tracer));
+        withActiveSpanOnly, ignoreStatements, tracer));
   }
 
   @Override
@@ -180,7 +180,7 @@ public class TracingConnection implements Connection {
     final CallableStatement statement = connection
         .prepareCall(sql, resultSetType, resultSetConcurrency);
     return WrapperProxy.wrap(statement, new TracingCallableStatement(statement, sql, connectionInfo,
-        withActiveSpanOnly, ignoredStatements, tracer));
+        withActiveSpanOnly, ignoreStatements, tracer));
   }
 
   @Override
@@ -229,7 +229,7 @@ public class TracingConnection implements Connection {
     final Statement statement = connection
         .createStatement(resultSetType, resultSetConcurrency, resultSetHoldability);
     return WrapperProxy.wrap(statement, new TracingStatement(statement,
-        connectionInfo, withActiveSpanOnly, ignoredStatements, tracer));
+        connectionInfo, withActiveSpanOnly, ignoreStatements, tracer));
   }
 
   @Override
@@ -238,7 +238,7 @@ public class TracingConnection implements Connection {
     final PreparedStatement statement = connection
         .prepareStatement(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
     return WrapperProxy.wrap(statement, new TracingPreparedStatement(statement,
-        sql, connectionInfo, withActiveSpanOnly, ignoredStatements, tracer));
+        sql, connectionInfo, withActiveSpanOnly, ignoreStatements, tracer));
   }
 
   @Override
@@ -247,28 +247,28 @@ public class TracingConnection implements Connection {
     final CallableStatement statement = connection
         .prepareCall(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
     return WrapperProxy.wrap(statement, new TracingCallableStatement(statement, sql,
-        connectionInfo, withActiveSpanOnly, ignoredStatements, tracer));
+        connectionInfo, withActiveSpanOnly, ignoreStatements, tracer));
   }
 
   @Override
   public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException {
     final PreparedStatement statement = connection.prepareStatement(sql, autoGeneratedKeys);
     return WrapperProxy.wrap(statement, new TracingPreparedStatement(statement, sql,
-        connectionInfo, withActiveSpanOnly, ignoredStatements, tracer));
+        connectionInfo, withActiveSpanOnly, ignoreStatements, tracer));
   }
 
   @Override
   public PreparedStatement prepareStatement(String sql, int[] columnIndexes) throws SQLException {
     final PreparedStatement statement = connection.prepareStatement(sql, columnIndexes);
     return WrapperProxy.wrap(statement, new TracingPreparedStatement(statement, sql,
-        connectionInfo, withActiveSpanOnly, ignoredStatements, tracer));
+        connectionInfo, withActiveSpanOnly, ignoreStatements, tracer));
   }
 
   @Override
   public PreparedStatement prepareStatement(String sql, String[] columnNames) throws SQLException {
     final PreparedStatement statement = connection.prepareStatement(sql, columnNames);
     return WrapperProxy.wrap(statement, new TracingPreparedStatement(statement, sql, connectionInfo,
-        withActiveSpanOnly, ignoredStatements, tracer));
+        withActiveSpanOnly, ignoreStatements, tracer));
   }
 
   @Override

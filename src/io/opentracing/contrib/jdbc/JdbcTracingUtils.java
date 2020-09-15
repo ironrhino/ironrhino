@@ -37,11 +37,11 @@ class JdbcTracingUtils {
       String sql,
       ConnectionInfo connectionInfo,
       boolean withActiveSpanOnly,
-      Set<String> ignoredStatements,
+      Set<String> ignoreStatements,
       Tracer tracer) {
     if (!TracingDriver.isTraceEnabled() || (withActiveSpanOnly && tracer.activeSpan() == null)) {
       return NoopSpan.INSTANCE;
-    } else if (ignoredStatements != null && ignoredStatements.contains(sql)) {
+    } else if (ignoreStatements != null && ignoreStatements.contains(sql)) {
       return NoopSpan.INSTANCE;
     }
 
@@ -56,15 +56,18 @@ class JdbcTracingUtils {
 
   static <E extends Exception> void execute(String operationName,
       CheckedRunnable<E> runnable,
+      String sql,
       ConnectionInfo connectionInfo,
       boolean withActiveSpanOnly,
+      Set<String> ignoreStatements,
       Tracer tracer) throws E {
     if (!TracingDriver.isTraceEnabled() || (withActiveSpanOnly && tracer.activeSpan() == null)) {
+      runnable.run();
       return;
     }
 
-    final Span span = buildSpan(operationName, "", connectionInfo, withActiveSpanOnly,
-            null, tracer);
+    final Span span = buildSpan(operationName, sql, connectionInfo, withActiveSpanOnly,
+    ignoreStatements, tracer);
      try (Scope ignored = tracer.activateSpan(span)) {
        runnable.run();
      } catch (Exception e) {
@@ -74,6 +77,29 @@ class JdbcTracingUtils {
        span.finish();
      }
   }
+
+  static <T, E extends Exception> T call(String operationName,
+  CheckedCallable<T, E> callable,
+  String sql,
+  ConnectionInfo connectionInfo,
+  boolean withActiveSpanOnly,
+  Set<String> ignoreStatements,
+  Tracer tracer) throws E {
+if (!TracingDriver.isTraceEnabled() || (withActiveSpanOnly && tracer.activeSpan() == null)) {
+  return callable.call();
+}
+
+final Span span = buildSpan(operationName, sql, connectionInfo, withActiveSpanOnly,
+ignoreStatements, tracer);
+ try (Scope ignored = tracer.activateSpan(span)) {
+   return callable.call();
+ } catch (Exception e) {
+   JdbcTracingUtils.onError(e, span);
+   throw e;
+ } finally {
+   span.finish();
+ }
+}
 
   private static boolean isNotEmpty(CharSequence s) {
     return s != null && !"".contentEquals(s);
@@ -124,6 +150,13 @@ class JdbcTracingUtils {
   interface CheckedRunnable<E extends Throwable> {
 
     void run() throws E;
+
+  }
+
+  @FunctionalInterface
+  interface CheckedCallable<T, E extends Throwable> {
+
+    T call() throws E;
 
   }
 }
