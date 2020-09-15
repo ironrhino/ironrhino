@@ -1,11 +1,13 @@
 package org.ironrhino.core.metrics;
 
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
+import javax.sql.DataSource;
 
 import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.ironrhino.core.util.AppInfo;
@@ -16,6 +18,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Role;
 import org.springframework.core.annotation.Order;
+
+import com.zaxxer.hikari.HikariDataSource;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Metrics;
@@ -34,6 +38,9 @@ public class MetricsConfiguration {
 
 	@Autowired(required = false)
 	private List<MeterRegistryProvider> meterRegistryProviders = Collections.emptyList();
+
+	@Autowired(required = false)
+	private List<DataSource> dataSources;
 
 	@Autowired(required = false)
 	private ServletContext servletContext;
@@ -67,6 +74,16 @@ public class MetricsConfiguration {
 		new JvmThreadMetrics().bindTo(meterRegistry);
 		new JvmMemoryMetrics().bindTo(meterRegistry);
 		meterBinders.forEach(mb -> mb.bindTo(meterRegistry));
+
+		if (dataSources != null) {
+			for (DataSource dataSource : dataSources) {
+				try {
+					if (dataSource.isWrapperFor(HikariDataSource.class))
+						dataSource.unwrap(HikariDataSource.class).setMetricRegistry(meterRegistry);
+				} catch (SQLException ignored) {
+				}
+			}
+		}
 
 		if (servletContext != null) {
 			String className = servletContext.getClass().getName();

@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.flywaydb.core.Flyway;
 import org.ironrhino.core.hibernate.HibernateEnabled;
 import org.ironrhino.core.jdbc.DatabaseProduct;
-import org.ironrhino.core.metrics.MetricsConfiguration;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +24,6 @@ import org.springframework.util.ClassUtils;
 
 import com.zaxxer.hikari.HikariDataSource;
 
-import io.micrometer.core.instrument.Metrics;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -85,9 +83,6 @@ public class DataSourceConfiguration {
 	@Getter
 	private boolean enableMigrations;
 
-	@Autowired(required = false)
-	private MetricsConfiguration metricsConfiguration;
-
 	protected DataSource createDataSource() {
 		if (AppInfo.getStage() == Stage.DEVELOPMENT && StringUtils.isBlank(env.getProperty("jdbc.url"))) {
 			boolean available = AddressAvailabilityCondition.check(jdbcUrl, 5000);
@@ -119,10 +114,6 @@ public class DataSourceConfiguration {
 			hikari.setConnectionTestQuery(connectionTestQuery);
 		hikari.setPoolName("HikariPool-" + AppInfo.getAppName());
 		log.info("Using {} to connect {}", hikari.getClass().getName(), hikari.getJdbcUrl());
-
-		if (metricsConfiguration != null) {
-			hikari.setMetricRegistry(Metrics.globalRegistry);
-		}
 
 		if (enableMigrations) {
 			Flyway.configure().baselineOnMigrate(true).dataSource(hikari).load().migrate();
