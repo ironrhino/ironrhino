@@ -216,10 +216,8 @@
 						<#else>
 							<#if value?is_date_like>
 								<#if config.cssClass?contains('datetime')><#local value=value?datetime/><#elseif config.cssClass?contains('time')><#local value=value?time/><#else><#local value=value?date/></#if>
-								<@s.textfield id="" theme="simple" name=name type=config.inputType value=value?string class=config.cssClass maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes/>
-							<#else>
-								<@s.textfield id="" theme="simple" name=name type=config.inputType class=config.cssClass maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes/>
 							</#if>
+							<@s.textfield id="" theme="simple" name=name type=config.inputType value=value?string class=config.cssClass maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes/>
 						</#if>
 						</td>
 						</#if>
@@ -233,10 +231,8 @@
 		<#else>
 			<#if value?is_date_like>
 				<#if config.cssClass?contains('datetime')><#local value=value?datetime/><#elseif config.cssClass?contains('time')><#local value=value?time/><#else><#local value=value?date/></#if>
-				<@s.textfield id=id label=label name=name type=config.inputType value=value?string class=config.cssClass maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes/>
-			<#else>
-				<@s.textfield id=id label=label name=name type=config.inputType class=config.cssClass maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes/>
 			</#if>
+			<@s.textfield id=id label=label name=name type=config.inputType value=value?string class=config.cssClass maxlength="${(config.maxlength gt 0)?then(config.maxlength,'')}" readonly=readonly dynamicAttributes=dynamicAttributes/>
 		</#if>
 	</#if>
 </#macro>
