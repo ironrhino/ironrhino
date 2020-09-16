@@ -45,7 +45,10 @@
 		<tbody>
 		<#if value?has_content>
 		<#list value as element>
-			<#if element??>
+			<#-- expose element@index,element for template -->
+			<#assign element@index=element?index>
+			<#assign element=element!>
+			<#if element?has_content>
 			<tr>
 				<#list config.embeddedUiConfigs as nestedKey,config>
 				<#local value=element[nestedKey]!>

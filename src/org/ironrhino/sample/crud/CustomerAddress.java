@@ -45,7 +45,7 @@ public class CustomerAddress implements Serializable {
 	@UiConfig(width = "80px")
 	private boolean active;
 
-	@UiConfig(inputTemplate = "<span class=\"info\"><#if (element.type)??>${element.type} : ${element.mobile!}</#if></span>")
+	@UiConfig(inputTemplate = "<span class=\"info\"><#if (element.type)??>${element.type} : ${element.mobile!}</#if></span>", template = "${element@index+1}. <#if (element.type)??>${element.type} : ${element.mobile!}</#if>")
 	public String getDescription() {
 		if (type != null)
 			return type + " : " + (mobile != null ? mobile : "");
