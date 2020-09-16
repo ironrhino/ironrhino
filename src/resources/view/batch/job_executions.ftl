@@ -5,7 +5,7 @@
 <title>${getText('jobExecution')}${getText('list')} - ${getText(jobInstance.jobName)!}</title>
 </head>
 <body>
-<#assign actionColumnButtons='<@btn view="steps" windowoptions="{\'width\':\'80%\',\'reloadonclose\':false}"/><#if entity_index==0><#if entity.status.name()=="STARTED"> <@btn action="stop" confirm=true/></#if><#if entity.status.name()=="STOPPED"||entity.status.name()=="FAILED"&&jobRegistry.getJob(entity.jobInstance.jobName).restartable> <@btn action="restart" confirm=true/> <@btn action="abandon" confirm=true/></#if></#if>'>
+<#assign actionColumnButtons='<@btn view="steps" windowoptions="{\'width\':\'80%\',\'reloadonclose\':false}"/><#if entity@index==0><#if entity.status.name()=="STARTED"> <@btn action="stop" confirm=true/></#if><#if entity.status.name()=="STOPPED"||entity.status.name()=="FAILED"&&jobRegistry.getJob(entity.jobInstance.jobName).restartable> <@btn action="restart" confirm=true/> <@btn action="abandon" confirm=true/></#if></#if>'>
 <#assign bottomButtons='<@btn class="reload"/>'>
 <#assign columns={
 "jobParameters":{"template":r"${statics['org.ironrhino.batch.job.JobParameterHelper'].toString(value)}"},

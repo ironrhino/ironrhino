@@ -198,10 +198,10 @@
 		<#list sumColumns as name,config>
 			<#if key==name && value?has_content><#assign sumColumns+={name:{"value":config.value+value,"template":template!}}></#if>
 		</#list>
-		<@rttbodytd entity=entity entity_index=entity?index value=value celleditable=_celleditable template=template cellDynamicAttributes=config.cellDynamicAttributes dynamicAttributes=dynamicAttributes/>
+		<@rttbodytd entity=entity entity@index=entity?index value=value celleditable=_celleditable template=template cellDynamicAttributes=config.cellDynamicAttributes dynamicAttributes=dynamicAttributes/>
 	</#if>
 </#list>
-<@rttbodytrend entity=entity entity_index=entity?index showActionColumn=showActionColumn buttons=richtableConfig.actionColumnButtons editable=!readonly.value viewable=viewable entityReadonly=entityReadonly inputWindowOptions=richtableConfig.inputWindowOptions! viewWindowOptions=richtableConfig.viewWindowOptions!/>
+<@rttbodytrend entity=entity entity@index=entity?index showActionColumn=showActionColumn buttons=richtableConfig.actionColumnButtons editable=!readonly.value viewable=viewable entityReadonly=entityReadonly inputWindowOptions=richtableConfig.inputWindowOptions! viewWindowOptions=richtableConfig.viewWindowOptions!/>
 </#list>
 <@rtend columns=columns sumColumns=sumColumns showCheckColumn=richtableConfig.showCheckColumn showActionColumn=showActionColumn showBottomButtons=richtableConfig.showBottomButtons celleditable=celleditable readonly=readonly.value deletable=!readonly.value||readonly.deletable searchable=searchable filterable=richtableConfig.filterable downloadable=richtableConfig.downloadable showPageSize=richtableConfig.showPageSize! buttons=richtableConfig.bottomButtons! enableable=enableable formFooter=formFooter! inputWindowOptions=richtableConfig.inputWindowOptions!/>
 <#if !readonly.value && hasSelect>
