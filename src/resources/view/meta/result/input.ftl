@@ -157,9 +157,9 @@
 				</thead>
 				<tbody>
 				<#list 0..((value?is_collection&&value?has_content)?then(value?size-1,0)) as index>
-					<#-- expose index,element for template -->
-					<#assign index=index>
-					<#if value?has_content><#assign element=entity[key][index]></#if>
+					<#-- expose element@index,element for template -->
+					<#assign element@index=index>
+					<#assign element=entity[key][index]!>
 					<tr>
 						<#list config.embeddedUiConfigs as nestedKey,config>
 						<#local hidden=config.hiddenInInput.value>

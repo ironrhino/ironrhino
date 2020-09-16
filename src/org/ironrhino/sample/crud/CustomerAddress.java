@@ -20,7 +20,7 @@ public class CustomerAddress implements Serializable {
 
 	private static final long serialVersionUID = -2175577393105618397L;
 
-	@UiConfig(width = "150px", cssClass = "input-medium decrease conjunct", dynamicAttributes = "{\"data-replacement\":\"customer-addresses[${index}].description\"}")
+	@UiConfig(width = "150px", cssClass = "input-medium decrease conjunct", dynamicAttributes = "{\"data-replacement\":\"customer-addresses[${element@index}].description\"}")
 	@Column(nullable = false)
 	private AddressType type;
 
