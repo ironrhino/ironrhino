@@ -156,10 +156,11 @@
 					</tr>
 				</thead>
 				<tbody>
-				<#list 0..((value?is_collection&&value?has_content)?then(value?size-1,0)) as index>
+				<#local collection=value>
+				<#list 0..(collection?has_content?then(collection?size-1,0)) as index>
 					<#-- expose element@index,element for template -->
 					<#assign element@index=index>
-					<#assign element=entity[key][index]!>
+					<#assign element=collection[index]!>
 					<tr>
 						<#list config.embeddedUiConfigs as nestedKey,config>
 						<#local hidden=config.hiddenInInput.value>
