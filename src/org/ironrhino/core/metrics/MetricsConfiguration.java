@@ -12,12 +12,15 @@ import javax.sql.DataSource;
 import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.ReflectionUtils;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Role;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -38,9 +41,6 @@ public class MetricsConfiguration {
 
 	@Autowired(required = false)
 	private List<MeterRegistryProvider> meterRegistryProviders = Collections.emptyList();
-
-	@Autowired(required = false)
-	private List<DataSource> dataSources;
 
 	@Autowired(required = false)
 	private ServletContext servletContext;
@@ -67,6 +67,24 @@ public class MetricsConfiguration {
 		return new TimedAspect();
 	}
 
+	@Bean
+	protected static BeanPostProcessor metricsBeanPostProcessor(Environment env) {
+		return new BeanPostProcessor() {
+			@Override
+			public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+				if (bean instanceof DataSource) {
+					DataSource dataSource = (DataSource) bean;
+					try {
+						if (dataSource.isWrapperFor(HikariDataSource.class))
+							dataSource.unwrap(HikariDataSource.class).setMetricRegistry(Metrics.globalRegistry);
+					} catch (SQLException ignored) {
+					}
+				}
+				return bean;
+			}
+		};
+	}
+
 	protected void instrument() {
 
 		MeterRegistry meterRegistry = Metrics.globalRegistry;
@@ -74,16 +92,6 @@ public class MetricsConfiguration {
 		new JvmThreadMetrics().bindTo(meterRegistry);
 		new JvmMemoryMetrics().bindTo(meterRegistry);
 		meterBinders.forEach(mb -> mb.bindTo(meterRegistry));
-
-		if (dataSources != null) {
-			for (DataSource dataSource : dataSources) {
-				try {
-					if (dataSource.isWrapperFor(HikariDataSource.class))
-						dataSource.unwrap(HikariDataSource.class).setMetricRegistry(meterRegistry);
-				} catch (SQLException ignored) {
-				}
-			}
-		}
 
 		if (servletContext != null) {
 			String className = servletContext.getClass().getName();
