@@ -43,7 +43,7 @@ public class DataSourceConfiguration {
 	@Value("${jdbc.driverClassName:}")
 	private String driverClassName;
 
-	@Value("${jdbc.url:jdbc:mysql://localhost/#{systemProperties['app.name'].replaceAll('-','_').replaceAll('\\.','_')}}")
+	@Value("${jdbc.url:jdbc:mysql:///#{systemProperties['app.name'].replaceAll('-','_').replaceAll('\\.','_')}}")
 	private String jdbcUrl;
 
 	@Value("${jdbc.username:root}")
