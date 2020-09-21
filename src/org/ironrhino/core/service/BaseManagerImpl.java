@@ -101,9 +101,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			Serializable id = obj.getId();
 			if (id == null)
 				throw new IllegalArgumentException(obj + " must have an ID");
-			DetachedCriteria dc = detachedCriteria();
-			dc.add(Restrictions.eq("id", id));
-			isnew = countByCriteria(dc) == 0;
+			isnew = !exists(id);
 		}
 		Session session = sessionFactory.getCurrentSession();
 		if (obj instanceof BaseTreeableEntity) {
