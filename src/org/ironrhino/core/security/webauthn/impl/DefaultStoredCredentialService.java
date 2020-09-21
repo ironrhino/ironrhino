@@ -36,7 +36,7 @@ public class DefaultStoredCredentialService implements StoredCredentialService {
 		entityManager.setEntityClass(WebAuthnCredential.class);
 		WebAuthnCredential wac = entityManager.get(Utils.encodeBase64url(credentialId));
 		wac.setExpiryTime(expiryTime);
-		entityManager.save(wac);
+		entityManager.update(wac);
 	}
 
 	@Override
@@ -44,7 +44,7 @@ public class DefaultStoredCredentialService implements StoredCredentialService {
 		entityManager.setEntityClass(WebAuthnCredential.class);
 		WebAuthnCredential wac = entityManager.get(Utils.encodeBase64url(credentialId));
 		wac.setSignCount(signCount);
-		entityManager.save(wac);
+		entityManager.update(wac);
 	}
 
 	@Override
