@@ -14,9 +14,9 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.ironrhino.core.aop.BaseAspect;
 import org.ironrhino.core.service.BaseManager;
 import org.ironrhino.core.util.AppInfo;
+import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.ExpressionUtils;
 import org.ironrhino.core.util.ReflectionUtils;
-import org.ironrhino.core.util.AppInfo.Stage;
 import org.springframework.core.Ordered;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,8 +45,6 @@ public class TracingAspect extends BaseAspect {
 
 	@Around("execution(public * *(..)) and @annotation(traced)")
 	public Object trace(ProceedingJoinPoint pjp, Traced traced) throws Throwable {
-		if (!Tracing.isEnabled())
-			return pjp.proceed();
 		Tracer tracer = GlobalTracer.get();
 		if (traced.withActiveSpanOnly() && tracer.activeSpan() == null)
 			return pjp.proceed();
@@ -79,8 +77,6 @@ public class TracingAspect extends BaseAspect {
 
 	@Around("execution(public * *(..)) and @annotation(transactional) and not @annotation(org.ironrhino.core.tracing.Traced)")
 	public Object trace(ProceedingJoinPoint pjp, Transactional transactional) throws Throwable {
-		if (!Tracing.isEnabled())
-			return pjp.proceed();
 		Method method = ((MethodSignature) pjp.getSignature()).getMethod();
 		List<Serializable> tags = new ArrayList<>();
 		tags.add(Tags.COMPONENT.getKey());

@@ -11,7 +11,6 @@ import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -121,20 +120,15 @@ public class TracingConfiguration {
 	}
 
 	@Bean
-	public TracingAspect tracingAspect() {
-		return new TracingAspect();
-	}
-
-	@Bean
-	protected static BeanPostProcessor tracingBeanPostProcessor(Environment env) {
+	protected static TracingPostProcessor tracingPostProcessor(Environment env) {
 		String uri = env.getProperty(KEY_JAEGER_COLLECTOR_URI, DEFAULT_JAEGER_COLLECTOR_URI);
 		boolean enabled = uri.startsWith("udp://") || AddressAvailabilityCondition.check(uri, 2000);
 		if (!enabled) {
 			log.warn("Skip jaeger tracer with {}", uri);
 			Tracing.disable();
-			return TracingBeanPostProcessor.EMPTY;
+			return TracingPostProcessor.EMPTY;
 		}
-		return TracingBeanPostProcessor.INSTANCE;
+		return TracingPostProcessor.INSTANCE;
 	}
 
 	@PreDestroy
