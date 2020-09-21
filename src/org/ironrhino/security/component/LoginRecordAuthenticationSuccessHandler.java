@@ -35,6 +35,7 @@ public class LoginRecordAuthenticationSuccessHandler extends DefaultAuthenticati
 		} else {
 			username = String.valueOf(principal);
 		}
+		entityManager.setEntityClass(LoginRecord.class);
 		LoginRecord loginRecord = new LoginRecord();
 		loginRecord.setUsername(username);
 		loginRecord.setAddress(request.getRemoteAddr());
