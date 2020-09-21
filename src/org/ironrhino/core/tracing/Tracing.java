@@ -225,7 +225,7 @@ public class Tracing {
 					span.setTag(name, (Number) value);
 				else if (value instanceof Boolean)
 					span.setTag(name, (Boolean) value);
-				else
+				else if (value != null)
 					span.setTag(name, String.valueOf(value));
 			}
 		}
