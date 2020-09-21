@@ -219,4 +219,15 @@ public class ResultPage<T> implements Serializable {
 		return _parameterString;
 	}
 
+	@Override
+	public String toString() {
+		if (!paged) {
+			return "unpaged";
+		} else {
+			if (isDefaultPageSize())
+				return "page(" + pageNo + ')';
+			else
+				return "page(" + pageNo + ", " + pageSize + ')';
+		}
+	}
 }
