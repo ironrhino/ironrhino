@@ -377,6 +377,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	@Transactional(readOnly = true)
 	public ResultPage<T> findByResultPage(ResultPage<T> resultPage) {
+		long time = System.nanoTime();
 		DetachedCriteria detachedCriteria = resultPage.getCriteria();
 		if (detachedCriteria == null)
 			detachedCriteria = detachedCriteria();
@@ -392,7 +393,6 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 				return resultPage;
 			}
 		}
-		long time = System.nanoTime();
 		if (resultPage.isPaged()) {
 			if (!(resultPage.isCounting() && totalResults == 0)) {
 				int start = (resultPage.getPageNo() - 1) * resultPage.getPageSize();
