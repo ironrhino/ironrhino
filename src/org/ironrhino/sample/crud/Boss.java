@@ -23,6 +23,7 @@ import org.ironrhino.core.search.elasticsearch.annotations.SearchableProperty;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @Searchable
 @AutoConfig(fileupload = "text/plain")
@@ -30,6 +31,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
+@Slf4j
 public class Boss extends AbstractEntity<String> {
 
 	private static final long serialVersionUID = 4908831348636951422L;
@@ -62,7 +64,7 @@ public class Boss extends AbstractEntity<String> {
 	@PreUpdate
 	@PrePersist
 	private void processResume() {
-		System.out.println("upload file name: " + resumeFileName + ", path: " + resume);
+		log.info("upload file name: {}, path: {}",resumeFileName, resume);
 	}
 
 }

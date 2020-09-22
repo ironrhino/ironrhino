@@ -90,7 +90,6 @@ public class XWorkListPropertyAccessor extends ListPropertyAccessor {
             return super.getProperty(context, target, name);
         }
         ReflectionContextState.updateCurrentPropertyPath(context, name);
-        //System.out.println("Entering XWorkListPropertyAccessor. Name: " + name);
         Class lastClass = (Class) context.get(XWorkConverter.LAST_BEAN_CLASS_ACCESSED);
         String lastProperty = (String) context.get(XWorkConverter.LAST_BEAN_PROPERTY_ACCESSED);
         
@@ -98,7 +97,6 @@ public class XWorkListPropertyAccessor extends ListPropertyAccessor {
                 && ReflectionContextState.isCreatingNullObjects(context)
                 && objectTypeDeterminer.shouldCreateIfNew(lastClass,lastProperty,target,null,true)) {
 
-            //System.out.println("Getting index from List");
             List list = (List) target;
             int index = ((Number) name).intValue();
             int listSize = list.size();
