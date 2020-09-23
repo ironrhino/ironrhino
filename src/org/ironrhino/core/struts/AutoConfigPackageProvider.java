@@ -116,7 +116,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 					for (Map.Entry<String, Set<String>> entry : packages.entrySet()) {
 						if (entry.getValue().contains(p)) {
 							entry.getValue().remove(p);
-							log.warn("package {} have been overriden from {} to {} in struts.xml", p, entry.getKey(),
+							log.warn("package {} have been overridden from {} to {} in struts.xml", p, entry.getKey(),
 									defaultNamespace);
 						}
 					}

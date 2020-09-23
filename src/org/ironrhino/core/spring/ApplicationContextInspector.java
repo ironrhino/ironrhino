@@ -84,28 +84,28 @@ public class ApplicationContextInspector {
 
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
-	private SingletonSupplier<Map<String, ApplicationProperty>> overridenPropertiesSupplier = SingletonSupplier
-			.of(this::computeOverridenProperties);
+	private SingletonSupplier<Map<String, ApplicationProperty>> overriddenPropertiesSupplier = SingletonSupplier
+			.of(this::computeOverriddenProperties);
 
 	private SingletonSupplier<Map<String, ApplicationProperty>> defaultPropertiesSupplier = SingletonSupplier
 			.of(this::computeDefaultProperties);
 
 	private SingletonSupplier<ServerMap> serverMapSupplier = SingletonSupplier.of(this::computeServerMap);
 
-	public Map<String, ApplicationProperty> getOverridenProperties() {
-		return overridenPropertiesSupplier.obtain();
+	public Map<String, ApplicationProperty> getOverriddenProperties() {
+		return overriddenPropertiesSupplier.obtain();
 	}
 
-	private Map<String, ApplicationProperty> computeOverridenProperties() {
-		Map<String, ApplicationProperty> overridenProperties = new TreeMap<>();
+	private Map<String, ApplicationProperty> computeOverriddenProperties() {
+		Map<String, ApplicationProperty> overriddenProperties = new TreeMap<>();
 		for (PropertySource<?> ps : env.getPropertySources()) {
-			addOverridenProperties(overridenProperties, ps);
+			addOverriddenProperties(overriddenProperties, ps);
 		}
-		return Collections.unmodifiableMap(overridenProperties);
+		return Collections.unmodifiableMap(overriddenProperties);
 
 	}
 
-	private void addOverridenProperties(Map<String, ApplicationProperty> properties, PropertySource<?> propertySource) {
+	private void addOverriddenProperties(Map<String, ApplicationProperty> properties, PropertySource<?> propertySource) {
 		String name = propertySource.getName();
 		if (name != null && name.startsWith("servlet"))
 			return;
@@ -123,7 +123,7 @@ public class ApplicationContextInspector {
 			}
 		} else if (propertySource instanceof CompositePropertySource) {
 			for (PropertySource<?> ps : ((CompositePropertySource) propertySource).getPropertySources()) {
-				addOverridenProperties(properties, ps);
+				addOverriddenProperties(properties, ps);
 			}
 		}
 	}
@@ -470,7 +470,7 @@ public class ApplicationContextInspector {
 			return format(String.join(", ", list));
 		}
 
-		public String getOverridenSource() {
+		public String getOverriddenSource() {
 			String source = sources.size() > 0 ? sources.get(0) : null;
 			return format(extract(source));
 		}

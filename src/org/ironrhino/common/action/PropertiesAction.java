@@ -34,39 +34,39 @@ public class PropertiesAction extends BaseAction {
 		response.setContentType("text/plain");
 		Writer writer = response.getWriter();
 		Map<String, ApplicationProperty> defaultProperties = applicationContextInspector.getDefaultProperties();
-		Map<String, ApplicationProperty> overridenProperties = applicationContextInspector.getOverridenProperties();
+		Map<String, ApplicationProperty> overriddenProperties = applicationContextInspector.getOverriddenProperties();
 		for (Map.Entry<String, ApplicationProperty> entry : defaultProperties.entrySet()) {
 			String key = entry.getKey();
 			String value = entry.getValue().getValue();
-			ApplicationProperty orverriden = overridenProperties.get(key);
-			if (orverriden != null && !orverriden.getValue().equals(value) && !key.startsWith("app.")) {
+			ApplicationProperty orverridden = overriddenProperties.get(key);
+			if (orverridden != null && !orverridden.getValue().equals(value) && !key.startsWith("app.")) {
 				writer.write("#" + key + '=' + value + "\n");
 			}
-			writer.write(key + '=' + (orverriden != null ? orverriden.getValue() : value) + "\n");
+			writer.write(key + '=' + (orverridden != null ? orverridden.getValue() : value) + "\n");
 			if (!brief)
 				writer.write("#defined in " + entry.getValue().getDefinedSource()
-						+ (orverriden != null ? ", overriden in " + orverriden.getOverridenSource() : "") + "\n\n");
+						+ (orverridden != null ? ", overridden in " + orverridden.getOverriddenSource() : "") + "\n\n");
 		}
 		writer.write("\n");
 		writer.write("\n");
-		for (Map.Entry<String, ApplicationProperty> entry : overridenProperties.entrySet())
+		for (Map.Entry<String, ApplicationProperty> entry : overriddenProperties.entrySet())
 			if (!defaultProperties.containsKey(entry.getKey())) {
 				writer.write(entry.getKey() + '=' + entry.getValue().getValue() + "\n");
 				if (!brief)
-					writer.write("#defined in " + entry.getValue().getOverridenSource() + "\n\n");
+					writer.write("#defined in " + entry.getValue().getOverriddenSource() + "\n\n");
 			}
 		return NONE;
 	}
 
-	public String overriden() throws Exception {
+	public String overridden() throws Exception {
 		HttpServletResponse response = ServletActionContext.getResponse();
 		response.setContentType("text/plain");
 		Writer writer = response.getWriter();
-		Map<String, ApplicationProperty> overridenProperties = applicationContextInspector.getOverridenProperties();
-		for (Map.Entry<String, ApplicationProperty> entry : overridenProperties.entrySet()) {
+		Map<String, ApplicationProperty> overriddenProperties = applicationContextInspector.getOverriddenProperties();
+		for (Map.Entry<String, ApplicationProperty> entry : overriddenProperties.entrySet()) {
 			writer.write(entry.getKey() + '=' + entry.getValue().getValue() + "\n");
 			if (!brief)
-				writer.write("#defined in " + entry.getValue().getOverridenSource() + "\n\n");
+				writer.write("#defined in " + entry.getValue().getOverriddenSource() + "\n\n");
 		}
 		return NONE;
 	}
