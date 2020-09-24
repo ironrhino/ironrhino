@@ -88,8 +88,11 @@ public class TracingAspect extends BaseAspect {
 			tags.add(TAG_NAME_CALLSITE);
 			tags.add(getCallSite(method, target));
 			if (target instanceof BaseManager<?>) {
-				tags.add(TAG_NAME_ENTITY);
-				tags.add(((BaseManager<?>) target).getEntityClass().getName());
+				Class<?> entityClass = ((BaseManager<?>) target).getEntityClass();
+				if (entityClass != null) {
+					tags.add(TAG_NAME_ENTITY);
+					tags.add(entityClass.getName());
+				}
 			}
 			String[] params = ReflectionUtils.getParameterNames(method);
 			for (int i = 0; i < params.length; i++) {
