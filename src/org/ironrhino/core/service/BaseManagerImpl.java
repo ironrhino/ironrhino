@@ -27,14 +27,19 @@ import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.action.internal.EntityInsertAction;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.engine.spi.ActionQueue;
+import org.hibernate.engine.spi.ExecutableList;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.internal.CriteriaImpl.OrderEntry;
+import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.query.Query;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.type.Type;
@@ -106,33 +111,55 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 		Session session = sessionFactory.getCurrentSession();
 		if (obj instanceof BaseTreeableEntity) {
 			BaseTreeableEntity entity = (BaseTreeableEntity) obj;
-			boolean positionChanged = false;
 			if (isnew) {
 				entity.setFullId(UUID.randomUUID().toString());
 				// assign any temporary unique value to fullId
-				// sqlserver treat duplicated <NULL> as violation of UNIQUE KEY constraint
+				// some database treat duplicated <NULL> as violation of UNIQUE KEY constraint
 				session.save(entity);
-				session.flush();
-				positionChanged = true;
-			} else {
-				positionChanged = (entity.getParent() == null && entity.getLevel() != 1
-						|| entity.getParent() != null && (entity.getLevel() - entity.getParent().getLevel() != 1
-								|| !entity.getFullId().startsWith(entity.getParent().getFullId())));
-			}
-			if (positionChanged) {
 				String fullId = String.valueOf(entity.getId()) + ".";
 				if (entity.getParent() != null)
 					fullId = entity.getParent().getFullId() + fullId;
 				entity.setFullId(fullId);
 				entity.setLevel(fullId.split("\\.").length);
-				if (entity.getParent() != null)
-					entity.setParent(entity.getParent()); // recalculate fullname
-			}
-			if (!isnew && !session.contains(obj))
-				session.update(obj);
-			if (positionChanged) {
-				for (Object c : entity.getChildren())
-					save((T) c);
+				ActionQueue queue = ((SessionImplementor) session).getActionQueue();
+				ExecutableList<EntityInsertAction> insertions = ReflectionUtils.getFieldValue(queue, "insertions");
+				if (insertions != null) {
+					Iterator<EntityInsertAction> it = insertions.iterator();
+					while (it.hasNext()) {
+						EntityInsertAction action = it.next();
+						if (action.getInstance() == entity) {
+							Object[] state = action.getState();
+							EntityPersister ep = action.getPersister();
+							String[] propertyNames = ep.getPropertyNames();
+							for (int i = 0; i < propertyNames.length; i++) {
+								if (propertyNames[i].equals("fullId"))
+									state[i] = entity.getFullId();
+								else if (propertyNames[i].equals("level"))
+									state[i] = entity.getLevel();
+							}
+							break;
+						}
+					}
+				}
+			} else {
+				boolean positionChanged = (entity.getParent() == null && entity.getLevel() != 1
+						|| entity.getParent() != null && (entity.getLevel() - entity.getParent().getLevel() != 1
+								|| !entity.getFullId().startsWith(entity.getParent().getFullId())));
+				if (positionChanged) {
+					String fullId = String.valueOf(entity.getId()) + ".";
+					if (entity.getParent() != null)
+						fullId = entity.getParent().getFullId() + fullId;
+					entity.setFullId(fullId);
+					entity.setLevel(fullId.split("\\.").length);
+					if (entity.getParent() != null)
+						entity.setParent(entity.getParent()); // recalculate fullname
+				}
+				if (!session.contains(entity))
+					session.update(entity);
+				if (positionChanged) {
+					for (Object c : entity.getChildren())
+						save((T) c);
+				}
 			}
 		} else {
 			if (isnew)
