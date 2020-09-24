@@ -6,11 +6,9 @@ import java.util.List;
 
 import javax.persistence.Table;
 
-import org.hibernate.dialect.DB2Dialect;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.MySQLDialect;
 import org.hibernate.dialect.Oracle8iDialect;
-import org.hibernate.dialect.PostgreSQL81Dialect;
 import org.hibernate.dialect.SQLServerDialect;
 import org.hibernate.dialect.SybaseDialect;
 import org.hibernate.dialect.function.SQLFunction;
@@ -108,11 +106,6 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 							+ " t join (select a.id,concat(b.fullId, a.id, '.') as fullId,b.level+1 as level from "
 							+ tableName + " a join " + tableName
 							+ " b on a.parentId=b.id where b.level=:level) c on t.id=c.id set t.fullId=c.fullId,t.level=c.level";
-				} else if (dialect instanceof PostgreSQL81Dialect || dialect instanceof DB2Dialect) {
-					sql = "update " + tableName
-							+ " t set fullId=c.fullId,level=c.level from (select a.id,(b.fullId||a.id||'.') as fullId,b.level+1 as level from "
-							+ tableName + " a join " + tableName
-							+ " b on a.parentId=b.id where b.level=:level) c where t.id=c.id";
 				} else if (dialect instanceof Oracle8iDialect) {
 					sql = "update (select a.fullId,a.\"level\",b.fullId||a.id||'.' as newFullId,b.\"level\"+1 as newLevel from "
 							+ tableName + " a join " + tableName
@@ -121,8 +114,12 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 					sql = "update a set fullId=(b.fullId+str(a.id)+'.'),level=b.level+1 from " + tableName + " a join "
 							+ tableName + " b on a.parentId=b.id where b.level=:level";
 				} else {
-					throw new UnsupportedOperationException(
-							"Unsupported database dialect: " + dialect.getClass().getName());
+					// verified PostgreSQL81Dialect and DB2Dialect
+					String fullId = concat.render(StringType.INSTANCE, Arrays.asList("b.fullId", "a.id", "'.'"), sf);
+					sql = "update " + tableName + " t set fullId=c.fullId," + levelColumn + "=c." + levelColumn
+							+ " from (select a.id," + fullId + " as fullId,b." + levelColumn + "+1 as " + levelColumn
+							+ " from " + tableName + " a join " + tableName + " b on a.parentId=b.id where b."
+							+ levelColumn + "=:level) c where t.id=c.id";
 				}
 				query = session.createNativeQuery(sql);
 				int level = 1;
