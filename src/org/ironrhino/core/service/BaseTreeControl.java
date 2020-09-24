@@ -6,9 +6,11 @@ import java.util.List;
 
 import javax.persistence.Table;
 
+import org.hibernate.dialect.DB2Dialect;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.MySQLDialect;
 import org.hibernate.dialect.Oracle8iDialect;
+import org.hibernate.dialect.PostgreSQL81Dialect;
 import org.hibernate.dialect.SQLServerDialect;
 import org.hibernate.dialect.SybaseDialect;
 import org.hibernate.dialect.function.SQLFunction;
@@ -91,35 +93,41 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 				tableName = entityClass.getAnnotation(Table.class).name();
 			SessionFactoryImplementor sf = ((SessionFactoryImplementor) session.getSessionFactory());
 			Dialect dialect = sf.getServiceRegistry().getService(JdbcServices.class).getDialect();
-			SQLFunction str = dialect.getFunctions().get("str");
 			SQLFunction concat = dialect.getFunctions().get("concat");
 			String levelColumn = dialect.quote(sf.getServiceRegistry().getService(JdbcEnvironment.class)
 					.getIdentifierHelper().isReservedWord("level") ? "`level`" : "level");
-			Query<?> query = session.createNativeQuery("update " + tableName + " set fullId="
-					+ concat.render(StringType.INSTANCE,
-							Arrays.asList(str.render(StringType.INSTANCE, Arrays.asList("id"), sf), "'.'"), sf)
-					+ "," + levelColumn + "=1 where parentId is null");
+			String fullId = concat.render(StringType.INSTANCE, Arrays.asList("id", "'.'"), sf);
+			if (dialect instanceof SQLServerDialect || dialect instanceof SybaseDialect)
+				fullId = "(convert(varchar,id)+'.')";
+			Query<?> query = session.createNativeQuery(
+					"update " + tableName + " set fullId=" + fullId + "," + levelColumn + "=1 where parentId is null");
 			if (query.executeUpdate() > 0) {
+				fullId = concat.render(StringType.INSTANCE, Arrays.asList("b.fullId", "a.id", "'.'"), sf);
 				String sql;
 				if (dialect instanceof MySQLDialect) {
-					sql = "update " + tableName
-							+ " t join (select a.id,concat(b.fullId, a.id, '.') as fullId,b.level+1 as level from "
-							+ tableName + " a join " + tableName
-							+ " b on a.parentId=b.id where b.level=:level) c on t.id=c.id set t.fullId=c.fullId,t.level=c.level";
-				} else if (dialect instanceof Oracle8iDialect) {
-					sql = "update (select a.fullId,a.\"level\",b.fullId||a.id||'.' as newFullId,b.\"level\"+1 as newLevel from "
-							+ tableName + " a join " + tableName
-							+ " b on a.parentId=b.id where b.\"level\"=:level) t set t.fullId=t.newFullId,t.\"level\"=t.newLevel";
-				} else if (dialect instanceof SQLServerDialect || dialect instanceof SybaseDialect) {
-					sql = "update a set fullId=(b.fullId+str(a.id)+'.'),level=b.level+1 from " + tableName + " a join "
-							+ tableName + " b on a.parentId=b.id where b.level=:level";
-				} else {
-					// verified PostgreSQL81Dialect and DB2Dialect
-					String fullId = concat.render(StringType.INSTANCE, Arrays.asList("b.fullId", "a.id", "'.'"), sf);
+					sql = "update " + tableName + " t join (select a.id," + fullId + " as fullId,b." + levelColumn
+							+ "+1 as " + levelColumn + " from " + tableName + " a join " + tableName
+							+ " b on a.parentId=b.id where b." + levelColumn
+							+ "=:level) c on t.id=c.id set t.fullId=c.fullId,t." + levelColumn + "=c." + levelColumn;
+				} else if (dialect instanceof PostgreSQL81Dialect || dialect instanceof DB2Dialect) {
 					sql = "update " + tableName + " t set fullId=c.fullId," + levelColumn + "=c." + levelColumn
 							+ " from (select a.id," + fullId + " as fullId,b." + levelColumn + "+1 as " + levelColumn
 							+ " from " + tableName + " a join " + tableName + " b on a.parentId=b.id where b."
 							+ levelColumn + "=:level) c where t.id=c.id";
+				} else if (dialect instanceof Oracle8iDialect) {
+					sql = "update (select a.fullId,a." + levelColumn + "," + fullId + " as newFullId,b." + levelColumn
+							+ "+1 as newLevel from " + tableName + " a join " + tableName
+							+ " b on a.parentId=b.id where b." + levelColumn + "=:level) t set t.fullId=t.newFullId,t."
+							+ levelColumn + "=t.newLevel";
+				} else if (dialect instanceof SQLServerDialect || dialect instanceof SybaseDialect) {
+					sql = "update a set fullId=(b.fullId+convert(varchar,a.id)+'.')," + levelColumn + "=b."
+							+ levelColumn + "+1 from " + tableName + " a join " + tableName
+							+ " b on a.parentId=b.id where b." + levelColumn + "=:level";
+				} else {
+					sql = "update " + tableName + " a set (fullId," + levelColumn + ")=(select " + fullId + ",b."
+							+ levelColumn + "+1 from " + tableName + " b where b.id=a.parentId and b." + levelColumn
+							+ "=:level) where exists (select * from " + tableName + " d where d.id=a.parentId and d."
+							+ levelColumn + "=:level)";
 				}
 				query = session.createNativeQuery(sql);
 				int level = 1;
