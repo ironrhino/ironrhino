@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.persistence.Table;
 
+import org.hibernate.dialect.DB2Dialect;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.MySQLDialect;
 import org.hibernate.dialect.Oracle8iDialect;
@@ -13,6 +14,7 @@ import org.hibernate.dialect.PostgreSQL81Dialect;
 import org.hibernate.dialect.SQLServerDialect;
 import org.hibernate.dialect.SybaseDialect;
 import org.hibernate.dialect.function.SQLFunction;
+import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.hibernate.engine.jdbc.spi.JdbcServices;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.query.Query;
@@ -93,10 +95,12 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 			Dialect dialect = sf.getServiceRegistry().getService(JdbcServices.class).getDialect();
 			SQLFunction str = dialect.getFunctions().get("str");
 			SQLFunction concat = dialect.getFunctions().get("concat");
+			String levelColumn = dialect.quote(sf.getServiceRegistry().getService(JdbcEnvironment.class)
+					.getIdentifierHelper().isReservedWord("level") ? "`level`" : "level");
 			Query<?> query = session.createNativeQuery("update " + tableName + " set fullId="
 					+ concat.render(StringType.INSTANCE,
 							Arrays.asList(str.render(StringType.INSTANCE, Arrays.asList("id"), sf), "'.'"), sf)
-					+ "," + dialect.quote("`level`") + "=1 where parentId is null");
+					+ "," + levelColumn + "=1 where parentId is null");
 			if (query.executeUpdate() > 0) {
 				String sql;
 				if (dialect instanceof MySQLDialect) {
@@ -104,7 +108,7 @@ public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 							+ " t join (select a.id,concat(b.fullId, a.id, '.') as fullId,b.level+1 as level from "
 							+ tableName + " a join " + tableName
 							+ " b on a.parentId=b.id where b.level=:level) c on t.id=c.id set t.fullId=c.fullId,t.level=c.level";
-				} else if (dialect instanceof PostgreSQL81Dialect) {
+				} else if (dialect instanceof PostgreSQL81Dialect || dialect instanceof DB2Dialect) {
 					sql = "update " + tableName
 							+ " t set fullId=c.fullId,level=c.level from (select a.id,(b.fullId||a.id||'.') as fullId,b.level+1 as level from "
 							+ tableName + " a join " + tableName
