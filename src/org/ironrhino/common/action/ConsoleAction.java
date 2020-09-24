@@ -62,7 +62,7 @@ public class ConsoleAction extends BaseAction {
 			if (throwable.getCause() instanceof InvocationTargetException)
 				throwable = ((InvocationTargetException) throwable.getCause()).getTargetException();
 			String msg = throwable.getLocalizedMessage();
-			log.error(msg);
+			log.error(msg, throwable);
 			addActionError(getText("error") + (StringUtils.isNotBlank(msg) ? (": " + msg) : ""));
 			return ERROR;
 		}
@@ -79,7 +79,7 @@ public class ConsoleAction extends BaseAction {
 			if (throwable instanceof InvocationTargetException)
 				throwable = ((InvocationTargetException) throwable).getTargetException();
 			String msg = throwable.getLocalizedMessage();
-			log.error(msg);
+			log.error(msg, throwable);
 			addActionError(getText("error") + (StringUtils.isNotBlank(msg) ? (": " + msg) : ""));
 			Map<String, Collection<String>> map = new HashMap<>();
 			map.put("actionErrors", getActionErrors());
