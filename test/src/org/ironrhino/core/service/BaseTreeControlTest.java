@@ -43,7 +43,8 @@ public class BaseTreeControlTest {
 		entityManager.executeUpdate("update TreeNode t set t.fullId=concat(t.fullId,'xxx'),t.level=0");
 		treeNodeControl.repairHierarchy();
 		verify();
-		entityManager.executeUpdate("delete from TreeNode t");
+		entityManager.executeUpdate("delete from TreeNode t where t.parent is not null");
+		entityManager.executeUpdate("delete from TreeNode t where t.parent is null");
 	}
 
 	private void verify() {
