@@ -100,9 +100,8 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	@Transactional
 	public void save(T obj) {
-		Class<?> clazz = ReflectionUtils.getActualClass(obj);
 		boolean isnew = obj.isNew();
-		if (EntityClassHelper.isIdAssigned(clazz)) {
+		if (EntityClassHelper.isIdAssigned(obj.getClass())) {
 			Serializable id = obj.getId();
 			if (id == null)
 				throw new IllegalArgumentException(obj + " must have an ID");

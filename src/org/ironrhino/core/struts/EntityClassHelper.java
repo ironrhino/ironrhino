@@ -793,6 +793,7 @@ public class EntityClassHelper {
 	}
 
 	public static boolean isIdAssigned(Class<?> entityClass) {
+		entityClass = ReflectionUtils.getActualClass(entityClass);
 		Boolean b = idAssignedCache.get(entityClass);
 		if (b == null || AppInfo.getStage() == Stage.DEVELOPMENT) {
 			b = _isIdAssigned(entityClass);
