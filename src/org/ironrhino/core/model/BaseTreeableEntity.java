@@ -6,7 +6,9 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -60,11 +62,13 @@ public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extend
 	protected int displayOrder;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "parentId")
+	@JoinColumn(name = "parentId", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
 	protected T parent;
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "parent")
 	@OrderBy("displayOrder,name")
+	@SuppressWarnings("deprecation")
+	@org.hibernate.annotations.ForeignKey(name = "none")
 	protected Collection<T> children = new ArrayList<>(0);
 
 	@JsonIgnore
