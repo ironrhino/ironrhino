@@ -194,7 +194,8 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 	protected RemoteInvocationResult executeRequest(RemoteInvocation invocation, MethodInvocation methodInvocation)
 			throws Throwable {
 		return circuitBreakerRegistry != null
-				? circuitBreakerRegistry.of(getServiceInterface().getName(), ex -> ex instanceof IOException)
+				? circuitBreakerRegistry
+						.of(ReflectionUtils.stringify(methodInvocation.getMethod()), ex -> ex instanceof IOException)
 						.executeCheckedSupplier(() -> doExecuteRequest(invocation, methodInvocation))
 				: doExecuteRequest(invocation, methodInvocation);
 	}
