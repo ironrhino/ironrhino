@@ -6,7 +6,6 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.ironrhino.core.aop.BaseAspect;
-import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
@@ -15,7 +14,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 
 @Aspect
 @Component
-@ClassPresentConditional("io.github.resilience4j.circuitbreaker.CircuitBreaker")
+@CircuitBreakerEnabled
 public class CircuitBreakerAspect extends BaseAspect {
 
 	@Autowired

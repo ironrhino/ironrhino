@@ -14,7 +14,6 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.ironrhino.core.metrics.Metrics;
-import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Getter
-@ClassPresentConditional("io.github.resilience4j.circuitbreaker.CircuitBreaker")
+@CircuitBreakerEnabled
 @Slf4j
 public class CircuitBreakerRegistry {
 
