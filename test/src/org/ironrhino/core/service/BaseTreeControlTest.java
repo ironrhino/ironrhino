@@ -36,7 +36,7 @@ public class BaseTreeControlTest {
 		TreeNode child1 = new TreeNode("child1",1);
 		child1.setParent(parent);
 		entityManager.save(child1);
-		TreeNode child2 = new TreeNode("child1",2);
+		TreeNode child2 = new TreeNode("child2",2);
 		child2.setParent(parent);
 		entityManager.save(child2);
 		verify();
@@ -52,6 +52,7 @@ public class BaseTreeControlTest {
 		assertThat(root.getFullId(), is(nullValue()));
 		assertThat(root.getLevel(), is(0));
 		TreeNode parent = root.getChildren().iterator().next();
+		assertThat("parent", is(parent.getName()));
 		assertThat(parent.getFullId(), is(parent.getId() + "."));
 		assertThat(parent.getLevel(), is(1));
 		Collection<TreeNode> children = parent.getChildren();
@@ -59,10 +60,12 @@ public class BaseTreeControlTest {
 		Iterator<TreeNode> it = children.iterator();
 		TreeNode child1 = it.next();
 		assertThat(child1.getId(), is(parent.getId() + 1));
+		assertThat("child1", is(child1.getName()));
 		assertThat(child1.getFullId(), is(parent.getId() + "." + child1.getId() + "."));
 		assertThat(child1.getLevel(), is(2));
 		TreeNode child2 = it.next();
 		assertThat(child2.getId(), is(parent.getId() + 2));
+		assertThat("child2", is(child2.getName()));
 		assertThat(child2.getFullId(), is(parent.getId() + "." + child2.getId() + "."));
 		assertThat(child2.getLevel(), is(2));
 	}
