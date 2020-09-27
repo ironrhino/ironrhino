@@ -111,6 +111,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 		if (obj instanceof BaseTreeableEntity) {
 			BaseTreeableEntity entity = (BaseTreeableEntity) obj;
 			if (isnew) {
+				entity.setLevel(entity.getParent() != null ? entity.getParent().getLevel() + 1 : 1);
 				entity.setFullId(UUID.randomUUID().toString());
 				// assign any temporary unique value to fullId
 				// some database treat duplicated <NULL> as violation of UNIQUE KEY constraint
@@ -119,7 +120,6 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 				if (entity.getParent() != null)
 					fullId = entity.getParent().getFullId() + fullId;
 				entity.setFullId(fullId);
-				entity.setLevel(fullId.split("\\.").length);
 				ActionQueue queue = ((SessionImplementor) session).getActionQueue();
 				ExecutableList<EntityInsertAction> insertions = ReflectionUtils.getFieldValue(queue, "insertions");
 				if (insertions != null) {
@@ -131,10 +131,10 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 							EntityPersister ep = action.getPersister();
 							String[] propertyNames = ep.getPropertyNames();
 							for (int i = 0; i < propertyNames.length; i++) {
-								if (propertyNames[i].equals("fullId"))
+								if (propertyNames[i].equals("fullId")) {
 									state[i] = entity.getFullId();
-								else if (propertyNames[i].equals("level"))
-									state[i] = entity.getLevel();
+									break;
+								}
 							}
 							break;
 						}
