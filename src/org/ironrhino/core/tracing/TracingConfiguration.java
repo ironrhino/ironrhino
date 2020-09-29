@@ -128,6 +128,9 @@ public class TracingConfiguration {
 			Tracing.disable();
 			return TracingPostProcessor.EMPTY;
 		}
+		String key = "io.opentracing.contrib.jdbc.slowQueryThresholdMs";
+		if (System.getProperty(key) == null)
+			System.setProperty(key, env.getProperty(key, "100"));
 		return TracingPostProcessor.INSTANCE;
 	}
 
