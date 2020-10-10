@@ -1,5 +1,7 @@
 package org.ironrhino.core.tracing;
 
+import java.io.Serializable;
+
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionException;
@@ -12,23 +14,25 @@ import lombok.Getter;
 @Getter
 public class TracingTransactionManager implements PlatformTransactionManager {
 
+	private static final Serializable[] TAGS = new String[] { "component", "tx" };
+
 	private final PlatformTransactionManager underlying;
 
 	@Override
 	public TransactionStatus getTransaction(TransactionDefinition transactionDefinition) throws TransactionException {
-		return underlying.getTransaction(transactionDefinition);
+		return Tracing.executeCheckedCallable("transactionManager.getTransaction",
+				() -> underlying.getTransaction(transactionDefinition), TAGS);
 	}
 
 	@Override
 	public void commit(TransactionStatus transactionStatus) throws TransactionException {
-		Tracing.executeCheckedRunnable("transactionManager.commit", () -> underlying.commit(transactionStatus),
-				"component", "tx");
+		Tracing.executeCheckedRunnable("transactionManager.commit", () -> underlying.commit(transactionStatus), TAGS);
 	}
 
 	@Override
 	public void rollback(TransactionStatus transactionStatus) throws TransactionException {
 		Tracing.executeCheckedRunnable("transactionManager.rollback", () -> underlying.rollback(transactionStatus),
-				"component", "tx");
+				TAGS);
 	}
 
 }
