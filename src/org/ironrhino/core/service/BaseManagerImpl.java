@@ -36,7 +36,9 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.engine.spi.ActionQueue;
 import org.hibernate.engine.spi.ExecutableList;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.id.Assigned;
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.internal.CriteriaImpl.OrderEntry;
 import org.hibernate.persister.entity.EntityPersister;
@@ -48,7 +50,6 @@ import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.model.Ordered;
 import org.ironrhino.core.model.Persistable;
 import org.ironrhino.core.model.ResultPage;
-import org.ironrhino.core.struts.EntityClassHelper;
 import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.BeanUtils;
 import org.ironrhino.core.util.ReflectionUtils;
@@ -101,7 +102,8 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Transactional
 	public void save(T obj) {
 		boolean isnew = obj.isNew();
-		if (EntityClassHelper.isIdAssigned(obj.getClass())) {
+		if (((SessionFactoryImplementor) sessionFactory).getMetamodel().entityPersister(obj.getClass())
+				.getIdentifierGenerator() instanceof Assigned) {
 			Serializable id = obj.getId();
 			if (id == null)
 				throw new IllegalArgumentException(obj + " must have an ID");
