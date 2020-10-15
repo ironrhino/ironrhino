@@ -9,7 +9,7 @@
 <#local size = columns?size>
 <#list columns as name,config>
 <#local cellname=((config['trimPrefix']??)?then('',entityName+'.'))+name>
-<@rttheadtd name=name alias=config['alias']! description=config['description']! title=config['title']! class=config['thCssClass']! width=config['width']! cellname=cellname cellEdit=celleditable?then(config['cellEdit']!,'') readonly=readonly resizable=(readonly&&name?has_next||!readonly)&&resizable/>
+<@rttheadtd name=name alias=config['alias']! description=config['description']! title=config['title']! class=config['thCssClass']! width=config['width']! cellname=cellname cellEdit=celleditable?then(config['cellEdit']!,'') readonly=readonly resizable=config['width']?has_content&&(readonly&&name?has_next||!readonly)&&resizable/>
 </#list>
 <#local showActionColumn=showActionColumn&&(actionColumnButtons?has_content||!readonly||viewable)/>
 <@rtmiddle width=actionColumnWidth showActionColumn=showActionColumn/>
