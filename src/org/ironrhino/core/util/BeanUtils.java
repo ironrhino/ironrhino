@@ -165,8 +165,13 @@ public class BeanUtils {
 						propertyName);
 				return pd != null ? pd.getPropertyType() : null;
 			} else {
-				Method m = org.springframework.beans.BeanUtils
-						.getPropertyDescriptor(beanClass, propertyName.substring(0, index)).getReadMethod();
+				PropertyDescriptor pd = org.springframework.beans.BeanUtils.getPropertyDescriptor(beanClass,
+						propertyName.substring(0, index));
+				if (pd == null)
+					return null;
+				Method m = pd.getReadMethod();
+				if (m == null)
+					return null;
 				Type type = m.getGenericReturnType();
 				if (type instanceof ParameterizedType) {
 					type = ((ParameterizedType) type).getActualTypeArguments()[0];
