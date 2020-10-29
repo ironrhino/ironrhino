@@ -97,6 +97,7 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 
 	@After
 	public void clearInvocations() {
+		mockHttpInvokerRequestExecutor.setSerializer(HttpInvokerSerializers.ofSerializationType(serializationType));
 		Mockito.clearInvocations(mockHttpInvokerRequestExecutor, mockTestService, mockFooService, mockBarService,
 				fallbackBarService);
 	}
@@ -360,13 +361,13 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 		UserDetails userDetails = callable.call();
 		assertThat(userDetails.getUsername(), is("username"));
 		verifyUserDetails(userDetails);
-		then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(TestService.class)),
+		then(mockHttpInvokerRequestExecutor).should(atLeast(1)).executeRequest(eq(serviceUrl(TestService.class)),
 				argThat(ri -> "loadCallableUserDetailsByUsername".equals(ri.getMethodName())),
 				any(MethodInvocation.class));
 		then(mockHttpServletRequest).should().startAsync();
 		then(mockAsyncContext).should().start(any(Runnable.class));
 		then(mockAsyncContext).should().complete();
-		then(mockTestService).should().loadCallableUserDetailsByUsername("username");
+		then(mockTestService).should(atLeast(1)).loadCallableUserDetailsByUsername("username");
 	}
 
 	@Test
@@ -392,14 +393,14 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 			UserDetails userDetails = future.get();
 			assertThat(userDetails.getUsername(), is("username"));
 			verifyUserDetails(userDetails);
-			then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(TestService.class)),
+			then(mockHttpInvokerRequestExecutor).should(atLeast(1)).executeRequest(eq(serviceUrl(TestService.class)),
 					argThat(ri -> "loadFutureUserDetailsByUsername".equals(ri.getMethodName())),
 					any(MethodInvocation.class));
 			then(mockHttpServletRequest).should().startAsync();
 			if (futureType == FutureType.RUNNABLE)
 				then(mockAsyncContext).should().start(any(Runnable.class));
 			then(mockAsyncContext).should().complete();
-			then(mockTestService).should().loadFutureUserDetailsByUsername("username", futureType);
+			then(mockTestService).should(atLeast(1)).loadFutureUserDetailsByUsername("username", futureType);
 			clearInvocations();
 		}
 	}
@@ -477,12 +478,12 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 		UserDetails userDetails = listenableFuture.get();
 		assertThat(userDetails.getUsername(), is("username"));
 		verifyUserDetails(userDetails);
-		then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(TestService.class)),
+		then(mockHttpInvokerRequestExecutor).should(atLeast(1)).executeRequest(eq(serviceUrl(TestService.class)),
 				argThat(ri -> "loadListenableFutureUserDetailsByUsername".equals(ri.getMethodName())),
 				any(MethodInvocation.class));
 		then(mockHttpServletRequest).should().startAsync();
 		then(mockAsyncContext).should().complete();
-		then(mockTestService).should().loadListenableFutureUserDetailsByUsername("username");
+		then(mockTestService).should(atLeast(1)).loadListenableFutureUserDetailsByUsername("username");
 	}
 
 	@Test
@@ -502,12 +503,12 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 		CompletableFuture<? extends UserDetails> completableFuture = testService
 				.loadCompletableFutureUserDetailsByUsername("username");
 		assertThat(completableFuture.get().getUsername(), is("username"));
-		then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(TestService.class)),
+		then(mockHttpInvokerRequestExecutor).should(atLeast(1)).executeRequest(eq(serviceUrl(TestService.class)),
 				argThat(ri -> "loadCompletableFutureUserDetailsByUsername".equals(ri.getMethodName())),
 				any(MethodInvocation.class));
 		then(mockHttpServletRequest).should().startAsync();
 		then(mockAsyncContext).should().complete();
-		then(mockTestService).should().loadCompletableFutureUserDetailsByUsername("username");
+		then(mockTestService).should(atLeast(1)).loadCompletableFutureUserDetailsByUsername("username");
 	}
 
 	@Test
@@ -516,12 +517,12 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 			assertThat(ud.getUsername(), is("username"));
 		});
 		Thread.sleep(500);
-		then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(TestService.class)),
+		then(mockHttpInvokerRequestExecutor).should(atLeast(1)).executeRequest(eq(serviceUrl(TestService.class)),
 				argThat(ri -> "loadCompletionStageUserDetailsByUsername".equals(ri.getMethodName())),
 				any(MethodInvocation.class));
 		then(mockHttpServletRequest).should().startAsync();
 		then(mockAsyncContext).should().complete();
-		then(mockTestService).should().loadCompletionStageUserDetailsByUsername("username");
+		then(mockTestService).should(atLeast(1)).loadCompletionStageUserDetailsByUsername("username");
 	}
 
 	@Test
