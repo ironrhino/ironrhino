@@ -2,6 +2,7 @@ package org.ironrhino.core.remoting.impl;
 
 import static org.ironrhino.core.metadata.Profiles.DEFAULT;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -39,7 +40,7 @@ public class StandaloneServiceRegistry extends AbstractServiceRegistry {
 	protected void lookup(String serviceName) {
 		List<String> list = services.get(serviceName);
 		if (list != null)
-			getImportedServiceCandidates().put(serviceName, list);
+			getImportedServiceCandidates().put(serviceName, new ArrayList<>(list));
 	}
 
 	@Override
