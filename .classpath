@@ -102,7 +102,6 @@
 	<classpathentry kind="lib" path="lib/asm-7.2.jar"/>
 	<classpathentry kind="lib" path="lib/el-api-3.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/hamcrest-2.2.jar"/>
-	<classpathentry kind="lib" path="lib/jetty-all-9.4.14.jar"/>
 	<classpathentry kind="lib" path="lib/jmh-core-1.21.jar"/>
 	<classpathentry kind="lib" path="lib/jmh-generator-annprocess-1.21.jar"/>
 	<classpathentry kind="lib" path="lib/jopt-simple-4.6.jar"/>
@@ -115,5 +114,6 @@
 	<classpathentry kind="lib" path="lib/spring-security-test-5.2.1.jar"/>
 	<classpathentry kind="lib" path="lib/spring-test-5.2.2.jar"/>
 	<classpathentry kind="lib" path="lib/websocket-api-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-all-9.4.14.jar"/>
 	<classpathentry kind="output" path="webapp/WEB-INF/classes"/>
 </classpath>
