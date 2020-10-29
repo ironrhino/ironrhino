@@ -6,7 +6,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/antlr-runtime-3.5.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/aspectjweaver-1.9.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/batch-api-1.0.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/byte-buddy-1.10.3.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/byte-buddy-1.11.7.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/cache2k-api-1.2.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/cache2k-core-1.2.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/classmate-1.5.1.jar"/>
@@ -40,7 +40,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-module-mrbean-2.12.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-module-parameter-names-2.12.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jaeger-all-1.5.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/javassist-3.26.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/javassist-3.28.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jaxb-api-2.3.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jboss-logging-3.3.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jboss-logging-annotations-2.1.0.jar"/>
@@ -58,7 +58,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mvel2-2.4.4.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mysql-connector-java-8.0.25.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/netty-all-4.1.43.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/objenesis-3.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/objenesis-3.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/ognl-3.1.26.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/persistence-api-2.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/pinyin4j-2.5.0.jar"/>
@@ -99,7 +99,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/validation-api-2.0.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/xwork-core-2.4.16.jar"/>
 	<classpathentry kind="lib" path="lib/annotations-api-3.0.jar"/>
-	<classpathentry kind="lib" path="lib/asm-7.2.jar"/>
+	<classpathentry kind="lib" path="lib/asm-9.2.jar"/>
 	<classpathentry kind="lib" path="lib/el-api-3.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/hamcrest-2.2.jar"/>
 	<classpathentry kind="lib" path="lib/jmh-core-1.21.jar"/>
@@ -107,7 +107,7 @@
 	<classpathentry kind="lib" path="lib/jopt-simple-4.6.jar"/>
 	<classpathentry kind="lib" path="lib/junit-4.12.jar"/>
 	<classpathentry kind="lib" path="lib/lombok-1.18.18.jar"/>
-	<classpathentry kind="lib" path="lib/mockito-core-3.1.0.jar"/>
+	<classpathentry kind="lib" path="lib/mockito-core-3.11.2.jar"/>
 	<classpathentry kind="lib" path="lib/reactor-test-3.3.5.jar"/>
 	<classpathentry kind="lib" path="lib/servlet-api-4.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/spring-batch-test-4.2.1.jar"/>
