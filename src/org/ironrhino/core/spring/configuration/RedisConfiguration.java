@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import org.ironrhino.core.tracing.Tracing;
 import org.ironrhino.core.util.AppInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,6 +39,9 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.SocketOptions;
 import io.lettuce.core.TimeoutOptions;
+import io.opentracing.contrib.redis.common.TracingConfiguration;
+import io.opentracing.contrib.redis.spring.data2.connection.TracingRedisConnectionFactory;
+import io.opentracing.util.GlobalTracer;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -157,7 +161,7 @@ public class RedisConfiguration {
 	@Primary
 	public RedisTemplate<String, ?> redisTemplate() {
 		RedisTemplate<String, ?> template = new RedisTemplate<>();
-		template.setConnectionFactory(redisConnectionFactory());
+		template.setConnectionFactory(wrap(redisConnectionFactory()));
 		RedisSerializer<String> stringSerializer = new StringRedisSerializer();
 		template.setKeySerializer(stringSerializer);
 		return template;
@@ -166,7 +170,7 @@ public class RedisConfiguration {
 	@Bean
 	public StringRedisTemplate stringRedisTemplate() {
 		StringRedisTemplate template = new StringRedisTemplate();
-		template.setConnectionFactory(redisConnectionFactory());
+		template.setConnectionFactory(wrap(redisConnectionFactory()));
 		return template;
 	}
 
@@ -179,6 +183,13 @@ public class RedisConfiguration {
 		if (executorService != null)
 			container.setTaskExecutor(executorService);
 		return container;
+	}
+
+	protected RedisConnectionFactory wrap(RedisConnectionFactory redisConnectionFactory) {
+		return Tracing.isEnabled()
+				? new TracingRedisConnectionFactory(redisConnectionFactory,
+						new TracingConfiguration.Builder(GlobalTracer.get()).traceWithActiveSpanOnly(true).build())
+				: redisConnectionFactory;
 	}
 
 }
