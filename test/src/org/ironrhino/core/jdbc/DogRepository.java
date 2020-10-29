@@ -36,8 +36,8 @@ public interface DogRepository {
 
 	@Transactional(readOnly = true)
 	default Dog findDog(String name) {
-		List<Dog> dogs = jdbcTemplate().query("select * from dog where name=?", new Object[] { name },
-				new BeanPropertyRowMapper<>(Dog.class));
+		List<Dog> dogs = jdbcTemplate().query("select * from dog where name=?", new BeanPropertyRowMapper<>(Dog.class),
+				new Object[] { name });
 		if (dogs.size() == 1)
 			return dogs.get(0);
 		return null;

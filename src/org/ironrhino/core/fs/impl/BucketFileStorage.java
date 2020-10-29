@@ -7,12 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.fs.FileInfo;
 import org.ironrhino.core.fs.Paged;
 import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.FileUtils;
 import org.ironrhino.core.util.LimitExceededException;
-import org.springframework.util.StringUtils;
 
 public abstract class BucketFileStorage extends AbstractFileStorage {
 
@@ -37,7 +37,7 @@ public abstract class BucketFileStorage extends AbstractFileStorage {
 	}
 
 	protected String normalizePath(String path) {
-		return FileUtils.normalizePath(StringUtils.trimLeadingCharacter(path, '/'));
+		return FileUtils.normalizePath(org.springframework.util.StringUtils.trimLeadingCharacter(path, '/'));
 	}
 
 	@Override
