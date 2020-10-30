@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Locale;
@@ -168,15 +167,16 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 			int remainingAttempts = maxAttempts;
 			do {
 				Result result = queryTimestampWithSequence(con, stmt);
-				Date now = result.currentTimestamp;
+				Timestamp now = result.currentTimestamp;
 				if (sameCycle(result)) {
-					if (updateLastUpdated(con, now, ct.getCycleStart(ct.skipCycles(now, 1))))
+					if (updateLastUpdated(con, now, new Timestamp(ct.getCycleStart(ct.skipCycles(now, 1)).getTime())))
 						return getStringValue(now, getPaddingLength(), result.nextId);
 				} else {
 					con.setAutoCommit(false);
 					try {
 						result = queryTimestampForUpdate(con, stmt);
-						if (!sameCycle(result) && updateLastUpdated(con, now, ct.getCycleStart(now))) {
+						if (!sameCycle(result)
+								&& updateLastUpdated(con, now, new Timestamp(ct.getCycleStart(now).getTime()))) {
 							restartSequence(con, stmt);
 							result = queryTimestampWithSequence(con, stmt);
 							return getStringValue(result.currentTimestamp, getPaddingLength(), result.nextId);
@@ -205,10 +205,10 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 		stmt.execute(getRestartSequenceStatement());
 	}
 
-	private boolean updateLastUpdated(Connection con, Date lastUpdated, Date limit) throws SQLException {
+	private boolean updateLastUpdated(Connection con, Timestamp lastUpdated, Timestamp limit) throws SQLException {
 		try (PreparedStatement ps = con.prepareStatement(updateTimestampStatement)) {
-			ps.setTimestamp(1, new Timestamp(lastUpdated.getTime()));
-			ps.setTimestamp(2, new Timestamp(limit.getTime()));
+			ps.setTimestamp(1, lastUpdated);
+			ps.setTimestamp(2, limit);
 			return ps.executeUpdate() == 1;
 		}
 	}
@@ -246,7 +246,7 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 
 	private static class Result {
 		int nextId;
-		Date currentTimestamp;
-		Date lastTimestamp;
+		Timestamp currentTimestamp;
+		Timestamp lastTimestamp;
 	}
 }
