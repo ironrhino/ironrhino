@@ -67,8 +67,6 @@ public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extend
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "parent")
 	@OrderBy("displayOrder,name")
-	@SuppressWarnings("deprecation")
-	@org.hibernate.annotations.ForeignKey(name = "none")
 	protected Collection<T> children = new ArrayList<>(0);
 
 	@JsonIgnore

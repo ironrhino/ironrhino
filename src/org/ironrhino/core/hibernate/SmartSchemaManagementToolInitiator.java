@@ -108,7 +108,6 @@ public class SmartSchemaManagementToolInitiator implements StandardServiceInitia
 									}
 								} catch (SQLException e) {
 								}
-								@SuppressWarnings("unchecked")
 								Iterator<ForeignKey> foreignKeys = table.getForeignKeyIterator();
 								loop: while (foreignKeys.hasNext()) {
 									ForeignKey foreignKey = foreignKeys.next();
