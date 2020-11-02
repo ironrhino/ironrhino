@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.lang.Nullable;
+import io.micrometer.influx.InfluxApiVersion;
 import io.micrometer.influx.InfluxConfig;
 import io.micrometer.influx.InfluxMeterRegistry;
 import io.micrometer.influx.InfluxNamingConvention;
@@ -72,16 +73,24 @@ public class InfluxMeterRegistryProvider implements MeterRegistryProvider, Defau
 
 	private Optional<InfluxMeterRegistry> createMeterRegistry(InfluxConfig config, boolean forUpdate) {
 		if (AddressAvailabilityCondition.check(config.uri(), 2000)) {
-			if (!forUpdate)
-				log.info("Add influx metrics registry {} with db '{}'", config.uri(), config.db());
+			if (!forUpdate) {
+				if (config.apiVersion() == InfluxApiVersion.V1)
+					log.info("Add influx metrics registry {} with db '{}'", config.uri(), config.db());
+				else
+					log.info("Add influx metrics registry {} with bucket '{}'", config.uri(), config.bucket());
+			}
 			this.influxConfig = config;
 			this.influxMeterRegistry = InfluxMeterRegistry.builder(config).threadFactory(threadFactory).build();
-			// revert https://github.com/micrometer-metrics/micrometer/issues/693
+
 			this.influxMeterRegistry.config().namingConvention(new InfluxNamingConvention() {
 
 				@Override
 				public String name(String name, Meter.Type type, @Nullable String baseUnit) {
-					return format(name.replace("=", "_"));
+					if (config.apiVersion() == InfluxApiVersion.V1) {
+						// revert https://github.com/micrometer-metrics/micrometer/issues/693
+						return format(name.replace("=", "_"));
+					}
+					return super.name(name, type, baseUnit);
 				}
 
 				private String format(String name) {
