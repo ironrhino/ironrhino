@@ -109,7 +109,10 @@ public class DataSourceConfiguration {
 		hikari.setIdleTimeout(idleTimeout);
 		hikari.setMaxLifetime(maxLifetime);
 		hikari.setAutoCommit(autoCommit);
-		hikari.setRegisterMbeans(registerMbeans);
+		if (registerMbeans) {
+			System.setProperty("hikaricp.jmx.register2.0", "true");
+			hikari.setRegisterMbeans(true);
+		}
 		if (StringUtils.isNotBlank(connectionTestQuery))
 			hikari.setConnectionTestQuery(connectionTestQuery);
 		hikari.setPoolName("HikariPool-" + AppInfo.getAppName());
