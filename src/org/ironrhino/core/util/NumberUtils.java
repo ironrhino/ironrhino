@@ -27,7 +27,7 @@ public class NumberUtils {
 	}
 
 	public static BigDecimal parseAmount(String value) throws ParseException {
-		return new BigDecimal(new DecimalFormat("#,##0.00").parse(value).doubleValue());
+		return BigDecimal.valueOf(new DecimalFormat("#,##0.00").parse(value).doubleValue());
 	}
 
 	public static String format(int value, int digit) {
@@ -46,7 +46,7 @@ public class NumberUtils {
 	}
 
 	public static double round(double value, int decimalDigits) {
-		return round(new BigDecimal(String.valueOf(value)), decimalDigits).doubleValue();
+		return round(BigDecimal.valueOf(value), decimalDigits).doubleValue();
 	}
 
 	public static BigDecimal round(BigDecimal bd, int decimalDigits) {
@@ -56,7 +56,7 @@ public class NumberUtils {
 		String s = String.valueOf(bd.intValue());
 		if (!s.equals("0"))
 			precision += s.length();
-		return new BigDecimal(bd.round(new MathContext(precision, RoundingMode.HALF_UP)).doubleValue());
+		return BigDecimal.valueOf(bd.round(new MathContext(precision, RoundingMode.HALF_UP)).doubleValue());
 	}
 
 	public static String formatPercent(double value, int fractionDigits) {
@@ -110,7 +110,7 @@ public class NumberUtils {
 	private static final String[] DUNIT = { "角", "分", "厘" };
 
 	public static String toChineseUpperCase(double input) {
-		return _toChineseUpperCase(new BigDecimal(String.valueOf(input)).toString());
+		return _toChineseUpperCase(BigDecimal.valueOf(input).toString());
 	}
 
 	public static String toChineseUpperCase(BigDecimal input) {

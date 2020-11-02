@@ -1587,12 +1587,12 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 							BigDecimal old = (BigDecimal) sumColumns.get(name);
 							if (old == null)
 								old = BigDecimal.ZERO;
-							sum = old.add(new BigDecimal((Float) value));
+							sum = old.add(new BigDecimal(Float.toString((Float) value)));
 						} else if (clazz == double.class || clazz == Double.class) {
 							BigDecimal old = (BigDecimal) sumColumns.get(name);
 							if (old == null)
 								old = BigDecimal.ZERO;
-							sum = old.add(new BigDecimal((Double) value));
+							sum = old.add(new BigDecimal(Double.toString((Double) value)));
 						} else if (clazz == BigDecimal.class) {
 							BigDecimal old = (BigDecimal) sumColumns.get(name);
 							if (old == null)
