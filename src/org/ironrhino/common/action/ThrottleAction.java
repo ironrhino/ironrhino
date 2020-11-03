@@ -5,6 +5,7 @@ import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.spring.ApplicationContextConsole;
+import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.ironrhino.core.struts.BaseAction;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -17,6 +18,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreaker.State;
 import lombok.Getter;
 import lombok.Setter;
 
+@ClassPresentConditional("io.github.resilience4j.circuitbreaker.CircuitBreaker")
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 @Getter

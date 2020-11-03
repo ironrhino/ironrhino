@@ -37,8 +37,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.util.concurrent.ListenableFuture;
 
-import io.github.resilience4j.bulkhead.BulkheadFullException;
-import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -78,9 +76,11 @@ public class SchedulingConfiguration implements SchedulingConfigurer, AsyncConfi
 		threadPoolTaskScheduler.setThreadNamePrefix("taskScheduler-");
 		threadPoolTaskScheduler.setRemoveOnCancelPolicy(true);
 		threadPoolTaskScheduler.setErrorHandler(ex -> {
+			String className = ex.getClass().getName();
 			if (ex instanceof FrequencyLimitExceededException || ex instanceof IllegalConcurrentAccessException
-					|| ex instanceof RequestNotPermitted || ex instanceof BulkheadFullException
-					|| ex instanceof LockFailedException || ex instanceof ShortCircuitException)
+					|| ex instanceof LockFailedException || ex instanceof ShortCircuitException
+					|| className.equals("io.github.resilience4j.bulkhead.BulkheadFullException")
+					|| className.equals("io.github.resilience4j.ratelimiter.RequestNotPermitted"))
 				log.warn("Error occurred in scheduled task: {}", ex.getLocalizedMessage());
 			else
 				log.error("Unexpected error occurred in scheduled task", ex);
@@ -102,14 +102,15 @@ public class SchedulingConfiguration implements SchedulingConfigurer, AsyncConfi
 	@Override
 	public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
 		return (ex, method, args) -> {
+			String className = ex.getClass().getName();
 			if (AnnotationUtils.findAnnotation(method, Frequency.class) != null
 					&& ex instanceof FrequencyLimitExceededException
 					|| AnnotationUtils.findAnnotation(method, Concurrency.class) != null
 							&& ex instanceof IllegalConcurrentAccessException
 					|| AnnotationUtils.findAnnotation(method, RateLimiter.class) != null
-							&& ex instanceof RequestNotPermitted
+							&& className.equals("io.github.resilience4j.ratelimiter.RequestNotPermitted")
 					|| AnnotationUtils.findAnnotation(method, Bulkhead.class) != null
-							&& ex instanceof BulkheadFullException)
+							&& className.equals("io.github.resilience4j.bulkhead.BulkheadFullException"))
 				log.warn("Error occurred when call method ( " + method.toString() + " ) asynchronously: {}",
 						ex.getLocalizedMessage());
 			else if (AnnotationUtils.findAnnotation(method, Mutex.class) != null && ex instanceof LockFailedException)

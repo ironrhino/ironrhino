@@ -87,7 +87,6 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -194,7 +193,9 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 
 	@Override
 	protected boolean shouldFallBackFor(Throwable ex) {
-		return ex instanceof CallNotPermittedException;
+		// return ex instanceof CallNotPermittedException;
+		// avoid static reference of resilience4j
+		return ex.getClass().getName().equals("io.github.resilience4j.circuitbreaker.CallNotPermittedException");
 	}
 
 	@PostConstruct

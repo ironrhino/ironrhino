@@ -44,7 +44,6 @@ import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationResult;
 import org.springframework.util.Assert;
 
-import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -163,7 +162,8 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 	protected boolean shouldFallBackFor(Throwable ex) {
 		if (ex instanceof RemoteAccessException) {
 			ex = ex.getCause();
-			return ex instanceof CallNotPermittedException || ex instanceof ServiceNotFoundException;
+			return ex.getClass().getName().equals("io.github.resilience4j.circuitbreaker.CallNotPermittedException")
+					|| ex instanceof ServiceNotFoundException;
 		}
 		return false;
 	}
