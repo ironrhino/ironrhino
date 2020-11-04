@@ -104,7 +104,7 @@ public class NumberConverter extends DefaultTypeConverter {
             return true;
         }
 
-        return ((Comparable)bigValue).compareTo(lowerBound) >= 0 && ((Comparable)bigValue).compareTo(upperBound) <= 0;
+        return bigValue != null && ((Comparable)bigValue).compareTo(lowerBound) >= 0 && ((Comparable)bigValue).compareTo(upperBound) <= 0;
     }
 
     private boolean isIntegerType(Class type) {
