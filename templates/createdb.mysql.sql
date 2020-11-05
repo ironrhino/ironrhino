@@ -67,12 +67,13 @@ delimiter ;
 
 drop function if exists next_snowflake_id;
 delimiter $$
-create function next_snowflake_id(worker_id int) returns bigint(20) not deterministic
+create function next_snowflake_id() returns bigint not deterministic
 begin
-    declare epoch bigint(20) default 1556150400000;
+    declare epoch bigint default 1556150400000;
     declare worker_id_length int default 8;
+    declare worker_id smallint default connection_id()%(1<<worker_id_length);
     declare sequence_length int default 10;
-    declare current_ts bigint(20) default round(unix_timestamp(curtime(4)) * 1000);
+    declare current_ts bigint default round(unix_timestamp(curtime(4)) * 1000);
     if @sequence > 1023 then
         while @last_ts = current_ts do
             set current_ts = round(unix_timestamp(curtime(4)) * 1000);
