@@ -73,6 +73,9 @@ public class GlobalRedisConfiguration extends RedisConfiguration {
 	@Value("${global.redis.useSsl:false}")
 	private boolean useSsl;
 
+	@Value("${global.redis.shareNativeConnection:true}")
+	private boolean shareNativeConnection;
+
 	@Override
 	@Bean(name = "globalRedisConnectionFactory")
 	public RedisConnectionFactory redisConnectionFactory() {

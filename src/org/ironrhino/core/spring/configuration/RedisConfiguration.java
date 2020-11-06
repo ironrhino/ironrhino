@@ -98,12 +98,12 @@ public class RedisConfiguration {
 	@Value("${redis.useSsl:false}")
 	private boolean useSsl;
 
+	@Value("${redis.shareNativeConnection:true}")
+	private boolean shareNativeConnection;
+
 	@Bean
 	@Primary
 	public RedisConnectionFactory redisConnectionFactory() {
-		ClientOptions clientOptions = ClientOptions.builder()
-				.socketOptions(SocketOptions.builder().connectTimeout(Duration.ofMillis(getConnectTimeout())).build())
-				.timeoutOptions(TimeoutOptions.enabled()).build();
 		LettuceClientConfigurationBuilder builder;
 		if (isUsePool()) {
 			GenericObjectPoolConfig<?> poolConfig = new GenericObjectPoolConfig<>();
@@ -116,6 +116,9 @@ public class RedisConfiguration {
 		}
 		if (isUseSsl())
 			builder.useSsl();
+		ClientOptions clientOptions = ClientOptions.builder()
+				.socketOptions(SocketOptions.builder().connectTimeout(Duration.ofMillis(getConnectTimeout())).build())
+				.timeoutOptions(TimeoutOptions.enabled()).build();
 		LettuceClientConfiguration clientConfiguration = builder.clientOptions(clientOptions)
 				.commandTimeout(Duration.ofMillis(getReadTimeout()))
 				.shutdownTimeout(Duration.ofMillis(getShutdownTimeout())).build();
@@ -145,6 +148,7 @@ public class RedisConfiguration {
 				standaloneConfiguration.setPassword(RedisPassword.of(password));
 			redisConnectionFactory = new LettuceConnectionFactory(standaloneConfiguration, clientConfiguration);
 		}
+		redisConnectionFactory.setShareNativeConnection(isShareNativeConnection());
 		return redisConnectionFactory;
 	}
 
