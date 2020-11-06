@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import org.ironrhino.core.util.AppInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -120,7 +121,7 @@ public class RedisConfiguration {
 				.socketOptions(SocketOptions.builder().connectTimeout(Duration.ofMillis(getConnectTimeout())).build())
 				.timeoutOptions(TimeoutOptions.enabled()).build();
 		LettuceClientConfiguration clientConfiguration = builder.clientOptions(clientOptions)
-				.commandTimeout(Duration.ofMillis(getReadTimeout()))
+				.clientName(AppInfo.getInstanceId(true)).commandTimeout(Duration.ofMillis(getReadTimeout()))
 				.shutdownTimeout(Duration.ofMillis(getShutdownTimeout())).build();
 		LettuceConnectionFactory redisConnectionFactory;
 		int database = getDatabase();
