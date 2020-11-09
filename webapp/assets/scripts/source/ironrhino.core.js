@@ -810,7 +810,6 @@ Ajax = {
 			if (!options.preflight)
 				Ajax.fire(target, 'onsuccess', data, xhr);
 		} else {
-			Ajax.jsonResult = data;
 			if (data.fieldErrors || data.actionErrors) {
 				hasError = true;
 				if (options.onerror)
@@ -870,7 +869,6 @@ Ajax = {
 		if (Ajax.title == _title)
 			Ajax.title = '';
 	},
-	jsonResult: null,
 	title: ''
 };
 
