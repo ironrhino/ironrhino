@@ -32861,9 +32861,11 @@ Ajax = {
 		var target = options.target;
 		if (target && $(target).parents('div.ui-dialog').length)
 			options.quiet = true;
-		if ((typeof data == 'string')
-			&& (data.indexOf('{') == 0 || data.indexOf('[') == 0))
-			data = JSON.parse(data);
+		if (typeof data == 'string') {
+			var contentType = xhr.getResponseHeader('Content-Type');
+			if (contentType && contentType.indexOf('application/json') == 0)
+				data = (data ? JSON.parse(data) : null) || {};
+		}
 		if (typeof data == 'string') {
 			var i = data.indexOf('<title>');
 			if (i >= 0 && data.indexOf('</title>') > 0) {
