@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.persistence.MappedSuperclass;
 import javax.servlet.ServletContext;
 
 import org.apache.commons.lang3.StringUtils;
@@ -158,7 +159,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 				continue;
 			packageLoader = new PackageLoader();
 			for (Class<?> clazz : classes) {
-				if (clazz.getSimpleName().equals("package-info"))
+				if (clazz.getSimpleName().equals("package-info") || clazz.isAnnotationPresent(MappedSuperclass.class))
 					continue;
 				boolean inAnotherPackage = false;
 				String thisPackage = ClassUtils.getPackageName(clazz);
