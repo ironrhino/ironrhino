@@ -39,7 +39,7 @@
 </#if>
 <#if apiDoc.requestParams?has_content>
 <tr><td>请求参数</td><td class="compact-horizontal">
-	<table class="requestParams table datagrid adaptive"><tbody>
+	<table class="requestParams table adaptive"><tbody>
 	<#list apiDoc.requestParams as param>
 	<tr>
 	<td><input type="text" value="${param.name}" placeholder="名字" readonly></td><td class="center middle"> = </td>
@@ -62,7 +62,7 @@
 </#if>
 <#if apiDoc.requestHeaders?has_content>
 <tr><td>请求头</td><td class="compact-horizontal">
-	<table class="requestHeaders table datagrid adaptive"><tbody>
+	<table class="requestHeaders table adaptive"><tbody>
 	<#list apiDoc.requestHeaders as header>
 	<tr>
 	<td><input type="text" value="${header.name}" placeholder="名字" readonly></td><td class="center middle"> = </td>
@@ -92,6 +92,7 @@
 </#if>
 </td></tr>
 </#if>
+<tr><td colspan="3" class="center"><button type="submit" class="btn btn-primary">${getText('submit')}</button></td></tr>
 <tr><td>响应状态</td><td>
 <div class="responseStatus"></div>
 </td></tr>
@@ -103,5 +104,4 @@
 </td></tr>
 </tbody>
 </table>
-<button type="submit" class="btn btn-primary btn-block">${getText('confirm')}</button>
 </form>
