@@ -92,17 +92,19 @@
 						<td class="manipulate"></td>
 					</tr>
 				</thead>
-				<tbody>
+				<#local folded=!entity.attributes?has_content>
+				<#if folded><tbody></tbody></#if>
+				<${folded?then('tfoot','tbody')}>
 					<#local size=0>
 					<#if entity.attributes?has_content><#local size=entity.attributes?size-1></#if>
 					<#list 0..size as index>
-					<tr>
+					<tr<#if folded> style="display:none;"</#if>>
 						<td><@s.textfield theme="simple" name="${entityName}.attributes[${index}].name"/></td>
 						<td><@s.textfield theme="simple" name="${entityName}.attributes[${index}].value"/></td>
 						<td class="manipulate"></td>
 					</tr>
 					</#list>
-				</tbody>
+				</${folded?then('tfoot','tbody')}>
 			</table>
 			</@controlGroup>	
 		<#elseif config.type=='schema'>
@@ -155,13 +157,15 @@
 						<th class="manipulate"></th>
 					</tr>
 				</thead>
-				<tbody>
+				<#local folded=!value?has_content&&config.cssClasses?seq_contains('nullable')>
+				<#if folded><tbody></tbody></#if>
+				<${folded?then('tfoot','tbody')}>
 				<#local collection=value>
 				<#list 0..(collection?has_content?then(collection?size-1,0)) as index>
 					<#-- expose element@index,element for template -->
 					<#assign element@index=index>
 					<#assign element=collection[index]!>
-					<tr>
+					<tr<#if folded> style="display:none;"</#if>>
 						<#list config.embeddedUiConfigs as nestedKey,config>
 						<#local hidden=config.hiddenInInput.value>
 						<#if !hidden&&config.hiddenInInput.expression?has_content><#local hidden=config.hiddenInInput.expression?eval></#if>
@@ -225,7 +229,7 @@
 						<td class="manipulate"></td>
 					</tr>
 				</#list>
-				</tbody>
+				</${folded?then('tfoot','tbody')}>
 				</table>
 			</@controlGroup>	
 		<#else>
