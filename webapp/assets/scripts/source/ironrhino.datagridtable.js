@@ -78,10 +78,10 @@
 				if (row.length > 0)
 					addRow(event, options, row.eq(0), true);
 			});
-			$('tbody td > .add', this).click(function(event) {
+			$(this).on('click', 'tbody td > .add', function(event) {
 				addRow(event, options)
 			});
-			$('tbody .remove', this).click(function(event) {
+			$(this).on('click', 'tbody td > .remove', function(event) {
 				removeRow(event, options)
 			});
 		})
