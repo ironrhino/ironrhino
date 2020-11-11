@@ -52,6 +52,8 @@
 					}
 				}
 			});
+			$('tfoot :input:not([disabled])', this).addClass('_disabled').prop(
+				'disabled', true);
 			if ($(this).parents('.datagrided').length)
 				return;
 			if ($(this).hasClass('keydown')) {
@@ -109,7 +111,7 @@
 		var r = row.clone(true);
 		if (r.is(':hidden'))
 			r.show().find('._disabled:input').removeClass('_disabled').prop(
-				'disabled', false);
+				'disabled', false).closest('.input-pseudo').removeClass('disabled');
 		$('*', r).not('td').removeAttr('id');
 		$('.resettable', r).html('');
 		$('span.info', r).html('');
