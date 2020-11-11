@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Length;
@@ -23,6 +25,7 @@ import org.ironrhino.security.service.UserManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,6 +42,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/user")
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
+@Validated
 public class UserController {
 
 	@Autowired
@@ -67,8 +71,8 @@ public class UserController {
 	@Order(2)
 	@Api("分页获取所有用户信息")
 	@RequestMapping(value = "/@paged", method = RequestMethod.GET)
-	public ResultPage<User> paged(@RequestParam(defaultValue = "1") Integer pageNo,
-			@RequestParam(defaultValue = "10") Integer pageSize) {
+	public ResultPage<User> paged(@RequestParam(defaultValue = "1") @Min(1) Integer pageNo,
+			@RequestParam(defaultValue = "10") @Min(1) @Max(100) Integer pageSize) {
 		ResultPage<User> rp = new ResultPage<>();
 		if (pageNo != null && pageNo > 0)
 			rp.setPageNo(pageNo);
@@ -80,8 +84,8 @@ public class UserController {
 	@Order(3)
 	@Api("包一层code和status的分页获取所有用户信息")
 	@RequestMapping(value = "/@pagedRestResult", method = RequestMethod.GET)
-	public RestResult<ResultPage<User>> pagedRestResult(@RequestParam(defaultValue = "1") Integer pageNo,
-			@RequestParam(defaultValue = "10") Integer pageSize) {
+	public RestResult<ResultPage<User>> pagedRestResult(@RequestParam(defaultValue = "1") @Min(1) Integer pageNo,
+			@RequestParam(defaultValue = "10") @Min(1) @Max(100) Integer pageSize) {
 		ResultPage<User> rp = new ResultPage<>();
 		if (pageNo != null && pageNo > 0)
 			rp.setPageNo(pageNo);
