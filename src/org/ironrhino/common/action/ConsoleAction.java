@@ -17,6 +17,8 @@ import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.spring.ApplicationContextConsole;
 import org.ironrhino.core.struts.BaseAction;
 import org.ironrhino.core.util.JsonUtils;
+import org.ironrhino.core.util.ReflectionUtils;
+import org.mvel2.CompileException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.opensymphony.xwork2.interceptor.annotations.InputConfig;
@@ -51,7 +53,7 @@ public class ConsoleAction extends BaseAction {
 	@Valid
 	@InputConfig(resultName = SUCCESS)
 	public String execute() throws Exception {
-		log.info("Executing: {}", expression);
+		log.info("Executing: {}", mask(expression));
 		try {
 			result = applicationContextConsole.execute(expression, scope);
 			addActionMessage(getText("operate.success") + (result != null ? (":" + JsonUtils.toJson(result)) : ""));
@@ -61,7 +63,16 @@ public class ConsoleAction extends BaseAction {
 				throwable = ((InvocationTargetException) throwable).getTargetException();
 			if (throwable.getCause() instanceof InvocationTargetException)
 				throwable = ((InvocationTargetException) throwable.getCause()).getTargetException();
-			String msg = throwable.getLocalizedMessage();
+			String msg = mask(throwable.getLocalizedMessage());
+			try {
+				ReflectionUtils.setFieldValue(throwable, "detailMessage", msg);
+				if (throwable instanceof CompileException) {
+					String expr = mask(new String(((CompileException) throwable).getExpr()));
+					ReflectionUtils.setFieldValue(throwable, "expr", expr.toCharArray());
+				}
+			} catch (Exception e) {
+				// ignore;
+			}
 			log.error(msg, throwable);
 			addActionError(getText("error") + (StringUtils.isNotBlank(msg) ? (": " + msg) : ""));
 			return ERROR;
@@ -72,13 +83,22 @@ public class ConsoleAction extends BaseAction {
 	@InputConfig(resultName = SUCCESS)
 	@JsonConfig(root = "result")
 	public String executeJson() {
-		log.info("Executing: {}", expression);
+		log.info("Executing: {}", mask(expression));
 		try {
 			result = applicationContextConsole.execute(expression, scope);
 		} catch (Throwable throwable) {
 			if (throwable instanceof InvocationTargetException)
 				throwable = ((InvocationTargetException) throwable).getTargetException();
-			String msg = throwable.getLocalizedMessage();
+			String msg = mask(throwable.getLocalizedMessage());
+			try {
+				ReflectionUtils.setFieldValue(throwable, "detailMessage", msg);
+				if (throwable instanceof CompileException) {
+					String expr = mask(new String(((CompileException) throwable).getExpr()));
+					ReflectionUtils.setFieldValue(throwable, "expr", expr.toCharArray());
+				}
+			} catch (Exception e) {
+				// ignore;
+			}
 			log.error(msg, throwable);
 			addActionError(getText("error") + (StringUtils.isNotBlank(msg) ? (": " + msg) : ""));
 			Map<String, Collection<String>> map = new HashMap<>();
@@ -91,4 +111,16 @@ public class ConsoleAction extends BaseAction {
 	public String interactive() {
 		return "interactive";
 	}
+
+	private static String mask(String message) {
+		if (message.contains("setPassword(")) {
+			message = message.replaceAll("(setPassword\\(\\s*['\"]).*(['\"]\\s*\\))", "$1" + MASK + "$2");
+		} else if (message.contains(".password")) {
+			message = message.replaceAll("(.password\\s*=\\s*['\"]).*(['\"])", "$1" + MASK + "$2");
+		}
+		return message;
+	}
+
+	private static final String MASK = "********";
+
 }
