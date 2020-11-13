@@ -118,4 +118,9 @@ public class ErrorAction extends ActionSupport {
 		return result;
 	}
 
+	@Deprecated
+	public String handle() {
+		return execute();
+	}
+
 }
