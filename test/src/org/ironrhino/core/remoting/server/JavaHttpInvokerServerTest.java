@@ -490,7 +490,7 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 	public void testCompletableFuture() throws Exception {
 		CompletableFuture<User> completableFuture = testService.loadCompletableFutureUserByUsername("username");
 		assertThat(completableFuture.get().getUsername(), is("username"));
-		then(mockHttpInvokerRequestExecutor).should().executeRequest(eq(serviceUrl(TestService.class)),
+		then(mockHttpInvokerRequestExecutor).should(atLeast(1)).executeRequest(eq(serviceUrl(TestService.class)),
 				argThat(ri -> "loadCompletableFutureUserByUsername".equals(ri.getMethodName())),
 				any(MethodInvocation.class));
 		then(mockHttpServletRequest).should().startAsync();
