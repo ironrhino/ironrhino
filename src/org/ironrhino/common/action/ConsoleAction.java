@@ -114,9 +114,9 @@ public class ConsoleAction extends BaseAction {
 
 	private static String mask(String message) {
 		if (message.contains("setPassword(")) {
-			message = message.replaceAll("(setPassword\\(\\s*['\"]).*(['\"]\\s*\\))", "$1" + MASK + "$2");
+			message = message.replaceAll("(setPassword\\(\\s*(['\"])).*(\\2\\s*\\))", "$1" + MASK + "$3");
 		} else if (message.contains(".password")) {
-			message = message.replaceAll("(.password\\s*=\\s*['\"]).*(['\"])", "$1" + MASK + "$2");
+			message = message.replaceAll("(.password\\s*=\\s*(['\"])).*(\\2)", "$1" + MASK + "$3");
 		}
 		return message;
 	}
