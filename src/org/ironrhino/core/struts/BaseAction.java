@@ -362,11 +362,12 @@ public class BaseAction extends ActionSupport {
 						password);
 				attempt.setDetails(authenticationDetailsSource.buildDetails(request));
 				Authentication authResult = authenticationManager.authenticate(attempt);
-				if (!AuthzUtils.authorizeUserDetails((UserDetails) authResult.getPrincipal(), null, doubleCheck.value(),
-						null)) {
+				UserDetails doubleChecker = (UserDetails) authResult.getPrincipal();
+				if (!AuthzUtils.authorizeUserDetails(doubleChecker, null, doubleCheck.value(), null)) {
 					addFieldError(DoubleChecker.PARAMETER_NAME_USERNAME, getText("access.denied"));
 					return;
 				}
+				AuthzUtils.DOUBLE_CHCKER_HOLDER.set(doubleChecker);
 			} catch (InternalAuthenticationServiceException failed) {
 				log.error(failed.getMessage(), failed);
 				addActionError(ExceptionUtils.getRootMessage(failed));
@@ -386,7 +387,8 @@ public class BaseAction extends ActionSupport {
 			return;
 		HttpSession session = request.getSession();
 		String currentPasswordThreshold = (String) session.getAttribute(SESSION_KEY_CURRENT_PASSWORD_THRESHOLD);
-		int threshold = StringUtils.isNumeric(currentPasswordThreshold) ? Integer.parseInt(currentPasswordThreshold) : 0;
+		int threshold = StringUtils.isNumeric(currentPasswordThreshold) ? Integer.parseInt(currentPasswordThreshold)
+				: 0;
 		String currentPassword = request.getParameter(CurrentPassword.PARAMETER_NAME_CURRENT_PASSWORD);
 		if (currentPassword == null) {
 			response.setHeader("X-Current-Password", "1");
@@ -410,6 +412,7 @@ public class BaseAction extends ActionSupport {
 
 	@BeforeResult
 	protected void preResult() throws Exception {
+		AuthzUtils.DOUBLE_CHCKER_HOLDER.remove();
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();
 		if (StringUtils.isNotBlank(targetUrl)
