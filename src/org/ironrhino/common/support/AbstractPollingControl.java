@@ -179,7 +179,7 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> implem
 			if (updatedEntities.isEmpty())
 				break;
 			push(updatedEntities.stream().map(entity -> {
-				logger.info(message, entity);
+				logger.info(message, entity.getId());
 				return entity.getId();
 			}).collect(Collectors.toList()), mode != Mode.NORMAL);
 		}

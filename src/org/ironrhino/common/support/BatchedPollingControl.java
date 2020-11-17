@@ -32,13 +32,13 @@ public abstract class BatchedPollingControl<T extends BasePollingEntity> extends
 					logger.warn("not found: {}", id);
 					continue;
 				}
-				logger.info("dequeue {}", entity);
+				logger.info("dequeue {}", entity.getId());
 				if (entity.getStatus() == PollingStatus.SUCCESSFUL || entity.getStatus() == PollingStatus.FAILED) {
-					logger.warn("status is {}: {}", entity.getStatus(), entity);
+					logger.warn("status is {}: {}", entity.getStatus(), entity.getId());
 					continue;
 				}
 				if (entity.getAttempts() >= getMaxAttempts()) {
-					logger.error("max attempts reached: {}", entity);
+					logger.error("max attempts reached: {}", entity.getId());
 					entityManager.executeUpdate(simpleUpdateStatusHql, entity.getId(), entity.getStatus(),
 							PollingStatus.FAILED, new Date(), "max attempts reached");
 					continue;
@@ -53,7 +53,7 @@ public abstract class BatchedPollingControl<T extends BasePollingEntity> extends
 				for (T entity : entities) {
 					Result obj = results.get(entity);
 					if (obj == null) {
-						logger.error("process {} failed cause updated fields is null or invalid", entity);
+						logger.error("process {} failed cause updated fields is null or invalid", entity.getId());
 					}
 				}
 				entityManager.execute(session -> {
@@ -79,9 +79,9 @@ public abstract class BatchedPollingControl<T extends BasePollingEntity> extends
 						int ret = query.executeUpdate();
 						if (ret == 1) {
 							afterUpdated(session, entity);
-							logger.info("process {} successful", entity);
+							logger.info("process {} successful", entity.getId());
 						} else {
-							logger.warn("process {} successful but ignored", entity);
+							logger.warn("process {} successful but ignored", entity.getId());
 						}
 					});
 					return null;
@@ -108,9 +108,9 @@ public abstract class BatchedPollingControl<T extends BasePollingEntity> extends
 												entity.getStatus(), PollingStatus.FAILED, new Date(), errorInfo);
 									}
 									if (result == 1)
-										logger.info("process {} failed", entity);
+										logger.info("process {} failed", entity.getId());
 									else
-										logger.warn("process {} failed but ignored", entity);
+										logger.warn("process {} failed but ignored", entity.getId());
 									return null;
 								});
 							});
@@ -137,9 +137,9 @@ public abstract class BatchedPollingControl<T extends BasePollingEntity> extends
 									entity.getStatus(), PollingStatus.FAILED, new Date(), errorInfo);
 						}
 						if (result == 1)
-							logger.info("process {} failed", entity);
+							logger.info("process {} failed", entity.getId());
 						else
-							logger.warn("process {} failed but ignored", entity);
+							logger.warn("process {} failed but ignored", entity.getId());
 					}
 					return null;
 				});
