@@ -1,6 +1,6 @@
 package org.ironrhino.common.model;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -28,8 +28,8 @@ public abstract class BasePollingEntity implements Persistable<Long> {
 	@GenericGenerator(name = "snowflake", strategy = "snowflake")
 	private Long id;
 
-	@UiConfig(width = "130px", displayOrder = 94)
-	private Date scheduledFor;
+	@UiConfig(width = "160px", displayOrder = 94)
+	private LocalDateTime scheduledFor;
 
 	@UiConfig(width = "80px", displayOrder = 95)
 	private int precedence;
@@ -37,14 +37,14 @@ public abstract class BasePollingEntity implements Persistable<Long> {
 	@UiConfig(width = "80px", readonly = @Readonly(true), displayOrder = 96)
 	private PollingStatus status = PollingStatus.INITIALIZED;
 
-	@UiConfig(width = "130px", displayOrder = 97)
+	@UiConfig(width = "160px", displayOrder = 97)
 	@Column(updatable = false)
 	@CreationTimestamp
-	private Date createDate;
+	private LocalDateTime createDate;
 
-	@UiConfig(width = "130px", displayOrder = 98)
+	@UiConfig(width = "160px", displayOrder = 98)
 	@Column(insertable = false)
-	private Date modifyDate;
+	private LocalDateTime modifyDate;
 
 	@UiConfig(type = "textarea", displayOrder = 99)
 	@Column(length = 4000)

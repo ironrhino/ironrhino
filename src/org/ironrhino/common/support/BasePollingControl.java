@@ -1,6 +1,6 @@
 package org.ironrhino.common.support;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import org.hibernate.query.Query;
@@ -31,7 +31,7 @@ public abstract class BasePollingControl<T extends BasePollingEntity> extends Ab
 			if (entity.getAttempts() >= getMaxAttempts()) {
 				logger.error("max attempts reached: {}", entity.getId());
 				entityManager.executeUpdate(simpleUpdateStatusHql, entity.getId(), entity.getStatus(),
-						PollingStatus.FAILED, new Date(), "max attempts reached");
+						PollingStatus.FAILED, LocalDateTime.now(), "max attempts reached");
 				continue;
 			}
 			try {
@@ -51,7 +51,7 @@ public abstract class BasePollingControl<T extends BasePollingEntity> extends Ab
 					query.setParameter(1, entity.getId());
 					query.setParameter(2, entity.getStatus());
 					query.setParameter(3, PollingStatus.SUCCESSFUL);
-					query.setParameter(4, new Date());
+					query.setParameter(4, LocalDateTime.now());
 					int index = 5;
 					for (String field : fields.keySet())
 						query.setParameter(index++, fields.get(field));
@@ -73,11 +73,11 @@ public abstract class BasePollingControl<T extends BasePollingEntity> extends Ab
 				int result;
 				if (retryable) {
 					result = entityManager.executeUpdate(conditionalUpdateStatusHql, entity.getId(), entity.getStatus(),
-							getMaxAttempts(), PollingStatus.FAILED, PollingStatus.TEMPORARY_ERROR, new Date(),
+							getMaxAttempts(), PollingStatus.FAILED, PollingStatus.TEMPORARY_ERROR, LocalDateTime.now(),
 							errorInfo);
 				} else {
 					result = entityManager.executeUpdate(defaultUpdateStatusHql, entity.getId(), entity.getStatus(),
-							PollingStatus.FAILED, new Date(), errorInfo);
+							PollingStatus.FAILED, LocalDateTime.now(), errorInfo);
 				}
 				if (result == 1)
 					logger.info("process {} failed", entity.getId());

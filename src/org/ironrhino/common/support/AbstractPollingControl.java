@@ -1,9 +1,8 @@
 package org.ironrhino.common.support;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Executors;
@@ -117,7 +116,8 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> implem
 		// normal
 		DetachedCriteria dc = entityManager.detachedCriteria();
 		dc.add(Restrictions.eq("status", PollingStatus.INITIALIZED));
-		dc.add(Restrictions.or(Restrictions.isNull("scheduledFor"), Restrictions.le("scheduledFor", new Date())));
+		dc.add(Restrictions.or(Restrictions.isNull("scheduledFor"),
+				Restrictions.le("scheduledFor", LocalDateTime.now())));
 		doEnqueue(dc, Mode.NORMAL);
 
 		if (current % 5 == 1) {
@@ -126,27 +126,23 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> implem
 				dc = entityManager.detachedCriteria();
 				dc.add(Restrictions.eq("status", PollingStatus.TEMPORARY_ERROR));
 				dc.add(Restrictions.eq("attempts", attempts));
-				Calendar cal = Calendar.getInstance();
-				cal.add(Calendar.SECOND, -getIntervalFactorInSeconds() * attempts);
-				dc.add(Restrictions.lt("modifyDate", cal.getTime()));
+				dc.add(Restrictions.lt("modifyDate",
+						LocalDateTime.now().minusSeconds(getIntervalFactorInSeconds() * attempts)));
 				doEnqueue(dc, Mode.RETRIED);
 			}
 			// abnormal retryable
 			dc = entityManager.detachedCriteria();
 			dc.add(Restrictions.eq("status", PollingStatus.TEMPORARY_ERROR));
 			dc.add(Restrictions.ge("attempts", getMaxAttempts()));
-			Calendar cal = Calendar.getInstance();
-			cal.add(Calendar.SECOND, -getIntervalFactorInSeconds() * getMaxAttempts());
-			dc.add(Restrictions.lt("modifyDate", cal.getTime()));
+			dc.add(Restrictions.lt("modifyDate",
+					LocalDateTime.now().minusSeconds(getIntervalFactorInSeconds() * getMaxAttempts())));
 			doEnqueue(dc, Mode.RETRIED);
 		}
 		if (current % 10 == 1) {
 			// resubmit entities which status are PROCESSING, maybe caused by jvm killed
 			dc = entityManager.detachedCriteria();
 			dc.add(Restrictions.eq("status", PollingStatus.PROCESSING));
-			Calendar cal = Calendar.getInstance();
-			cal.add(Calendar.SECOND, -getResubmitIntervalInSeconds());
-			dc.add(Restrictions.lt("modifyDate", cal.getTime()));
+			dc.add(Restrictions.lt("modifyDate", LocalDateTime.now().minusSeconds(getResubmitIntervalInSeconds())));
 			doEnqueue(dc, Mode.RESUBMITTED);
 		}
 	}
@@ -168,7 +164,7 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> implem
 				List<T> entities = c.list();
 				for (T entity : entities) {
 					entity.setStatus(PollingStatus.PROCESSING);
-					entity.setModifyDate(new Date());
+					entity.setModifyDate(LocalDateTime.now());
 					session.update(entity);
 				}
 				return entities;
