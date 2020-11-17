@@ -22,6 +22,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Role;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.connection.RedisClusterConfiguration;
+import org.springframework.data.redis.connection.RedisConfiguration.WithDatabaseIndex;
+import org.springframework.data.redis.connection.RedisConfiguration.WithPassword;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisSentinelConfiguration;
@@ -109,6 +111,9 @@ public class RedisConfiguration {
 	@Bean
 	@Primary
 	public RedisConnectionFactory redisConnectionFactory() {
+		ClientOptions clientOptions = ClientOptions.builder()
+				.socketOptions(SocketOptions.builder().connectTimeout(Duration.ofMillis(getConnectTimeout())).build())
+				.timeoutOptions(TimeoutOptions.enabled()).build();
 		LettuceClientConfigurationBuilder builder;
 		if (isUsePool()) {
 			GenericObjectPoolConfig<?> poolConfig = new GenericObjectPoolConfig<>();
@@ -121,38 +126,28 @@ public class RedisConfiguration {
 		}
 		if (isUseSsl())
 			builder.useSsl();
-		ClientOptions clientOptions = ClientOptions.builder()
-				.socketOptions(SocketOptions.builder().connectTimeout(Duration.ofMillis(getConnectTimeout())).build())
-				.timeoutOptions(TimeoutOptions.enabled()).build();
 		LettuceClientConfiguration clientConfiguration = builder.clientOptions(clientOptions)
 				.clientName(AppInfo.getInstanceId(true)).commandTimeout(Duration.ofMillis(getReadTimeout()))
 				.shutdownTimeout(Duration.ofMillis(getShutdownTimeout())).build();
-		LettuceConnectionFactory redisConnectionFactory;
-		int database = getDatabase();
-		String password = getPassword();
+		org.springframework.data.redis.connection.RedisConfiguration redisConfiguration;
 		if (getSentinels() != null) {
-			RedisSentinelConfiguration sentinelConfiguration = new RedisSentinelConfiguration(getMaster(),
-					getSentinels());
-			sentinelConfiguration.setDatabase(database);
-			if (StringUtils.isNotBlank(password))
-				sentinelConfiguration.setPassword(RedisPassword.of(password));
-			redisConnectionFactory = new LettuceConnectionFactory(sentinelConfiguration, clientConfiguration);
+			redisConfiguration = new RedisSentinelConfiguration(getMaster(), getSentinels());
 		} else if (getClusterNodes() != null) {
-			RedisClusterConfiguration clusterConfiguration = new RedisClusterConfiguration(getClusterNodes());
-			if (StringUtils.isNotBlank(password))
-				clusterConfiguration.setPassword(RedisPassword.of(password));
-			redisConnectionFactory = new LettuceConnectionFactory(clusterConfiguration, clientConfiguration);
+			redisConfiguration = new RedisClusterConfiguration(getClusterNodes());
 		} else {
 			String hostName = getHostName();
 			if (StringUtils.isNotBlank(getHost()))
 				hostName = getHost();
-			RedisStandaloneConfiguration standaloneConfiguration = new RedisStandaloneConfiguration(hostName,
-					getPort());
-			standaloneConfiguration.setDatabase(database);
-			if (StringUtils.isNotBlank(password))
-				standaloneConfiguration.setPassword(RedisPassword.of(password));
-			redisConnectionFactory = new LettuceConnectionFactory(standaloneConfiguration, clientConfiguration);
+			redisConfiguration = new RedisStandaloneConfiguration(hostName, getPort());
 		}
+		if (StringUtils.isNotBlank(password) && redisConfiguration instanceof WithPassword) {
+			((WithPassword) redisConfiguration).setPassword(RedisPassword.of(getPassword()));
+		}
+		if (redisConfiguration instanceof WithDatabaseIndex) {
+			((WithDatabaseIndex) redisConfiguration).setDatabase(getDatabase());
+		}
+		LettuceConnectionFactory redisConnectionFactory = new LettuceConnectionFactory(redisConfiguration,
+				clientConfiguration);
 		redisConnectionFactory.setShareNativeConnection(isShareNativeConnection());
 		return redisConnectionFactory;
 	}
