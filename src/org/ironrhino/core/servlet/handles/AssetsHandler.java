@@ -24,6 +24,7 @@ public class AssetsHandler extends AccessHandler {
 	public boolean handle(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
 		String uri = request.getRequestURI();
+		uri = uri.substring(request.getContextPath().length());
 		if (request.getServletContext().getResource(uri) == null) {
 			request.getRequestDispatcher(uri.replace("-min", "")).forward(request, response);
 			return true;
