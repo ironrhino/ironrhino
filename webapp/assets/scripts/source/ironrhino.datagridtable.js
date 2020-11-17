@@ -52,7 +52,7 @@
 					}
 				}
 			});
-			$('tfoot :input:not([disabled])', this).addClass('_disabled').prop(
+			$('tfoot tr.template :input:not([disabled])', this).addClass('_disabled').prop(
 				'disabled', true);
 			if ($(this).parents('.datagrided').length)
 				return;
@@ -76,7 +76,7 @@
 				var row = table.children('tbody')
 					.children(':not(.nontemplate):eq(0)');
 				if (!row.length)
-					row = table.children('tfoot').children('tr:hidden');
+					row = table.children('tfoot').children('tr.template');
 				if (row.length > 0)
 					addRow(event, options, row.eq(0), true);
 			});
@@ -109,8 +109,8 @@
 			}
 		}
 		var r = row.clone(true);
-		if (r.is(':hidden'))
-			r.show().find('._disabled:input').removeClass('_disabled').prop(
+		if (r.is('.template'))
+			r.removeClass('template').find('._disabled:input').removeClass('_disabled').prop(
 				'disabled', false).closest('.input-pseudo').removeClass('disabled');
 		$('*', r).not('td').removeAttr('id');
 		$('.resettable', r).html('');
@@ -227,12 +227,13 @@
 			var tfoot = table.children('tfoot');
 			if (!tfoot.length)
 				tfoot = $('<tfoot></tfoot>').appendTo(table);
+			row.addClass('template');
 			$(':input:not([disabled])', row).addClass('_disabled').prop(
 				'disabled', true);
-			if (tfoot.find('tr:hidden').length)
+			if (tfoot.find('tr.template').length)
 				row.remove();
 			else
-				row.appendTo(tfoot).hide();
+				row.appendTo(tfoot);
 		} else {
 			row.remove();
 		}

@@ -1,3 +1,7 @@
+.datagrided tfoot > tr.template {
+	display: none;
+}
+
 .table.datagrided th , .table.datagrided td {
 	padding: 5px;
 }

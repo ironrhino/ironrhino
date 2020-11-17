@@ -98,7 +98,7 @@
 					<#local size=0>
 					<#if entity.attributes?has_content><#local size=entity.attributes?size-1></#if>
 					<#list 0..size as index>
-					<tr<#if folded> style="display:none;"</#if>>
+					<tr<#if folded> class="template"</#if>>
 						<td><@s.textfield theme="simple" name="${entityName}.attributes[${index}].name"/></td>
 						<td><@s.textfield theme="simple" name="${entityName}.attributes[${index}].value"/></td>
 						<td class="manipulate"></td>
@@ -165,7 +165,7 @@
 					<#-- expose element@index,element for template -->
 					<#assign element@index=index>
 					<#assign element=collection[index]!>
-					<tr<#if folded> style="display:none;"</#if>>
+					<tr<#if folded> class="template"</#if>>
 						<#list config.embeddedUiConfigs as nestedKey,config>
 						<#local hidden=config.hiddenInInput.value>
 						<#if !hidden&&config.hiddenInInput.expression?has_content><#local hidden=config.hiddenInInput.expression?eval></#if>
