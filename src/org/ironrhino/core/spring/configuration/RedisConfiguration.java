@@ -43,6 +43,7 @@ import io.lettuce.core.SocketOptions;
 import io.lettuce.core.TimeoutOptions;
 import io.opentracing.contrib.redis.common.TracingConfiguration;
 import io.opentracing.contrib.redis.spring.data2.connection.TracingRedisConnectionFactory;
+import io.opentracing.tag.Tags;
 import io.opentracing.util.GlobalTracer;
 import lombok.Getter;
 import lombok.Setter;
@@ -135,10 +136,7 @@ public class RedisConfiguration {
 		} else if (getClusterNodes() != null) {
 			redisConfiguration = new RedisClusterConfiguration(getClusterNodes());
 		} else {
-			String hostName = getHostName();
-			if (StringUtils.isNotBlank(getHost()))
-				hostName = getHost();
-			redisConfiguration = new RedisStandaloneConfiguration(hostName, getPort());
+			redisConfiguration = new RedisStandaloneConfiguration(hostName(), getPort());
 		}
 		if (StringUtils.isNotBlank(password) && redisConfiguration instanceof WithPassword) {
 			((WithPassword) redisConfiguration).setPassword(RedisPassword.of(getPassword()));
@@ -180,11 +178,36 @@ public class RedisConfiguration {
 		return container;
 	}
 
+	protected String hostName() {
+		String hostName = getHostName();
+		if (StringUtils.isNotBlank(getHost()))
+			hostName = getHost();
+		return hostName;
+	}
+
 	protected RedisConnectionFactory wrap(RedisConnectionFactory redisConnectionFactory) {
-		return Tracing.isEnabled()
-				? new TracingRedisConnectionFactory(redisConnectionFactory,
-						new TracingConfiguration.Builder(GlobalTracer.get()).traceWithActiveSpanOnly(true).build())
-				: redisConnectionFactory;
+		if (!Tracing.isEnabled())
+			return redisConnectionFactory;
+		TracingConfiguration.Builder builder = new TracingConfiguration.Builder(GlobalTracer.get())
+				.traceWithActiveSpanOnly(true).extensionTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_CLIENT);
+		StringBuilder service = new StringBuilder("redis");
+		if (getSentinels() != null) {
+			builder.extensionTag("peer.address", String.join(",", getSentinels()));
+			service.append("-sentinel");
+		} else if (getClusterNodes() != null) {
+			builder.extensionTag("peer.address", String.join(",", getClusterNodes()));
+			service.append("-cluster");
+		} else {
+			if (isUseSsl())
+				service.append("s");
+			service.append("://").append(hostName());
+			if (getPort() != 6379)
+				service.append(":").append(getPort());
+			if (getDatabase() > 0)
+				service.append("/").append(getDatabase());
+		}
+		builder.extensionTag(Tags.PEER_SERVICE.getKey(), service.toString());
+		return new TracingRedisConnectionFactory(redisConnectionFactory, builder.build());
 	}
 
 }
