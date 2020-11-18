@@ -102,10 +102,13 @@ function resolveDependence(paths) {
 			var br = new BufferedReader(new InputStreamReader(is, 'utf-8'));
 			var line;
 			while (line = br.readLine()) {
+				var artifact = line.substring(1);
 				if (line.indexOf('+') == 0) {
-					increment.push(line.substring(1));
+					increment.push(artifact);
+					removeItem(decrement, artifact);
 				} else if (line.indexOf('-') == 0) {
-					decrement.push(line.substring(1));
+					decrement.push(artifact);
+					removeItem(increment, artifact);
 				}
 			}
 			br.close();
@@ -272,4 +275,12 @@ function compareVersion(v1, v2) {
 		}
 	}
 	return upgradable;
+}
+
+function removeItem(arr, item) {
+	var index = arr.indexOf(item);
+	if (index > -1) {
+		arr.splice(index, 1);
+	}
+	return arr;
 }
