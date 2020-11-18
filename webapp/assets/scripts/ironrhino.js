@@ -40787,7 +40787,10 @@ Observation.treeview = function(container) {
 	$$('.treeview', container).each(function() {
 		var t = $(this);
 		var head = t.data('head');
-		var template = t.find('template').html().trim();
+		var template;
+		var temp = t.find('template');
+		if (temp.length)
+			template = temp.html().trim();
 		if (template)
 			t.html('');
 		if (head) {
