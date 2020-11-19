@@ -18,6 +18,8 @@ import org.ironrhino.core.util.MaxAttemptsExceededException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
 
+import lombok.Value;
+
 public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyclicSequence {
 
 	private String querySequenceStatement;
@@ -218,32 +220,31 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 	}
 
 	private Result queryTimestampWithSequence(Connection con, Statement stmt) throws SQLException {
-		Result result = new Result();
 		try (ResultSet rs = stmt.executeQuery(querySequenceStatement)) {
 			rs.next();
-			result.nextId = rs.getInt(1);
-			result.currentTimestamp = rs.getTimestamp(2);
-			result.lastTimestamp = rs.getTimestamp(3);
+			int nextId = rs.getInt(1);
+			Timestamp currentTimestamp = rs.getTimestamp(2);
+			Timestamp lastTimestamp = rs.getTimestamp(3);
 			// keep monotonic incrementing
-			if (result.lastTimestamp.after(result.currentTimestamp))
-				result.currentTimestamp = result.lastTimestamp;
-			return result;
+			if (lastTimestamp.after(currentTimestamp))
+				currentTimestamp = lastTimestamp;
+			return new Result(nextId, currentTimestamp, lastTimestamp);
 		}
 	}
 
 	private Result queryTimestampForUpdate(Connection con, Statement stmt) throws SQLException {
-		Result result = new Result();
 		try (ResultSet rs = stmt.executeQuery(queryTimestampForUpdateStatement)) {
 			rs.next();
-			result.currentTimestamp = rs.getTimestamp(1);
-			result.lastTimestamp = rs.getTimestamp(2);
+			Timestamp currentTimestamp = rs.getTimestamp(1);
+			Timestamp lastTimestamp = rs.getTimestamp(2);
 			// keep monotonic incrementing
-			if (result.lastTimestamp.after(result.currentTimestamp))
-				result.currentTimestamp = result.lastTimestamp;
-			return result;
+			if (lastTimestamp.after(currentTimestamp))
+				currentTimestamp = lastTimestamp;
+			return new Result(0, currentTimestamp, lastTimestamp);
 		}
 	}
 
+	@Value
 	private static class Result {
 		int nextId;
 		Timestamp currentTimestamp;
