@@ -356,7 +356,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 			namespace = ac.namespace();
 			if (StringUtils.isBlank(namespace))
 				namespace = defaultNamespace;
-			actionClass = cls.getName().replace("model", "action") + "Action";
+			actionClass = cls.getName().replace(".model.", ".action.") + "Action";
 			if (!ClassUtils.isPresent(actionClass, getClass().getClassLoader()))
 				actionClass = defaultActionClass;
 			entityClassURLMapping.put(namespace + (namespace.endsWith("/") ? "" : "/") + actionName, cls);
@@ -384,6 +384,46 @@ public class AutoConfigPackageProvider implements PackageProvider {
 		for (Map.Entry<String, Class<?>> entry : entityClassURLMapping.entrySet())
 			if (entry.getValue().equals(entityClass))
 				return entry.getKey();
+		String actionClass = entityClass.getName().replace(".model.", ".action.") + "Action";
+		if (ClassUtils.isPresent(actionClass, entityClass.getClassLoader())) {
+			try {
+				Class<?> clz = entityClass.getClassLoader().loadClass(actionClass);
+				AutoConfig ac = clz.getAnnotation(AutoConfig.class);
+				if (ac != null) {
+					String actionName = ac.actionName();
+					if (actionName.isEmpty())
+						actionName = StringUtils.uncapitalize(entityClass.getSimpleName());
+					String namespace = "";
+					if (!ac.namespace().isEmpty()) {
+						namespace = ac.namespace();
+					} else {
+						String packageName = actionClass;
+						while (packageName.contains(".")) {
+							packageName = packageName.substring(0, packageName.lastIndexOf('.'));
+							Package p = Package.getPackage(packageName);
+							if (p != null) {
+								ac = p.getAnnotation(AutoConfig.class);
+								if (ac != null) {
+									if (!ac.namespace().isEmpty()) {
+										namespace = ac.namespace();
+									} else {
+										namespace = "/" + (packageName.indexOf('.') > 0
+												? packageName.substring(packageName.lastIndexOf('.') + 1)
+												: packageName);
+									}
+									break;
+								}
+							}
+						}
+					}
+					String url = namespace + (namespace.endsWith("/") ? "" : "/") + actionName;
+					entityClassURLMapping.put(url, entityClass);
+					return url;
+				}
+			} catch (ClassNotFoundException e) {
+				throw new RuntimeException(e);
+			}
+		}
 		return null;
 	}
 
