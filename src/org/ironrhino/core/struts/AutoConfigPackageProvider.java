@@ -40,6 +40,7 @@ import com.opensymphony.xwork2.config.providers.InterceptorBuilder;
 import com.opensymphony.xwork2.inject.Inject;
 import com.opensymphony.xwork2.util.LocalizedTextUtil;
 
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -223,10 +224,10 @@ public class AutoConfigPackageProvider implements PackageProvider {
 
 	protected void processAutoConfigClass(Class<?> cls, String defaultNamespace) {
 		AutoConfig ac = cls.getAnnotation(AutoConfig.class);
-		String[] arr = getNamespaceAndActionName(cls, defaultNamespace);
-		String namespace = arr[0];
-		String actionName = arr[1];
-		String actionClass = arr[2];
+		Mapping mapping = getNamespaceAndActionName(cls, defaultNamespace);
+		String namespace = mapping.namespace;
+		String actionName = mapping.actionName;
+		String actionClass = mapping.actionClass;
 		String packageName;
 		if (!namespace.isEmpty()) {
 			packageName = namespace.substring(1);
@@ -343,7 +344,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 
 	private static Map<String, Class<?>> entityClassURLMapping = new ConcurrentHashMap<>();
 
-	public String[] getNamespaceAndActionName(Class<?> cls, String defaultNamespace) {
+	private Mapping getNamespaceAndActionName(Class<?> cls, String defaultNamespace) {
 		String actionName = null;
 		String namespace = null;
 		String actionClass = null;
@@ -372,7 +373,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 			namespace = "";
 		if (!ac.actionName().isEmpty())
 			actionName = ac.actionName();
-		return new String[] { namespace, actionName, actionClass };
+		return new Mapping(namespace, actionName, actionClass);
 	}
 
 	public static Class<?> getEntityClass(String namespace, String actionName) {
@@ -390,4 +391,10 @@ public class AutoConfigPackageProvider implements PackageProvider {
 		return configuration.getPackageConfigs().values();
 	}
 
+	@Value
+	static class Mapping {
+		private String namespace;
+		private String actionName;
+		private String actionClass;
+	}
 }
