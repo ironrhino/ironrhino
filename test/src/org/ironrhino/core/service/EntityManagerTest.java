@@ -1,5 +1,6 @@
 package org.ironrhino.core.service;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -8,6 +9,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.io.Serializable;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -46,7 +48,8 @@ import lombok.Data;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = HibernateConfiguration.class)
-@TestPropertySource(properties = { "annotatedClasses=org.ironrhino.core.service.Person,org.ironrhino.core.service.Cat", "hibernate.show_sql=true" })
+@TestPropertySource(properties = { "annotatedClasses=org.ironrhino.core.service.Person,org.ironrhino.core.service.Cat",
+		"hibernate.show_sql=true" })
 public class EntityManagerTest {
 
 	@Autowired
@@ -115,6 +118,43 @@ public class EntityManagerTest {
 		assertThat(entityManager.exists(person.getId()), is(false));
 		assertThat(entityManager.findByNaturalId("test"), is(nullValue()));
 
+	}
+
+	@Test
+	public void testMultiLoad() {
+		prepareData();
+		entityManager.setEntityClass(Person.class);
+		List<Person> all = entityManager.findAll();
+		List<Person> persons = entityManager
+				.get(Arrays.asList(all.get(1).getId(), all.get(8).getId(), all.get(6).getId(), all.get(0).getId()));
+		assertThat(persons.size(), is(4));
+		assertThat(persons.get(0), equalTo(all.get(1)));
+		assertThat(persons.get(1), equalTo(all.get(8)));
+		assertThat(persons.get(2), equalTo(all.get(6)));
+		assertThat(persons.get(3), equalTo(all.get(0)));
+		persons = entityManager
+				.get(Arrays.asList("notexistsid", all.get(8).getId(), all.get(6).getId(), all.get(0).getId()));
+		assertThat(persons.size(), is(4));
+		assertThat(persons.get(0), nullValue());
+		assertThat(persons.get(1), equalTo(all.get(8)));
+		assertThat(persons.get(2), equalTo(all.get(6)));
+		assertThat(persons.get(3), equalTo(all.get(0)));
+		persons = entityManager
+				.get(Arrays.asList("notexistsid", all.get(8).getId(), all.get(6).getId(), "notexistsid"));
+		assertThat(persons.size(), is(4));
+		assertThat(persons.get(0), nullValue());
+		assertThat(persons.get(1), equalTo(all.get(8)));
+		assertThat(persons.get(2), equalTo(all.get(6)));
+		assertThat(persons.get(3), nullValue());
+		persons = entityManager
+				.get(Arrays.asList(all.get(1).getId(), all.get(8).getId(), "notexistsid", all.get(0).getId()));
+		assertThat(persons.size(), is(4));
+
+		assertThat(persons.get(0), equalTo(all.get(1)));
+		assertThat(persons.get(1), equalTo(all.get(8)));
+		assertThat(persons.get(2), nullValue());
+		assertThat(persons.get(3), equalTo(all.get(0)));
+		clearData();
 	}
 
 	@Test
