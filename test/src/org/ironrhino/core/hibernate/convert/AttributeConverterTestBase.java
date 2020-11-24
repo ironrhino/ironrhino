@@ -25,6 +25,7 @@ public abstract class AttributeConverterTestBase {
 
 	StandardServiceRegistry buildStandardServiceRegistry() {
 		return new StandardServiceRegistryBuilder().applySetting(AvailableSettings.HBM2DDL_AUTO, "create-drop")
+				.applySetting(AvailableSettings.XML_MAPPING_ENABLED, String.valueOf(false))
 				.applySetting(AvailableSettings.URL, "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1")
 				.applySetting(AvailableSettings.SHOW_SQL, "true").build();
 	}
@@ -84,6 +85,7 @@ public abstract class AttributeConverterTestBase {
 
 	enum TestEnum implements Displayable {
 		BAR, BAZ, FOO;
+
 		@Override
 		public String toString() {
 			return getDisplayName();
