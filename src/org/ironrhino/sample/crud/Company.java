@@ -58,7 +58,7 @@ public class Company extends BaseEntity {
 	private CompanyType type;
 
 	@OrganizationCode(groups = Step1.class)
-	@UiConfig(width = "100px", group = "baseInfo", shownInPick = true)
+	@UiConfig(width = "150px", group = "baseInfo", shownInPick = true)
 	@Column(nullable = false, unique = true, length = 9)
 	private String organizationCode;
 
