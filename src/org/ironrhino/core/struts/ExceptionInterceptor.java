@@ -13,6 +13,7 @@ import org.ironrhino.core.util.ErrorMessage;
 import org.ironrhino.core.util.ExceptionUtils;
 import org.ironrhino.core.util.LocalizedException;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.dao.QueryTimeoutException;
 
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionInvocation;
@@ -126,7 +127,8 @@ public class ExceptionInterceptor extends AbstractInterceptor {
 					} else if (e instanceof ErrorMessage || cause instanceof ErrorMessage) {
 						ErrorMessage em = (ErrorMessage) ((e instanceof ErrorMessage) ? e : cause);
 						validationAwareAction.addActionError(em.getLocalizedMessage());
-					} else if (e instanceof UnsupportedOperationException || e instanceof SocketTimeoutException) {
+					} else if (e instanceof UnsupportedOperationException || e instanceof SocketTimeoutException
+							|| e instanceof QueryTimeoutException) {
 						validationAwareAction.addActionError(findText(e.getClass().getCanonicalName(), null));
 					} else if (e instanceof LocalizedException || cause instanceof LocalizedException) {
 						LocalizedException le = (LocalizedException) ((e instanceof LocalizedException) ? e : cause);
