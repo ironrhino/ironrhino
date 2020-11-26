@@ -18,6 +18,8 @@ import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.context.ContextLoaderListener;
 
+import reactor.core.scheduler.Schedulers;
+
 /**
  * 
  * Section 4.4 of the Servlet 3.0 specification does not permit configuration
@@ -49,6 +51,7 @@ public class MainContextLoaderListener extends ContextLoaderListener {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		Schedulers.shutdownNow();
 		LogManager.shutdown();
 		cleanupJdbcDrivers();
 		cancelTimers();
