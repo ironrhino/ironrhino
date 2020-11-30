@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.ironrhino.core.fs.impl.FtpFileStorage;
@@ -70,6 +71,7 @@ import org.xml.sax.InputSource;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.opensymphony.xwork2.ActionSupport;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
@@ -105,7 +107,8 @@ public class ApplicationContextInspector {
 
 	}
 
-	private void addOverriddenProperties(Map<String, ApplicationProperty> properties, PropertySource<?> propertySource) {
+	private void addOverriddenProperties(Map<String, ApplicationProperty> properties,
+			PropertySource<?> propertySource) {
 		String name = propertySource.getName();
 		if (name != null && name.startsWith("servlet"))
 			return;
@@ -293,14 +296,14 @@ public class ApplicationContextInspector {
 		ServerMap sm = new ServerMap(AppInfo.getAppName());
 
 		// JDK
-		sm.getServices().add(new Service("JDK", System.getProperty("java.version"), null));
+		sm.getServices().add(new Service("JDK", System.getProperty("java.version"), null, true));
 
 		// servlet container
 		if (ctx instanceof WebApplicationContext) {
 			String serverInfo = ServletContainerHelper.getServerInfo(((WebApplicationContext) ctx).getServletContext());
 			if (serverInfo != null) {
 				String[] arr = serverInfo.split("/");
-				sm.getServices().add(new Service(arr[0], arr[1], null));
+				sm.getServices().add(new Service(arr[0], arr[1], null, true));
 			}
 		}
 
@@ -327,6 +330,11 @@ public class ApplicationContextInspector {
 						address = address.substring(0, address.lastIndexOf(':'));
 					}
 				}
+				i = address.indexOf('?');
+				if (i > 0)
+					address = address.substring(0, i);
+				if (address.startsWith("/"))
+					address = "localhost" + address;
 			} catch (Exception e) {
 			}
 			String type = null;
@@ -504,13 +512,43 @@ public class ApplicationContextInspector {
 	public static class ServerMap {
 		private String name;
 		private Collection<Service> services = new LinkedHashSet<>();
+
+		public String toGraphvizString() {
+			String self = "\"" + name + "\"";
+			StringBuilder sb = new StringBuilder();
+			sb.append("digraph \"Server Map\" {\ngraph [rankdir=LR]\n");
+			sb.append(self).append(" [shape=rectangle,penwidth=5.0,style=bold,color=azure3]\n");
+			for (Service service : services) {
+				String nodeName = service.type;
+				String nodeLabel = service.type;
+				if (StringUtils.isNotBlank(service.version))
+					nodeLabel = nodeLabel + "( " + service.version + " )";
+				if (StringUtils.isNotBlank(service.address)) {
+					nodeName = nodeName + "( " + service.address + " )";
+					nodeLabel = nodeLabel + "\n[ " + service.address + " ]";
+				}
+				nodeName = "\"" + nodeName + "\"";
+				nodeLabel = "\"" + nodeLabel + "\"";
+				sb.append(nodeName).append(" [label=").append(nodeLabel).append("]\n");
+				sb.append(self).append(" -> ").append(nodeName).append(" [weight=5,style=")
+						.append(service.internal ? "dashed" : "solid").append("]\n");
+			}
+			sb.append("}");
+			return sb.toString();
+		}
 	}
 
 	@lombok.Value
+	@AllArgsConstructor
 	public static class Service {
 		private String type;
 		private String version;
 		private String address;
+		private boolean internal;
+
+		public Service(String type, String version, String address) {
+			this(type, version, address, false);
+		}
 	}
 
 }

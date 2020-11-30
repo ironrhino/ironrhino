@@ -5,25 +5,6 @@
 <title>${getText('serverMap')}</title>
 </head>
 <body>
-<#assign serverMap = beans['applicationContextInspector'].serverMap>
-<table class="table">
-	<caption><h3>${serverMap.name}</h3></caption>
-	<thead>
-		<tr>
-			<th style="width:200px;">Service</th>
-			<th style="width:200px;">Version</th>
-			<th>Address</th>
-		</tr>
-	</thead>
-	<tbody>
-	<#list serverMap.services as service>
-		<tr>
-			<td>${service.type}</td>
-			<td>${service.version!}</td>
-			<td>${service.address!}</td>
-		</tr>
-	</#list>
-	</tbody>
-</table>
+<iframe src="<@url value="/assets/components/graphviz/viewer.html"/>#${beans['applicationContextInspector'].serverMap.toGraphvizString()?url}" style="width: 100%; height:500px; border: 0px;" scrolling="no"></iframe>
 </body>
 </html>
