@@ -192,11 +192,12 @@ public class JdbcRepositoryFactoryBean extends MethodInterceptorFactoryBean
 			this.sqls = loadSqls();
 		Method method = methodInvocation.getMethod();
 		if (method.isAnnotationPresent(Lookup.class)) {
-			if (method.getReturnType().isAssignableFrom(NamedParameterJdbcTemplate.class))
+			Class<?> returnType = method.getReturnType();
+			if (returnType.isAssignableFrom(NamedParameterJdbcTemplate.class))
 				return namedParameterJdbcTemplate;
-			if (method.getReturnType().isAssignableFrom(JdbcTemplate.class))
+			if (returnType.isAssignableFrom(JdbcTemplate.class))
 				return namedParameterJdbcTemplate.getJdbcTemplate();
-			if (method.getReturnType() == DataSource.class)
+			if (returnType == DataSource.class)
 				return namedParameterJdbcTemplate.getJdbcTemplate().getDataSource();
 		}
 		String methodName = method.getName();
