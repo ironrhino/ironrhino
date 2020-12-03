@@ -39,6 +39,8 @@ import org.hibernate.engine.spi.ExecutableList;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.id.Assigned;
+import org.hibernate.id.CompositeNestedGeneratedValueGenerator;
+import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.internal.CriteriaImpl.OrderEntry;
 import org.hibernate.persister.entity.EntityPersister;
@@ -102,8 +104,9 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Transactional
 	public void save(T obj) {
 		boolean isnew = obj.isNew();
-		if (((SessionFactoryImplementor) sessionFactory).getMetamodel().entityPersister(obj.getClass())
-				.getIdentifierGenerator() instanceof Assigned) {
+		IdentifierGenerator ig = ((SessionFactoryImplementor) sessionFactory).getMetamodel()
+				.entityPersister(obj.getClass()).getIdentifierGenerator();
+		if (ig instanceof Assigned || ig instanceof CompositeNestedGeneratedValueGenerator) {
 			Serializable id = obj.getId();
 			if (id == null)
 				throw new IllegalArgumentException(obj + " must have an ID");
