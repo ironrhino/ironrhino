@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @AutoConfig
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
-@StageConditional(Stage.DEVELOPMENT)
+@StageConditional(value = Stage.PRODUCTION, negated = true)
 @Slf4j
 public class PlaygroundAction extends BaseAction {
 

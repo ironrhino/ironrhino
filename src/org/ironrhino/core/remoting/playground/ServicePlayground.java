@@ -37,7 +37,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 @Component
-@StageConditional(Stage.DEVELOPMENT)
+@StageConditional(value = Stage.PRODUCTION, negated = true)
 public class ServicePlayground {
 
 	@Autowired

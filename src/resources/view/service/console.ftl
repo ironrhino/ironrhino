@@ -74,7 +74,7 @@ $(document).click(function(e){
 	<li class="span6<#if description?has_content> poped</#if>"<#if description?has_content> data-placement="bottom" data-content="${description}"</#if>>
 	<button type="button" class="btn btn-block service">
 	${service}
-	<@stageConditional value="DEVELOPMENT">
+	<@stageConditional value="PRODUCTION" negated=true>
 	<#if beans['servicePlayground'].services?seq_contains(service)>
 	<a href="${actionNamespace}/playground/${service}" target="_blank"><span class="glyphicon glyphicon-align-justify pull-right" style="margin-right:5px;"></span></a>
 	</#if>
