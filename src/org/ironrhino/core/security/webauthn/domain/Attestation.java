@@ -7,9 +7,11 @@ import org.ironrhino.core.security.webauthn.internal.Utils;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
+import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
 @Value
+@RequiredArgsConstructor(onConstructor = @__(@JsonCreator))
 public class Attestation {
 
 	private AttestationStatementFormat fmt;

@@ -10,9 +10,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Data
+@RequiredArgsConstructor(onConstructor = @__(@JsonCreator))
 public class ClientData {
 
 	private final PublicKeyCredentialOperationType type;

@@ -42,7 +42,6 @@ public class DeserializationTest {
 		assertThat(key.getCurve(), equalTo(Curve.secp256r1));
 		assertThat(key.getX(), equalTo(Base64.getDecoder().decode("KAdACr2BYzM22clwTv3d/jS4SqV3BEwSu6SSkcu9kqQ=")));
 		assertThat(key.getY(), equalTo(Base64.getDecoder().decode("zBh9ZybYDt8uzI1KA5juXxQ4Rn5gB0DAmDtg//e2F2s=")));
-		System.out.println(Utils.JSON_OBJECTMAPPER.writeValueAsString(key));
 	}
 
 	@Test
