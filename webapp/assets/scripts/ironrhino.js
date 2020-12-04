@@ -32114,6 +32114,8 @@ MessageBundle = {
 			top: top + 'px',
 			left: left + 'px'
 		});
+		if (container.height() > $(topWindow).height())
+			container.css('position', 'absolute');
 	}
 
 	function maintainPosition(status) {
