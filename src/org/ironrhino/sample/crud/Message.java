@@ -55,7 +55,7 @@ public class Message implements Persistable<Long> {
 	@UpdateTimestamp
 	private LocalDateTime modifyDate;
 
-	@UiConfig(width = "120px", displayOrder = -1, description = "messageId.description")
+	@UiConfig(width = "140px", displayOrder = -1, description = "messageId.description")
 	public Long getMessageId() {
 		return getId();
 	}
