@@ -48,7 +48,8 @@ import lombok.Data;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = HibernateConfiguration.class)
-@TestPropertySource(properties = { "annotatedClasses=org.ironrhino.core.service.Person,org.ironrhino.core.service.Cat",
+@TestPropertySource(properties = {
+		"annotatedClasses=org.ironrhino.core.service.Person,org.ironrhino.core.service.Cat,org.ironrhino.core.service.Dog",
 		"hibernate.show_sql=true" })
 public class EntityManagerTest {
 
@@ -57,6 +58,9 @@ public class EntityManagerTest {
 
 	@Autowired
 	private EntityManager<Cat> catManager;
+
+	@Autowired
+	private EntityManager<Dog> dogManager;
 
 	@Test
 	public void testCrud() {
@@ -167,6 +171,20 @@ public class EntityManagerTest {
 		catManager.save(cat2);
 		assertThat(catManager.countAll(), is(1L));
 		assertThat(catManager.get("tom").getName(), is("Tom2"));
+
+		dogManager.setEntityClass(Dog.class);
+		Identity id = new Identity("A", "01");
+		Dog dog = new Dog();
+		dog.setId(id);
+		dog.setName("amao");
+		dogManager.save(dog);
+		assertThat(dogManager.countAll(), is(1L));
+		Dog dog2 = new Dog();
+		dog2.setId(id);
+		dog2.setName("agou");
+		dogManager.save(dog2);
+		assertThat(dogManager.countAll(), is(1L));
+		assertThat(dogManager.get(id).getName(), is("agou"));
 	}
 
 	@Test(expected = ObjectOptimisticLockingFailureException.class)
