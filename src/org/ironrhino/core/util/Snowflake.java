@@ -1,5 +1,6 @@
 package org.ironrhino.core.util;
 
+import java.math.BigInteger;
 import java.util.Random;
 
 import org.apache.commons.lang3.StringUtils;
@@ -70,6 +71,10 @@ public class Snowflake {
 		}
 		lastTimestamp = timestamp;
 		return ((timestamp - EPOCH) << (sequenceBits + workerIdBits)) | (workerId << sequenceBits) | sequence;
+	}
+
+	public String nextBase62Id() {
+		return NumberUtils.decimalToX(62, BigInteger.valueOf(nextId()));
 	}
 
 }
