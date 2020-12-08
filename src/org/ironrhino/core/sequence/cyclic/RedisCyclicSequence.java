@@ -93,9 +93,9 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 			if (success)
 				return restart;
 			try {
-				Thread.sleep(100);
+				Thread.sleep((1 + maxAttempts - remainingAttempts) * 50);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				logger.warn(e.getMessage(), e);
 			}
 		} while (--remainingAttempts > 0);
 		throw new MaxAttemptsExceededException(maxAttempts);
