@@ -6,7 +6,6 @@ import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.View;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.rest.RestStatus;
-import org.ironrhino.rest.client.RestApi;
 import org.ironrhino.rest.doc.annotation.Api;
 import org.ironrhino.rest.doc.annotation.ApiModule;
 import org.ironrhino.rest.doc.annotation.Status;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
-@RestApi
 @RequestMapping("/article")
 @Authorize(ifAnyGranted = UserRole.ROLE_ADMINISTRATOR)
 @ApiModule(value = "文章API")
