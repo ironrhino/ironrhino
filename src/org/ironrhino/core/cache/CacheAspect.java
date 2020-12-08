@@ -3,6 +3,7 @@ package org.ironrhino.core.cache;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -27,6 +28,8 @@ import org.springframework.stereotype.Component;
 public class CacheAspect extends BaseAspect {
 
 	private final static String MUTEX = "_MUTEX_";
+
+	private final Map<String, Object> locks = new ConcurrentHashMap<>();
 
 	@Autowired
 	private CacheManager cacheManager;
@@ -79,7 +82,11 @@ public class CacheAspect extends BaseAspect {
 		if (cacheManager.increment(keyMutex, 1, waitTimeout, TimeUnit.MILLISECONDS, namespace) <= throughPermits) {
 			mutexed = true;
 		} else {
-			Thread.sleep(waitTimeout);
+			Object lock = locks.computeIfAbsent(keyMutex, (k) -> new Object());
+			synchronized (lock) {
+				lock.wait(waitTimeout);
+			}
+			locks.remove(keyMutex);
 			for (String key : keys) {
 				Object value = cacheManager.get(key, namespace);
 				if (value instanceof NullObject) {
@@ -119,8 +126,15 @@ public class CacheAspect extends BaseAspect {
 			if (result != null)
 				ExpressionUtils.eval(checkCache.onPut(), context);
 		}
-		if (mutexed)
+		if (mutexed) {
+			Object lock = locks.remove(keyMutex);
+			if (lock != null) {
+				synchronized (lock) {
+					lock.notifyAll();
+				}
+			}
 			cacheManager.decrement(keyMutex, 1, 0, TimeUnit.MILLISECONDS, namespace);
+		}
 		return result;
 	}
 
