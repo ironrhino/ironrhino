@@ -64,7 +64,7 @@ public class NumberUtils {
 		return format(value, fractionDigits) + "%";
 	}
 
-	public static final String NUMBERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-";
+	public static final String NUMBERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-";
 
 	public static String decimalToX(int scale, BigInteger decimalValue) {
 		if (scale > NUMBERS.length())
