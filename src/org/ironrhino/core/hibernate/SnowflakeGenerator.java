@@ -13,7 +13,9 @@ public class SnowflakeGenerator implements IdentifierGenerator {
 
 	@Override
 	public Serializable generate(SharedSessionContractImplementor session, Object obj) {
-		return Snowflake.DEFAULT_INSTANCE.nextId();
+		Snowflake snowflake = Snowflake.DEFAULT_INSTANCE;
+		Class<?> idType = session.getFactory().getMetamodel().entity(obj.getClass()).getIdType().getJavaType();
+		return idType == String.class ? snowflake.nextBase62Id() : snowflake.nextId();
 	}
 
 }
