@@ -103,19 +103,21 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	@Override
 	@Transactional
 	public void save(T obj) {
-		boolean isnew = obj.isNew();
+		boolean isNew;
 		IdentifierGenerator ig = ((SessionFactoryImplementor) sessionFactory).getMetamodel()
 				.entityPersister(obj.getClass()).getIdentifierGenerator();
 		if (ig instanceof Assigned || ig instanceof CompositeNestedGeneratedValueGenerator) {
 			Serializable id = obj.getId();
 			if (id == null)
 				throw new IllegalArgumentException(obj + " must have an ID");
-			isnew = !exists(id);
+			isNew = !exists(id);
+		} else {
+			isNew = obj.isNew();
 		}
 		Session session = sessionFactory.getCurrentSession();
 		if (obj instanceof BaseTreeableEntity) {
 			BaseTreeableEntity entity = (BaseTreeableEntity) obj;
-			if (isnew) {
+			if (isNew) {
 				entity.setLevel(entity.getParent() != null ? entity.getParent().getLevel() + 1 : 1);
 				entity.setFullId(UUID.randomUUID().toString());
 				// assign any temporary unique value to fullId
@@ -166,7 +168,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 				}
 			}
 		} else {
-			if (isnew)
+			if (isNew)
 				session.save(obj);
 			else if (!session.contains(obj))
 				session.update(obj);
