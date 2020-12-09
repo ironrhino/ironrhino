@@ -66,6 +66,25 @@ public class NumberUtils {
 
 	public static final String NUMBERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-";
 
+	public static String decimalToX(int scale, long decimalValue) {
+		if (scale > NUMBERS.length())
+			throw new IllegalArgumentException("n must less or equal to " + NUMBERS.length());
+		boolean negative = decimalValue < 0;
+		if (negative)
+			decimalValue = -decimalValue;
+		StringBuilder sb = new StringBuilder();
+
+		String sub = NUMBERS.substring(0, scale);
+		while (decimalValue != 0) {
+			int b = (int) (decimalValue % scale);
+			sb.insert(0, sub.charAt(b));
+			decimalValue = (decimalValue - b) / scale;
+		}
+		if (negative)
+			sb.insert(0, '-');
+		return sb.toString();
+	}
+
 	public static String decimalToX(int scale, BigInteger decimalValue) {
 		if (scale > NUMBERS.length())
 			throw new IllegalArgumentException("n must less or equal to " + NUMBERS.length());

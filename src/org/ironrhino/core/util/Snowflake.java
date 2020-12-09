@@ -1,6 +1,5 @@
 package org.ironrhino.core.util;
 
-import java.math.BigInteger;
 import java.util.Random;
 
 import org.apache.commons.lang3.StringUtils;
@@ -74,7 +73,7 @@ public class Snowflake {
 	}
 
 	public String nextBase62Id() {
-		return NumberUtils.decimalToX(62, BigInteger.valueOf(nextId()));
+		return NumberUtils.decimalToX(62, nextId());
 	}
 
 }
