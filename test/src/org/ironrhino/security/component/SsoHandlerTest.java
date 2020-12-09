@@ -25,7 +25,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.ironrhino.security.component.SsoHandlerTest.SsoHandlerConfig;
 import org.ironrhino.security.domain.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,7 +49,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = SsoHandlerConfig.class)
+@ContextConfiguration(classes = SsoHandlerTest.SsoHandlerConfig.class)
 @TestPropertySource(properties = "portal.baseUrl=http://portal.cywb.com")
 public class SsoHandlerTest {
 

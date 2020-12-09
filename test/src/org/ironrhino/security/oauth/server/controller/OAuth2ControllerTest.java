@@ -23,7 +23,6 @@ import org.ironrhino.core.session.HttpSessionManager;
 import org.ironrhino.core.struts.I18N;
 import org.ironrhino.rest.AbstractMockMvcConfigurer;
 import org.ironrhino.security.oauth.server.component.OAuthHandler;
-import org.ironrhino.security.oauth.server.controller.OAuth2ControllerTest.OAuth2Configuration;
 import org.ironrhino.security.oauth.server.enums.GrantType;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
@@ -56,7 +55,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
-@ContextConfiguration(classes = OAuth2Configuration.class)
+@ContextConfiguration(classes = OAuth2ControllerTest.OAuth2Configuration.class)
 @TestPropertySource(properties = { "oauth.token.jwtEnabled=true",
 		"oauth.token.jwtExpiresIn=" + OAuth2ControllerTest.EXPIRES_IN })
 public class OAuth2ControllerTest {

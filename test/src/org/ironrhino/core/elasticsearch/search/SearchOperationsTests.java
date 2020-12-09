@@ -9,7 +9,6 @@ import java.util.concurrent.TimeUnit;
 import org.ironrhino.core.elasticsearch.Article;
 import org.ironrhino.core.elasticsearch.ArticleOperations;
 import org.ironrhino.core.elasticsearch.Constants;
-import org.ironrhino.core.elasticsearch.search.SearchOperationsTests.Config;
 import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.NumberUtils;
 import org.ironrhino.rest.client.RestApiRegistryPostProcessor;
@@ -22,7 +21,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = Config.class)
+@ContextConfiguration(classes = SearchOperationsTests.Config.class)
 @TestPropertySource(properties = Constants.KEY_ELASTICSEARCH_URL + "=http://localhost:9200")
 public class SearchOperationsTests {
 

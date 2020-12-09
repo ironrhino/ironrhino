@@ -8,7 +8,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.ironrhino.core.throttle.BulkheadAspectTest.BulkheadConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import io.github.resilience4j.bulkhead.BulkheadFullException;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = BulkheadConfiguration.class)
+@ContextConfiguration(classes = BulkheadAspectTest.BulkheadConfiguration.class)
 public class BulkheadAspectTest {
 
 	@Autowired

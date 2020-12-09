@@ -18,7 +18,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.validation.ConstraintViolationException;
 
 import org.ironrhino.core.metadata.Scope;
-import org.ironrhino.core.remoting.JavaRemotingServiceTests.RemotingConfiguration;
 import org.ironrhino.core.remoting.client.HttpInvokerClient;
 import org.ironrhino.sample.remoting.BarService;
 import org.ironrhino.sample.remoting.FooService;
@@ -41,7 +40,7 @@ import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = RemotingConfiguration.class)
+@ContextConfiguration(classes = JavaRemotingServiceTests.RemotingConfiguration.class)
 @TestPropertySource(properties = "httpInvoker.serializationType=JAVA")
 public class JavaRemotingServiceTests {
 

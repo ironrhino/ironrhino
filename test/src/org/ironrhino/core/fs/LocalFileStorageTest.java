@@ -1,6 +1,5 @@
 package org.ironrhino.core.fs;
 
-import org.ironrhino.core.fs.LocalFileStorageTest.LocalFileStorageConfiguration;
 import org.ironrhino.core.fs.impl.LocalFileStorage;
 import org.junit.runner.RunWith;
 import org.springframework.context.annotation.Bean;
@@ -10,7 +9,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = LocalFileStorageConfiguration.class)
+@ContextConfiguration(classes = LocalFileStorageTest.LocalFileStorageConfiguration.class)
 @TestPropertySource(properties = "fileStorage.uri=file:///tmp/fs")
 public class LocalFileStorageTest extends FileStorageTestBase {
 

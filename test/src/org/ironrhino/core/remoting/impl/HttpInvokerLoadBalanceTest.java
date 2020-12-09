@@ -24,7 +24,6 @@ import org.ironrhino.core.remoting.ExportServicesEvent;
 import org.ironrhino.core.remoting.client.HttpInvokerClient;
 import org.ironrhino.core.remoting.client.HttpInvokerRequestExecutor;
 import org.ironrhino.core.remoting.client.RemotingServiceRegistryPostProcessor;
-import org.ironrhino.core.remoting.impl.HttpInvokerLoadBalanceTest.HttpInvokerConfiguration;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializers;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.sample.remoting.BarService;
@@ -42,7 +41,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = HttpInvokerConfiguration.class)
+@ContextConfiguration(classes = HttpInvokerLoadBalanceTest.HttpInvokerConfiguration.class)
 public class HttpInvokerLoadBalanceTest extends RedisServiceRegistryAdapter {
 
 	@Autowired

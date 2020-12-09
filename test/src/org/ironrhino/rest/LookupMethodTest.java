@@ -9,7 +9,6 @@ import static org.mockito.Mockito.spy;
 import javax.annotation.PostConstruct;
 
 import org.ironrhino.core.spring.http.client.RestTemplate;
-import org.ironrhino.rest.LookupMethodTest.RestApiConfiguration;
 import org.ironrhino.rest.client.RestApi;
 import org.ironrhino.rest.client.RestApiFactoryBean;
 import org.ironrhino.sample.api.controller.ArticleController;
@@ -28,7 +27,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
-@ContextConfiguration(classes = RestApiConfiguration.class)
+@ContextConfiguration(classes = LookupMethodTest.RestApiConfiguration.class)
 public class LookupMethodTest {
 
 	@Autowired

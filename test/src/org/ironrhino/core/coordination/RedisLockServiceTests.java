@@ -1,6 +1,5 @@
 package org.ironrhino.core.coordination;
 
-import org.ironrhino.core.coordination.RedisLockServiceTests.RedisLockServiceConfiguration;
 import org.ironrhino.core.coordination.impl.RedisLockService;
 import org.ironrhino.core.spring.configuration.RedisConfiguration;
 import org.junit.runner.RunWith;
@@ -10,7 +9,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = RedisLockServiceConfiguration.class)
+@ContextConfiguration(classes = RedisLockServiceTests.RedisLockServiceConfiguration.class)
 public class RedisLockServiceTests extends LockServiceTestBase {
 
 	@Configuration

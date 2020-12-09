@@ -11,7 +11,6 @@ import static org.mockito.Mockito.reset;
 import java.util.concurrent.TimeUnit;
 
 import org.ironrhino.core.coordination.LockService;
-import org.ironrhino.core.coordination.impl.RedisLockServiceTest.RedisLockServiceConfig;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,7 +25,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = RedisLockServiceConfig.class)
+@ContextConfiguration(classes = RedisLockServiceTest.RedisLockServiceConfig.class)
 public class RedisLockServiceTest {
 
 	protected static ValueOperations<String, String> opsForValue;

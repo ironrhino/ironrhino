@@ -12,7 +12,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import org.ironrhino.core.fs.FtpFileStorageTests.FtpFileStorageConfiguration;
 import org.ironrhino.core.fs.impl.FtpFileStorage;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +22,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = FtpFileStorageConfiguration.class)
+@ContextConfiguration(classes = FtpFileStorageTests.FtpFileStorageConfiguration.class)
 @TestPropertySource(properties = { "fileStorage.uri=ftp://admin:admin@localhost:2121/temp", "ftp.pool.maxTotal=5",
 		"ftp.dataTimeout=30000", "ftp.bufferThreshold=8" })
 public class FtpFileStorageTests extends FileStorageTestBase {

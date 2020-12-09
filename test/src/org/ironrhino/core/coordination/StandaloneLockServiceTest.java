@@ -1,6 +1,5 @@
 package org.ironrhino.core.coordination;
 
-import org.ironrhino.core.coordination.StandaloneLockServiceTest.StandaloneLockServiceConfiguration;
 import org.ironrhino.core.coordination.impl.StandaloneLockService;
 import org.ironrhino.core.spring.configuration.RedisConfiguration;
 import org.junit.runner.RunWith;
@@ -10,7 +9,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = StandaloneLockServiceConfiguration.class)
+@ContextConfiguration(classes = StandaloneLockServiceTest.StandaloneLockServiceConfiguration.class)
 public class StandaloneLockServiceTest extends LockServiceTestBase {
 
 	@Configuration

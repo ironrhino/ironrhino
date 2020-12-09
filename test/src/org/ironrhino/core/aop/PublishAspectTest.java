@@ -6,7 +6,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ironrhino.core.aop.PublishAspectTest.PublishAspectConfiguration;
 import org.ironrhino.core.event.EntityOperationEvent;
 import org.ironrhino.core.event.EntityOperationType;
 import org.ironrhino.core.event.EventPublisher;
@@ -23,7 +22,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = PublishAspectConfiguration.class)
+@ContextConfiguration(classes = PublishAspectTest.PublishAspectConfiguration.class)
 @TestPropertySource(properties = { "annotatedClasses=org.ironrhino.core.aop.TestEntity" })
 public class PublishAspectTest {
 

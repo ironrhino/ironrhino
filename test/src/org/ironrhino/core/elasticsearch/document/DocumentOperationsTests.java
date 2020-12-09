@@ -9,7 +9,6 @@ import java.util.Date;
 import org.ironrhino.core.elasticsearch.Article;
 import org.ironrhino.core.elasticsearch.ArticleOperations;
 import org.ironrhino.core.elasticsearch.Constants;
-import org.ironrhino.core.elasticsearch.document.DocumentOperationsTests.Config;
 import org.ironrhino.rest.client.RestApiRegistryPostProcessor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +20,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.HttpClientErrorException;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = Config.class)
+@ContextConfiguration(classes = DocumentOperationsTests.Config.class)
 @TestPropertySource(properties = Constants.KEY_ELASTICSEARCH_URL + "=http://localhost:9200")
 public class DocumentOperationsTests {
 

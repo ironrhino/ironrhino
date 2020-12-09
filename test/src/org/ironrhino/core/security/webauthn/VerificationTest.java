@@ -9,7 +9,6 @@ import java.util.Arrays;
 
 import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.cache.impl.Cache2kCacheManager;
-import org.ironrhino.core.security.webauthn.VerificationTest.WebAuthnConfiguration;
 import org.ironrhino.core.security.webauthn.domain.AuthenticatorAssertionResponse;
 import org.ironrhino.core.security.webauthn.domain.AuthenticatorAttestationResponse;
 import org.ironrhino.core.security.webauthn.domain.PublicKeyCredential;
@@ -30,7 +29,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = { WebAuthnConfiguration.class, HibernateConfiguration.class })
+@ContextConfiguration(classes = { VerificationTest.WebAuthnConfiguration.class, HibernateConfiguration.class })
 @TestPropertySource(properties = { "annotatedClasses=org.ironrhino.core.security.webauthn.model.WebAuthnCredential",
 		"hibernate.show_sql=true" })
 public class VerificationTest {

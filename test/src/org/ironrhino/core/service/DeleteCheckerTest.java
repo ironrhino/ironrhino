@@ -3,7 +3,6 @@ package org.ironrhino.core.service;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.ironrhino.core.service.DeleteCheckerTest.MyConfiguration;
 import org.ironrhino.core.util.ErrorMessage;
 import org.junit.After;
 import org.junit.Before;
@@ -16,7 +15,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = { HibernateConfiguration.class, MyConfiguration.class })
+@ContextConfiguration(classes = { HibernateConfiguration.class, DeleteCheckerTest.MyConfiguration.class })
 @TestPropertySource(properties = {
 		"annotatedClasses=org.ironrhino.core.service.Product,org.ironrhino.core.service.Category",
 		"hibernate.show_sql=true" })

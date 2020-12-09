@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.cache.impl.Cache2kCacheManager;
-import org.ironrhino.core.throttle.FrequencyAspectTest.FrequencyConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = FrequencyConfiguration.class)
+@ContextConfiguration(classes = FrequencyAspectTest.FrequencyConfiguration.class)
 public class FrequencyAspectTest {
 
 	@Autowired

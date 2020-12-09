@@ -15,7 +15,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.ironrhino.core.cache.CacheAspectTest.AnotherPersonRepository;
-import org.ironrhino.core.cache.CacheAspectTest.CacheConfiguration;
 import org.ironrhino.core.cache.impl.Cache2kCacheManager;
 import org.junit.After;
 import org.junit.Before;
@@ -37,7 +36,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = CacheConfiguration.class)
+@ContextConfiguration(classes = CacheAspectTest.CacheConfiguration.class)
 @TestPropertySource(properties = AnotherPersonRepository.KEY_CACHE_NAMESPACE + "="
 		+ CacheAspectTest.CUSTOMIZED_CACHE_NAMESPACE)
 public class CacheAspectTest {

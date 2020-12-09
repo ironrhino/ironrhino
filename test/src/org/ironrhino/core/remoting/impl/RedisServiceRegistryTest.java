@@ -14,7 +14,6 @@ import static org.mockito.Mockito.spy;
 import java.util.Arrays;
 
 import org.ironrhino.core.event.EventPublisher;
-import org.ironrhino.core.remoting.impl.RedisServiceRegistryTest.RedisServiceRegistryConfiguration;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.sample.remoting.BarService;
 import org.ironrhino.sample.remoting.TestService;
@@ -31,7 +30,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = RedisServiceRegistryConfiguration.class)
+@ContextConfiguration(classes = RedisServiceRegistryTest.RedisServiceRegistryConfiguration.class)
 public class RedisServiceRegistryTest extends RedisServiceRegistryAdapter {
 
 	@Before

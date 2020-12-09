@@ -1,6 +1,5 @@
 package org.ironrhino.core.seq;
 
-import org.ironrhino.core.seq.RedisSequenceTests.RedisSequenceConfiguration;
 import org.ironrhino.core.sequence.CyclicSequence.CycleType;
 import org.ironrhino.core.sequence.Sequence;
 import org.ironrhino.core.sequence.cyclic.RedisCyclicSequence;
@@ -13,7 +12,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = RedisSequenceConfiguration.class)
+@ContextConfiguration(classes = RedisSequenceTests.RedisSequenceConfiguration.class)
 public class RedisSequenceTests extends SequenceTestBase {
 
 	@Configuration

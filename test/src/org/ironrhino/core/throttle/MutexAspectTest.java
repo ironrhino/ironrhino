@@ -11,7 +11,6 @@ import java.util.concurrent.Future;
 
 import org.ironrhino.core.coordination.LockService;
 import org.ironrhino.core.coordination.impl.StandaloneLockService;
-import org.ironrhino.core.throttle.MutexAspectTest.MutexConfiguration;
 import org.ironrhino.core.util.LockFailedException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +22,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = MutexConfiguration.class)
+@ContextConfiguration(classes = MutexAspectTest.MutexConfiguration.class)
 public class MutexAspectTest {
 
 	@Autowired

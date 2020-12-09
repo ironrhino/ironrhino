@@ -1,6 +1,5 @@
 package org.ironrhino.core.cache;
 
-import org.ironrhino.core.cache.RedisCacheManagerTests.RedisCacheManagerConfiguration;
 import org.ironrhino.core.cache.impl.RedisCacheManager;
 import org.ironrhino.core.spring.configuration.RedisConfiguration;
 import org.junit.runner.RunWith;
@@ -10,7 +9,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = RedisCacheManagerConfiguration.class)
+@ContextConfiguration(classes = RedisCacheManagerTests.RedisCacheManagerConfiguration.class)
 public class RedisCacheManagerTests extends CacheManagerTestBase {
 
 	@Configuration

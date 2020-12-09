@@ -7,7 +7,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.ironrhino.core.service.BaseTreeControlTest.TreeConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = { HibernateConfiguration.class, TreeConfiguration.class })
+@ContextConfiguration(classes = { HibernateConfiguration.class, BaseTreeControlTest.TreeConfiguration.class })
 @TestPropertySource(properties = { "annotatedClasses=org.ironrhino.core.service.TreeNode", "hibernate.show_sql=true" })
 public class BaseTreeControlTest {
 

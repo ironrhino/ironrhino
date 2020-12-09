@@ -12,7 +12,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.ironrhino.core.scheduled.ScheduledTaskRegistry.ScheduledTask;
 import org.ironrhino.core.scheduled.ScheduledTaskRegistry.ScheduledType;
-import org.ironrhino.core.scheduled.ScheduledTasksIntegrationTest.ScheduledTasksConfig;
 import org.ironrhino.core.scheduled.impl.StandaloneScheduledTaskCircuitBreaker;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,7 +31,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = ScheduledTasksConfig.class)
+@ContextConfiguration(classes = ScheduledTasksIntegrationTest.ScheduledTasksConfig.class)
 public class ScheduledTasksIntegrationTest {
 
 	private static final int STARTED = 0;

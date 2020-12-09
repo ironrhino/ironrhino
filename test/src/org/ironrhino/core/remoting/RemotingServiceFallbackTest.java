@@ -8,7 +8,6 @@ import java.lang.reflect.Proxy;
 import java.net.ConnectException;
 
 import org.aopalliance.intercept.MethodInvocation;
-import org.ironrhino.core.remoting.RemotingServiceFallbackTest.RemotingFallbackConfiguration;
 import org.ironrhino.core.remoting.client.HttpInvokerClient;
 import org.ironrhino.core.remoting.client.HttpInvokerRequestExecutor;
 import org.ironrhino.core.remoting.client.RemotingServiceRegistryPostProcessor;
@@ -29,7 +28,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = RemotingFallbackConfiguration.class)
+@ContextConfiguration(classes = RemotingServiceFallbackTest.RemotingFallbackConfiguration.class)
 @TestPropertySource(properties = "org.ironrhino.core.remoting.RemotingServiceFallbackTest$EchoService"
 		+ HttpInvokerClient.BASE_URL_SUFFIX + "=http://localhost:8888")
 public class RemotingServiceFallbackTest {

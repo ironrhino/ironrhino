@@ -17,7 +17,6 @@ import org.ironrhino.security.oauth.server.enums.GrantType;
 import org.ironrhino.security.oauth.server.enums.ResponseType;
 import org.ironrhino.security.oauth.server.model.Authorization;
 import org.ironrhino.security.oauth.server.model.Client;
-import org.ironrhino.security.oauth.server.service.DefaultOAuthManagerTest.OAuthManagerConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +27,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = OAuthManagerConfig.class)
+@ContextConfiguration(classes = DefaultOAuthManagerTest.OAuthManagerConfig.class)
 @TestPropertySource(properties = { "oauth.authorization.maximumDevices=1" })
 public class DefaultOAuthManagerTest {
 

@@ -12,7 +12,6 @@ import java.net.ConnectException;
 import org.ironrhino.core.spring.configuration.Fallback;
 import org.ironrhino.core.spring.http.client.RestTemplate;
 import org.ironrhino.core.throttle.CircuitBreakerRegistry;
-import org.ironrhino.rest.client.RestApiFallbackTest.RestApiConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
@@ -27,7 +26,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.ResourceAccessException;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = RestApiConfiguration.class)
+@ContextConfiguration(classes = RestApiFallbackTest.RestApiConfiguration.class)
 @TestPropertySource(properties = { "org.ironrhino.rest.client.TestClient.apiBaseUrl=http://localhost/api" })
 public class RestApiFallbackTest {
 

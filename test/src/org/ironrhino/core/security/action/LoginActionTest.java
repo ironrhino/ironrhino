@@ -19,7 +19,6 @@ import javax.servlet.ServletException;
 import org.apache.struts2.StrutsSpringJUnit4TestCase;
 import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.freemarker.FreemarkerConfigurer;
-import org.ironrhino.core.security.action.LoginActionTest.LoginActionConfig;
 import org.ironrhino.core.security.verfication.VerificationManager;
 import org.ironrhino.core.security.verfication.impl.DefaultVerificationCodeChecker;
 import org.ironrhino.core.spring.configuration.CommonConfiguration;
@@ -61,7 +60,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
-@ContextConfiguration(classes = LoginActionConfig.class)
+@ContextConfiguration(classes = LoginActionTest.LoginActionConfig.class)
 @TestPropertySource(properties = "verification.code.enabled=true")
 public class LoginActionTest extends StrutsSpringJUnit4TestCase<LoginAction> {
 

@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.ironrhino.core.throttle.CircuitBreakerAspectTest.CircuitBreakerConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = CircuitBreakerConfiguration.class)
+@ContextConfiguration(classes = CircuitBreakerAspectTest.CircuitBreakerConfiguration.class)
 public class CircuitBreakerAspectTest {
 
 	@Autowired

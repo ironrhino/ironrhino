@@ -7,7 +7,6 @@ import javax.annotation.PostConstruct;
 
 import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.cache.impl.Cache2kCacheManager;
-import org.ironrhino.core.session.BaseHttpSessionTest.HttpSessionConfiguration;
 import org.ironrhino.core.session.impl.CacheBasedHttpSessionStore;
 import org.ironrhino.core.session.impl.CookieBasedHttpSessionStore;
 import org.ironrhino.core.session.impl.DefaultHttpSessionManager;
@@ -29,7 +28,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = HttpSessionConfiguration.class)
+@ContextConfiguration(classes = BaseHttpSessionTest.HttpSessionConfiguration.class)
 @Ignore
 public abstract class BaseHttpSessionTest {
 

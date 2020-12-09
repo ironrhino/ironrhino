@@ -9,7 +9,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.ironrhino.core.throttle.ConcurrencyAspectTest.ConcurrencyConfiguration;
 import org.ironrhino.core.throttle.impl.StandaloneConcurrencyService;
 import org.ironrhino.core.util.IllegalConcurrentAccessException;
 import org.junit.Test;
@@ -22,7 +21,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = ConcurrencyConfiguration.class)
+@ContextConfiguration(classes = ConcurrencyAspectTest.ConcurrencyConfiguration.class)
 public class ConcurrencyAspectTest {
 
 	@Autowired

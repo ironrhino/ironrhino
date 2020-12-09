@@ -3,7 +3,6 @@ package org.ironrhino.core.spring.configuration;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.ironrhino.core.spring.configuration.PriorityQualifierTest.TestConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = TestConfiguration.class)
+@ContextConfiguration(classes = PriorityQualifierTest.TestConfiguration.class)
 public class PriorityQualifierTest {
 
 	@Autowired

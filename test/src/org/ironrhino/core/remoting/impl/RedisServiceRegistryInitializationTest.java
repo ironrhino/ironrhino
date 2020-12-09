@@ -17,7 +17,6 @@ import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.remoting.ExportServicesEvent;
 import org.ironrhino.core.remoting.client.RemotingServiceRegistryPostProcessor;
-import org.ironrhino.core.remoting.impl.RedisServiceRegistryInitializationTest.RedisServiceRegistryInitialConfiguration;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.sample.remoting.BarService;
 import org.ironrhino.sample.remoting.FooService;
@@ -34,7 +33,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = RedisServiceRegistryInitialConfiguration.class)
+@ContextConfiguration(classes = RedisServiceRegistryInitializationTest.RedisServiceRegistryInitialConfiguration.class)
 @TestPropertySource(properties = { "org.ironrhino.sample.remoting.FooService.description=FooService Test" })
 public class RedisServiceRegistryInitializationTest extends RedisServiceRegistryAdapter {
 

@@ -6,7 +6,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.io.IOException;
 
 import org.ironrhino.core.spring.http.client.RestTemplate;
-import org.ironrhino.rest.client.RestApiPlaceholderTest.RestApiConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.ResourceAccessException;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = RestApiConfiguration.class)
+@ContextConfiguration(classes = RestApiPlaceholderTest.RestApiConfiguration.class)
 @TestPropertySource(properties = { "testClient.apiBaseUrl=invalidprotocol://localhost" })
 public class RestApiPlaceholderTest {
 

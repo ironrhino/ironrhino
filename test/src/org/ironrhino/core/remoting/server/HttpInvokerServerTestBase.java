@@ -14,7 +14,6 @@ import org.ironrhino.core.remoting.client.HttpInvokerRequestExecutor;
 import org.ironrhino.core.remoting.client.RemotingServiceRegistryPostProcessor;
 import org.ironrhino.core.remoting.impl.StandaloneServiceRegistry;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializers;
-import org.ironrhino.core.remoting.server.HttpInvokerServerTestBase.HttpInvokerConfiguration;
 import org.ironrhino.core.servlet.AccessFilter;
 import org.ironrhino.core.spring.MethodInvocationFilter;
 import org.ironrhino.core.spring.configuration.Fallback;
@@ -42,7 +41,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = HttpInvokerConfiguration.class)
+@ContextConfiguration(classes = HttpInvokerServerTestBase.HttpInvokerConfiguration.class)
 public abstract class HttpInvokerServerTestBase {
 
 	protected static MockHttpServletRequest mockHttpServletRequest;

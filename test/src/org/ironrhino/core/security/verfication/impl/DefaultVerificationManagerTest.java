@@ -12,7 +12,6 @@ import org.ironrhino.core.security.verfication.ReceiverNotFoundException;
 import org.ironrhino.core.security.verfication.VerificationAware;
 import org.ironrhino.core.security.verfication.VerificationManager;
 import org.ironrhino.core.security.verfication.VerificationService;
-import org.ironrhino.core.security.verfication.impl.DefaultVerificationManagerTest.VerificationConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = VerificationConfig.class)
+@ContextConfiguration(classes = DefaultVerificationManagerTest.VerificationConfig.class)
 public class DefaultVerificationManagerTest {
 
 	@Autowired

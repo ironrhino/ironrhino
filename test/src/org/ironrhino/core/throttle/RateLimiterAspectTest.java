@@ -1,6 +1,5 @@
 package org.ironrhino.core.throttle;
 
-import org.ironrhino.core.throttle.RateLimiterAspectTest.RateLimiterConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = RateLimiterConfiguration.class)
+@ContextConfiguration(classes = RateLimiterAspectTest.RateLimiterConfiguration.class)
 public class RateLimiterAspectTest {
 
 	@Autowired

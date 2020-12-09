@@ -17,7 +17,6 @@ import org.ironrhino.core.cache.impl.Cache2kCacheManager;
 import org.ironrhino.core.security.verfication.VerificationCodeGenerator;
 import org.ironrhino.core.security.verfication.VerificationCodeNotifier;
 import org.ironrhino.core.security.verfication.VerificationService;
-import org.ironrhino.core.security.verfication.impl.DefaultVerificationServiceTest.VerificationConfig;
 import org.ironrhino.core.spring.security.VerificationCodeRequirementService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,7 +27,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = VerificationConfig.class)
+@ContextConfiguration(classes = DefaultVerificationServiceTest.VerificationConfig.class)
 @TestPropertySource(properties = "verification.code.resend.interval=2")
 public class DefaultVerificationServiceTest {
 

@@ -3,7 +3,6 @@ package org.ironrhino.core.seq;
 import javax.sql.DataSource;
 
 import org.ironrhino.core.configuration.DataSourceConfiguration;
-import org.ironrhino.core.seq.DatabaseSequenceTest.DatabaseSequenceConfiguration;
 import org.ironrhino.core.sequence.CyclicSequence.CycleType;
 import org.ironrhino.core.sequence.Sequence;
 import org.ironrhino.core.sequence.cyclic.DatabaseCyclicSequenceDelegate;
@@ -16,7 +15,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = DatabaseSequenceConfiguration.class)
+@ContextConfiguration(classes = DatabaseSequenceTest.DatabaseSequenceConfiguration.class)
 public class DatabaseSequenceTest extends SequenceTestBase {
 
 	@Configuration

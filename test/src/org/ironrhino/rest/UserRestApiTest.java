@@ -31,7 +31,6 @@ import org.ironrhino.core.spring.ExecutorServiceFactoryBean;
 import org.ironrhino.core.spring.http.client.RestTemplate;
 import org.ironrhino.core.spring.security.password.MixedPasswordEncoder;
 import org.ironrhino.core.util.JsonUtils;
-import org.ironrhino.rest.UserRestApiTest.UserRestApiConfiguration;
 import org.ironrhino.rest.client.RestApiFactoryBean;
 import org.ironrhino.rest.client.RestClientConfiguration.MyJsonValidator;
 import org.ironrhino.rest.client.UserClient;
@@ -68,7 +67,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
-@ContextConfiguration(classes = UserRestApiConfiguration.class)
+@ContextConfiguration(classes = UserRestApiTest.UserRestApiConfiguration.class)
 public class UserRestApiTest {
 
 	@Autowired

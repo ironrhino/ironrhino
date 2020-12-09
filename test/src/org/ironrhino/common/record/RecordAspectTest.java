@@ -5,7 +5,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
-import org.ironrhino.common.record.RecordAspectTest.RecordAspectConfiguration;
 import org.ironrhino.core.service.EntityManager;
 import org.ironrhino.core.service.HibernateConfiguration;
 import org.junit.Test;
@@ -18,7 +17,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = RecordAspectConfiguration.class)
+@ContextConfiguration(classes = RecordAspectTest.RecordAspectConfiguration.class)
 @TestPropertySource(properties = {
 		"annotatedClasses=org.ironrhino.common.record.Record,org.ironrhino.common.record.TestEntity" })
 @SuppressWarnings({ "rawtypes", "unchecked" })

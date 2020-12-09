@@ -6,7 +6,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.util.Collections;
 
 import org.ironrhino.core.elasticsearch.Constants;
-import org.ironrhino.core.elasticsearch.index.IndexOperationsTests.Config;
 import org.ironrhino.rest.client.RestApiRegistryPostProcessor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +17,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ClassUtils;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = Config.class)
+@ContextConfiguration(classes = IndexOperationsTests.Config.class)
 @TestPropertySource(properties = Constants.KEY_ELASTICSEARCH_URL + "=http://localhost:9200")
 public class IndexOperationsTests {
 

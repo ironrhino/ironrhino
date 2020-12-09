@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
 import org.ironrhino.core.spring.http.client.RestTemplate;
-import org.ironrhino.rest.RestApiTest.RestApiConfiguration;
 import org.ironrhino.rest.client.ArticleClient;
 import org.ironrhino.rest.client.DownloadClient;
 import org.ironrhino.rest.client.RestApiFactoryBean;
@@ -57,7 +56,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
-@ContextConfiguration(classes = RestApiConfiguration.class)
+@ContextConfiguration(classes = RestApiTest.RestApiConfiguration.class)
 public class RestApiTest {
 
 	@Autowired
