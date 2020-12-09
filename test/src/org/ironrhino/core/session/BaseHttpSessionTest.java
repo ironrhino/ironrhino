@@ -28,7 +28,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = BaseHttpSessionTest.HttpSessionConfiguration.class)
+@ContextConfiguration(classes = BaseHttpSessionTest.Config.class)
 @Ignore
 public abstract class BaseHttpSessionTest {
 
@@ -60,7 +60,7 @@ public abstract class BaseHttpSessionTest {
 	}
 
 	@Configuration
-	static class HttpSessionConfiguration {
+	static class Config {
 
 		@Autowired
 		private CacheManager cacheManager;

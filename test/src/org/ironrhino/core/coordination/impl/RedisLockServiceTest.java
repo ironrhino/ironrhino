@@ -25,7 +25,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = RedisLockServiceTest.RedisLockServiceConfig.class)
+@ContextConfiguration(classes = RedisLockServiceTest.Config.class)
 public class RedisLockServiceTest {
 
 	protected static ValueOperations<String, String> opsForValue;
@@ -74,7 +74,7 @@ public class RedisLockServiceTest {
 	}
 
 	@Configuration
-	static class RedisLockServiceConfig {
+	static class Config {
 
 		@Bean
 		public StringRedisTemplate stringRedisTemplate() {

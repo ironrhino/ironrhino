@@ -56,7 +56,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
-@ContextConfiguration(classes = RestApiTest.RestApiConfiguration.class)
+@ContextConfiguration(classes = RestApiTest.Config.class)
 public class RestApiTest {
 
 	@Autowired
@@ -204,7 +204,7 @@ public class RestApiTest {
 	}
 
 	@EnableWebMvc
-	static class RestApiConfiguration extends AbstractMockMvcConfigurer {
+	static class Config extends AbstractMockMvcConfigurer {
 
 		@Bean
 		public ArticleController articleController() {

@@ -17,7 +17,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = { HibernateConfiguration.class, BaseTreeControlTest.TreeConfiguration.class })
+@ContextConfiguration(classes = { HibernateConfiguration.class, BaseTreeControlTest.Config.class })
 @TestPropertySource(properties = { "annotatedClasses=org.ironrhino.core.service.TreeNode", "hibernate.show_sql=true" })
 public class BaseTreeControlTest {
 
@@ -71,7 +71,7 @@ public class BaseTreeControlTest {
 	}
 
 	@Configuration
-	public static class TreeConfiguration {
+	public static class Config {
 
 		@Bean
 		public BaseTreeControl<TreeNode> treeNodeControl() {

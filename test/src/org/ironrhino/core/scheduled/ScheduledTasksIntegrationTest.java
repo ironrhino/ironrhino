@@ -31,7 +31,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = ScheduledTasksIntegrationTest.ScheduledTasksConfig.class)
+@ContextConfiguration(classes = ScheduledTasksIntegrationTest.Config.class)
 public class ScheduledTasksIntegrationTest {
 
 	private static final int STARTED = 0;
@@ -148,7 +148,7 @@ public class ScheduledTasksIntegrationTest {
 	@ComponentScan
 	@Configuration
 	@EnableAspectJAutoProxy(proxyTargetClass = true)
-	static class ScheduledTasksConfig implements SchedulingConfigurer {
+	static class Config implements SchedulingConfigurer {
 
 		@Bean
 		public TaskScheduler taskScheduler() {

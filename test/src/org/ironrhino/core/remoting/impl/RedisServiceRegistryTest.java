@@ -30,7 +30,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = RedisServiceRegistryTest.RedisServiceRegistryConfiguration.class)
+@ContextConfiguration(classes = RedisServiceRegistryTest.Config.class)
 public class RedisServiceRegistryTest extends RedisServiceRegistryAdapter {
 
 	@Before
@@ -101,7 +101,7 @@ public class RedisServiceRegistryTest extends RedisServiceRegistryAdapter {
 		assertThat(host4, is(host2));
 	}
 
-	static class RedisServiceRegistryConfiguration {
+	static class Config {
 
 		@Bean
 		public StringRedisTemplate stringRedisTemplate() {

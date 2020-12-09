@@ -49,7 +49,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = SsoHandlerTest.SsoHandlerConfig.class)
+@ContextConfiguration(classes = SsoHandlerTest.Config.class)
 @TestPropertySource(properties = "portal.baseUrl=http://portal.cywb.com")
 public class SsoHandlerTest {
 
@@ -166,7 +166,7 @@ public class SsoHandlerTest {
 		assertThat(roles.contains("ROLE_APP_1"), is(true));
 	}
 
-	static class SsoHandlerConfig {
+	static class Config {
 
 		@Bean
 		public SsoHandler ssoHandler() {

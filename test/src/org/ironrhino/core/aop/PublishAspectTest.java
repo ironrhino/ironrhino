@@ -22,7 +22,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = PublishAspectTest.PublishAspectConfiguration.class)
+@ContextConfiguration(classes = PublishAspectTest.Config.class)
 @TestPropertySource(properties = { "annotatedClasses=org.ironrhino.core.aop.TestEntity" })
 public class PublishAspectTest {
 
@@ -65,7 +65,7 @@ public class PublishAspectTest {
 	}
 
 	@Configuration
-	static class PublishAspectConfiguration extends HibernateConfiguration {
+	static class Config extends HibernateConfiguration {
 
 		@Bean
 		public EventPublisher eventPublisher() {

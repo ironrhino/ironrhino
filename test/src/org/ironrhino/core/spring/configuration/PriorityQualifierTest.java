@@ -16,7 +16,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = PriorityQualifierTest.TestConfiguration.class)
+@ContextConfiguration(classes = PriorityQualifierTest.Config.class)
 public class PriorityQualifierTest {
 
 	@Autowired
@@ -64,7 +64,7 @@ public class PriorityQualifierTest {
 	}
 
 	@Configuration
-	static class TestConfiguration {
+	static class Config {
 
 		@Bean
 		static PriorityQualifierPostProcessor priorityQualifierPostProcessor() {

@@ -9,12 +9,12 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = LocalFileStorageTest.LocalFileStorageConfiguration.class)
+@ContextConfiguration(classes = LocalFileStorageTest.Config.class)
 @TestPropertySource(properties = "fileStorage.uri=file:///tmp/fs")
 public class LocalFileStorageTest extends FileStorageTestBase {
 
 	@Configuration
-	static class LocalFileStorageConfiguration {
+	static class Config {
 
 		@Bean
 		public FileStorage fileStorage() {

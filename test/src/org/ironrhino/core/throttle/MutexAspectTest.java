@@ -22,7 +22,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = MutexAspectTest.MutexConfiguration.class)
+@ContextConfiguration(classes = MutexAspectTest.Config.class)
 public class MutexAspectTest {
 
 	@Autowired
@@ -59,7 +59,7 @@ public class MutexAspectTest {
 
 	@Configuration
 	@EnableAspectJAutoProxy(proxyTargetClass = true)
-	static class MutexConfiguration {
+	static class Config {
 
 		@Bean
 		public LockService lockService() {

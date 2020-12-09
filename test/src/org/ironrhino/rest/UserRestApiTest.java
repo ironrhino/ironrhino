@@ -67,7 +67,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
-@ContextConfiguration(classes = UserRestApiTest.UserRestApiConfiguration.class)
+@ContextConfiguration(classes = UserRestApiTest.Config.class)
 public class UserRestApiTest {
 
 	@Autowired
@@ -358,7 +358,7 @@ public class UserRestApiTest {
 	@EnableWebMvc
 	@EnableWebSecurity
 	@EnableAspectJAutoProxy(proxyTargetClass = true)
-	static class UserRestApiConfiguration extends AbstractMockMvcConfigurer {
+	static class Config extends AbstractMockMvcConfigurer {
 
 		@Bean
 		public UserDetailsService userDetailsService() {

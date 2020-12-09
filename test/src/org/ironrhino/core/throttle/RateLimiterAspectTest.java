@@ -12,7 +12,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = RateLimiterAspectTest.RateLimiterConfiguration.class)
+@ContextConfiguration(classes = RateLimiterAspectTest.Config.class)
 public class RateLimiterAspectTest {
 
 	@Autowired
@@ -54,7 +54,7 @@ public class RateLimiterAspectTest {
 
 	@Configuration
 	@EnableAspectJAutoProxy(proxyTargetClass = true)
-	static class RateLimiterConfiguration {
+	static class Config {
 
 		@Bean
 		public TestService testService() {

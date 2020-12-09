@@ -17,7 +17,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.ResourceAccessException;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = RestApiPlaceholderTest.RestApiConfiguration.class)
+@ContextConfiguration(classes = RestApiPlaceholderTest.Config.class)
 @TestPropertySource(properties = { "testClient.apiBaseUrl=invalidprotocol://localhost" })
 public class RestApiPlaceholderTest {
 
@@ -36,7 +36,7 @@ public class RestApiPlaceholderTest {
 	}
 
 	@Configuration
-	static class RestApiConfiguration {
+	static class Config {
 
 		@Bean
 		public static RestApiRegistryPostProcessor restApiRegistryPostProcessor() {

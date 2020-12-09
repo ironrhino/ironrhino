@@ -9,11 +9,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = StandaloneLockServiceTest.StandaloneLockServiceConfiguration.class)
+@ContextConfiguration(classes = StandaloneLockServiceTest.Config.class)
 public class StandaloneLockServiceTest extends LockServiceTestBase {
 
 	@Configuration
-	static class StandaloneLockServiceConfiguration extends RedisConfiguration {
+	static class Config extends RedisConfiguration {
 
 		@Bean
 		public LockService lockService() {

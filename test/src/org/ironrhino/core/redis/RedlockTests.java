@@ -22,7 +22,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = RedlockTests.RedlockConfiguration.class)
+@ContextConfiguration(classes = RedlockTests.Config.class)
 @TestPropertySource(properties = "redlock.addresses=localhost")
 public class RedlockTests {
 
@@ -95,7 +95,7 @@ public class RedlockTests {
 	}
 
 	@Configuration
-	static class RedlockConfiguration {
+	static class Config {
 
 		@Bean
 		public Redlock redlock() {

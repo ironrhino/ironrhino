@@ -41,7 +41,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = HttpInvokerLoadBalanceTest.HttpInvokerConfiguration.class)
+@ContextConfiguration(classes = HttpInvokerLoadBalanceTest.Config.class)
 public class HttpInvokerLoadBalanceTest extends RedisServiceRegistryAdapter {
 
 	@Autowired
@@ -146,7 +146,7 @@ public class HttpInvokerLoadBalanceTest extends RedisServiceRegistryAdapter {
 		assertThat(getServiceUrl(barServiceClient), is(serviceUrl(normalizeHost(provider2), BarService.class)));
 	}
 
-	static class HttpInvokerConfiguration {
+	static class Config {
 
 		@Bean
 		@SuppressWarnings("unchecked")

@@ -29,7 +29,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = { VerificationTest.WebAuthnConfiguration.class, HibernateConfiguration.class })
+@ContextConfiguration(classes = { VerificationTest.Config.class, HibernateConfiguration.class })
 @TestPropertySource(properties = { "annotatedClasses=org.ironrhino.core.security.webauthn.model.WebAuthnCredential",
 		"hibernate.show_sql=true" })
 public class VerificationTest {
@@ -68,7 +68,7 @@ public class VerificationTest {
 	}
 
 	@Configuration
-	static class WebAuthnConfiguration {
+	static class Config {
 
 		@Bean
 		public DefaultWebAuthnService webAuthnService() {

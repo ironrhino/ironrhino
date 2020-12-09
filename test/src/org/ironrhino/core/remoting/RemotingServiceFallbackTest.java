@@ -28,7 +28,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = RemotingServiceFallbackTest.RemotingFallbackConfiguration.class)
+@ContextConfiguration(classes = RemotingServiceFallbackTest.Config.class)
 @TestPropertySource(properties = "org.ironrhino.core.remoting.RemotingServiceFallbackTest$EchoService"
 		+ HttpInvokerClient.BASE_URL_SUFFIX + "=http://localhost:8888")
 public class RemotingServiceFallbackTest {
@@ -70,7 +70,7 @@ public class RemotingServiceFallbackTest {
 	}
 
 	@Configuration
-	static class RemotingFallbackConfiguration {
+	static class Config {
 
 		@Bean
 		public static RemotingServiceRegistryPostProcessor remotingServiceRegistryPostProcessor() {

@@ -27,7 +27,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
-@ContextConfiguration(classes = LookupMethodTest.RestApiConfiguration.class)
+@ContextConfiguration(classes = LookupMethodTest.Config.class)
 public class LookupMethodTest {
 
 	@Autowired
@@ -53,7 +53,7 @@ public class LookupMethodTest {
 	}
 
 	@EnableWebMvc
-	static class RestApiConfiguration extends AbstractMockMvcConfigurer {
+	static class Config extends AbstractMockMvcConfigurer {
 
 		@Bean
 		public ArticleController articleController() {

@@ -55,7 +55,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
-@ContextConfiguration(classes = OAuth2ControllerTest.OAuth2Configuration.class)
+@ContextConfiguration(classes = OAuth2ControllerTest.Config.class)
 @TestPropertySource(properties = { "oauth.token.jwtEnabled=true",
 		"oauth.token.jwtExpiresIn=" + OAuth2ControllerTest.EXPIRES_IN })
 public class OAuth2ControllerTest {
@@ -334,7 +334,7 @@ public class OAuth2ControllerTest {
 	}
 
 	@EnableWebMvc
-	static class OAuth2Configuration extends AbstractMockMvcConfigurer {
+	static class Config extends AbstractMockMvcConfigurer {
 
 		@Bean
 		@Override

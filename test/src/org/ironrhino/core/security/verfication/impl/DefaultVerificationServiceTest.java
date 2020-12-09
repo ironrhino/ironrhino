@@ -27,7 +27,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = DefaultVerificationServiceTest.VerificationConfig.class)
+@ContextConfiguration(classes = DefaultVerificationServiceTest.Config.class)
 @TestPropertySource(properties = "verification.code.resend.interval=2")
 public class DefaultVerificationServiceTest {
 
@@ -86,7 +86,7 @@ public class DefaultVerificationServiceTest {
 		assertThat(verificationService.verify("testVerifyWithErrorCode", "testVerifyWithErrorCode"), is(false));
 	}
 
-	static class VerificationConfig {
+	static class Config {
 
 		@Bean
 		public VerificationService verificationService() {

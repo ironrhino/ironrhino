@@ -19,7 +19,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = CircuitBreakerAspectTest.CircuitBreakerConfiguration.class)
+@ContextConfiguration(classes = CircuitBreakerAspectTest.Config.class)
 public class CircuitBreakerAspectTest {
 
 	@Autowired
@@ -133,7 +133,7 @@ public class CircuitBreakerAspectTest {
 
 	@Configuration
 	@EnableAspectJAutoProxy(proxyTargetClass = true)
-	static class CircuitBreakerConfiguration {
+	static class Config {
 
 		@Bean
 		public EchoService echoService() {

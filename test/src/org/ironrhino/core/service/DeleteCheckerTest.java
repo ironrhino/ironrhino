@@ -15,7 +15,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = { HibernateConfiguration.class, DeleteCheckerTest.MyConfiguration.class })
+@ContextConfiguration(classes = { HibernateConfiguration.class, DeleteCheckerTest.Config.class })
 @TestPropertySource(properties = {
 		"annotatedClasses=org.ironrhino.core.service.Product,org.ironrhino.core.service.Category",
 		"hibernate.show_sql=true" })
@@ -64,7 +64,7 @@ public class DeleteCheckerTest {
 	}
 
 	@Configuration
-	static class MyConfiguration {
+	static class Config {
 
 		public DeleteChecker deleteChecker() {
 			return new DeleteChecker();

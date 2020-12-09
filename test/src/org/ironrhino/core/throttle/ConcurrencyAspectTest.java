@@ -21,7 +21,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = ConcurrencyAspectTest.ConcurrencyConfiguration.class)
+@ContextConfiguration(classes = ConcurrencyAspectTest.Config.class)
 public class ConcurrencyAspectTest {
 
 	@Autowired
@@ -71,7 +71,7 @@ public class ConcurrencyAspectTest {
 
 	@Configuration
 	@EnableAspectJAutoProxy(proxyTargetClass = true)
-	static class ConcurrencyConfiguration {
+	static class Config {
 
 		@Bean
 		public ConcurrencyService concurrencyService() {

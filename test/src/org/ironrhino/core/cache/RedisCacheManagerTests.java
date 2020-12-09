@@ -9,11 +9,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = RedisCacheManagerTests.RedisCacheManagerConfiguration.class)
+@ContextConfiguration(classes = RedisCacheManagerTests.Config.class)
 public class RedisCacheManagerTests extends CacheManagerTestBase {
 
 	@Configuration
-	static class RedisCacheManagerConfiguration extends RedisConfiguration {
+	static class Config extends RedisConfiguration {
 
 		@Bean
 		public CacheManager cacheManager() {

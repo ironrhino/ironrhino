@@ -60,7 +60,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
-@ContextConfiguration(classes = LoginActionTest.LoginActionConfig.class)
+@ContextConfiguration(classes = LoginActionTest.Config.class)
 @TestPropertySource(properties = "verification.code.enabled=true")
 public class LoginActionTest extends StrutsSpringJUnit4TestCase<LoginAction> {
 
@@ -251,7 +251,7 @@ public class LoginActionTest extends StrutsSpringJUnit4TestCase<LoginAction> {
 
 	@Configuration
 	@Import(CommonConfiguration.class)
-	static class LoginActionConfig {
+	static class Config {
 
 		@Bean
 		public FreemarkerConfigurer freemarkerConfigurer() {

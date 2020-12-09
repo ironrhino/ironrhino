@@ -17,7 +17,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = RecordAspectTest.RecordAspectConfiguration.class)
+@ContextConfiguration(classes = RecordAspectTest.Config.class)
 @TestPropertySource(properties = {
 		"annotatedClasses=org.ironrhino.common.record.Record,org.ironrhino.common.record.TestEntity" })
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -60,7 +60,7 @@ public class RecordAspectTest {
 	}
 
 	@Configuration
-	static class RecordAspectConfiguration extends HibernateConfiguration {
+	static class Config extends HibernateConfiguration {
 
 		@Bean
 		public EventListenerForRecord eventListenerForRecord() {

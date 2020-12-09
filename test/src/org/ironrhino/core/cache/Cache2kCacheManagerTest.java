@@ -8,11 +8,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = Cache2kCacheManagerTest.Cache2kCacheManagerConfiguration.class)
+@ContextConfiguration(classes = Cache2kCacheManagerTest.Config.class)
 public class Cache2kCacheManagerTest extends CacheManagerTestBase {
 
 	@Configuration
-	static class Cache2kCacheManagerConfiguration {
+	static class Config {
 
 		@Bean
 		public CacheManager cacheManager() {

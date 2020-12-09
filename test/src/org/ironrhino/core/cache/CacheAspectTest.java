@@ -36,7 +36,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = CacheAspectTest.CacheConfiguration.class)
+@ContextConfiguration(classes = CacheAspectTest.Config.class)
 @TestPropertySource(properties = AnotherPersonRepository.KEY_CACHE_NAMESPACE + "="
 		+ CacheAspectTest.CUSTOMIZED_CACHE_NAMESPACE)
 public class CacheAspectTest {
@@ -265,7 +265,7 @@ public class CacheAspectTest {
 
 	@Configuration
 	@EnableAspectJAutoProxy(proxyTargetClass = true)
-	static class CacheConfiguration {
+	static class Config {
 
 		@Bean
 		public CacheManager cacheManager() {

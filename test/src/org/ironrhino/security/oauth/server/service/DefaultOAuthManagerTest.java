@@ -27,7 +27,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = DefaultOAuthManagerTest.OAuthManagerConfig.class)
+@ContextConfiguration(classes = DefaultOAuthManagerTest.Config.class)
 @TestPropertySource(properties = { "oauth.authorization.maximumDevices=1" })
 public class DefaultOAuthManagerTest {
 
@@ -157,7 +157,7 @@ public class DefaultOAuthManagerTest {
 		return client;
 	}
 
-	static class OAuthManagerConfig {
+	static class Config {
 
 		@Bean
 		public OAuthManager oauthManager() {

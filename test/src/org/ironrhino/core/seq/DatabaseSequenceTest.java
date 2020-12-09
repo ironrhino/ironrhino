@@ -15,12 +15,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = DatabaseSequenceTest.DatabaseSequenceConfiguration.class)
+@ContextConfiguration(classes = DatabaseSequenceTest.Config.class)
 public class DatabaseSequenceTest extends SequenceTestBase {
 
 	@Configuration
 	@Import(DataSourceConfiguration.class)
-	static class DatabaseSequenceConfiguration {
+	static class Config {
 
 		@Bean
 		public Sequence sample1Sequence(DataSource dataSource) {

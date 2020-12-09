@@ -40,7 +40,7 @@ import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = JavaRemotingServiceTests.RemotingConfiguration.class)
+@ContextConfiguration(classes = JavaRemotingServiceTests.Config.class)
 @TestPropertySource(properties = "httpInvoker.serializationType=JAVA")
 public class JavaRemotingServiceTests {
 
@@ -319,7 +319,7 @@ public class JavaRemotingServiceTests {
 	}
 
 	@Configuration
-	static class RemotingConfiguration {
+	static class Config {
 
 		@Bean
 		public HttpInvokerClient testService() {

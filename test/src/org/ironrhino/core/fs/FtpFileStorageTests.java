@@ -22,7 +22,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = FtpFileStorageTests.FtpFileStorageConfiguration.class)
+@ContextConfiguration(classes = FtpFileStorageTests.Config.class)
 @TestPropertySource(properties = { "fileStorage.uri=ftp://admin:admin@localhost:2121/temp", "ftp.pool.maxTotal=5",
 		"ftp.dataTimeout=30000", "ftp.bufferThreshold=8" })
 public class FtpFileStorageTests extends FileStorageTestBase {
@@ -66,7 +66,7 @@ public class FtpFileStorageTests extends FileStorageTestBase {
 	}
 
 	@Configuration
-	static class FtpFileStorageConfiguration {
+	static class Config {
 
 		@Bean
 		public FileStorage fileStorage() {

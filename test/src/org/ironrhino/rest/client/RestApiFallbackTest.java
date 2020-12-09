@@ -26,7 +26,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.ResourceAccessException;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = RestApiFallbackTest.RestApiConfiguration.class)
+@ContextConfiguration(classes = RestApiFallbackTest.Config.class)
 @TestPropertySource(properties = { "org.ironrhino.rest.client.TestClient.apiBaseUrl=http://localhost/api" })
 public class RestApiFallbackTest {
 
@@ -57,7 +57,7 @@ public class RestApiFallbackTest {
 	}
 
 	@Configuration
-	static class RestApiConfiguration {
+	static class Config {
 
 		@Bean
 		public static RestApiRegistryPostProcessor restApiRegistryPostProcessor() {

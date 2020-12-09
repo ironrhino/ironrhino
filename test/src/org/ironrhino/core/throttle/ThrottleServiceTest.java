@@ -24,7 +24,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = ThrottleServiceTest.ConcurrencyConfiguration.class)
+@ContextConfiguration(classes = ThrottleServiceTest.Config.class)
 public class ThrottleServiceTest {
 
 	@Autowired
@@ -54,7 +54,7 @@ public class ThrottleServiceTest {
 
 	@Configuration
 	@EnableAspectJAutoProxy(proxyTargetClass = true)
-	static class ConcurrencyConfiguration {
+	static class Config {
 
 		@Bean
 		public CacheManager cacheManager() {

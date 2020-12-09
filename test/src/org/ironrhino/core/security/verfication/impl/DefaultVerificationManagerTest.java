@@ -22,7 +22,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = DefaultVerificationManagerTest.VerificationConfig.class)
+@ContextConfiguration(classes = DefaultVerificationManagerTest.Config.class)
 public class DefaultVerificationManagerTest {
 
 	@Autowired
@@ -111,7 +111,7 @@ public class DefaultVerificationManagerTest {
 		then(verificationService).should().verify("test", "verificationCode");
 	}
 
-	static class VerificationConfig {
+	static class Config {
 
 		@Bean
 		public VerificationManager verificationManager() {

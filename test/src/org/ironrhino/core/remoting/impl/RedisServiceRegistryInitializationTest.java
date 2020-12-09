@@ -33,7 +33,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = RedisServiceRegistryInitializationTest.RedisServiceRegistryInitialConfiguration.class)
+@ContextConfiguration(classes = RedisServiceRegistryInitializationTest.Config.class)
 @TestPropertySource(properties = { "org.ironrhino.sample.remoting.FooService.description=FooService Test" })
 public class RedisServiceRegistryInitializationTest extends RedisServiceRegistryAdapter {
 
@@ -76,7 +76,7 @@ public class RedisServiceRegistryInitializationTest extends RedisServiceRegistry
 				eq(Scope.GLOBAL));
 	}
 
-	static class RedisServiceRegistryInitialConfiguration {
+	static class Config {
 
 		@Bean
 		@SuppressWarnings("unchecked")

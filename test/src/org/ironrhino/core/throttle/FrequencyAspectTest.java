@@ -22,7 +22,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = FrequencyAspectTest.FrequencyConfiguration.class)
+@ContextConfiguration(classes = FrequencyAspectTest.Config.class)
 public class FrequencyAspectTest {
 
 	@Autowired
@@ -83,7 +83,7 @@ public class FrequencyAspectTest {
 
 	@Configuration
 	@EnableAspectJAutoProxy(proxyTargetClass = true)
-	static class FrequencyConfiguration {
+	static class Config {
 
 		@Bean
 		public CacheManager cacheManager() {

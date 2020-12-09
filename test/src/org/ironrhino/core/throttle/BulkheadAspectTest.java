@@ -20,7 +20,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import io.github.resilience4j.bulkhead.BulkheadFullException;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = BulkheadAspectTest.BulkheadConfiguration.class)
+@ContextConfiguration(classes = BulkheadAspectTest.Config.class)
 public class BulkheadAspectTest {
 
 	@Autowired
@@ -99,7 +99,7 @@ public class BulkheadAspectTest {
 
 	@Configuration
 	@EnableAspectJAutoProxy(proxyTargetClass = true)
-	static class BulkheadConfiguration {
+	static class Config {
 
 		@Bean
 		public TestService testService() {

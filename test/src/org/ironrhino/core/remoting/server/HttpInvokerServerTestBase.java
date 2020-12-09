@@ -41,7 +41,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = HttpInvokerServerTestBase.HttpInvokerConfiguration.class)
+@ContextConfiguration(classes = HttpInvokerServerTestBase.Config.class)
 public abstract class HttpInvokerServerTestBase {
 
 	protected static MockHttpServletRequest mockHttpServletRequest;
@@ -55,7 +55,7 @@ public abstract class HttpInvokerServerTestBase {
 	}
 
 	@Configuration
-	static class HttpInvokerConfiguration {
+	static class Config {
 
 		@Bean
 		public RemotingServiceRegistryPostProcessor remotingServiceRegistryPostProcessor() {

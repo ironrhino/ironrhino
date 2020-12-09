@@ -12,11 +12,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = RedisSequenceTests.RedisSequenceConfiguration.class)
+@ContextConfiguration(classes = RedisSequenceTests.Config.class)
 public class RedisSequenceTests extends SequenceTestBase {
 
 	@Configuration
-	static class RedisSequenceConfiguration extends RedisConfiguration {
+	static class Config extends RedisConfiguration {
 
 		@Bean
 		public Sequence sample1Sequence() {
