@@ -547,7 +547,10 @@
 				<zipgroupfileset file="${lib.dir}/asm-*.jar" />
 				<zipgroupfileset file="${target.dir}/temp.jar" />
 			</zip>
-			<delete file="${target.dir}/temp.jar" />
+			<jar destfile="${target.dir}/temp.jar">
+				<zipfileset src="${target.dir}/bootstrap.jar" excludes="META-INF/services/org.eclipse.jetty.security.Authenticator$Factory" />
+			</jar>
+			<move file="${target.dir}/temp.jar" tofile="${target.dir}/bootstrap.jar"/>
 		</target>
 
 	</project>
