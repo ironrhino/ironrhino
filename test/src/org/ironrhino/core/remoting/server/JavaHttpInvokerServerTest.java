@@ -442,7 +442,7 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 			if (futureType == FutureType.RUNNABLE)
 				then(mockAsyncContext).should().start(any(Runnable.class));
 			then(mockAsyncContext).should().complete();
-			then(mockTestService).should().loadFutureUserByUsername("", futureType);
+			then(mockTestService).should(atLeast(1)).loadFutureUserByUsername("", futureType);
 			clearInvocations();
 		}
 	}
@@ -462,7 +462,7 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 				any(MethodInvocation.class));
 		then(mockHttpServletRequest).should().startAsync();
 		then(mockAsyncContext).should().complete();
-		then(mockTestService).should().loadListenableFutureUserByUsername("username");
+		then(mockTestService).should(atLeast(1)).loadListenableFutureUserByUsername("username");
 	}
 
 	@Test
@@ -495,7 +495,7 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 				any(MethodInvocation.class));
 		then(mockHttpServletRequest).should().startAsync();
 		then(mockAsyncContext).should().complete();
-		then(mockTestService).should().loadCompletableFutureUserByUsername("username");
+		then(mockTestService).should(atLeast(1)).loadCompletableFutureUserByUsername("username");
 	}
 
 	@Test
