@@ -35,7 +35,8 @@ public class FrequencyAspect extends BaseAspect {
 		}
 		long timestamp = System.currentTimeMillis();
 		long duration = frequency.timeUnit().toMillis(frequency.duration());
-		String actualKey = key + ":" + (timestamp - timestamp % duration);
+		long windowStart = (timestamp - timestamp % duration);
+		String actualKey = key + ":" + windowStart; // Fixed Window
 		int limits = ExpressionUtils.evalInt(frequency.limits(), context, 0);
 		int used = (int) cacheManager.increment(actualKey, 1, frequency.duration(), frequency.timeUnit(), NAMESPACE);
 		if (limits >= used) {
