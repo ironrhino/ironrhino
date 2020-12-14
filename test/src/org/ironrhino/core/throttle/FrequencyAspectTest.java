@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.cache.impl.Cache2kCacheManager;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +26,42 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ContextConfiguration(classes = FrequencyAspectTest.Config.class)
 public class FrequencyAspectTest {
 
+	private static final int LIMITS = 5;
+
 	@Autowired
 	private EchoService echoService;
 
+	@Autowired
+	private Cache2kCacheManager cacheManager;
+
+	@Before
+	public void before() {
+		cacheManager.invalidate("frequency");
+	}
+
+	@Test
+	public void testSequentialUnderLmimit() throws Throwable {
+		for (int i = 0; i < LIMITS; i++)
+			echoService.echo("test");
+	}
+
 	@Test(expected = FrequencyLimitExceededException.class)
-	public void test() throws Throwable {
-		int concurrency = 10;
+	public void testSequentialBeyondLmimit() throws Throwable {
+		for (int i = 0; i < 2 * LIMITS; i++)
+			echoService.echo("test");
+	}
+
+	@Test
+	public void testSequentialBeyondLmimitButWithDelay() throws Throwable {
+		for (int i = 0; i < 2 * LIMITS; i++) {
+			Thread.sleep(400);
+			echoService.echo("test");
+		}
+	}
+
+	@Test(expected = FrequencyLimitExceededException.class)
+	public void testConcurrent() throws Throwable {
+		int concurrency = LIMITS + 1;
 		ExecutorService es = Executors.newFixedThreadPool(concurrency);
 		Collection<Callable<String>> tasks = new ArrayList<>();
 		for (int i = 0; i < concurrency; i++)
@@ -49,13 +80,13 @@ public class FrequencyAspectTest {
 
 	@Test
 	public void testRecover() throws Throwable {
-		int concurrency = 10;
+		int concurrency = LIMITS + 1;
 		ExecutorService es = Executors.newFixedThreadPool(concurrency);
 		Collection<Callable<String>> tasks = new ArrayList<>();
-		for (int i = 0; i < concurrency; i++)
+		for (int i = 0; i < LIMITS + 1; i++)
 			tasks.add(() -> echoService.echo("test"));
 		List<Future<String>> results = es.invokeAll(tasks);
-		Thread.sleep(2000);
+		Thread.sleep(2410);
 		tasks = new ArrayList<>();
 		for (int i = 0; i < concurrency / 2; i++)
 			tasks.add(() -> echoService.echo("test"));
@@ -73,9 +104,9 @@ public class FrequencyAspectTest {
 
 	public static class EchoService {
 
-		@Frequency(limits = "5", duration = 2, timeUnit = TimeUnit.SECONDS)
+		@Frequency(limits = "" + LIMITS, duration = 2, timeUnit = TimeUnit.SECONDS)
 		public String echo(String s) throws Exception {
-			Thread.sleep(100);
+			Thread.sleep(50);
 			return s;
 		}
 
