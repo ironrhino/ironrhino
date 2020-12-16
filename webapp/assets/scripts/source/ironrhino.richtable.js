@@ -275,7 +275,7 @@ Richtable = {
 			idparams = 'id=' + id;
 		} else {
 			var arr = [];
-			$('form.richtable tbody input[type="checkbox"]').each(function() {
+			$('tbody input[type="checkbox"]', form).each(function() {
 				if (this.checked) {
 					var _id = $(this).closest('tr').data('rowid') || this.value;
 					arr.push('id=' + _id);
