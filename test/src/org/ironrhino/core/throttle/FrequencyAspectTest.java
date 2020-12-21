@@ -86,7 +86,7 @@ public class FrequencyAspectTest {
 		for (int i = 0; i < LIMITS + 1; i++)
 			tasks.add(() -> echoService.echo("test"));
 		List<Future<String>> results = es.invokeAll(tasks);
-		Thread.sleep(2410);
+		Thread.sleep(3000);
 		tasks = new ArrayList<>();
 		for (int i = 0; i < concurrency / 2; i++)
 			tasks.add(() -> echoService.echo("test"));
