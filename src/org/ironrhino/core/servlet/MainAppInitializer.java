@@ -32,6 +32,7 @@ public class MainAppInitializer implements WebApplicationInitializer {
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
 		AppInfo.initialize();
+		ServletContainerHelper.setDisplayName(servletContext, AppInfo.getAppName());
 		SERVLET_CONTEXT = servletContext;
 		AppInfo.setContextPath(servletContext.getContextPath());
 

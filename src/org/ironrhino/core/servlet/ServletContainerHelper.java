@@ -1,6 +1,7 @@
 package org.ironrhino.core.servlet;
 
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Locale;
@@ -253,6 +254,43 @@ public class ServletContainerHelper {
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static void setDisplayName(ServletContext servletContext, String displayName) {
+		try {
+			Object displayNameHolder = null;
+			String className = servletContext.getClass().getName();
+			if (className.startsWith("org.apache.catalina.")) {
+				Object ctx = ReflectionUtils.getFieldValue(servletContext, "context");
+				try {
+					Method m = ctx.getClass().getDeclaredMethod("getContext");
+					m.setAccessible(true);
+					displayNameHolder = m.invoke(ctx);
+				} catch (NoSuchMethodException e) {
+					// tomcat7 or glassfish
+					displayNameHolder = ReflectionUtils.getFieldValue(ctx, "context");
+				}
+			} else if (className.startsWith("org.eclipse.jetty.")) {
+				displayNameHolder = ReflectionUtils.getFieldValue(servletContext, "this$0");
+			} else if (className.startsWith("io.undertow.servlet.")) {
+				Object deployment = servletContext.getClass().getMethod("getDeployment").invoke(servletContext);
+				displayNameHolder = deployment.getClass().getMethod("getDeploymentInfo").invoke(deployment);
+			} else if (className.startsWith("weblogic.servlet.")) {
+				displayNameHolder = servletContext;
+				Field f = displayNameHolder.getClass().getDeclaredField("displayName");
+				f.setAccessible(true);
+				f.set(displayNameHolder, displayName);
+				return;
+			} else if (className.startsWith("com.ibm.ws.")) {
+				displayNameHolder = ReflectionUtils.getFieldValue(servletContext, "webAppConfig");
+			}
+			if (displayNameHolder != null)
+				displayNameHolder.getClass().getMethod("setDisplayName", String.class).invoke(displayNameHolder,
+						displayName);
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 	}
 
 }
