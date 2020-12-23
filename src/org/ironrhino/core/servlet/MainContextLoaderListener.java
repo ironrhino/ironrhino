@@ -125,6 +125,8 @@ public class MainContextLoaderListener extends ContextLoaderListener {
 	}
 
 	private void cleanupThreadLocals(Thread thread) throws Exception {
+		if ("JettyShutdownThread".equals(thread.getName()))
+			return; // see https://github.com/eclipse/jetty.project/issues/5782
 		for (String name : "threadLocals,inheritableThreadLocals".split(",")) {
 			Field f = Thread.class.getDeclaredField(name);
 			f.setAccessible(true);
