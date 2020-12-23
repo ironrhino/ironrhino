@@ -442,6 +442,7 @@ public class AppInfo {
 					&& (System.getProperty("os.name") == null || !System.getProperty("os.name").startsWith("Windows"))
 							? "WARN"
 							: "INFO");
+		System.setProperty("log4j2.formatMsgNoLookups", String.valueOf(true));
 		String kafkaBootstrapServers = getRawApplicationContextProperties().getProperty("kafka.bootstrap.servers");
 		if (StringUtils.isNotBlank(kafkaBootstrapServers))
 			System.setProperty("kafka.bootstrap.servers", kafkaBootstrapServers);
