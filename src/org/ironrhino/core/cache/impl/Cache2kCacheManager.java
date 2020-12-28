@@ -15,8 +15,7 @@ import javax.annotation.PreDestroy;
 
 import org.apache.commons.lang3.StringUtils;
 import org.cache2k.Cache;
-import org.cache2k.CacheEntry;
-import org.cache2k.configuration.Cache2kConfiguration;
+import org.cache2k.Cache2kBuilder;
 import org.cache2k.expiry.ExpiryTimeValues;
 import org.cache2k.processor.EntryProcessingException;
 import org.ironrhino.core.cache.CacheManager;
@@ -50,7 +49,7 @@ public class Cache2kCacheManager implements CacheManager {
 		if (value == null)
 			throw new IllegalArgumentException("value should not be null");
 		Cache<String, Object> cache = getCache(namespace, true);
-		cache.invoke(key, e -> e.setValue(value).setExpiryTime(timeToLive == 0 ? ExpiryTimeValues.ETERNAL
+		cache.invoke(key, entry -> entry.setValue(value).setExpiryTime(timeToLive == 0 ? ExpiryTimeValues.ETERNAL
 				: (System.currentTimeMillis() + timeUnit.toMillis(timeToLive))));
 	}
 
@@ -81,8 +80,10 @@ public class Cache2kCacheManager implements CacheManager {
 		Cache<String, Object> cache = getCache(namespace, false);
 		if (cache == null)
 			return null;
-		if (timeToIdle > 0)
-			cache.expireAt(key, System.currentTimeMillis() + timeUnit.toMillis(timeToIdle));
+		if (timeToIdle > 0) {
+			return cache.invoke(key, entry -> entry
+					.setExpiryTime(System.currentTimeMillis() + timeUnit.toMillis(timeToIdle)).getValue());
+		}
 		return get(key, namespace);
 	}
 
@@ -99,7 +100,7 @@ public class Cache2kCacheManager implements CacheManager {
 			throw new IllegalArgumentException("timeToLive should be postive");
 		Cache<String, Object> cache = getCache(namespace, false);
 		if (cache != null)
-			cache.expireAt(key, System.currentTimeMillis() + timeUnit.toMillis(timeToLive));
+			cache.invoke(key, entry -> entry.setExpiryTime(System.currentTimeMillis() + timeUnit.toMillis(timeToLive)));
 	}
 
 	@Override
@@ -117,7 +118,7 @@ public class Cache2kCacheManager implements CacheManager {
 			throw new IllegalArgumentException("map should not be null");
 		Cache<String, Object> cache = getCache(namespace, true);
 		map.forEach((k, v) -> {
-			cache.invoke(k, e -> e.setValue(v).setExpiryTime(timeToLive == 0 ? ExpiryTimeValues.ETERNAL
+			cache.invoke(k, entry -> entry.setValue(v).setExpiryTime(timeToLive == 0 ? ExpiryTimeValues.ETERNAL
 					: (System.currentTimeMillis() + timeUnit.toMillis(timeToLive))));
 		});
 	}
@@ -152,8 +153,8 @@ public class Cache2kCacheManager implements CacheManager {
 		Cache<String, Object> cache = getCache(namespace, true);
 		boolean b = cache.putIfAbsent(key, value);
 		if (b)
-			cache.expireAt(key,
-					System.currentTimeMillis() + (timeToLive > 0 ? timeUnit.toMillis(timeToLive) : Integer.MAX_VALUE));
+			cache.invoke(key, entry -> entry.setExpiryTime(
+					System.currentTimeMillis() + (timeToLive > 0 ? timeUnit.toMillis(timeToLive) : Integer.MAX_VALUE)));
 		return b;
 	}
 
@@ -162,19 +163,20 @@ public class Cache2kCacheManager implements CacheManager {
 		if (key == null)
 			throw new IllegalArgumentException("key should not be null");
 		Cache<String, Object> cache = getCache(namespace, true);
-		CacheEntry<String, Object> ce = cache.invoke(key, e -> {
-			if (e.exists()) {
-				e.setValue((Long) e.getValue() + delta);
+		return cache.invoke(key, entry -> {
+			Long newValue;
+			if (entry.exists()) {
+				newValue = (Long) entry.getValue() + delta;
 				if (timeToLive > 0)
-					e.setExpiryTime(System.currentTimeMillis() + timeUnit.toMillis(timeToLive));
+					entry.setExpiryTime(System.currentTimeMillis() + timeUnit.toMillis(timeToLive));
 			} else {
-				e.setValue(delta);
-				e.setExpiryTime(System.currentTimeMillis()
+				newValue = delta;
+				entry.setExpiryTime(System.currentTimeMillis()
 						+ (timeToLive > 0 ? timeUnit.toMillis(timeToLive) : Integer.MAX_VALUE));
 			}
-			return e;
+			entry.setValue(newValue);
+			return newValue;
 		});
-		return (Long) ce.getValue();
 	}
 
 	@Override
@@ -186,20 +188,20 @@ public class Cache2kCacheManager implements CacheManager {
 			throw new IllegalArgumentException("delta should great than 0");
 		Cache<String, Object> cache = getCache(namespace, true);
 		try {
-			CacheEntry<String, Object> ce = cache.invoke(key, e -> {
-				if (e.exists()) {
-					if ((Long) e.getValue() < delta)
+			return cache.invoke(key, entry -> {
+				if (entry.exists()) {
+					if ((Long) entry.getValue() < delta)
 						throw new IllegalStateException(
 								"namespace:" + namespace + ", key:" + key + " is less than " + delta);
-					e.setValue((Long) e.getValue() - delta);
+					Long newValue = (Long) entry.getValue() - delta;
+					entry.setValue(newValue);
 					if (timeToLive > 0)
-						e.setExpiryTime(System.currentTimeMillis() + timeUnit.toMillis(timeToLive));
+						entry.setExpiryTime(System.currentTimeMillis() + timeUnit.toMillis(timeToLive));
+					return newValue;
 				} else {
 					throw new IllegalStateException("namespace:" + namespace + ", key:" + key + " does not exist");
 				}
-				return e;
 			});
-			return (Long) ce.getValue();
 		} catch (EntryProcessingException e) {
 			if (e.getCause() instanceof IllegalStateException)
 				throw (IllegalStateException) e.getCause();
@@ -235,11 +237,9 @@ public class Cache2kCacheManager implements CacheManager {
 			synchronized (this) {
 				cache = cache2kCacheManager.getCache(namespace);
 				if (cache == null) {
-					Cache2kConfiguration<String, Object> cfg = Cache2kConfiguration.of(String.class, Object.class);
-					cfg.setName(namespace);
-					cfg.setExpireAfterWrite(3600 * 1000);
-					cfg.setEntryCapacity(10000);
-					cache = cache2kCacheManager.createCache(cfg);
+					cache = cache2kCacheManager
+							.createCache(Cache2kBuilder.of(String.class, Object.class).name(namespace)
+									.expireAfterWrite(1, TimeUnit.HOURS).entryCapacity(10000).toConfiguration());
 				}
 			}
 		}
