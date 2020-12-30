@@ -1,5 +1,7 @@
 package org.ironrhino.common.model;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -60,6 +62,18 @@ public class Setting extends BaseRecordableEntity {
 	public Setting(String key, String value) {
 		this.key = key;
 		this.value = value;
+	}
+
+	@Override
+	@UiConfig(displayOrder = 99, width = "130px")
+	public Date getCreateDate() {
+		return super.getCreateDate();
+	}
+
+	@Override
+	@UiConfig(displayOrder = 100, width = "130px")
+	public Date getModifyDate() {
+		return super.getModifyDate();
 	}
 
 }
