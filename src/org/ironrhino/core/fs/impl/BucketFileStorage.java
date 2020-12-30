@@ -36,6 +36,10 @@ public abstract class BucketFileStorage extends AbstractFileStorage {
 		return null;
 	}
 
+	protected boolean isHierarchicalDirectory() {
+		return false;
+	}
+
 	protected String normalizePath(String path) {
 		return FileUtils.normalizePath(org.springframework.util.StringUtils.trimLeadingCharacter(path, '/'));
 	}
@@ -44,16 +48,18 @@ public abstract class BucketFileStorage extends AbstractFileStorage {
 	public boolean mkdir(String path) {
 		if (path.isEmpty() || path.equals("/") || isDirectory(path))
 			return true;
-		path = normalizePath(path);
-		int lastIndex = path.lastIndexOf('/');
-		if (lastIndex > 0) {
-			int index = 0;
-			while (index < lastIndex) {
-				index = path.indexOf('/', index + 1);
-				if (index < 0)
-					break;
-				if (!doMkdir(path.substring(0, index)))
-					return false;
+		if (!isHierarchicalDirectory()) {
+			path = normalizePath(path);
+			int lastIndex = path.lastIndexOf('/');
+			if (lastIndex > 0) {
+				int index = 0;
+				while (index < lastIndex) {
+					index = path.indexOf('/', index + 1);
+					if (index < 0)
+						break;
+					if (!doMkdir(path.substring(0, index)))
+						return false;
+				}
 			}
 		}
 		return doMkdir(path);
@@ -66,9 +72,11 @@ public abstract class BucketFileStorage extends AbstractFileStorage {
 		if (path.isEmpty() || path.endsWith("/"))
 			throw new ErrorMessage("path " + path + " is directory");
 		path = normalizePath(path);
-		int lastIndex = path.lastIndexOf('/');
-		if (lastIndex > 0)
-			mkdir(path.substring(0, lastIndex));
+		if (!isHierarchicalDirectory()) {
+			int lastIndex = path.lastIndexOf('/');
+			if (lastIndex > 0)
+				mkdir(path.substring(0, lastIndex));
+		}
 		if (contentLength < 0) {
 			if (is instanceof ByteArrayInputStream)
 				contentLength = ((ByteArrayInputStream) is).available();
