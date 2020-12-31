@@ -144,6 +144,8 @@
 			${getText(value?c)}
 			<#elseif value?is_unknown_date_like>
 			${value?datetime}
+			<#elseif value?is_datetime>
+			<span title="${value?string.iso}">${value?datetime}</span>
 			<#else>
 			${value?string!}
 			</#if>
