@@ -46,10 +46,12 @@ public abstract class BucketFileStorage extends AbstractFileStorage {
 
 	@Override
 	public boolean mkdir(String path) {
-		if (path.isEmpty() || path.equals("/") || isDirectory(path))
+		path = normalizePath(path);
+		if (!path.endsWith("/"))
+			path += "/";
+		if (path.equals("/") || isDirectory(path))
 			return true;
 		if (!isHierarchicalDirectory()) {
-			path = normalizePath(path);
 			int lastIndex = path.lastIndexOf('/');
 			if (lastIndex > 0) {
 				int index = 0;
@@ -57,12 +59,14 @@ public abstract class BucketFileStorage extends AbstractFileStorage {
 					index = path.indexOf('/', index + 1);
 					if (index < 0)
 						break;
-					if (!doMkdir(path.substring(0, index)))
+					if (!doMkdir(path.substring(0, index + 1)))
 						return false;
 				}
 			}
+			return true;
+		} else {
+			return doMkdir(path);
 		}
-		return doMkdir(path);
 	}
 
 	protected abstract boolean doMkdir(String path);
