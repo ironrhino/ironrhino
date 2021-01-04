@@ -65,7 +65,7 @@ public abstract class FileStorageTestBase {
 	}
 
 	@Test
-	public void testRenmaeFile() throws IOException {
+	public void testRenameFile() throws IOException {
 		String text = "test";
 		String path = "/test/test2/test.txt";
 		String path2 = "/test/test2/test2.txt";
