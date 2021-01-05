@@ -1,7 +1,6 @@
 package org.ironrhino.core.fs;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -116,36 +115,45 @@ public abstract class FileStorageTestBase {
 
 	@Test
 	public void testListFilesWithMarker() throws IOException {
+		String dir = "/test";
+
+		// prepare
 		String text = "test";
 		for (int i = 0; i < 5; i++)
-			fs.mkdir("/test/testdir" + i);
+			fs.mkdir(dir + "/testdir" + i);
 		for (int i = 0; i < 5; i++)
-			writeToFile(fs, text, "/test/test" + i + ".txt");
-		Paged<FileInfo> paged = fs.listFiles("/test", 2, null);
-		assertThat(paged.getMarker(), is(nullValue()));
-		assertThat(paged.getNextMarker(), is(notNullValue()));
-		assertThat(paged.getResult().size(), is(2));
-		paged = fs.listFiles("/test", 2, paged.getNextMarker());
-		assertThat(paged.getMarker(), is(notNullValue()));
-		assertThat(paged.getNextMarker(), is(notNullValue()));
-		assertThat(paged.getResult().size(), is(2));
-		paged = fs.listFiles("/test", 2, paged.getNextMarker());
-		assertThat(paged.getMarker(), is(notNullValue()));
-		// assertNull(paged.getNextMarker());
-		assertThat(paged.getResult().size(), is(1));
-		Paged<FileInfo> paged2 = fs.listFilesAndDirectory("/test", 5, null);
-		assertThat(paged2.getMarker(), is(nullValue()));
-		assertThat(paged2.getNextMarker(), is(notNullValue()));
-		assertThat(paged2.getResult().size(), is(5));
-		paged2 = fs.listFilesAndDirectory("/test", 5, paged2.getNextMarker());
-		assertThat(paged2.getMarker(), is(notNullValue()));
-		assertThat(paged2.getNextMarker(), is(nullValue()));
-		assertThat(paged2.getResult().size(), is(5));
+			writeToFile(fs, text, dir + "/test" + i + ".txt");
+
+		int total = 0;
+		int limit = 2;
+		Paged<FileInfo> paged;
+		String marker = null;
+		do {
+			paged = fs.listFiles(dir, limit, marker);
+			marker = paged.getNextMarker();
+			int size = paged.getResult().size();
+			total += size;
+			assertThat(size <= limit, is(true));
+		} while (marker != null);
+		assertThat(total, is(5));
+
+		total = 0;
+		limit = 5;
+		do {
+			paged = fs.listFilesAndDirectory(dir, limit, marker);
+			marker = paged.getNextMarker();
+			int size = paged.getResult().size();
+			total += size;
+			assertThat(size <= limit, is(true));
+		} while (marker != null);
+		assertThat(total, is(10));
+
+		// cleanup
 		for (int i = 0; i < 5; i++)
-			fs.delete("/test/test" + i + ".txt");
+			fs.delete(dir + "/test" + i + ".txt");
 		for (int i = 0; i < 5; i++)
-			fs.delete("/test/testdir" + i);
-		fs.delete("/test");
+			fs.delete(dir + "/testdir" + i);
+		fs.delete(dir);
 	}
 
 	private static boolean isFile(List<FileInfo> files, String name) {
