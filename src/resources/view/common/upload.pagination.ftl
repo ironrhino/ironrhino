@@ -3,8 +3,8 @@
 <#assign view=.main_template_name?keep_after_last('_')?keep_before('.')/>
 <#assign baseurl= actionBaseUrl+'/'+view+folderEncoded/>
 <#if limit??><#assign baseurl+=('?limit='+limit)/></#if>
-<tr>
-	<td colspan="4" class="center">
+<tr class="toolbar">
+	<td colspan="4" class="pagination keyset center">
 	<#if marker?has_content>
 	<#assign _url=baseurl>
 	<#if previousMarker?has_content>
