@@ -107,6 +107,14 @@ public class UploadAction extends BaseAction {
 	@Setter
 	private String suffix;
 
+	public void setM(String m) {
+		this.marker = m;
+	}
+
+	public void setPm(String pm) {
+		this.previousMarker = pm;
+	}
+
 	public String getFolderEncoded() {
 		if (folderEncoded == null) {
 			if (folder != null) {
