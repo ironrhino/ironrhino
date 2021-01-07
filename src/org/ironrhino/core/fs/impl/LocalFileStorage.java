@@ -102,7 +102,7 @@ public class LocalFileStorage extends AbstractFileStorage {
 		if (source.getParent().equals(target.getParent())) {
 			return source.renameTo(target);
 		} else {
-			return false;
+			return target.getParentFile().mkdirs() && source.renameTo(target);
 		}
 	}
 

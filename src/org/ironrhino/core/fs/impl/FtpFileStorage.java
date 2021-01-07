@@ -339,16 +339,16 @@ public class FtpFileStorage extends AbstractFileStorage {
 
 	@Override
 	public boolean rename(String fromPath, String toPath) {
+		String fromPath_ = FileUtils.normalizePath(fromPath);
+		String toPath_ = FileUtils.normalizePath(toPath);
+		int index = fromPath_.lastIndexOf('/');
+		String parentFrom = index > 0 ? fromPath_.substring(0, index + 1) : "/";
+		index = toPath_.lastIndexOf('/');
+		String parentTo = index > 0 ? toPath_.substring(0, index + 1) : "/";
+		if (!parentFrom.startsWith(parentTo))
+			mkdir(parentTo);
 		return executeWrapped(ftpClient -> {
-			String _fromPath = getPathname(fromPath, ftpClient);
-			String _toPath = getPathname(toPath, ftpClient);
-			String s1 = _fromPath.substring(0, _fromPath.lastIndexOf('/'));
-			String s2 = _toPath.substring(0, _toPath.lastIndexOf('/'));
-			if (!s1.equals(s2))
-				return false;
-			ftpClient.changeWorkingDirectory(s1);
-			return ftpClient.rename(_fromPath.substring(_fromPath.lastIndexOf('/') + 1),
-					_toPath.substring(_toPath.lastIndexOf('/') + 1));
+			return ftpClient.rename(getPathname(fromPath_, ftpClient), getPathname(toPath_, ftpClient));
 		});
 	}
 

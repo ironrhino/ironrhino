@@ -23,7 +23,7 @@ public abstract class FileStorageTestBase {
 
 	@Before
 	public void cleanup() {
-		// delete(fs, "/");
+		delete(fs, "/");
 	}
 
 	@Test
@@ -68,12 +68,19 @@ public abstract class FileStorageTestBase {
 		String text = "test";
 		String path = "/test/test2/test.txt";
 		String path2 = "/test/test2/test2.txt";
+		String path3 = "/test/test3/test3.txt";
 		writeToFile(fs, text, path);
 		assertThat(fs.rename(path, path2), is(true));
 		assertThat(fs.exists(path), is(false));
 		assertThat(fs.exists(path2), is(true));
-		fs.delete(path2);
-		fs.delete("/test/test2/");
+		assertThat(fs.isDirectory(path2.substring(0, path2.lastIndexOf('/'))), is(true));
+		assertThat(fs.rename(path2, path3), is(true));
+		assertThat(fs.exists(path2), is(false));
+		assertThat(fs.exists(path3), is(true));
+		assertThat(fs.isDirectory(path3.substring(0, path3.lastIndexOf('/'))), is(true));
+		fs.delete(path3);
+		fs.delete(path3.substring(0, path3.lastIndexOf('/')));
+		fs.delete(path2.substring(0, path2.lastIndexOf('/')));
 		fs.delete("/test/");
 	}
 
@@ -83,13 +90,13 @@ public abstract class FileStorageTestBase {
 		List<FileInfo> files = fs.listFiles("/");
 		assertThat(files.isEmpty(), is(true));
 		List<FileInfo> fileList = fs.listFilesAndDirectory("/");
-		assertThat(fileList.size() == 1, is(true));
+		assertThat(fileList.size(), is(1));
 		assertThat(isFile(fileList, "test"), is(false));
 		writeToFile(fs, "test", "/test.txt");
 		files = fs.listFiles("/");
-		assertThat(files.size() == 1, is(true));
+		assertThat(files.size(), is(1));
 		fileList = fs.listFilesAndDirectory("/");
-		assertThat(fileList.size() == 2, is(true));
+		assertThat(fileList.size(), is(2));
 		assertThat(isFile(fileList, "test.txt"), is(true));
 		assertThat(isFile(fileList, "test"), is(false));
 
@@ -97,13 +104,13 @@ public abstract class FileStorageTestBase {
 		files = fs.listFiles("/test");
 		assertThat(files.isEmpty(), is(true));
 		fileList = fs.listFilesAndDirectory("/test");
-		assertThat(fileList.size() == 1, is(true));
+		assertThat(fileList.size(), is(1));
 		assertThat(isFile(fileList, "test2"), is(false));
 		writeToFile(fs, "test", "/test/test.txt");
 		files = fs.listFiles("/test");
-		assertThat(files.size() == 1, is(true));
+		assertThat(files.size(), is(1));
 		fileList = fs.listFilesAndDirectory("/test");
-		assertThat(fileList.size() == 2, is(true));
+		assertThat(fileList.size(), is(2));
 		assertThat(isFile(fileList, "test.txt"), is(true));
 		assertThat(isFile(fileList, "test2"), is(false));
 
