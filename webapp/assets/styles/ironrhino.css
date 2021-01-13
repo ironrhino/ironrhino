@@ -10025,7 +10025,7 @@ a.remove:empty:after , .close:empty:after {
 	overflow: hidden ! important;
 }
 
-[data-shown] {
+[data-shown]:not(.selected) {
 	display: none;
 }
 

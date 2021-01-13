@@ -141,6 +141,7 @@
 
 						}
 					});
+					var classes = 'selected btn-primary';
 					t.is('[data-shown="selected"]')
 						&& (!allmatch || count == rows.length)
 						&& count > 0
@@ -151,8 +152,8 @@
 						|| t.is('[data-shown="multiselected"]')
 						&& (!allmatch || count == rows.length)
 						&& count > 1 ? t
-							.addClass('btn-primary').show() : t
-								.removeClass('btn-primary').hide();
+							.addClass(classes) : t
+								.removeClass(classes);
 				});
 			});
 	});
