@@ -9,7 +9,6 @@ import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 
-import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.BeansException;
@@ -33,7 +32,7 @@ import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
 @Order(0)
 @Configuration
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-@ClassPresentConditional("io.micrometer.core.instrument.Metrics")
+@MicrometerPresent
 public class MetricsConfiguration {
 
 	@Autowired(required = false)

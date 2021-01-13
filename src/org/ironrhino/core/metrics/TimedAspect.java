@@ -11,7 +11,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.ironrhino.core.aop.BaseAspect;
 import org.ironrhino.core.spring.NameGenerator;
-import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.ironrhino.core.util.CheckedCallable;
 import org.ironrhino.core.util.ExpressionUtils;
 import org.springframework.core.Ordered;
@@ -27,7 +26,7 @@ import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Timer;
 
 @Aspect
-@ClassPresentConditional("io.micrometer.core.instrument.Metrics")
+@MicrometerPresent
 public class TimedAspect extends BaseAspect {
 
 	public TimedAspect() {

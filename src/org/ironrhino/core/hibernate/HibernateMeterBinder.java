@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.hibernate.SessionFactory;
+import org.ironrhino.core.metrics.MicrometerPresent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +14,7 @@ import io.micrometer.core.instrument.binder.jpa.HibernateMetrics;
 
 @Component
 @HibernateEnabled
+@MicrometerPresent
 public class HibernateMeterBinder implements MeterBinder {
 
 	@Autowired

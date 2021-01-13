@@ -14,6 +14,7 @@ import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.ironrhino.core.metrics.KafkaConsumerMetrics;
+import org.ironrhino.core.metrics.MicrometerPresent;
 import org.ironrhino.core.spring.DefaultPropertiesProvider;
 import org.ironrhino.core.tracing.Tracing;
 import org.ironrhino.core.util.AppInfo;
@@ -62,7 +63,7 @@ public class KafkaConsumerConfigBase implements DefaultPropertiesProvider {
 	}
 
 	@Bean
-	@ClassPresentConditional("io.micrometer.core.instrument.Metrics")
+	@MicrometerPresent
 	public KafkaConsumerMetrics kafkaConsumerMetrics() {
 		return new KafkaConsumerMetrics();
 	}

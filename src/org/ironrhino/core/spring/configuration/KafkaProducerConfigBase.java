@@ -10,6 +10,7 @@ import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.ironrhino.core.metrics.KafkaProducerMetrics;
+import org.ironrhino.core.metrics.MicrometerPresent;
 import org.ironrhino.core.spring.DefaultPropertiesProvider;
 import org.ironrhino.core.tracing.Tracing;
 import org.ironrhino.core.util.AppInfo;
@@ -53,7 +54,7 @@ public class KafkaProducerConfigBase implements DefaultPropertiesProvider {
 	}
 
 	@Bean
-	@ClassPresentConditional("io.micrometer.core.instrument.Metrics")
+	@MicrometerPresent
 	public KafkaProducerMetrics kafkaProducerMetrics() {
 		return new KafkaProducerMetrics();
 	}

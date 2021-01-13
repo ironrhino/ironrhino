@@ -13,6 +13,7 @@ import javax.servlet.ServletRegistration;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.freemarker.FreemarkerConfigurer;
+import org.ironrhino.core.metrics.MicrometerPresent;
 import org.ironrhino.core.spring.configuration.ClassPresentConditional;
 import org.ironrhino.core.spring.converter.DateConverter;
 import org.ironrhino.core.spring.converter.LocalDateConverter;
@@ -275,7 +276,7 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 	}
 
 	@Bean
-	@ClassPresentConditional("io.micrometer.core.instrument.Metrics")
+	@MicrometerPresent
 	protected MetricsAspect metricsAspect() {
 		return new MetricsAspect(getServletMapping());
 	}
