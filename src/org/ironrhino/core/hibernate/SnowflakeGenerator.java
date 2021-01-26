@@ -11,9 +11,10 @@ import org.springframework.stereotype.Component;
 @HibernateEnabled
 public class SnowflakeGenerator implements IdentifierGenerator {
 
+	private final Snowflake snowflake = Snowflake.DEFAULT_INSTANCE;
+
 	@Override
 	public Serializable generate(SharedSessionContractImplementor session, Object obj) {
-		Snowflake snowflake = Snowflake.DEFAULT_INSTANCE;
 		Class<?> idType = session.getFactory().getMetamodel().entity(obj.getClass()).getIdType().getJavaType();
 		return idType == String.class ? snowflake.nextBase62Id() : snowflake.nextId();
 	}
