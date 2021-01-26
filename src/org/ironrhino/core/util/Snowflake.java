@@ -9,31 +9,47 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Snowflake {
 
+	public static final Snowflake DEFAULT_INSTANCE;
+
 	private final static long EPOCH = 1556150400000L;
 	private final static Random RANDOM = new Random();
-
 	private final int workerId;
-	private final long workerIdBits;
-	private final long sequenceBits;
+	private final int workerIdBits;
+	private final int sequenceBits;
 	private final long sequenceMask;
-
 	private long sequence = 0L;
 	private long lastTimestamp = -1L;
 
-	public static final Snowflake DEFAULT_INSTANCE;
-
 	static {
 		int workerId = 0;
+		int workerIdBits = 8;
+		int sequenceBits = 10;
 		String id = AppInfo.getEnv("worker.id");
 		if (id == null) {
 			String ip = AppInfo.getHostAddress();
-			id = ip.substring(ip.lastIndexOf('.') + 1);
+			int index = ip.lastIndexOf('.');
+			if (index > 0) {
+				id = ip.substring(index + 1);
+			} else {
+				// IPv6
+				index = ip.lastIndexOf(':');
+				if (index > 0) {
+					workerIdBits = 16;
+					id = ip.substring(index + 1);
+					if (!StringUtils.isNumeric(id))
+						id = String.valueOf(NumberUtils.xToDecimal(16, id.toUpperCase()));
+				}
+			}
 		}
-		if (StringUtils.isNumeric(id)) {
-			workerId = Integer.parseInt(id);
+		if (id != null) {
+			try {
+				workerId = Integer.parseInt(id);
+			} catch (NumberFormatException e) {
+				throw new IllegalArgumentException("Snowflake worker id should be an integer", e);
+			}
 		}
 		log.info("Snowflake default instance worker id is {}", workerId);
-		DEFAULT_INSTANCE = new Snowflake(workerId);
+		DEFAULT_INSTANCE = new Snowflake(workerId, workerIdBits, sequenceBits);
 	}
 
 	public Snowflake(int workerId) {
