@@ -69,6 +69,7 @@ public class CriterionUtils {
 	}
 
 	public static Criterion like(String value, Map<String, MatchMode> map) {
+		value = value.replaceAll("\\%", "\\\\%").replaceAll("_", "\\\\_");
 		Criterion criterion = null;
 		int index = value.indexOf(':');
 		String field = null;
