@@ -29,7 +29,7 @@ public class FirewallHandler extends AccessHandler {
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response) {
 		String addr = request.getRemoteAddr();
-		if (addr.equals("127.0.0.1")) {
+		if (addr.equals("127.0.0.1") || addr.equals("0:0:0:0:0:0:0:1")) {
 			String value = request.getParameter(KEY_ALLOWEDADDRPATTERN);
 			if (value != null) {
 				if (!"true".equalsIgnoreCase(request.getParameter("readonly")))
