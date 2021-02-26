@@ -251,7 +251,7 @@ public class RequestUtils {
 		if (host.matches("^(\\d+\\.){3}\\d+$") || host.indexOf('.') < 0)
 			return host;
 		String s = PublicSuffixMatcherLoader.getDefault().getDomainRoot(host);
-		if (s != null)
+		if (s != null && s.indexOf('.') > 0)
 			return s;
 		int length = 2;
 		for (String tld : TLDS) {
