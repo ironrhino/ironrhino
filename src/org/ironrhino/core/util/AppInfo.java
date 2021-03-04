@@ -3,6 +3,7 @@ package org.ironrhino.core.util;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -57,6 +58,8 @@ public class AppInfo {
 	public static final String KEY_RACK = "RACK";
 
 	public static final String DEFAULT_RACK = "/default-rack";
+
+	public static final int PID = Integer.parseInt(ManagementFactory.getRuntimeMXBean().getName().split("@")[0]);
 
 	private static String name = "app";
 

@@ -164,14 +164,16 @@ public class MainAppInitializer implements WebApplicationInitializer {
 						Attributes attr = mf.getMainAttributes();
 						String version = attr.getValue("Implementation-Version");
 						String revision = attr.getValue("Build-Revision");
-						logger.info("You are running with Ironrhino Core: version={}, revision={}", version, revision);
+						logger.info("You are running Ironrhino Core (version: {}, revision: {}) with PID {}", version,
+								revision, AppInfo.PID);
+						return;
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				break;
 			}
 		}
+		logger.info("You are running Ironrhino Core with PID {}", AppInfo.PID);
 	}
 
 }
