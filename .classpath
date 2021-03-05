@@ -106,7 +106,7 @@
 	<classpathentry kind="lib" path="lib/jmh-generator-annprocess-1.21.jar"/>
 	<classpathentry kind="lib" path="lib/jopt-simple-4.6.jar"/>
 	<classpathentry kind="lib" path="lib/junit-4.12.jar"/>
-	<classpathentry kind="lib" path="lib/lombok-1.18.2.jar"/>
+	<classpathentry kind="lib" path="lib/lombok-1.18.18.jar"/>
 	<classpathentry kind="lib" path="lib/mockito-core-3.1.0.jar"/>
 	<classpathentry kind="lib" path="lib/reactor-test-3.3.5.jar"/>
 	<classpathentry kind="lib" path="lib/servlet-api-4.0.0.jar"/>
