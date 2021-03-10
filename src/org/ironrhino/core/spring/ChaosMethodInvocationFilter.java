@@ -1,6 +1,7 @@
 package org.ironrhino.core.spring;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -127,6 +128,20 @@ public class ChaosMethodInvocationFilter implements MethodInvocationFilter {
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
+				}
+			}
+		},
+		OOM {
+			@Override
+			void perform(ChaosMethodInvocationFilter _this) {
+				Map<String, String> map = new HashMap<>();
+				int counter = 0;
+				while (true) {
+					StringBuilder value = new StringBuilder();
+					for (int i = 0; i < 10000; i++)
+						value.append("value");
+					map.put("key" + counter, value.toString());
+					++counter;
 				}
 			}
 		},
