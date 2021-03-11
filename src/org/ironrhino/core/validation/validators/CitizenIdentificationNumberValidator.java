@@ -1,7 +1,7 @@
 package org.ironrhino.core.validation.validators;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -19,6 +19,8 @@ import org.ironrhino.core.validation.constraints.CitizenIdentificationNumber;
  * GB11643-1999
  */
 public class CitizenIdentificationNumberValidator implements ConstraintValidator<CitizenIdentificationNumber, String> {
+
+	private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 
 	@Override
 	public boolean isValid(String input, ConstraintValidatorContext constraintValidatorContext) {
@@ -46,8 +48,8 @@ public class CitizenIdentificationNumberValidator implements ConstraintValidator
 			return false;
 		String dob = input.substring(6, 14);
 		try {
-			new SimpleDateFormat("yyyyMMdd").parse(dob);
-		} catch (ParseException pe) {
+			dateFormatter.parse(dob);
+		} catch (DateTimeParseException pe) {
 			return false;
 		}
 		return getCheckBit(getPowerSum(bits)) == checkBit;

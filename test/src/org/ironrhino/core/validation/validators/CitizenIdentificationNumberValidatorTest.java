@@ -14,6 +14,7 @@ public class CitizenIdentificationNumberValidatorTest {
 		assertThat(CitizenIdentificationNumberValidator.isValid("43022419840628423A"), is(false));
 		assertThat(CitizenIdentificationNumberValidator.isValid("43022419840628423X"), is(false));
 		assertThat(CitizenIdentificationNumberValidator.isValid("430224198309145163"), is(false));
+		assertThat(CitizenIdentificationNumberValidator.isValid("440000200100177718"), is(false));
 		assertThat(CitizenIdentificationNumberValidator.isValid("440000197108227711"), is(true));
 		assertThat(CitizenIdentificationNumberValidator.isValid("440000197302188242"), is(true));
 		assertThat(CitizenIdentificationNumberValidator.isValid("440000197301154323"), is(true));
