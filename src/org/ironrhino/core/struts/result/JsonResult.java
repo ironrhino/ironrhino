@@ -25,7 +25,7 @@ public class JsonResult implements Result {
 
 	private static final long serialVersionUID = 5984356746581381755L;
 
-	private String generateJson(ActionInvocation invocation) {
+	protected String generateJson(ActionInvocation invocation) {
 		Object action = ReflectionUtils.getTargetObject(invocation.getAction());
 		Method method = BeanUtils.findDeclaredMethod(action.getClass(), invocation.getProxy().getMethod(),
 				new Class[0]);
@@ -80,8 +80,7 @@ public class JsonResult implements Result {
 	public void execute(ActionInvocation invocation) throws Exception {
 		String json = generateJson(invocation);
 		HttpServletResponse response = ServletActionContext.getResponse();
-		String encoding = response.getCharacterEncoding();
-		response.setContentType("application/json;charset=" + encoding);
+		response.setContentType("application/json");
 		if (!response.containsHeader("Cache-Control")) {
 			response.setHeader("Cache-Control", "no-cache");
 			response.setHeader("Pragma", "no-cache");
