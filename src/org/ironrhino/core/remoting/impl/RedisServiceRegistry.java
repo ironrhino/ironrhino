@@ -24,6 +24,7 @@ import org.ironrhino.core.remoting.ExportServicesEvent;
 import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
 import org.ironrhino.core.util.AppInfo;
+import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.EventListener;
@@ -147,12 +148,32 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 		return services;
 	}
 
+	public void detach(String host) {
+		for (String serviceName : getExportedServices().keySet())
+			doUnregister(serviceName, host);
+		InstanceShutdownEvent event = new InstanceShutdownEvent();
+		ReflectionUtils.setFieldValue(event, "instanceId", host);
+		eventPublisher.publish(event, Scope.GLOBAL);
+	}
+
+	public void attach() {
+		for (Map.Entry<String, Object> entry : getExportedServices().entrySet())
+			register(entry.getKey(), entry.getValue());
+	}
+
 	@EventListener(condition = "!#event.local")
 	public void onApplicationEvent(InstanceLifecycleEvent event) {
+		String host;
 		String instanceId = event.getInstanceId();
-		String appName = instanceId.substring(0, instanceId.lastIndexOf('@'));
-		appName = appName.substring(0, appName.lastIndexOf('-'));
-		String host = appName + instanceId.substring(instanceId.lastIndexOf('@'));
+		int index = instanceId.lastIndexOf('-');
+		if (index > 0) {
+			String appName = instanceId.substring(0, instanceId.lastIndexOf('@'));
+			if (index > 0)
+				appName = appName.substring(0, index);
+			host = appName + instanceId.substring(instanceId.lastIndexOf('@'));
+		} else {
+			host = instanceId;
+		}
 		if (event instanceof InstanceShutdownEvent) {
 			evict(host);
 		} else if (event instanceof ExportServicesEvent) {
