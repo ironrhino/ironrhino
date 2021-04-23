@@ -39,6 +39,7 @@ public class ProxySupportHttpServletRequest extends HttpServletRequestWrapper {
 
 	// proxy_set_header X-Client-Certificate $ssl_client_cert;
 	public static final String HEADER_NAME_X_CLIENT_CERTIFICATE = "X-Client-Certificate";
+	public static final String HEADER_NAME_X_CLIENT_CERT = "X-Client-Cert";
 
 	public static final String REQUEST_ATTRIBUTE_PROXY_ADDR = "X-Proxy-Addr";
 
@@ -47,6 +48,8 @@ public class ProxySupportHttpServletRequest extends HttpServletRequestWrapper {
 	public ProxySupportHttpServletRequest(HttpServletRequest request) {
 		super(request);
 		String certificate = request.getHeader(HEADER_NAME_X_CLIENT_CERTIFICATE);
+		if (certificate == null)
+			certificate = request.getHeader(HEADER_NAME_X_CLIENT_CERT);
 		if (StringUtils.isNotBlank(certificate)) {
 			// nginx replaced line separator with whitespace and tab
 			String certificateContent = certificate.replaceAll("\\s{2,}", System.lineSeparator()).replaceAll("\\t+",
