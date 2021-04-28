@@ -377,18 +377,22 @@ public class EntityClassHelper {
 
 					if (returnType.isEnum()) {
 						uci.setType("enum");
-						try {
-							returnType.getMethod("getName");
-							uci.setListKey("name");
-						} catch (NoSuchMethodException e) {
-							uci.setListKey("top");
-						}
-						try {
-							returnType.getMethod("getDisplayName");
-							uci.setListValue("displayName");
-						} catch (NoSuchMethodException e) {
-							uci.setListValue(uci.getListKey());
-						}
+						if (StringUtils.isBlank(uci.getListKey()))
+							try {
+								returnType.getMethod("getName");
+								uci.setListKey("name");
+							} catch (NoSuchMethodException e) {
+								uci.setListKey("top");
+							}
+						if (StringUtils.isBlank(uci.getListValue()))
+							try {
+								returnType.getMethod("getDisplayName");
+								uci.setListValue("displayName");
+							} catch (NoSuchMethodException e) {
+								uci.setListValue(uci.getListKey());
+							}
+						if (StringUtils.isBlank(uci.getListOptions()))
+							uci.setListOptions("'@" + returnType.getName() + "@values()'");
 					} else if (Persistable.class.isAssignableFrom(returnType)) {
 						JoinColumn joinColumn = findAnnotation(readMethod, declaredField, JoinColumn.class);
 						if (joinColumn != null && !joinColumn.nullable())

@@ -144,12 +144,16 @@ public class AnnotationShadows {
 				this.cssClasses.addAll(Arrays.asList(config.cssClass().split("\\s")));
 			this.thCssClass = config.thCssClass();
 			this.listOptions = config.listOptions().trim();
-			if (listOptions.indexOf('{') == 0) {
-				this.listKey = "key";
-				this.listValue = "value";
+			if (this.listOptions.indexOf('{') == 0) {
+				if (StringUtils.isBlank(this.listKey))
+					this.listKey = "key";
+				if (StringUtils.isBlank(this.listValue))
+					this.listValue = "value";
 			} else if (listOptions.indexOf('[') == 0) {
-				this.listKey = "top";
-				this.listValue = "top";
+				if (StringUtils.isBlank(this.listKey))
+					this.listKey = "top";
+				if (StringUtils.isBlank(this.listValue))
+					this.listValue = "top";
 			}
 			this.pickUrl = config.pickUrl();
 			this.templateName = config.templateName();
