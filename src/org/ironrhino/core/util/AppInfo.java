@@ -446,9 +446,17 @@ public class AppInfo {
 							? "WARN"
 							: "INFO");
 		System.setProperty("log4j2.formatMsgNoLookups", String.valueOf(true));
-		String kafkaBootstrapServers = getRawApplicationContextProperties().getProperty("kafka.bootstrap.servers");
-		if (StringUtils.isNotBlank(kafkaBootstrapServers))
+
+		Properties rawApplicationContextProperties = getRawApplicationContextProperties();
+		// getApplicationContextProperties() will trigger early log4j2 initialization
+		String kafkaBootstrapServers = rawApplicationContextProperties.getProperty("kafka.bootstrap.servers");
+		if (StringUtils.isNotBlank(kafkaBootstrapServers)
+				&& StringUtils.isBlank(System.getProperty("kafka.bootstrap.servers")))
 			System.setProperty("kafka.bootstrap.servers", kafkaBootstrapServers);
+		String logsKafkaBootstrapServers = rawApplicationContextProperties.getProperty("logs.kafka.bootstrap.servers");
+		if (StringUtils.isNotBlank(logsKafkaBootstrapServers)
+				&& StringUtils.isBlank(System.getProperty("logs.kafka.bootstrap.servers")))
+			System.setProperty("logs.kafka.bootstrap.servers", logsKafkaBootstrapServers);
 
 		// configure timezone
 		String userTimezone = System.getProperty("user.timezone");
