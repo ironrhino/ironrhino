@@ -49,7 +49,7 @@ public class Cache2kCacheManager implements CacheManager {
 		if (value == null)
 			throw new IllegalArgumentException("value should not be null");
 		Cache<String, Object> cache = getCache(namespace, true);
-		cache.invoke(key, entry -> entry.setValue(value).setExpiryTime(timeToLive == 0 ? ExpiryTimeValues.ETERNAL
+		cache.invoke(key, entry -> entry.setValue(value).setExpiryTime(timeToLive <= 0 ? ExpiryTimeValues.ETERNAL
 				: (System.currentTimeMillis() + timeUnit.toMillis(timeToLive))));
 	}
 
@@ -118,7 +118,7 @@ public class Cache2kCacheManager implements CacheManager {
 			throw new IllegalArgumentException("map should not be null");
 		Cache<String, Object> cache = getCache(namespace, true);
 		map.forEach((k, v) -> {
-			cache.invoke(k, entry -> entry.setValue(v).setExpiryTime(timeToLive == 0 ? ExpiryTimeValues.ETERNAL
+			cache.invoke(k, entry -> entry.setValue(v).setExpiryTime(timeToLive <= 0 ? ExpiryTimeValues.ETERNAL
 					: (System.currentTimeMillis() + timeUnit.toMillis(timeToLive))));
 		});
 	}
