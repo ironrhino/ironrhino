@@ -68,6 +68,10 @@ public class RedisCacheManager implements CacheManager {
 			"if redis.call('exists',KEYS[1])==1 then local v=redis.call('decrby',KEYS[1],ARGV[1]) if v >= 0 then if tonumber(ARGV[2]) > 0 then redis.call('pexpire',KEYS[1],ARGV[2]) end return v else redis.call('incrby',KEYS[1],ARGV[1]) return -2 end else return -1 end",
 			Long.class);
 
+	private RedisScript<Void> invalidateScript = new DefaultRedisScript<>(
+			"local cursor=0 repeat local resp=redis.call('scan',cursor,'match',ARGV[1]..':*','count',1000) cursor=tonumber(resp[1]) local keys=resp[2] for i=1,#keys do redis.call('del',keys[i]) end until cursor==0",
+			Void.class);
+
 	@PostConstruct
 	public void init() {
 		String defaultSerializerClass = ctx.getEnvironment().getProperty(DEFAULT_SERIALIZER);
@@ -297,10 +301,7 @@ public class RedisCacheManager implements CacheManager {
 
 	@Override
 	public void invalidate(String namespace) {
-		RedisScript<Boolean> script = new DefaultRedisScript<>(
-				"local keys = redis.call('keys', ARGV[1]) \n for i=1,#keys,5000 do \n redis.call('del', unpack(keys, i, math.min(i+4999, #keys))) \n end \n return true",
-				Boolean.class);
-		cacheStringRedisTemplate.execute(script, Collections.emptyList(), namespace + ":*");
+		cacheStringRedisTemplate.execute(invalidateScript, Collections.emptyList(), namespace);
 	}
 
 	protected RedisTemplate findRedisTemplate(String namespace) {
