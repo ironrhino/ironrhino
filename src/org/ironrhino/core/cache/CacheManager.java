@@ -56,4 +56,6 @@ public interface CacheManager {
 
 	boolean supportsUpdateTtl();
 
+	void invalidate(String namespace);
+
 }

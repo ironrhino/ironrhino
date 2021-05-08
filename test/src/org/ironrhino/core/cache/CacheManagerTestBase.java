@@ -198,4 +198,17 @@ public abstract class CacheManagerTestBase {
 		assertThat(cacheManager.exists(key, NAMESPACE), is(false));
 	}
 
+	@Test
+	public void testInvalidate() {
+		String namespace = "temp";
+		int count = 10000;
+		for (int i = 0; i < count; i++)
+			cacheManager.put("key" + i, "", -1, TimeUnit.MILLISECONDS, namespace);
+		assertThat(cacheManager.exists("key" + (count / 2), namespace), is(true));
+		assertThat(cacheManager.exists("key" + (count - 1), namespace), is(true));
+		cacheManager.invalidate(namespace);
+		assertThat(cacheManager.exists("key" + (count / 2), namespace), is(false));
+		assertThat(cacheManager.exists("key" + (count - 1), namespace), is(false));
+	}
+
 }

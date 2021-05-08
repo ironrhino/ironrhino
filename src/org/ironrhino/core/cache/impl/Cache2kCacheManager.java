@@ -219,6 +219,7 @@ public class Cache2kCacheManager implements CacheManager {
 		return true;
 	}
 
+	@Override
 	public void invalidate(String namespace) {
 		Cache<String, Object> cache = cache2kCacheManager.getCache(namespace);
 		if (cache != null) {
