@@ -72,7 +72,7 @@ public class TracingConfiguration {
 	private Reporter reporter;
 
 	@PostConstruct
-	public void init() {
+	public void init() throws Exception {
 		if (!Tracing.isEnabled())
 			return;
 		String scheme = uri.getScheme();

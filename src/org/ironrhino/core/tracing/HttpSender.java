@@ -14,6 +14,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.thrift.transport.TTransportException;
 
 import io.jaegertracing.internal.exceptions.SenderException;
 import io.jaegertracing.thrift.internal.senders.ThriftSender;
@@ -41,11 +42,11 @@ public class HttpSender extends ThriftSender {
 
 	private boolean ioErrorOccurred;
 
-	public HttpSender(String endpoint) {
+	public HttpSender(String endpoint) throws TTransportException {
 		this(endpoint, 0);
 	}
 
-	public HttpSender(String endpoint, int maxPacketSize) {
+	public HttpSender(String endpoint, int maxPacketSize) throws TTransportException {
 		super(ProtocolType.Binary, maxPacketSize);
 		if (endpoint == null)
 			throw new IllegalArgumentException("endpoint should'nt be null");
