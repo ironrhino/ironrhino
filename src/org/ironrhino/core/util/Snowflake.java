@@ -4,6 +4,7 @@ import java.util.Random;
 
 import org.apache.commons.lang3.StringUtils;
 
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -90,6 +91,24 @@ public class Snowflake {
 
 	public String nextBase62Id() {
 		return NumberUtils.decimalToX(62, nextId());
+	}
+
+	public Info parse(long id) {
+		return new Info(id, workerIdBits, sequenceBits);
+	}
+
+	@Value
+	public static class Info {
+		private long timestamp;
+		private int workerId;
+		private long sequence;
+
+		Info(long id, int workerIdBits, int sequenceBits) {
+			long duration = id >> (sequenceBits + workerIdBits);
+			timestamp = EPOCH + duration;
+			workerId = (int) ((id - (duration << (sequenceBits + workerIdBits))) >> (sequenceBits));
+			sequence = id - (duration << (sequenceBits + workerIdBits)) - (workerId << sequenceBits);
+		}
 	}
 
 }
