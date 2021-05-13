@@ -72,7 +72,7 @@ public class InfluxMeterRegistryProvider implements MeterRegistryProvider, Defau
 
 	private Optional<InfluxMeterRegistry> createMeterRegistry(InfluxConfig config, boolean forUpdate) {
 		if (AddressAvailabilityCondition.check(config.uri(), 2000)) {
-			if (forUpdate)
+			if (!forUpdate)
 				log.info("Add influx metrics registry {} with db '{}'", config.uri(), config.db());
 			this.influxConfig = config;
 			this.influxMeterRegistry = InfluxMeterRegistry.builder(config).threadFactory(threadFactory).build();
