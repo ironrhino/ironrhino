@@ -51,8 +51,6 @@ public class MetricsConfiguration {
 			org.ironrhino.core.metrics.Metrics.disable();
 			return;
 		}
-		Metrics.globalRegistry.config().commonTags("app", AppInfo.getAppName(), "instance",
-				AppInfo.getInstanceId(true, true));
 		instrument();
 	}
 
@@ -68,6 +66,8 @@ public class MetricsConfiguration {
 
 	@Bean
 	protected static BeanPostProcessor metricsBeanPostProcessor(Environment env) {
+		Metrics.globalRegistry.config().commonTags("app", AppInfo.getAppName(), "instance",
+				AppInfo.getInstanceId(true, true));
 		return new BeanPostProcessor() {
 			@Override
 			public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
