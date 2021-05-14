@@ -2,6 +2,8 @@ package org.ironrhino.core.spring;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -143,6 +145,74 @@ public class ChaosMethodInvocationFilter implements MethodInvocationFilter {
 					map.put("key" + counter, value.toString());
 					++counter;
 				}
+			}
+		},
+		MEMORY_LEAK {
+			List<String> list = new LinkedList<>();
+
+			@Override
+			void perform(ChaosMethodInvocationFilter _this) {
+				StringBuilder value = new StringBuilder();
+				for (int i = 0; i < 10000; i++)
+					value.append("value");
+				list.add(value.toString());
+			}
+		},
+		STACK_OVERFLOW {
+			@Override
+			void perform(ChaosMethodInvocationFilter _this) {
+				perform(_this);
+			}
+		},
+		CPU_SPIKE {
+			@Override
+			void perform(ChaosMethodInvocationFilter _this) {
+				for (int i = 0; i < 10; i++)
+					new Thread(() -> {
+						while (true) {
+						}
+					}, "Chaos-CPUSpikerThread-" + i).start();
+			}
+		},
+		DEADLOCK {
+			@Override
+			void perform(ChaosMethodInvocationFilter _this) {
+				Object lock1 = new Object();
+				Object lock2 = new Object();
+				new Thread(() -> {
+					synchronized (lock1) {
+						try {
+							Thread.sleep(10);
+						} catch (InterruptedException e) {
+						}
+						synchronized (lock2) {
+						}
+					}
+				}, "Chaos-DeadlockThread-1").start();
+				new Thread(() -> {
+					synchronized (lock2) {
+						try {
+							Thread.sleep(10);
+						} catch (InterruptedException e) {
+						}
+						synchronized (lock1) {
+						}
+					}
+				}, "Chaos-DeadlockThread-2").start();
+			}
+		},
+		THREAD_LEAK {
+			@Override
+			void perform(ChaosMethodInvocationFilter _this) {
+				new Thread(() -> {
+					while (true) {
+						try {
+							Thread.sleep(10000);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				}, "Chaos-LeakThread").start();
 			}
 		},
 		KILL {
