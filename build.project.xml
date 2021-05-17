@@ -210,7 +210,16 @@
 		</script>
 	</target>
 
-	<target name="append-revision-for-assets" depends="set-revision">
+	<target name="expand-version" depends="set-revision">
+		<replace dir="${classes.dir}/resources/spring">
+			<include name="applicationContext.*"/>
+			<replacefilter token="@project.version@" value="${version}"/>
+			<replacefilter token="@build.revision@" value="${revision}"/>
+			<replacefilter token="@build.timestamp@" value="${timestamp}"/>
+		</replace>
+	</target>
+
+	<target name="append-revision-for-assets" depends="expand-version">
 		<script language="javascript">
 			<![CDATA[
 			var File = Java.type('java.io.File');
