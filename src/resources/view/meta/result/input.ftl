@@ -148,11 +148,9 @@
 						<#list config.embeddedUiConfigs as nestedKey,config>
 						<#local hidden=config.hiddenInInput.value>
 						<#if !hidden&&config.hiddenInInput.expression?has_content><#local hidden=config.hiddenInInput.expression?eval></#if>
-						<#if !hidden>
 						<#local label=(config.alias?has_content)?then(config.alias,nestedKey)><#local label=getText(label)>
 						<#local description=getText(config.description)>
-						<th<#if config.width?has_content> style="width:${config.width};"</#if>>${label}<#if description?has_content> <span data-content="${description}" class="poped glyphicon glyphicon-question-sign"></span></#if></th>
-						</#if>
+						<th<#if config.width?has_content> style="width:${config.width};<#if hidden>display:none;</#if>"</#if>>${label}<#if description?has_content> <span data-content="${description}" class="poped glyphicon glyphicon-question-sign"></span></#if></th>
 						</#list>
 						<th class="manipulate"></th>
 					</tr>
@@ -169,8 +167,7 @@
 						<#list config.embeddedUiConfigs as nestedKey,config>
 						<#local hidden=config.hiddenInInput.value>
 						<#if !hidden&&config.hiddenInInput.expression?has_content><#local hidden=config.hiddenInInput.expression?eval></#if>
-						<#if !hidden>
-						<td id="${id}[${index}].${nestedKey}">
+						<td id="${id}[${index}].${nestedKey}"<#if hidden> style="display:none;"</#if>>
 						<#local name=entityName+'.'+key+'['+index+'].'+nestedKey>
 						<#local value=(element[nestedKey])!>
 						<#local readonly=config.readonly.value||config.readonly.expression?has_content&&config.readonly.expression?eval>
@@ -226,7 +223,6 @@
 							</#if>
 						</#if>
 						</td>
-						</#if>
 						</#list>
 						<td class="manipulate"></td>
 					</tr>
