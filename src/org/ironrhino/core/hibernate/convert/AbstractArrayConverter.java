@@ -3,17 +3,18 @@ package org.ironrhino.core.hibernate.convert;
 import java.lang.reflect.Array;
 
 import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.core.util.ReflectionUtils;
+import org.springframework.core.ResolvableType;
 
 @SuppressWarnings("unchecked")
 public abstract class AbstractArrayConverter<T> {
 
 	public static final String SEPARATOR = AbstractCollectionConverter.SEPARATOR;
 
-	private Class<T> clazz;
+	private final Class<T> componentType;
 
 	public AbstractArrayConverter() {
-		clazz = (Class<T>) ReflectionUtils.getGenericClass(getClass());
+		componentType = (Class<T>) ResolvableType.forClass(getClass()).as(AbstractArrayConverter.class)
+				.resolveGeneric(0);
 	}
 
 	public String convertToDatabaseColumn(T[] array) {
@@ -28,9 +29,9 @@ public abstract class AbstractArrayConverter<T> {
 		if (string == null)
 			return null;
 		if (string.isEmpty())
-			return (T[]) Array.newInstance(clazz, 0);
+			return (T[]) Array.newInstance(componentType, 0);
 		String[] arr = string.split(SEPARATOR + "\\s*");
-		T[] array = (T[]) Array.newInstance(clazz, arr.length);
+		T[] array = (T[]) Array.newInstance(componentType, arr.length);
 		for (int i = 0; i < arr.length; i++)
 			array[i] = convert(arr[i]);
 		return array;

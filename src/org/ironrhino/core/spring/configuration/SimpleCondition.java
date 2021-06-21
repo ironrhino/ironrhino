@@ -3,9 +3,9 @@ package org.ironrhino.core.spring.configuration;
 import java.lang.annotation.Annotation;
 
 import org.ironrhino.core.util.AnnotationUtils;
-import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
+import org.springframework.core.ResolvableType;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.core.type.ClassMetadata;
 
@@ -14,11 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class SimpleCondition<T extends Annotation> implements Condition {
 
-	private Class<T> annotationClass;
+	private final Class<T> annotationClass;
 
 	@SuppressWarnings("unchecked")
 	public SimpleCondition() {
-		annotationClass = (Class<T>) ReflectionUtils.getGenericClass(getClass(), SimpleCondition.class);
+		annotationClass = (Class<T>) ResolvableType.forClass(getClass()).as(SimpleCondition.class).resolveGeneric(0);
 	}
 
 	public Class<T> getAnnotationClass() {

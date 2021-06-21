@@ -26,11 +26,11 @@ import org.ironrhino.common.model.BasePollingEntity;
 import org.ironrhino.common.model.PollingStatus;
 import org.ironrhino.core.service.EntityManager;
 import org.ironrhino.core.util.NameableThreadFactory;
-import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
+import org.springframework.core.ResolvableType;
 import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -75,7 +75,7 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> implem
 
 	private BoundListOperations<String, String> boundListOperations;
 
-	protected Class<T> entityClass;
+	protected final Class<T> entityClass;
 
 	protected String simpleUpdateStatusHql;
 
@@ -85,12 +85,9 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> implem
 
 	protected final AtomicInteger cycles = new AtomicInteger();
 
+	@SuppressWarnings("unchecked")
 	public AbstractPollingControl() {
-		@SuppressWarnings("unchecked")
-		Class<T> clazz = (Class<T>) ReflectionUtils.getGenericClass(getClass());
-		if (clazz == null)
-			throw new IllegalArgumentException("Generic type must be present");
-		entityClass = clazz;
+		entityClass = (Class<T>) ResolvableType.forClass(getClass()).as(AbstractPollingControl.class).resolveGeneric(0);
 	}
 
 	@PostConstruct

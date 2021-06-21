@@ -9,10 +9,10 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.ironrhino.core.spring.configuration.PriorityQualifier;
-import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ResolvableType;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.support.collections.DefaultRedisList;
 
@@ -43,7 +43,9 @@ public abstract class RedisQueue<T extends Serializable> implements org.ironrhin
 	protected BlockingDeque<T> queue;
 
 	public RedisQueue() {
-		Class<?> clazz = ReflectionUtils.getGenericClass(getClass(), RedisQueue.class);
+		Class<?> clazz = ResolvableType.forClass(getClass()).as(RedisQueue.class).resolveGeneric(0);
+		if (clazz == null)
+			throw new IllegalArgumentException(getClass().getName() + " should be generic");
 		queueName = clazz.getName();
 	}
 

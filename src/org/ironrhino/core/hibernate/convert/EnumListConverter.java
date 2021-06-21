@@ -6,19 +6,17 @@ import java.util.List;
 import javax.persistence.AttributeConverter;
 
 import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.core.util.ReflectionUtils;
+import org.springframework.core.ResolvableType;
 
 public abstract class EnumListConverter<T extends Enum<T>> implements AttributeConverter<List<T>, String> {
 
 	public static final String SEPARATOR = AbstractCollectionConverter.SEPARATOR;
 
-	private Class<T> enumType;
+	private final Class<T> enumType;
 
 	@SuppressWarnings("unchecked")
 	public EnumListConverter() {
-		Class<T> clazz = (Class<T>) ReflectionUtils.getGenericClass(getClass(), EnumListConverter.class);
-		if (clazz != null)
-			enumType = clazz;
+		enumType = (Class<T>) ResolvableType.forClass(getClass()).as(EnumListConverter.class).resolveGeneric(0);
 	}
 
 	@Override

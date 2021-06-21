@@ -78,7 +78,6 @@ import org.ironrhino.core.util.BeanUtils;
 import org.ironrhino.core.util.CompareUtils;
 import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.JsonUtils;
-import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapperImpl;
@@ -88,6 +87,7 @@ import org.springframework.beans.NullValueInNestedPathException;
 import org.springframework.beans.PropertyAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ResolvableType;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.ConverterNotFoundException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -1804,7 +1804,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		Collection<BaseTreeControl> baseTreeControls = ApplicationContextUtils.getBeansOfType(BaseTreeControl.class)
 				.values();
 		for (BaseTreeControl btc : baseTreeControls) {
-			if (ReflectionUtils.getGenericClass(btc.getClass()) == getEntityClass()) {
+			if (ResolvableType.forClass(btc.getClass()).as(BaseTreeControl.class)
+					.resolveGeneric(0) == getEntityClass()) {
 				baseTreeControl = btc;
 				break;
 			}
@@ -1914,8 +1915,9 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	// need call once before view
 	protected Class<EN> getEntityClass() {
-		if (entityClass == null)
-			entityClass = (Class<EN>) ReflectionUtils.getGenericClass(getClass());
+		if (entityClass == null && getClass() != EntityAction.class) {
+			entityClass = (Class<EN>) ResolvableType.forClass(getClass()).as(EntityAction.class).resolveGeneric(0);
+		}
 		if (entityClass == null) {
 			ActionProxy proxy = ActionContext.getContext().getActionInvocation().getProxy();
 			String actionName = getEntityName();

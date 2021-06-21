@@ -24,8 +24,8 @@ import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.core.struts.EntityAction;
 import org.ironrhino.core.struts.result.AutoConfigResult;
-import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.core.util.RequestUtils;
+import org.springframework.core.ResolvableType;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.opensymphony.xwork2.config.Configuration;
@@ -190,8 +190,13 @@ public class DefaultActionMapper extends AbstractActionMapper {
 						uid = methodAndUid;
 					} else {
 						AutoConfig ac = actionClass.getAnnotation(AutoConfig.class);
-						if (ac == null && actionClass.getSuperclass() == EntityAction.class)
-							ac = ReflectionUtils.getGenericClass(actionClass).getAnnotation(AutoConfig.class);
+						if (ac == null && actionClass != EntityAction.class
+								&& EntityAction.class.isAssignableFrom(actionClass)) {
+							Class<?> entityClass = ResolvableType.forClass(actionClass).as(EntityAction.class)
+									.resolveGeneric(0);
+							if (entityClass != null)
+								ac = entityClass.getAnnotation(AutoConfig.class);
+						}
 						if (ac != null && ac.lenientPathVariable()) {
 							uid = methodAndUid;
 						} else {

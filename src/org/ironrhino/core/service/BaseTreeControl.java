@@ -24,26 +24,23 @@ import org.ironrhino.core.event.EntityOperationType;
 import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.throttle.Mutex;
 import org.ironrhino.core.util.BeanUtils;
-import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.ResolvableType;
 import org.springframework.transaction.annotation.Transactional;
 
-public class BaseTreeControl<T extends BaseTreeableEntity<T>> {
+public abstract class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 
 	private volatile T tree;
 
-	private Class<T> entityClass;
+	private final Class<T> entityClass;
 
 	@Autowired
 	private EntityManager<T> entityManager;
 
+	@SuppressWarnings("unchecked")
 	public BaseTreeControl() {
-		@SuppressWarnings("unchecked")
-		Class<T> clazz = (Class<T>) ReflectionUtils.getGenericClass(getClass(), BaseTreeControl.class);
-		if (clazz == null)
-			throw new RuntimeException("generic class is required here");
-		entityClass = clazz;
+		entityClass = (Class<T>) ResolvableType.forClass(getClass()).as(BaseTreeControl.class).resolveGeneric(0);
 	}
 
 	protected T buildTree() {

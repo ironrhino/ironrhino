@@ -26,6 +26,7 @@ public class ReflectionUtilsTest {
 		assertThat(fieldNames.get(1), equalTo("b"));
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testGetGenericClass() throws Exception {
 		assertThat(ReflectionUtils.getGenericClass(D.class), equalTo(A.class));

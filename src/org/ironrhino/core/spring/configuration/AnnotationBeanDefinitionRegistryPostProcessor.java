@@ -11,7 +11,6 @@ import java.util.TreeSet;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.spring.NameGenerator;
 import org.ironrhino.core.util.ClassScanner;
-import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -52,8 +51,9 @@ public abstract class AnnotationBeanDefinitionRegistryPostProcessor<A extends An
 
 	@SuppressWarnings("unchecked")
 	public AnnotationBeanDefinitionRegistryPostProcessor() {
-		annotationClass = (Class<A>) ReflectionUtils.getGenericClass(getClass(), 0);
-		factoryBeanClass = (Class<FB>) ReflectionUtils.getGenericClass(getClass(), 1);
+		ResolvableType rt = ResolvableType.forClass(getClass()).as(AnnotationBeanDefinitionRegistryPostProcessor.class);
+		annotationClass = (Class<A>) rt.resolveGeneric(0);
+		factoryBeanClass = (Class<FB>) rt.resolveGeneric(1);
 	}
 
 	@Override

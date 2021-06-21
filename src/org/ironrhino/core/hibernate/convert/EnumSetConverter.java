@@ -8,19 +8,17 @@ import java.util.Set;
 import javax.persistence.AttributeConverter;
 
 import org.apache.commons.lang3.StringUtils;
-import org.ironrhino.core.util.ReflectionUtils;
+import org.springframework.core.ResolvableType;
 
 public abstract class EnumSetConverter<T extends Enum<T>> implements AttributeConverter<Set<T>, String> {
 
 	public static final String SEPARATOR = AbstractCollectionConverter.SEPARATOR;
 
-	private Class<T> enumType;
+	private final Class<T> enumType;
 
 	@SuppressWarnings("unchecked")
 	public EnumSetConverter() {
-		Class<T> clazz = (Class<T>) ReflectionUtils.getGenericClass(getClass(), EnumSetConverter.class);
-		if (clazz != null)
-			enumType = clazz;
+		enumType = (Class<T>) ResolvableType.forClass(getClass()).as(EnumSetConverter.class).resolveGeneric(0);
 	}
 
 	@Override

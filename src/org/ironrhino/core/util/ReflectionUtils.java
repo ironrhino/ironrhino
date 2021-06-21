@@ -78,19 +78,29 @@ public class ReflectionUtils {
 		}
 	}
 
+	@Deprecated
 	public static Class<?> getGenericClass(Class<?> clazz) {
+		// return ResolvableType.forClass(clazz).getSuperType().resolveGeneric(0);
 		return getGenericClass(clazz, null, 0);
 	}
 
+	@Deprecated
 	public static Class<?> getGenericClass(Class<?> clazz, int index) {
+		// return ResolvableType.forClass(clazz).getSuperType().resolveGeneric(index);
 		return getGenericClass(clazz, null, index);
 	}
 
+	@Deprecated
 	public static Class<?> getGenericClass(Class<?> clazz, Class<?> genericContainerClass) {
+		// return
+		// ResolvableType.forClass(clazz).as(genericContainerClass).resolveGeneric(0);
 		return getGenericClass(clazz, genericContainerClass, 0);
 	}
 
+	@Deprecated
 	public static Class<?> getGenericClass(Class<?> clazz, Class<?> genericContainerClass, int index) {
+		// return
+		// ResolvableType.forClass(clazz).as(genericContainerClass).resolveGeneric(index);
 		Type t = clazz.getGenericSuperclass();
 		while (t != null) {
 			if (t instanceof ParameterizedType) {

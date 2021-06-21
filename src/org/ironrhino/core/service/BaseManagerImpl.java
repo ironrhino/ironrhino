@@ -59,6 +59,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ResolvableType;
 import org.springframework.orm.hibernate5.HibernateCallback;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -88,7 +89,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	};
 
 	public BaseManagerImpl() {
-		entityClass = (Class<T>) ReflectionUtils.getGenericClass(getClass());
+		entityClass = (Class<T>) ResolvableType.forClass(getClass()).as(BaseManagerImpl.class).resolveGeneric(0);
 	}
 
 	public BaseManagerImpl(Class<T> clazz) {

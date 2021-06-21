@@ -4,17 +4,17 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ironrhino.core.util.ReflectionUtils;
+import org.springframework.core.ResolvableType;
 
 @SuppressWarnings("unchecked")
 public abstract class EnumArrayConverter<T extends Enum<T>> {
 
 	public static final String SEPARATOR = AbstractCollectionConverter.SEPARATOR;
 
-	private Class<T> enumType;
+	private final Class<T> enumType;
 
 	public EnumArrayConverter() {
-		enumType = (Class<T>) ReflectionUtils.getGenericClass(getClass(), EnumArrayConverter.class);
+		enumType = (Class<T>) ResolvableType.forClass(getClass()).as(EnumArrayConverter.class).resolveGeneric(0);
 	}
 
 	public String convertToDatabaseColumn(T[] array) {
