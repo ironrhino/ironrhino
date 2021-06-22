@@ -82,8 +82,19 @@ public class Snowflake {
 		} else if (timestamp > lastTimestamp) {
 			sequence = RANDOM.nextInt(2);
 		} else {
-			throw new IllegalStateException(String.format(
-					"Clock moved backwards. Refusing to generate id for %d milliseconds", lastTimestamp - timestamp));
+			long offset = lastTimestamp - timestamp;
+			if (offset < 5000) {
+				try {
+					Thread.sleep(offset + 1);
+					timestamp = System.currentTimeMillis();
+					sequence = RANDOM.nextInt(2);
+				} catch (InterruptedException e) {
+					throw new IllegalStateException(e);
+				}
+			} else {
+				throw new IllegalStateException(
+						String.format("Clock moved backwards. Refusing to generate id for %d milliseconds", offset));
+			}
 		}
 		lastTimestamp = timestamp;
 		return ((timestamp - EPOCH) << (sequenceBits + workerIdBits)) | (workerId << sequenceBits) | sequence;
