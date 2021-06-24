@@ -100,10 +100,6 @@ public class Snowflake {
 		return ((timestamp - EPOCH) << (sequenceBits + workerIdBits)) | (workerId << sequenceBits) | sequence;
 	}
 
-	public String nextBase62Id() {
-		return NumberUtils.decimalToX(62, nextId());
-	}
-
 	public Info parse(long id) {
 		return new Info(id, workerIdBits, sequenceBits);
 	}

@@ -19,14 +19,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = HibernateConfiguration.class)
 @TestPropertySource(properties = {
-		"annotatedClasses=org.ironrhino.core.hibernate.LongIdMessage,org.ironrhino.core.hibernate.StringIdMessage" })
+		"annotatedClasses=org.ironrhino.core.hibernate.LongIdMessage" })
 public class SnowflakeGeneratorTest {
 
 	@Autowired
 	private EntityManager<LongIdMessage> longIdMessageManager;
-
-	@Autowired
-	private EntityManager<StringIdMessage> stringIdMessageManager;
 
 	@Test
 	public void testLongId() throws Exception {
@@ -49,29 +46,6 @@ public class SnowflakeGeneratorTest {
 			assertThat(list.get(i).getTitle(), equalTo("title" + (size - i - 1)));
 		}
 		longIdMessageManager.executeUpdate("delete from LongIdMessage");
-	}
-
-	@Test
-	public void testStringId() throws Exception {
-		stringIdMessageManager.setEntityClass(StringIdMessage.class);
-		int size = 100;
-		for (int i = 0; i < size; i++) {
-			StringIdMessage message = new StringIdMessage();
-			message.setTitle("title" + i);
-			stringIdMessageManager.save(message);
-			TimeUnit.MILLISECONDS.sleep(20);
-		}
-		List<StringIdMessage> list = stringIdMessageManager.findAll(Order.asc("id"));
-		assertThat(list.size(), equalTo(size));
-		for (int i = 0; i < size; i++) {
-			assertThat(list.get(i).getTitle(), equalTo("title" + i));
-		}
-		list = stringIdMessageManager.findAll(Order.desc("id"));
-		assertThat(list.size(), equalTo(size));
-		for (int i = 0; i < size; i++) {
-			assertThat(list.get(i).getTitle(), equalTo("title" + (size - i - 1)));
-		}
-		stringIdMessageManager.executeUpdate("delete from StringIdMessage");
 	}
 
 }
