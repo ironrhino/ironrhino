@@ -2,7 +2,13 @@ package org.ironrhino.core.hibernate.type;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.common.reflection.XProperty;
@@ -14,7 +20,7 @@ import org.hibernate.usertype.DynamicParameterizedType;
 import org.ironrhino.core.util.JsonUtils;
 import org.springframework.beans.BeanUtils;
 
-public class JsonJavaTypeDescriptor extends AbstractTypeDescriptor<Object> implements DynamicParameterizedType {
+public class JsonTypeDescriptor extends AbstractTypeDescriptor<Object> implements DynamicParameterizedType {
 
 	private static final long serialVersionUID = -6335930102166043485L;
 
@@ -34,13 +40,22 @@ public class JsonJavaTypeDescriptor extends AbstractTypeDescriptor<Object> imple
 		}
 	}
 
-	public JsonJavaTypeDescriptor() {
+	public JsonTypeDescriptor() {
 		super(Object.class, new MutableMutabilityPlan<Object>() {
 
 			private static final long serialVersionUID = 1940316475848878030L;
 
 			@Override
 			protected Object deepCopyNotNull(Object value) {
+				if (value instanceof Set) {
+					return new LinkedHashSet<>((Set<?>) value);
+				}
+				if (value instanceof Collection) {
+					return new ArrayList<>((Collection<?>) value);
+				}
+				if (value instanceof Map) {
+					return new LinkedHashMap<>((Map<?, ?>) value);
+				}
 				Object obj;
 				try {
 					obj = BeanUtils.instantiateClass(value.getClass());
@@ -52,15 +67,6 @@ public class JsonJavaTypeDescriptor extends AbstractTypeDescriptor<Object> imple
 
 			}
 		});
-	}
-
-	@Override
-	public boolean areEqual(Object value, Object another) {
-		if (value == another)
-			return true;
-		if (value == null || another == null)
-			return false;
-		return JsonUtils.toJson(value).equals(JsonUtils.toJson(another));
 	}
 
 	@Override

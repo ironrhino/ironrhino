@@ -12,7 +12,7 @@ public class JsonType extends AbstractSingleColumnStandardBasicType<Object> impl
 	private static final long serialVersionUID = -6106597335909896629L;
 
 	public JsonType() {
-		super(VarcharTypeDescriptor.INSTANCE, new JsonJavaTypeDescriptor());
+		super(VarcharTypeDescriptor.INSTANCE, new JsonTypeDescriptor());
 	}
 
 	@Override
@@ -27,6 +27,6 @@ public class JsonType extends AbstractSingleColumnStandardBasicType<Object> impl
 
 	@Override
 	public void setParameterValues(Properties parameters) {
-		((JsonJavaTypeDescriptor) getJavaTypeDescriptor()).setParameterValues(parameters);
+		((JsonTypeDescriptor) getJavaTypeDescriptor()).setParameterValues(parameters);
 	}
 }
