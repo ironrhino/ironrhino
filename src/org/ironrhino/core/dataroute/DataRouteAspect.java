@@ -46,7 +46,7 @@ public class DataRouteAspect extends BaseAspect {
 		}
 	}
 
-	@Around("execution(public * *(..)) and @within(dataRoute) and not @annotation(org.ironrhino.core.dataroute.DataRoute)")
+	@Around("execution(public * *(..)) and @within(dataRoute) and not @annotation(DataRoute)")
 	public Object routeByClass(ProceedingJoinPoint pjp, DataRoute dataRoute) throws Throwable {
 		String nodeName = dataRoute.nodeName();
 		DataRouteContext.setNodeName(nodeName);

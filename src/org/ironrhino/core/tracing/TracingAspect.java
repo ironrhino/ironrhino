@@ -75,7 +75,7 @@ public class TracingAspect extends BaseAspect {
 		}
 	}
 
-	@Around("execution(public * *(..)) and @annotation(transactional) and not @annotation(org.ironrhino.core.tracing.Traced)")
+	@Around("execution(public * *(..)) and @annotation(transactional) and not @annotation(Traced)")
 	public Object trace(ProceedingJoinPoint pjp, Transactional transactional) throws Throwable {
 		Method method = ((MethodSignature) pjp.getSignature()).getMethod();
 		List<Serializable> tags = new ArrayList<>();
