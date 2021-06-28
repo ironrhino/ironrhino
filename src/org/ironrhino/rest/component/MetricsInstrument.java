@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Aspect
 @ControllerAdvice
-public class MetricsAspect extends AbstractInstrumentAspect {
+public class MetricsInstrument extends AbstractInstrument {
 
-	public MetricsAspect(String servletMapping) {
+	public MetricsInstrument(String servletMapping) {
 		super(servletMapping);
 		order = Ordered.HIGHEST_PRECEDENCE + 2;
 	}

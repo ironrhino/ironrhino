@@ -8,11 +8,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import lombok.Value;
 
-abstract class AbstractInstrumentAspect extends BaseAspect {
+abstract class AbstractInstrument extends BaseAspect {
 
 	protected final String servletMapping;
 
-	public AbstractInstrumentAspect(String servletMapping) {
+	public AbstractInstrument(String servletMapping) {
 		if (servletMapping.endsWith("/*"))
 			servletMapping = servletMapping.substring(0, servletMapping.length() - 2);
 		this.servletMapping = servletMapping;

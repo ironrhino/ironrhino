@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Aspect
 @ControllerAdvice
-public class AuthorizeAspect extends BaseAspect {
+public class AuthorizeInstrument extends BaseAspect {
 
-	public AuthorizeAspect() {
+	public AuthorizeInstrument() {
 		order = Ordered.HIGHEST_PRECEDENCE + 1;
 	}
 

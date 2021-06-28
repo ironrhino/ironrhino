@@ -34,7 +34,7 @@ import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.rest.client.RestApiFactoryBean;
 import org.ironrhino.rest.client.RestClientConfiguration.MyJsonValidator;
 import org.ironrhino.rest.client.UserClient;
-import org.ironrhino.rest.component.AuthorizeAspect;
+import org.ironrhino.rest.component.AuthorizeInstrument;
 import org.ironrhino.sample.api.controller.UserController;
 import org.ironrhino.security.domain.User;
 import org.ironrhino.security.service.UserManager;
@@ -386,8 +386,8 @@ public class UserRestApiTest {
 		}
 
 		@Bean
-		public AuthorizeAspect authorizeAspect() {
-			return new AuthorizeAspect();
+		public AuthorizeInstrument authorizeInstrument() {
+			return new AuthorizeInstrument();
 		}
 
 		@Bean

@@ -25,10 +25,10 @@ import org.ironrhino.core.spring.converter.YearMonthConverter;
 import org.ironrhino.core.spring.converter.ZonedDateTimeConverter;
 import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.core.util.ReflectionUtils;
-import org.ironrhino.rest.component.AuthorizeAspect;
-import org.ironrhino.rest.component.MetricsAspect;
+import org.ironrhino.rest.component.AuthorizeInstrument;
+import org.ironrhino.rest.component.MetricsInstrument;
 import org.ironrhino.rest.component.RestExceptionHandler;
-import org.ironrhino.rest.component.TracingAspect;
+import org.ironrhino.rest.component.TracingInstrument;
 import org.ironrhino.rest.doc.ApiDocInspector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -271,20 +271,20 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 	}
 
 	@Bean
-	protected AuthorizeAspect authorizeAspect() {
-		return new AuthorizeAspect();
+	protected AuthorizeInstrument authorizeInstrument() {
+		return new AuthorizeInstrument();
 	}
 
 	@Bean
 	@MicrometerPresent
-	protected MetricsAspect metricsAspect() {
-		return new MetricsAspect(getServletMapping());
+	protected MetricsInstrument metricsInstrument() {
+		return new MetricsInstrument(getServletMapping());
 	}
 
 	@Bean
 	@ClassPresentConditional("io.opentracing.Tracer")
-	protected TracingAspect tracingAspect() {
-		return new TracingAspect(getServletMapping());
+	protected TracingInstrument tracingInstrument() {
+		return new TracingInstrument(getServletMapping());
 	}
 
 	@Bean

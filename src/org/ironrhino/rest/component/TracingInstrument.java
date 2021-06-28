@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Aspect
 @ControllerAdvice
-public class TracingAspect extends AbstractInstrumentAspect {
+public class TracingInstrument extends AbstractInstrument {
 
-	public TracingAspect(String servletMapping) {
+	public TracingInstrument(String servletMapping) {
 		super(servletMapping);
 	}
 
