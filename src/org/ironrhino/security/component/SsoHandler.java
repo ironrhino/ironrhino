@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -47,6 +48,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.Data;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @ApplicationContextPropertiesConditional(key = "portal.baseUrl", value = ANY)
@@ -64,6 +66,7 @@ public class SsoHandler extends AccessHandler {
 	@Value("${ssoHandler.excludePattern:}")
 	protected String excludePattern;
 
+	@Setter
 	@Value("${ssoHandler.strictAccess:false}")
 	protected boolean strictAccess;
 
@@ -106,8 +109,11 @@ public class SsoHandler extends AccessHandler {
 
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		if (!RequestUtils.isSameOrigin(request.getRequestURL().toString(), portalBaseUrl))
-			return strictAccess;
+		if (!RequestUtils.isSameOrigin(request.getRequestURL().toString(), portalBaseUrl)) {
+			if (strictAccess)
+				throw new AccessDeniedException("Please access via domain name");
+			return false;
+		}
 		SecurityContext sc = SecurityContextHolder.getContext();
 		Authentication auth = sc.getAuthentication();
 		if (auth != null && auth.isAuthenticated())

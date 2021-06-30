@@ -34,6 +34,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -62,13 +63,14 @@ public class SsoHandlerTest {
 	@Autowired
 	private UserDetailsService userDetailsService;
 
-	@Test
+	@Test(expected = AccessDeniedException.class)
 	public void testStrictAccess() throws IOException {
 		HttpServletRequest request = mock(HttpServletRequest.class);
-		given(request.getRequestURL()).willReturn(new StringBuffer("http://127.0.0.0.1:8080"));
-		assertThat(ssoHandler.handle(request, mock(HttpServletResponse.class)), is(ssoHandler.strictAccess));
-		given(request.getRequestURL()).willReturn(new StringBuffer("http://www.baidu.com"));
-		assertThat(ssoHandler.handle(request, mock(HttpServletResponse.class)), is(ssoHandler.strictAccess));
+		HttpServletResponse response = mock(HttpServletResponse.class);
+		ssoHandler.setStrictAccess(true);
+		given(request.getRequestURL()).willReturn(new StringBuffer("http://test.com/test"));
+		ssoHandler.handle(request, response);
+		ssoHandler.setStrictAccess(false);
 	}
 
 	@Test
