@@ -102,7 +102,7 @@ public class TracingConfiguration {
 		JaegerTracer.Builder builder = new JaegerTracer.Builder(AppInfo.getAppName())
 				.withScopeManager(new MDCScopeManager.Builder().build()).withTraceId128Bit().withSampler(sampler)
 				.withReporter(reporter).withTag("java.version", System.getProperty("java.version"))
-				.withTag("instance", AppInfo.getInstanceId())
+				.withTag("server.port", AppInfo.getHttpPort())
 				.withTag(Constants.TRACER_HOSTNAME_TAG_KEY, AppInfo.getHostName())
 				.withTag(Constants.TRACER_IP_TAG_KEY, AppInfo.getHostAddress())
 				.registerExtractor(Builtin.HTTP_HEADERS, codec).registerInjector(Builtin.HTTP_HEADERS, codec);
@@ -111,7 +111,7 @@ public class TracingConfiguration {
 			builder.withTag("ironrhino.version", ironrhinoVersion);
 		String server = AppInfo.getServerInfo();
 		if (StringUtils.isNotBlank(server))
-			builder.withTag("server", server);
+			builder.withTag("server.info", server);
 		tracer = builder.build();
 		if (GlobalTracer.registerIfAbsent(tracer))
 			log.info("Register jaeger tracer with {}", uri);
