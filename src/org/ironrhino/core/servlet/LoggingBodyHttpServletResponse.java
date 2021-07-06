@@ -16,7 +16,6 @@ import org.ironrhino.core.util.JsonDesensitizer;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 import org.springframework.util.FastByteArrayOutputStream;
-import org.springframework.web.util.WebUtils;
 
 /**
  * @See org.springframework.web.util.ContentCachingResponseWrapper
@@ -25,21 +24,18 @@ public class LoggingBodyHttpServletResponse extends HttpServletResponseWrapper {
 
 	private final Logger logger;
 
+	private final String characterEncoding;
+
 	private volatile ServletOutputStream streamOutputStream;
 
 	private volatile PrintWriter writer;
 
 	private final FastByteArrayOutputStream cachedContent = new FastByteArrayOutputStream();
 
-	public LoggingBodyHttpServletResponse(HttpServletResponse response, Logger logger) {
+	public LoggingBodyHttpServletResponse(HttpServletResponse response, Logger logger, String characterEncoding) {
 		super(response);
 		this.logger = logger;
-	}
-
-	@Override
-	public String getCharacterEncoding() {
-		String enc = super.getCharacterEncoding();
-		return (enc != null ? enc : WebUtils.DEFAULT_CHARACTER_ENCODING);
+		this.characterEncoding = characterEncoding != null ? characterEncoding : "UTF-8";
 	}
 
 	@Override
@@ -89,7 +85,8 @@ public class LoggingBodyHttpServletResponse extends HttpServletResponseWrapper {
 		if (temp == null) {
 			synchronized (this) {
 				if ((temp = streamOutputStream) == null)
-					streamOutputStream = temp = new ResponseServletOutputStream(getResponse(), logger, cachedContent);
+					streamOutputStream = temp = new ResponseServletOutputStream(getResponse(), logger,
+							characterEncoding, cachedContent);
 			}
 		}
 		return temp;
@@ -98,7 +95,7 @@ public class LoggingBodyHttpServletResponse extends HttpServletResponseWrapper {
 	@Override
 	public PrintWriter getWriter() throws IOException {
 		if (this.writer == null) {
-			this.writer = new ResponsePrintWriter(getOutputStream(), getCharacterEncoding());
+			this.writer = new ResponsePrintWriter(getOutputStream(), characterEncoding);
 		}
 		return this.writer;
 	}
@@ -113,11 +110,11 @@ public class LoggingBodyHttpServletResponse extends HttpServletResponseWrapper {
 
 		private FastByteArrayOutputStream cachedContent;
 
-		public ResponseServletOutputStream(ServletResponse response, Logger logger,
+		public ResponseServletOutputStream(ServletResponse response, Logger logger, String characterEncoding,
 				FastByteArrayOutputStream cachedContent) throws IOException {
 			this.logger = logger;
 			this.os = response.getOutputStream();
-			this.characterEncoding = response.getCharacterEncoding();
+			this.characterEncoding = characterEncoding;
 			this.cachedContent = cachedContent;
 		}
 

@@ -33,19 +33,45 @@ public class RestFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		if (StringUtils.isBlank(request.getContentType()))
+		boolean skip = !loggingBody;
+		if (!skip) {
+			for (MediaType accept : MediaType.parseMediaTypes(request.getHeader(HttpHeaders.ACCEPT))) {
+				if (accept.equals(MediaType.TEXT_EVENT_STREAM)) {
+					skip = true;
+					break;
+				}
+				if (accept.isCompatibleWith(MediaType.APPLICATION_JSON)
+						|| accept.isCompatibleWith(MediaType.TEXT_PLAIN)) {
+					skip = false;
+					break;
+				}
+			}
+		}
+		if (skip) {
+			filterChain.doFilter(request, response);
+			return;
+		}
+
+		if (request.getContentType() == null)
 			request = new WrappedHttpServletRequest(request);
-		if (loggingBody && !MediaType.TEXT_EVENT_STREAM_VALUE.equals(request.getHeader(HttpHeaders.ACCEPT))
-				&& (request.getContentType() == null || request.getContentType().startsWith(MediaType.TEXT_PLAIN_VALUE)
-						|| request.getContentType().startsWith(MediaType.APPLICATION_JSON_VALUE))) {
-			if (request.getMethod().equalsIgnoreCase("GET")) {
+		String contentType = request.getContentType();
+		if (contentType == null || contentType.startsWith(MediaType.TEXT_PLAIN_VALUE)
+				|| contentType.startsWith(MediaType.APPLICATION_JSON_VALUE)) {
+			if (request.getMethod().equals("GET") || request.getMethod().equals("DELETE")) {
 				logger.info("");
 			} else {
 				request = new LoggingBodyHttpServletRequest(request, logger);
 			}
-			response = new LoggingBodyHttpServletResponse(response, logger);
+			response = new LoggingBodyHttpServletResponse(response, logger, request.getCharacterEncoding());
 		}
+
 		filterChain.doFilter(request, response);
+		if (response instanceof LoggingBodyHttpServletResponse) {
+			contentType = response.getContentType();
+			if (contentType != null && (contentType.startsWith(MediaType.TEXT_PLAIN_VALUE)
+					|| contentType.startsWith(MediaType.APPLICATION_JSON_VALUE)))
+				response.getOutputStream().close();
+		}
 	}
 
 	private static class WrappedHttpServletRequest extends HttpServletRequestWrapper {
