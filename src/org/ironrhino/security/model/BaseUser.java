@@ -73,6 +73,7 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 	@NotInCopy
 	@Column(nullable = false)
 	@UiConfig(hidden = true, excludedFromLike = true, excludedFromCriteria = true)
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private String password;
 
 	@SearchableProperty(boost = 3)
@@ -132,17 +133,6 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 	@Column(length = 4000)
 	@UiConfig(hidden = true)
 	private Map<String, String> attributes;
-
-	@Override
-	@JsonIgnore
-	public String getPassword() {
-		return password;
-	}
-
-	@JsonProperty
-	public void setPassword(String password) {
-		this.password = password;
-	}
 
 	public void setName(String name) {
 		name = StringUtils.isBlank(name) ? null : name;
