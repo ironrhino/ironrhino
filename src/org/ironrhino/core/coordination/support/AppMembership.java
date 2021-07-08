@@ -21,25 +21,21 @@ public class AppMembership {
 		this.membership = membership;
 	}
 
-	public boolean isLeader() throws Exception {
+	public boolean isLeader() {
 		return membership.isLeader(group);
 	}
 
-	public String getLeader(String group) throws Exception {
+	public String getLeader(String group) {
 		return membership.getLeader(group);
 	}
 
-	public List<String> getMembers(String group) throws Exception {
+	public List<String> getMembers(String group) {
 		return membership.getMembers(group);
 	}
 
 	@PostConstruct
 	public void init() {
-		try {
-			membership.join(group);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		membership.join(group);
 	}
 
 }
