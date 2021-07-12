@@ -24,6 +24,8 @@ import org.ironrhino.core.model.Treeable;
 import org.ironrhino.core.spring.converter.CustomConversionService;
 import org.junit.Test;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -59,13 +61,26 @@ public class BeanUtilsTest {
 	public static class User extends Base {
 
 		private static final long serialVersionUID = -1634488900558289348L;
+		@JsonView(View.A.class)
 		private String username;
 		@NotInCopy
+		@JsonView(View.B.class)
 		private String password;
 
 		private Team team;
 
 		private UserType type = UserType.A;
+		
+
+		interface View {
+			interface A {
+
+			}
+
+			interface B extends A {
+
+			}
+		}
 
 	}
 
@@ -263,6 +278,25 @@ public class BeanUtilsTest {
 		assertThat(user3.getId(), notNullValue());
 		assertThat(user3.getUsername(), notNullValue());
 		assertThat(user3.getPassword(), notNullValue());
+
+	}
+	
+	@Test
+	public void testCopyPropertiesInJsonView() {
+		User user1 = new User();
+		user1.setUsername("username1");
+		user1.setPassword("password1");
+
+		User user2 = new User();
+		user2.setPassword("password");
+		BeanUtils.copyPropertiesInJsonView(user1, user2, User.View.A.class);
+		assertThat(user2.getUsername(), notNullValue());
+		assertThat(user2.getPassword(), equalTo("password"));
+
+		User user3 = new User();
+		BeanUtils.copyPropertiesInJsonView(user1, user3, User.View.B.class);
+		assertThat(user2.getUsername(), notNullValue());
+		assertThat(user2.getPassword(), notNullValue());
 
 	}
 

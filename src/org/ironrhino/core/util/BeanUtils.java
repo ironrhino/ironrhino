@@ -23,8 +23,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.NotInCopy;
 import org.ironrhino.core.model.Treeable;
 import org.ironrhino.core.spring.converter.CustomConversionService;
+import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.convert.ConversionService;
+
+import com.fasterxml.jackson.annotation.JsonView;
 
 import lombok.experimental.UtilityClass;
 
@@ -35,6 +38,32 @@ public class BeanUtils {
 		if (org.springframework.beans.BeanUtils.getPropertyDescriptor(clazz, name) != null)
 			return true;
 		return false;
+	}
+
+	public static void copyPropertiesInJsonView(Object source, Object target, Class<?> view) {
+		BeanWrapper sourceBW = new BeanWrapperImpl(source);
+		BeanWrapper targetBW = new BeanWrapperImpl(target);
+		for (PropertyDescriptor pd : sourceBW.getPropertyDescriptors()) {
+			String name = pd.getName();
+			Method m = pd.getReadMethod();
+			if (m == null)
+				continue;
+			JsonView jsonView = m.getAnnotation(JsonView.class);
+			if (jsonView == null) {
+				try {
+					jsonView = m.getDeclaringClass().getDeclaredField(name).getAnnotation(JsonView.class);
+				} catch (Exception e) {
+				}
+			}
+			if (jsonView == null)
+				continue;
+			for (Class<?> clazz : jsonView.value()) {
+				if (clazz.isAssignableFrom(view)) {
+					targetBW.setPropertyValue(name, sourceBW.getPropertyValue(name));
+					break;
+				}
+			}
+		}
 	}
 
 	public static void copyPropertiesIfNotNull(Object source, Object target, String... properties) {
