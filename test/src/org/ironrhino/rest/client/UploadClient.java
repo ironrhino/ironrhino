@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -23,6 +24,6 @@ public interface UploadClient {
 	String uploadBytes(byte[] bytes);
 
 	@RequestMapping(value = "/upload", method = RequestMethod.POST)
-	JsonNode upload(@RequestParam String name, @RequestParam File file);
+	JsonNode upload(@RequestParam String name, @RequestPart File file);
 
 }

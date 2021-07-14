@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.model.ResultPage;
+import org.ironrhino.core.util.GenericTypeResolver;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.rest.RestResult;
 import org.ironrhino.rest.doc.annotation.Api;
@@ -30,7 +31,6 @@ import org.ironrhino.rest.doc.annotation.Fields;
 import org.ironrhino.rest.doc.annotation.Status;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.ironrhino.core.util.GenericTypeResolver;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.io.Resource;
@@ -46,6 +46,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.async.DeferredResult;
 
@@ -375,7 +376,7 @@ public class ApiDoc implements Serializable {
 						}
 					} else if (anno instanceof PathVariable) {
 						PathVariable ann = (PathVariable) anno;
-						String nameInAnn = StringUtils.isNotBlank(ann.name()) ? nameInAnn = ann.name() : ann.value();
+						String nameInAnn = StringUtils.isNotBlank(ann.name()) ? ann.name() : ann.value();
 						String fieldName = StringUtils.isNotBlank(nameInAnn) ? nameInAnn : parameterName;
 						Class<?> fieldType = parameterType;
 						boolean fieldRequired = ann.required();
@@ -386,25 +387,35 @@ public class ApiDoc implements Serializable {
 						}
 						if (!Map.class.isAssignableFrom(fieldType))
 							pathVariables.add(FieldObject.create(fieldName, fieldType, fieldRequired, null, fd));
-					} else if (anno instanceof RequestParam) {
-						RequestParam ann = (RequestParam) anno;
-						String nameInAnn = StringUtils.isNotBlank(ann.name()) ? nameInAnn = ann.name() : ann.value();
-						String fieldName = StringUtils.isNotBlank(nameInAnn) ? nameInAnn : parameterName;
+					} else if (anno instanceof RequestParam || anno instanceof RequestPart) {
+						String fieldName;
+						boolean fieldRequired;
+						String defaultValue = null;
+						if (anno instanceof RequestParam) {
+							RequestParam ann = (RequestParam) anno;
+							String nameInAnn = StringUtils.isNotBlank(ann.name()) ? ann.name() : ann.value();
+							fieldName = StringUtils.isNotBlank(nameInAnn) ? nameInAnn : parameterName;
+							fieldRequired = ann.required();
+							defaultValue = ann.defaultValue();
+						} else {
+							RequestPart ann = (RequestPart) anno;
+							String nameInAnn = StringUtils.isNotBlank(ann.name()) ? ann.name() : ann.value();
+							fieldName = StringUtils.isNotBlank(nameInAnn) ? nameInAnn : parameterName;
+							fieldRequired = ann.required();
+						}
 						Type fieldType = genericParameterType;
-						boolean fieldRequired = ann.required();
 						if (parameterType == Optional.class) {
 							fieldType = ((ParameterizedType) genericParameterType).getActualTypeArguments()[0];
 							fieldRequired = false;
 						}
 						if (!Map.class.isAssignableFrom(parameterType)) {
-							FieldObject fo = FieldObject.create(fieldName, fieldType, fieldRequired, ann.defaultValue(),
-									fd);
+							FieldObject fo = FieldObject.create(fieldName, fieldType, fieldRequired, defaultValue, fd);
 							if (fo != null)
 								requestParams.add(fo);
 						}
 					} else if (anno instanceof RequestHeader) {
 						RequestHeader ann = (RequestHeader) anno;
-						String nameInAnn = StringUtils.isNotBlank(ann.name()) ? nameInAnn = ann.name() : ann.value();
+						String nameInAnn = StringUtils.isNotBlank(ann.name()) ? ann.name() : ann.value();
 						String fieldName = StringUtils.isNotBlank(nameInAnn) ? nameInAnn : parameterName;
 						Type fieldType = genericParameterType;
 						boolean fieldRequired = ann.required();
@@ -421,7 +432,7 @@ public class ApiDoc implements Serializable {
 						}
 					} else if (anno instanceof CookieValue) {
 						CookieValue ann = (CookieValue) anno;
-						String nameInAnn = StringUtils.isNotBlank(ann.name()) ? nameInAnn = ann.name() : ann.value();
+						String nameInAnn = StringUtils.isNotBlank(ann.name()) ? ann.name() : ann.value();
 						String fieldName = StringUtils.isNotBlank(nameInAnn) ? nameInAnn : parameterName;
 						Type fieldType = genericParameterType;
 						boolean fieldRequired = ann.required();

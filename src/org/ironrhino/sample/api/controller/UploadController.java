@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,7 +32,7 @@ public class UploadController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public Map<String, Object> upload(@RequestParam String name, @RequestParam MultipartFile file) {
+	public Map<String, Object> upload(@RequestParam String name, @RequestPart MultipartFile file) {
 		Map<String, Object> result = new HashMap<>();
 		result.put("name", name);
 		if (!file.isEmpty()) {

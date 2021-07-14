@@ -78,6 +78,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.client.HttpClientErrorException.NotFound;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResourceAccessException;
@@ -293,9 +294,10 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 						headers.add(name, argument.toString());
 					}
 				}
-				if (anno instanceof RequestParam) {
+				if (anno instanceof RequestParam || anno instanceof RequestPart) {
 					annotationPresent = true;
-					String name = ((RequestParam) anno).value();
+					String name = anno instanceof RequestParam ? ((RequestParam) anno).value()
+							: ((RequestPart) anno).value();
 					if (StringUtils.isBlank(name))
 						name = parameterNames[i];
 					if (requestParams == null)
