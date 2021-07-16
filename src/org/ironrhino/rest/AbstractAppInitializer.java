@@ -58,9 +58,11 @@ public abstract class AbstractAppInitializer<T extends ApiConfigBase> implements
 		if (filterRegistration == null) {
 			FilterRegistration.Dynamic dynamicFilter = servletContext.addFilter("restFilter", DelegatingFilter.class);
 			dynamicFilter.setAsyncSupported(true);
-			dynamicFilter.addMappingForServletNames(EnumSet.of(DispatcherType.REQUEST), true, servletName);
+			dynamicFilter.addMappingForServletNames(
+					EnumSet.of(DispatcherType.REQUEST, DispatcherType.ERROR, DispatcherType.ASYNC), true, servletName);
 		} else {
-			filterRegistration.addMappingForServletNames(EnumSet.of(DispatcherType.REQUEST), true, servletName);
+			filterRegistration.addMappingForServletNames(
+					EnumSet.of(DispatcherType.REQUEST, DispatcherType.ERROR, DispatcherType.ASYNC), true, servletName);
 		}
 	}
 
