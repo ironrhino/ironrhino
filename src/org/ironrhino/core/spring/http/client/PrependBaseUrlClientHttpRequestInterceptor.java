@@ -23,7 +23,7 @@ public class PrependBaseUrlClientHttpRequestInterceptor implements ClientHttpReq
 	public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
 			throws IOException {
 		URI uri = request.getURI();
-		if (uri.getHost() == null) {
+		if (!uri.isAbsolute()) {
 			HttpRequest origin = request;
 			HttpRequest req = new HttpRequest() {
 				@Override

@@ -25,7 +25,7 @@ class RestClientTemplate extends RestTemplate {
 	public RestClientTemplate(RestClient client) {
 		super();
 		Assert.notNull(client, "client must not be null");
-		this.getInterceptors().add(new PrependBaseUrlClientHttpRequestInterceptor(() -> client.getApiBaseUrl()));
+		this.getInterceptors().add(new PrependBaseUrlClientHttpRequestInterceptor(client::getApiBaseUrl));
 		this.getInterceptors().add(new ClientHttpRequestInterceptor() {
 			@Override
 			public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
