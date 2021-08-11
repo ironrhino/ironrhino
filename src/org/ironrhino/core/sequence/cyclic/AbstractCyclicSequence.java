@@ -1,14 +1,14 @@
 package org.ironrhino.core.sequence.cyclic;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
-import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.sequence.CyclicSequence;
 import org.ironrhino.core.util.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.StringUtils;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -31,7 +31,7 @@ public abstract class AbstractCyclicSequence implements CyclicSequence, Initiali
 	private int paddingLength = 4;
 
 	public String getSequenceName() {
-		return StringUtils.isNotBlank(sequenceName) ? sequenceName : beanName;
+		return StringUtils.hasLength(sequenceName) ? sequenceName : beanName;
 	}
 
 	@Override
@@ -39,13 +39,13 @@ public abstract class AbstractCyclicSequence implements CyclicSequence, Initiali
 		return Long.valueOf(nextStringValue());
 	}
 
-	protected String getStringValue(Date date, int paddingLength, int nextId) {
-		return getCycleType().format(date) + NumberUtils.format(nextId, paddingLength);
+	protected String getStringValue(LocalDateTime datetime, int paddingLength, int nextId) {
+		return getCycleType().format(datetime) + NumberUtils.format(nextId, paddingLength);
 	}
 
 	@Override
 	public void setBeanName(String beanName) {
-		if (StringUtils.isNotBlank(beanName)) {
+		if (StringUtils.hasLength(beanName)) {
 			if (beanName.endsWith("CyclicSequence")) {
 				beanName = beanName.substring(0, beanName.length() - "CyclicSequence".length());
 			} else if (beanName.endsWith("Sequence")) {

@@ -8,6 +8,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -169,19 +170,18 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 			int remainingAttempts = maxAttempts;
 			do {
 				Result result = queryTimestampWithSequence(con, stmt);
-				Timestamp now = result.currentTimestamp;
+				LocalDateTime now = result.current;
 				if (sameCycle(result)) {
-					if (updateLastUpdated(con, now, new Timestamp(ct.getCycleStart(ct.skipCycles(now, 1)).getTime())))
+					if (updateLastUpdated(con, now, ct.getCycleStart(ct.skipCycles(now, 1))))
 						return getStringValue(now, getPaddingLength(), result.nextId);
 				} else {
 					con.setAutoCommit(false);
 					try {
 						result = queryTimestampForUpdate(con, stmt);
-						if (!sameCycle(result)
-								&& updateLastUpdated(con, now, new Timestamp(ct.getCycleStart(now).getTime()))) {
+						if (!sameCycle(result) && updateLastUpdated(con, now, ct.getCycleStart(now))) {
 							restartSequence(con, stmt);
 							result = queryTimestampWithSequence(con, stmt);
-							return getStringValue(result.currentTimestamp, getPaddingLength(), result.nextId);
+							return getStringValue(result.current, getPaddingLength(), result.nextId);
 						}
 						con.commit();
 					} catch (Exception e) {
@@ -207,16 +207,17 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 		stmt.execute(getRestartSequenceStatement());
 	}
 
-	private boolean updateLastUpdated(Connection con, Timestamp lastUpdated, Timestamp limit) throws SQLException {
+	private boolean updateLastUpdated(Connection con, LocalDateTime lastUpdated, LocalDateTime limit)
+			throws SQLException {
 		try (PreparedStatement ps = con.prepareStatement(updateTimestampStatement)) {
-			ps.setTimestamp(1, lastUpdated);
-			ps.setTimestamp(2, limit);
+			ps.setTimestamp(1, Timestamp.valueOf(lastUpdated));
+			ps.setTimestamp(2, Timestamp.valueOf(limit));
 			return ps.executeUpdate() == 1;
 		}
 	}
 
 	private boolean sameCycle(Result result) {
-		return getCycleType().isSameCycle(result.lastTimestamp, result.currentTimestamp);
+		return getCycleType().isSameCycle(result.last, result.current);
 	}
 
 	private Result queryTimestampWithSequence(Connection con, Statement stmt) throws SQLException {
@@ -228,7 +229,7 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 			// keep monotonic incrementing
 			if (lastTimestamp.after(currentTimestamp))
 				currentTimestamp = lastTimestamp;
-			return new Result(nextId, currentTimestamp, lastTimestamp);
+			return new Result(nextId, currentTimestamp.toLocalDateTime(), lastTimestamp.toLocalDateTime());
 		}
 	}
 
@@ -240,14 +241,14 @@ public abstract class AbstractSequenceCyclicSequence extends AbstractDatabaseCyc
 			// keep monotonic incrementing
 			if (lastTimestamp.after(currentTimestamp))
 				currentTimestamp = lastTimestamp;
-			return new Result(0, currentTimestamp, lastTimestamp);
+			return new Result(0, currentTimestamp.toLocalDateTime(), lastTimestamp.toLocalDateTime());
 		}
 	}
 
 	@Value
 	private static class Result {
 		int nextId;
-		Timestamp currentTimestamp;
-		Timestamp lastTimestamp;
+		LocalDateTime current;
+		LocalDateTime last;
 	}
 }

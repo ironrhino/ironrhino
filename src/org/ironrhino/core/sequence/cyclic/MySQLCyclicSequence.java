@@ -4,9 +4,11 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Date;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.TimeZone;
 
-import org.ironrhino.core.sequence.MySQLSequenceHelper;
+import org.ironrhino.core.sequence.simple.MySQLSimpleSequence;
 import org.ironrhino.core.util.MaxAttemptsExceededException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -30,7 +32,7 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 				+ getSequenceName() + "' AND DATE_FORMAT(FROM_UNIXTIME(LAST_UPDATED),'" + getDateFormat()
 				+ "')!=DATE_FORMAT(FROM_UNIXTIME(@TIMESTAMP),'" + getDateFormat() + "')";
 		try {
-			MySQLSequenceHelper.createOrUpgradeTable(getDataSource(), getTableName(), getSequenceName());
+			MySQLSimpleSequence.createTable(getDataSource(), getTableName(), getSequenceName());
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -72,8 +74,10 @@ public class MySQLCyclicSequence extends AbstractDatabaseCyclicSequence {
 			Long current = rs.getLong(2);
 			if (current < 10000000000L) // no mills
 				current *= 1000;
-			Date currentTimestamp = new Date(current);
-			return getStringValue(currentTimestamp, getPaddingLength(), next);
+			LocalDateTime datetime = LocalDateTime.ofInstant(Instant.ofEpochMilli(current),
+					TimeZone.getDefault().toZoneId());
+			;
+			return getStringValue(datetime, getPaddingLength(), next);
 		}
 	}
 

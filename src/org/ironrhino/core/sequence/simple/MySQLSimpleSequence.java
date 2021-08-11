@@ -1,11 +1,16 @@
 package org.ironrhino.core.sequence.simple;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Locale;
 
-import org.ironrhino.core.sequence.MySQLSequenceHelper;
+import javax.sql.DataSource;
+
 import org.springframework.dao.DataAccessResourceFailureException;
 
 public class MySQLSimpleSequence extends AbstractDatabaseSimpleSequence {
@@ -17,7 +22,7 @@ public class MySQLSimpleSequence extends AbstractDatabaseSimpleSequence {
 	@Override
 	public void afterPropertiesSet() {
 		try {
-			MySQLSequenceHelper.createOrUpgradeTable(getDataSource(), getTableName(), getSequenceName());
+			createTable(getDataSource(), getTableName(), getSequenceName());
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		}
@@ -72,6 +77,43 @@ public class MySQLSimpleSequence extends AbstractDatabaseSimpleSequence {
 			}
 		} catch (SQLException ex) {
 			throw new DataAccessResourceFailureException(ex.getMessage(), ex);
+		}
+	}
+
+	public static void createTable(DataSource dataSrouce, String tableName, String sequenceName) throws SQLException {
+		try (Connection conn = dataSrouce.getConnection(); Statement stmt = conn.createStatement()) {
+			boolean tableExists = false;
+			conn.setAutoCommit(true);
+			DatabaseMetaData dbmd = conn.getMetaData();
+			String catalog = conn.getCatalog();
+			String schema = null;
+			try {
+				schema = conn.getSchema();
+			} catch (Throwable t) {
+			}
+			for (String table : new LinkedHashSet<>(
+					Arrays.asList(tableName.toUpperCase(Locale.ROOT), tableName, tableName.toLowerCase(Locale.ROOT)))) {
+				try (ResultSet rs = dbmd.getTables(catalog, schema, table, new String[] { "TABLE" })) {
+					if (rs.next()) {
+						tableExists = true;
+						break;
+					}
+				}
+			}
+			if (tableExists) {
+				boolean rowExists = false;
+				try (ResultSet rs = stmt
+						.executeQuery("SELECT NAME FROM `" + tableName + "` WHERE NAME='" + sequenceName + "'")) {
+					rowExists = rs.next();
+				}
+				if (!rowExists) {
+					stmt.execute("INSERT INTO `" + tableName + "` VALUES('" + sequenceName + "',0,UNIX_TIMESTAMP())");
+				}
+			} else {
+				stmt.execute("CREATE TABLE `" + tableName
+						+ "` (NAME VARCHAR(50) NOT NULL PRIMARY KEY, VALUE INT NOT NULL DEFAULT 0, LAST_UPDATED BIGINT NOT NULL) ");
+				stmt.execute("INSERT INTO `" + tableName + "` VALUES('" + sequenceName + "',0,UNIX_TIMESTAMP())");
+			}
 		}
 	}
 }

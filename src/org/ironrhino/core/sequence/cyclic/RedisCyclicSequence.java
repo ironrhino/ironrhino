@@ -1,12 +1,12 @@
 package org.ironrhino.core.sequence.cyclic;
 
-import java.util.Calendar;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.ironrhino.core.spring.configuration.PriorityQualifier;
-import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.MaxAttemptsExceededException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -43,7 +43,8 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 		Long time = sequenceStringRedisTemplate.execute((RedisConnection connection) -> connection.time());
 		if (time == null)
 			throw new RuntimeException("Unexpected null");
-		boundValueOperations.setIfAbsent(getStringValue(new Date(time), getPaddingLength(), 0));
+		LocalDateTime datetime = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), TimeZone.getDefault().toZoneId());
+		boundValueOperations.setIfAbsent(getStringValue(datetime, getPaddingLength(), 0));
 	}
 
 	@Override
@@ -60,29 +61,29 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 				return null;
 			});
 			long value = (Long) results.get(0);
-			Date now = new Date((Long) results.get(1));
+			LocalDateTime now = LocalDateTime.ofInstant(Instant.ofEpochMilli((Long) results.get(1)),
+					TimeZone.getDefault().toZoneId());
 			final String stringValue = String.valueOf(value);
 			if (stringValue.length() == getPaddingLength() + getCycleType().getPattern().length()) {
-				Calendar cal = Calendar.getInstance();
+				LocalDateTime datetime = LocalDateTime.now();
 				CycleType cycleType = getCycleType();
 				if (cycleType.ordinal() <= CycleType.MINUTE.ordinal())
-					cal.set(Calendar.MINUTE, Integer.parseInt(stringValue.substring(10, 12)));
+					datetime = datetime.withMinute(Integer.parseInt(stringValue.substring(10, 12)));
 				if (cycleType.ordinal() <= CycleType.HOUR.ordinal())
-					cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(stringValue.substring(8, 10)));
+					datetime = datetime.withHour(Integer.parseInt(stringValue.substring(8, 10)));
 				if (cycleType.ordinal() <= CycleType.DAY.ordinal())
-					cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(stringValue.substring(6, 8)));
+					datetime = datetime.withDayOfMonth(Integer.parseInt(stringValue.substring(6, 8)));
 				if (cycleType.ordinal() <= CycleType.MONTH.ordinal())
-					cal.set(Calendar.MONTH, Integer.parseInt(stringValue.substring(4, 6)) - 1);
+					datetime = datetime.withMonth(Integer.parseInt(stringValue.substring(4, 6)));
 				if (cycleType.ordinal() <= CycleType.YEAR.ordinal())
-					cal.set(Calendar.YEAR, Integer.parseInt(stringValue.substring(0, 4)));
-				Date d = cal.getTime();
-				if (getCycleType().isSameCycle(d, now))
+					datetime = datetime.withYear(Integer.parseInt(stringValue.substring(0, 4)));
+				if (getCycleType().isSameCycle(datetime, now))
 					return stringValue;
-				else if (d.after(now)) {
+				else if (datetime.isAfter(now)) {
 					// treat it as overflow not clock jumps backward
 					long next = value
-							- Long.valueOf(DateUtils.formatDate8(now)) * ((long) Math.pow(10, getPaddingLength()));
-					return DateUtils.format(now, cycleType.getPattern()) + next;
+							- Long.valueOf(CycleType.DAY.format(now)) * ((long) Math.pow(10, getPaddingLength()));
+					return cycleType.format(now) + next;
 				}
 			}
 			String restart = getStringValue(now, getPaddingLength(), 1);
