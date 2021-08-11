@@ -168,7 +168,7 @@ public class CommonConfiguration {
 		}
 		Collections.reverse(basenames);
 		return basenames.stream().map(s -> ResourceLoader.CLASSPATH_URL_PREFIX + s).collect(Collectors.toList())
-				.toArray(new String[basenames.size()]);
+				.toArray(new String[0]);
 	}
 
 }

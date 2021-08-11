@@ -140,7 +140,7 @@ public class JakartaStreamMultiPartRequest implements MultiPartRequest {
         for (FileInfo fileInfo : infos)
             types.add(fileInfo.getContentType());
 
-        return types.toArray(new String[types.size()]);
+        return types.toArray(new String[0]);
     }
 
     /* (non-Javadoc)
@@ -171,7 +171,7 @@ public class JakartaStreamMultiPartRequest implements MultiPartRequest {
         for (FileInfo fileInfo : infos)
             files.add(fileInfo.getFile());
 
-        return files.toArray(new File[files.size()]);
+        return files.toArray(new File[0]);
     }
 
     /* (non-Javadoc)
@@ -186,7 +186,7 @@ public class JakartaStreamMultiPartRequest implements MultiPartRequest {
         for (FileInfo fileInfo : infos)
             names.add(getCanonicalName(fileInfo.getOriginalName()));
 
-        return names.toArray(new String[names.size()]);
+        return names.toArray(new String[0]);
     }
 
     /* (non-Javadoc)
@@ -208,7 +208,7 @@ public class JakartaStreamMultiPartRequest implements MultiPartRequest {
         for (FileInfo fileInfo : infos)
             names.add(fileInfo.getFile().getName());
 
-        return names.toArray(new String[names.size()]);
+        return names.toArray(new String[0]);
     }
 
     /* (non-Javadoc)
@@ -234,7 +234,7 @@ public class JakartaStreamMultiPartRequest implements MultiPartRequest {
     public String[] getParameterValues(String name) {
         List<String> values = parameters.get(name);
         if (values != null && values.size() > 0)
-            return values.toArray(new String[values.size()]);
+            return values.toArray(new String[0]);
         return null;
     }
 

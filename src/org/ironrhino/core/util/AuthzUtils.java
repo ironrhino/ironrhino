@@ -61,7 +61,7 @@ public class AuthzUtils {
 	}
 
 	public static boolean authorizeRoles(Collection<String> roles, String access) {
-		Authentication auth = new TestingAuthenticationToken(null, null, roles.toArray(new String[roles.size()]));
+		Authentication auth = new TestingAuthenticationToken(null, null, roles.toArray(new String[0]));
 		Boolean b = expressionParser.parseExpression(access).getValue(new WebSecurityExpressionRoot(auth),
 				Boolean.class);
 		return b != null && b;

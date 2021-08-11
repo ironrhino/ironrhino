@@ -227,9 +227,9 @@ public abstract class BaseUserManagerImpl<T extends BaseUser> extends BaseManage
 	protected void populateAuthorities(T user) {
 		List<GrantedAuthority> auths = new ArrayList<>();
 		Set<String> set = getBuiltInRoles();
-		auths.addAll(AuthorityUtils.createAuthorityList(set.toArray(new String[set.size()])));
+		auths.addAll(AuthorityUtils.createAuthorityList(set.toArray(new String[0])));
 		set = user.getRoles();
-		auths.addAll(AuthorityUtils.createAuthorityList(set.toArray(new String[set.size()])));
+		auths.addAll(AuthorityUtils.createAuthorityList(set.toArray(new String[0])));
 		user.setAuthorities(auths);
 		if (userRoleMappers != null)
 			for (UserRoleMapper mapper : userRoleMappers) {

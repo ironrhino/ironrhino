@@ -155,7 +155,7 @@ public class AutoConfigPackageProvider implements PackageProvider {
 			String defaultNamespace = entry.getKey();
 			Set<String> currentPackages = entry.getValue();
 			Collection<Class<?>> classes = ClassScanner
-					.scanAnnotated(currentPackages.toArray(new String[currentPackages.size()]), AutoConfig.class);
+					.scanAnnotated(currentPackages.toArray(new String[0]), AutoConfig.class);
 			if (classes.size() == 0)
 				continue;
 			packageLoader = new PackageLoader();

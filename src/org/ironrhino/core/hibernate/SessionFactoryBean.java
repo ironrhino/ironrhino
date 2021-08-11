@@ -275,7 +275,7 @@ public class SessionFactoryBean extends LocalSessionFactoryBean implements Defau
 			}
 		}
 		classes.sort(Comparator.comparing(Class::getName));
-		annotatedClasses = classes.toArray(new Class<?>[classes.size()]);
+		annotatedClasses = classes.toArray(new Class<?>[0]);
 		log.info("annotatedClasses: ");
 		for (Class<?> clz : annotatedClasses)
 			log.info(clz.getName());

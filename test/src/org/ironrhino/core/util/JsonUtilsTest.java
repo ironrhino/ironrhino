@@ -240,7 +240,7 @@ public class JsonUtilsTest {
 		u.setDepartment(department);
 		u.getDepartments().add(department);
 		u.getDepartments().add(department2);
-		u.setDepts(u.getDepartments().toArray(new Department[u.getDepartments().size()]));
+		u.setDepts(u.getDepartments().toArray(new Department[0]));
 		String json = JsonUtils.toJson(u);
 		JsonNode root = JsonUtils.fromJson(json, JsonNode.class);
 		JsonNode node = root.get("department");

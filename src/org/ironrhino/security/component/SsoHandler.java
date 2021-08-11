@@ -199,7 +199,7 @@ public class SsoHandler extends AccessHandler {
 				Set<String> roles = userFromApi.getRoles();
 				if (roles != null && !roles.isEmpty()) {
 					List<GrantedAuthority> list = AuthorityUtils
-							.createAuthorityList(roles.toArray(new String[roles.size()]));
+							.createAuthorityList(roles.toArray(new String[0]));
 					for (GrantedAuthority ga : list) {
 						if (!authorities.contains(ga))
 							authorities.add(ga);

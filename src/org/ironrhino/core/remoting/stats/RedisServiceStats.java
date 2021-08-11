@@ -240,7 +240,7 @@ public class RedisServiceStats implements ServiceStats {
 	@PreDestroy
 	public void flush() {
 		if (!warningBuffer.isEmpty()) {
-			warningsOperations.leftPushAll(warningBuffer.toArray(new String[warningBuffer.size()]));
+			warningsOperations.leftPushAll(warningBuffer.toArray(new String[0]));
 			warningBuffer.clear();
 			Long size = warningsOperations.size();
 			if (size != null && size > maxWarningsSize)
@@ -266,7 +266,7 @@ public class RedisServiceStats implements ServiceStats {
 		Map<String, Map<String, AtomicInteger>> buffer = type.getCountBuffer();
 		buffer.forEach((k, v) -> {
 			remotingStringRedisTemplate.opsForSet().add(NAMESPACE_SERVICES + k,
-					v.keySet().toArray(new String[v.size()]));
+					v.keySet().toArray(new String[0]));
 			v.forEach((k2, ai) -> {
 				int count = ai.get();
 				if (count > 0) {

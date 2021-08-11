@@ -101,7 +101,7 @@ public class TracingAspect extends BaseAspect {
 			}
 		}
 		return Tracing.executeCheckedCallable(ReflectionUtils.stringify(method), pjp::proceed,
-				tags.toArray(new Serializable[tags.size()]));
+				tags.toArray(new Serializable[0]));
 	}
 
 	private static boolean isDebug() {

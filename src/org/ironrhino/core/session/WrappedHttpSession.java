@@ -236,7 +236,7 @@ public class WrappedHttpSession implements Serializable, HttpSession {
 			names.add(e.nextElement());
 		}
 
-		return names.toArray(new String[names.size()]);
+		return names.toArray(new String[0]);
 	}
 
 	@Override

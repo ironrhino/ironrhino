@@ -39,7 +39,7 @@ public class Main {
 		ProtectionDomain protectionDomain = Main.class.getProtectionDomain();
 		URL warUrl = protectionDomain.getCodeSource().getLocation();
 		List<URL> jarUrls = extractJettyJarsFromWar(warUrl.getPath());
-		ClassLoader urlClassLoader = new URLClassLoader(jarUrls.toArray(new URL[jarUrls.size()]));
+		ClassLoader urlClassLoader = new URLClassLoader(jarUrls.toArray(new URL[0]));
 		Thread.currentThread().setContextClassLoader(urlClassLoader);
 		Class<?> jettyLauncher = urlClassLoader.loadClass("bootstrap.JettyLauncher");
 		Method mainMethod = jettyLauncher.getMethod("start", new Class[] { URL.class });
