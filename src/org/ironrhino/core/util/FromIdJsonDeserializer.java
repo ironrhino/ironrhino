@@ -8,7 +8,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeanWrapperImpl;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -18,6 +17,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
@@ -49,7 +49,7 @@ public class FromIdJsonDeserializer extends StdDeserializer<Object> implements C
 		try {
 			if (type.isCollectionLikeType() || type.isArrayType()) {
 				Collection<Object> coll = null;
-				Class<?> componentType = type.getContentType().getRawClass();
+				JavaType componentType = type.getContentType();
 				if (type.isArrayType()) {
 					coll = new ArrayList<>();
 				} else {
@@ -67,18 +67,15 @@ public class FromIdJsonDeserializer extends StdDeserializer<Object> implements C
 				while (parser.nextToken() != JsonToken.END_ARRAY) {
 					switch (parser.currentToken()) {
 					case START_OBJECT:
-						coll.add(parser.readValueAs(componentType));
+						coll.add(parser.readValueAs(componentType.getRawClass()));
 						break;
 					default:
-						Object obj = BeanUtils.instantiateClass(componentType);
-						BeanWrapperImpl bw = new BeanWrapperImpl(obj);
-						bw.setPropertyValue("id", parser.getText());
-						coll.add(obj);
+						coll.add(convert(parser, parser.getText(), componentType));
 					}
 				}
 				if (type.isArrayType()) {
 					List<Object> list = (List<Object>) coll;
-					Object array = Array.newInstance(componentType, list.size());
+					Object array = Array.newInstance(componentType.getRawClass(), list.size());
 					for (int i = 0; i < list.size(); i++)
 						Array.set(array, i, list.get(i));
 					return array;
@@ -90,9 +87,7 @@ public class FromIdJsonDeserializer extends StdDeserializer<Object> implements C
 				if (!parser.currentToken().isScalarValue()) {
 					obj = parser.readValueAs(type.getRawClass());
 				} else {
-					obj = BeanUtils.instantiateClass(type.getRawClass());
-					BeanWrapperImpl bw = new BeanWrapperImpl(obj);
-					bw.setPropertyValue("id", parser.getText());
+					obj = convert(parser, parser.getText(), type);
 				}
 				return obj;
 			} else {
@@ -107,6 +102,10 @@ public class FromIdJsonDeserializer extends StdDeserializer<Object> implements C
 	public JsonDeserializer<Object> createContextual(DeserializationContext ctx, BeanProperty beanProperty)
 			throws JsonMappingException {
 		return new FromIdJsonDeserializer(beanProperty.getType());
+	}
+
+	private static Object convert(JsonParser parser, String id, JavaType type) throws Exception {
+		return ((ObjectMapper) parser.getCodec()).readValue("{\"id\":\"" + id + "\"}", type);
 	}
 
 }
