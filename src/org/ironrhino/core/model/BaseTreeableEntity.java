@@ -45,7 +45,7 @@ public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extend
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "treeable_entity_seq")
 	protected Long id;
 
-	@Column(unique = true)
+	@Column(unique = true, nullable = false)
 	@UiConfig(hidden = true)
 	protected String fullId;
 

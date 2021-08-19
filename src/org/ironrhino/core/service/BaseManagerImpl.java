@@ -44,6 +44,7 @@ import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.internal.CriteriaImpl.OrderEntry;
 import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.query.Query;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.type.Type;
@@ -118,15 +119,21 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 		Session session = sessionFactory.getCurrentSession();
 		if (obj instanceof BaseTreeableEntity) {
 			BaseTreeableEntity entity = (BaseTreeableEntity) obj;
+			BaseTreeableEntity parent = (BaseTreeableEntity) entity.getParent();
+			if (parent instanceof HibernateProxy
+					|| parent != null && parent.getId() != null && parent.getFullId() == null) {
+				parent = (BaseTreeableEntity) get(parent.getId());
+				entity.setParent(parent);
+			}
 			if (isNew) {
-				entity.setLevel(entity.getParent() != null ? entity.getParent().getLevel() + 1 : 1);
+				entity.setLevel(parent != null ? parent.getLevel() + 1 : 1);
 				entity.setFullId(UUID.randomUUID().toString());
 				// assign any temporary unique value to fullId
 				// some database treat duplicated <NULL> as violation of UNIQUE KEY constraint
 				session.save(entity);
 				String fullId = String.valueOf(entity.getId()) + ".";
-				if (entity.getParent() != null)
-					fullId = entity.getParent().getFullId() + fullId;
+				if (parent != null)
+					fullId = parent.getFullId() + fullId;
 				entity.setFullId(fullId);
 				ActionQueue queue = ((SessionImplementor) session).getActionQueue();
 				ExecutableList<EntityInsertAction> insertions = ReflectionUtils.getFieldValue(queue, "insertions");
@@ -149,17 +156,17 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 					}
 				}
 			} else {
-				boolean positionChanged = (entity.getParent() == null && entity.getLevel() != 1
-						|| entity.getParent() != null && (entity.getLevel() - entity.getParent().getLevel() != 1
-								|| !entity.getFullId().startsWith(entity.getParent().getFullId())));
+				boolean positionChanged = (parent == null && entity.getLevel() != 1
+						|| parent != null && (entity.getLevel() - parent.getLevel() != 1
+								|| !entity.getFullId().startsWith(parent.getFullId())));
 				if (positionChanged) {
 					String fullId = String.valueOf(entity.getId()) + ".";
-					if (entity.getParent() != null)
-						fullId = entity.getParent().getFullId() + fullId;
+					if (parent != null)
+						fullId = parent.getFullId() + fullId;
 					entity.setFullId(fullId);
 					entity.setLevel(fullId.split("\\.").length);
-					if (entity.getParent() != null)
-						entity.setParent(entity.getParent()); // recalculate fullname
+					if (parent != null)
+						entity.setParent(parent); // recalculate fullname
 				}
 				if (!session.contains(entity))
 					session.update(entity);
