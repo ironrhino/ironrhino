@@ -2,7 +2,6 @@ package org.ironrhino.core.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -36,7 +35,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extends AbstractEntity<Long>
-		implements Treeable<T>, Ordered<T> {
+		implements Treeable<T, Long>, Ordered<T> {
 
 	private static final long serialVersionUID = 2462271646391940930L;
 
@@ -128,104 +127,12 @@ public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extend
 		return children;
 	}
 
-	@JsonIgnore
-	public boolean isLeaf() {
-		return this.children == null || this.children.size() == 0;
-	}
-
-	public boolean isHasChildren() {
-		return !isLeaf();
-	}
-
-	@JsonIgnore
-	public boolean isRoot() {
-		return this.parent == null;
-	}
-
 	@Override
 	@NotInCopy
 	@JsonIgnore
 	@UiConfig(hidden = true)
 	public T getParent() {
 		return parent;
-	}
-
-	public T getDescendantOrSelfById(Long id) {
-		if (id == null)
-			throw new IllegalArgumentException("id must not be null");
-		if (id.equals(this.getId()))
-			return (T) this;
-		for (T t : getChildren()) {
-			T tt = t.getDescendantOrSelfById(id);
-			if (tt != null)
-				return tt;
-		}
-		return null;
-	}
-
-	public T getDescendantOrSelfByName(String name) {
-		if (name == null)
-			throw new IllegalArgumentException("name must not be null");
-		if (name.equals(this.getName()))
-			return (T) this;
-		for (T t : getChildren()) {
-			T tt = t.getDescendantOrSelfByName(name);
-			if (tt != null)
-				return tt;
-		}
-		return null;
-	}
-
-	@JsonIgnore
-	public List<T> getDescendants() {
-		List<T> ids = new ArrayList<>();
-		if (!this.isLeaf())
-			for (T obj : this.getChildren()) {
-				collect(obj, ids);
-			}
-		return ids;
-	}
-
-	@JsonIgnore
-	public List<T> getDescendantsAndSelf() {
-		List<T> ids = new ArrayList<>();
-		collect((T) this, ids);
-		return ids;
-	}
-
-	private void collect(T node, Collection<T> coll) {
-		coll.add(node);
-		if (node.isLeaf())
-			return;
-		for (T obj : node.getChildren()) {
-			collect(obj, coll);
-		}
-	}
-
-	public boolean isAncestorOrSelfOf(T t) {
-		T parent = t;
-		while (parent != null) {
-			if (parent.getId().equals(this.getId()))
-				return true;
-			parent = parent.getParent();
-		}
-		return false;
-	}
-
-	public boolean isDescendantOrSelfOf(T t) {
-		return t != null && t.isAncestorOrSelfOf((T) this);
-	}
-
-	public T getAncestor(int level) {
-		if (level < 1 || level > this.getLevel())
-			return null;
-		T parent = (T) this;
-		while (parent != null) {
-			if (parent.getLevel() == level)
-				return parent;
-			parent = parent.getParent();
-		}
-		return null;
 	}
 
 	@Override

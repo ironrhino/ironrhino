@@ -133,7 +133,7 @@ public class BeanUtils {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <S extends Treeable<S>> S copyTree(S source, String... ignoreProperties) {
+	public static <S extends Treeable<S, ID>, ID> S copyTree(S source, String... ignoreProperties) {
 		return (S) copyTree(source, () -> {
 			try {
 				return org.springframework.beans.BeanUtils.instantiateClass(source.getClass());
@@ -143,13 +143,13 @@ public class BeanUtils {
 		}, null, ignoreProperties);
 	}
 
-	public static <S extends Treeable<S>, T extends Treeable<T>> T copyTree(S source, Supplier<T> supplier,
+	public static <S extends Treeable<S, ID>, T extends Treeable<T, ID>, ID> T copyTree(S source, Supplier<T> supplier,
 			String... ignoreProperties) {
 		return copyTree(source, supplier, null, ignoreProperties);
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <S extends Treeable<S>, T extends Treeable<T>> T copyTree(S source, Supplier<T> supplier,
+	public static <S extends Treeable<S, ID>, T extends Treeable<T, ID>, ID> T copyTree(S source, Supplier<T> supplier,
 			Predicate<S> filter, String... ignoreProperties) {
 		if (filter != null && !filter.test(source))
 			throw new IllegalArgumentException("source object self must be accepted if you specify a filter");

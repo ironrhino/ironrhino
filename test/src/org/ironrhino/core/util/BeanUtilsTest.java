@@ -70,7 +70,6 @@ public class BeanUtilsTest {
 		private Team team;
 
 		private UserType type = UserType.A;
-		
 
 		interface View {
 			interface A {
@@ -189,7 +188,7 @@ public class BeanUtilsTest {
 	@Getter
 	@Setter
 	@NoArgsConstructor
-	public static class TreeA implements Treeable<TreeA> {
+	public static class TreeA implements Treeable<TreeA, Long> {
 		private String name;
 		private TreeA parent;
 		private Collection<TreeA> children = new ArrayList<>();
@@ -202,7 +201,7 @@ public class BeanUtilsTest {
 	@Getter
 	@Setter
 	@NoArgsConstructor
-	public static class TreeB implements Treeable<TreeB> {
+	public static class TreeB implements Treeable<TreeB, Long> {
 		private String name;
 		private TreeB parent;
 		private Collection<TreeB> children = new ArrayList<>();
@@ -280,7 +279,7 @@ public class BeanUtilsTest {
 		assertThat(user3.getPassword(), notNullValue());
 
 	}
-	
+
 	@Test
 	public void testCopyPropertiesInJsonView() {
 		User user1 = new User();
@@ -321,7 +320,7 @@ public class BeanUtilsTest {
 		assertThat(BeanUtils.getPropertyDescriptor(User.class, "team"), notNullValue());
 		assertThat(BeanUtils.getPropertyDescriptor(User.class, "team.owner.id"), notNullValue());
 	}
-	
+
 	@Test
 	public void testGetPropertyType() {
 		assertThat(BeanUtils.getPropertyType(Team2.class, "none"), nullValue());
@@ -332,7 +331,6 @@ public class BeanUtilsTest {
 		assertThat(BeanUtils.getPropertyType(Team2.class, "users[0]"), equalTo(User2.class));
 		assertThat(BeanUtils.getPropertyType(Team2.class, "users[0].username"), equalTo(String.class));
 	}
-
 
 	@Test
 	public void testSetPropertyValue() {

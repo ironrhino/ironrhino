@@ -1820,7 +1820,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 					parentEntity = baseTreeControl.getTree();
 				}
 			} else {
-				parentEntity = baseTreeControl.getTree().getDescendantOrSelfById(parent);
+				parentEntity = (BaseTreeableEntity) baseTreeControl.getTree().getDescendantOrSelfById(parent);
 			}
 			if (parentEntity != null)
 				children = parentEntity.getChildren();
