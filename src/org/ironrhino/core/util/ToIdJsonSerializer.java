@@ -3,6 +3,7 @@ package org.ironrhino.core.util;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,13 +29,13 @@ public class ToIdJsonSerializer extends StdSerializer<Object> {
 	@Override
 	public void serialize(Object obj, JsonGenerator generator, SerializerProvider sp) throws IOException {
 		if (obj instanceof Collection) {
-			List<Object> ids = ((Collection<?>) obj).stream()
-					.map(o -> o != null ? new BeanWrapperImpl(o).getPropertyValue("id") : null)
+			List<Object> ids = ((Collection<?>) obj).stream().map(Optional::ofNullable)
+					.map(o -> o.map(o2 -> new BeanWrapperImpl(o2).getPropertyValue("id")).orElse(null))
 					.collect(Collectors.toList());
 			generator.writeObject(ids);
 		} else if (obj instanceof Object[]) {
-			List<Object> ids = Stream.of((Object[]) obj)
-					.map(o -> o != null ? new BeanWrapperImpl(o).getPropertyValue("id") : null)
+			List<Object> ids = Stream.of((Object[]) obj).map(Optional::ofNullable)
+					.map(o -> o.map(o2 -> new BeanWrapperImpl(o2).getPropertyValue("id")).orElse(null))
 					.collect(Collectors.toList());
 			generator.writeObject(ids);
 		} else {
