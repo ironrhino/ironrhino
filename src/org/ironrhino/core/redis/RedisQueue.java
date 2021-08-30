@@ -2,7 +2,6 @@ package org.ironrhino.core.redis;
 
 import java.io.Serializable;
 import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
@@ -32,9 +31,6 @@ public abstract class RedisQueue<T extends Serializable> implements org.ironrhin
 
 	private Thread worker;
 
-	@Autowired(required = false)
-	private ExecutorService executorService;
-
 	@Setter
 	@Autowired
 	@PriorityQualifier({ "mqRedisTemplate", "globalRedisTemplate" })
@@ -56,27 +52,24 @@ public abstract class RedisQueue<T extends Serializable> implements org.ironrhin
 			Runnable task = () -> {
 				while (!stopConsuming.get()) {
 					try {
-						T message = queue.take();
-						consume(message);
+						consume(queue.take());
 					} catch (Throwable e) {
 						logger.error(e.getMessage(), e);
 					}
 				}
 			};
-			if (executorService != null) {
-				executorService.execute(task);
-			} else {
-				worker = new Thread(task);
-				worker.start();
-			}
+			worker = new Thread(task, "redis-queue-consumer-" + getClass().getSimpleName());
+			worker.setDaemon(true);
+			worker.start();
 		}
 	}
 
 	@PreDestroy
 	public void stop() {
-		stopConsuming.set(true);
-		if (worker != null)
-			worker.interrupt();
+		if (stopConsuming.compareAndSet(false, true)) {
+			if (worker != null)
+				worker.interrupt();
+		}
 	}
 
 	@Override
