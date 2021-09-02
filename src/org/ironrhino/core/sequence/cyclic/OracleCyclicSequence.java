@@ -8,6 +8,11 @@ import java.sql.Statement;
 public class OracleCyclicSequence extends AbstractSequenceCyclicSequence {
 
 	@Override
+	protected String getCreateSequenceStatement() {
+		return super.getCreateSequenceStatement() + " NOMINVALUE NOMAXVALUE";
+	}
+
+	@Override
 	protected String getNameColumnType() {
 		return "VARCHAR2(50)";
 	}
