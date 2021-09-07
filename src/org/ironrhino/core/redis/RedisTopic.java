@@ -99,7 +99,7 @@ public abstract class RedisTopic<T extends Serializable> implements org.ironrhin
 	public void publish(T message, Scope scope) {
 		if (scope == null)
 			scope = Scope.GLOBAL;
-		log.info("Publish {} message: {}", scope.name(), message);
+		log.info("Publishing {} message: {}", scope.name(), message);
 		if (scope == Scope.LOCAL) {
 			Runnable task = () -> subscribe(message);
 			if (executorService != null)

@@ -4,7 +4,6 @@ import org.ironrhino.core.metadata.Scope;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.ApplicationContextEvent;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -17,9 +16,6 @@ public class EventPublisher {
 	@Autowired
 	private ApplicationContext ctx;
 
-	@Autowired
-	private ApplicationEventPublisher publisher;
-
 	@Autowired(required = false)
 	private ApplicationEventTopic applicationEventTopic;
 
@@ -27,7 +23,7 @@ public class EventPublisher {
 		if (applicationEventTopic != null && scope != null && scope != Scope.LOCAL)
 			applicationEventTopic.publish(event, scope);
 		else
-			publisher.publishEvent(event);
+			ctx.publishEvent(event);
 	}
 
 	@EventListener
@@ -35,17 +31,9 @@ public class EventPublisher {
 		if (event.getApplicationContext() != ctx)
 			return;
 		if (event instanceof ContextRefreshedEvent) {
-			InstanceStartupEvent ise = new InstanceStartupEvent();
-			if (applicationEventTopic != null)
-				applicationEventTopic.publish(ise, Scope.GLOBAL);
-			else
-				publisher.publishEvent(ise);
+			publish(new InstanceStartupEvent(), Scope.GLOBAL);
 		} else if (event instanceof ContextClosedEvent) {
-			InstanceShutdownEvent ise = new InstanceShutdownEvent();
-			if (applicationEventTopic != null)
-				applicationEventTopic.publish(ise, Scope.GLOBAL);
-			else
-				publisher.publishEvent(ise);
+			publish(new InstanceShutdownEvent(), Scope.GLOBAL);
 		}
 	}
 

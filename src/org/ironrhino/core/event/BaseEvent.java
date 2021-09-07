@@ -26,9 +26,11 @@ public class BaseEvent<T> extends ApplicationEvent {
 
 	@Override
 	public String toString() {
-		if ("".equals(source))
-			return getClass().getName();
-		return getClass().getName() + "[source=" + source + "]";
+		StringBuilder sb = new StringBuilder(getClass().getName());
+		if (!"".equals(source))
+			sb.append("[source=" + source + "]");
+		sb.append(" from ").append(getInstanceId());
+		return sb.toString();
 	}
 
 }
