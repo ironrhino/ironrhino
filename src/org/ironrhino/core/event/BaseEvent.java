@@ -1,5 +1,7 @@
 package org.ironrhino.core.event;
 
+import java.util.Objects;
+
 import org.ironrhino.core.util.AppInfo;
 import org.springframework.context.ApplicationEvent;
 
@@ -22,6 +24,20 @@ public class BaseEvent<T> extends ApplicationEvent {
 
 	public boolean isLocal() {
 		return getInstanceId().equals(AppInfo.getInstanceId());
+	}
+
+	@Override
+	public boolean equals(Object that) {
+		if (that == null)
+			return false;
+		if (this == that)
+			return true;
+		if (!getClass().isInstance(that))
+			return false;
+		BaseEvent<?> be = (BaseEvent<?>) that;
+		// EventObject.source is transient
+		return Objects.equals(this.instanceId, be.instanceId) && Objects.equals(this.source, be.source)
+				&& Objects.equals(this.getTimestamp(), be.getTimestamp());
 	}
 
 	@Override
