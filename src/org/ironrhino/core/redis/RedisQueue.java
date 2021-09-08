@@ -54,6 +54,8 @@ public abstract class RedisQueue<T extends Serializable> implements org.ironrhin
 					try {
 						consume(queue.take());
 					} catch (Throwable e) {
+						if (Thread.interrupted())
+							break;
 						logger.error(e.getMessage(), e);
 					}
 				}
