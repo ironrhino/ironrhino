@@ -1,5 +1,9 @@
 package org.ironrhino.core.aop;
 
+import static org.ironrhino.core.event.EntityOperationType.CREATE;
+import static org.ironrhino.core.event.EntityOperationType.DELETE;
+import static org.ironrhino.core.event.EntityOperationType.UPDATE;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,19 +69,19 @@ public class PublishAspect implements TransactionSynchronization, Ordered {
 			EntityOperationType action;
 			if (event instanceof PostInsertEvent) {
 				entity = ((PostInsertEvent) event).getEntity();
-				action = EntityOperationType.CREATE;
+				action = CREATE;
 			} else if (event instanceof PostUpdateEvent) {
 				entity = ((PostUpdateEvent) event).getEntity();
-				action = EntityOperationType.UPDATE;
+				action = UPDATE;
 			} else if (event instanceof PostDeleteEvent) {
 				entity = ((PostDeleteEvent) event).getEntity();
-				action = EntityOperationType.DELETE;
+				action = DELETE;
 			} else {
 				continue;
 			}
 			EntityOperationType previousAction = actions.get(entity);
-			if (previousAction == EntityOperationType.CREATE || previousAction == EntityOperationType.DELETE)
-				continue;
+			if (action == UPDATE && previousAction == CREATE)
+				action = CREATE;
 			actions.put((Persistable<?>) entity, action);
 		}
 		actions.forEach((k, v) -> {

@@ -2,8 +2,6 @@ package org.ironrhino.core.util;
 
 import java.util.Random;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,17 +32,16 @@ public class Snowflake {
 			} else {
 				// IPv6
 				index = ip.lastIndexOf(':');
-				if (index > 0) {
-					workerIdBits = 16;
-					id = ip.substring(index + 1);
-					if (!StringUtils.isNumeric(id))
-						id = String.valueOf(NumberUtils.xToDecimal(16, id.toUpperCase()));
-				}
+				id = ip.substring(index + 1);
+				id = String.valueOf(NumberUtils.xToDecimal(16, id.toUpperCase()));
+				workerIdBits = 16;
 			}
 		}
 		if (id != null) {
 			try {
 				workerId = Integer.parseInt(id);
+				if (workerId < 0)
+					workerId += 2 << workerIdBits;
 			} catch (NumberFormatException e) {
 				throw new IllegalArgumentException("Snowflake worker id should be an integer", e);
 			}
