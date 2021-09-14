@@ -31,6 +31,10 @@ public class EventPublisher {
 		if (event.getApplicationContext() != ctx)
 			return;
 		if (event instanceof ContextRefreshedEvent) {
+			try {
+				Thread.sleep(100); // wait for listeners started in this instance
+			} catch (InterruptedException ignored) {
+			}
 			publish(new InstanceStartupEvent(), Scope.GLOBAL);
 		} else if (event instanceof ContextClosedEvent) {
 			publish(new InstanceShutdownEvent(), Scope.GLOBAL);
