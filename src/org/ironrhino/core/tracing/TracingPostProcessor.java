@@ -1,7 +1,12 @@
 package org.ironrhino.core.tracing;
 
+import java.lang.reflect.Method;
+
 import javax.sql.DataSource;
 
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -37,8 +42,20 @@ public class TracingPostProcessor implements BeanPostProcessor, BeanDefinitionRe
 			bean = new TracingDataSource(GlobalTracer.get(), (DataSource) bean, null, true, null);
 			log.info("Wrapped DataSource [{}] with {}", beanName, bean.getClass().getName());
 		} else if (bean instanceof PlatformTransactionManager) {
-			bean = new TracingTransactionManager((PlatformTransactionManager) bean);
-			log.info("Wrapped PlatformTransactionManager [{}] with {}", beanName, bean.getClass().getName());
+			ProxyFactory pf = new ProxyFactory(bean);
+			pf.addAdvice(new MethodInterceptor() {
+				@Override
+				public Object invoke(MethodInvocation invocation) throws Throwable {
+					Method m = invocation.getMethod();
+					if (m.getDeclaringClass() == PlatformTransactionManager.class) {
+						return Tracing.executeCheckedCallable("transactionManager." + m.getName(),
+								() -> invocation.proceed(), "component", "tx");
+					}
+					return invocation.proceed();
+				}
+			});
+			bean = pf.getProxy();
+			log.info("Proxied PlatformTransactionManager [{}] with tracing supports", beanName);
 		}
 		return bean;
 	}
