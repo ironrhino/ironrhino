@@ -80,7 +80,7 @@ public class JsonSerializationUtilsTest {
 		u.setContent("this is a lob");
 		String json = JsonSerializationUtils.serialize(u);
 		User u2 = (User) JsonSerializationUtils.deserialize(json);
-		assertThat(u.getUsername(), u2.getUsername(), equalTo(u.getUsername()));
+		assertThat(u2.getUsername(), equalTo(u.getUsername()));
 		assertThat(u2.getAge(), equalTo(u.getAge()));
 		assertThat(u2.getStatus(), equalTo(u.getStatus()));
 		assertThat(u2.getDate().getTime(), equalTo(u.getDate().getTime()));

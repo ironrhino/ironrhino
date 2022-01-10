@@ -2,11 +2,11 @@ package org.ironrhino.core.spring.data.redis;
 
 import org.springframework.data.redis.serializer.RedisSerializer;
 
-public class FallbackToStringSerializerTest extends RedisSerializerTestBase {
+public class CompactJdkSerializationRedisSerializerTest extends RedisSerializerTestBase {
 
 	@Override
 	protected RedisSerializer<Object> getRedisSerializer() {
-		return new FallbackToStringSerializer();
+		return new CompactJdkSerializationRedisSerializer();
 	}
 
 }

@@ -19,7 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.cache.CacheManager;
 import org.ironrhino.core.spring.configuration.PriorityQualifier;
 import org.ironrhino.core.spring.configuration.ServiceImplementationConditional;
-import org.ironrhino.core.spring.data.redis.FallbackToStringSerializer;
+import org.ironrhino.core.spring.data.redis.CompactJdkSerializationRedisSerializer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -83,7 +83,7 @@ public class RedisCacheManager implements CacheManager {
 				throw new RuntimeException(e);
 			}
 		} else {
-			cacheRedisTemplate.setValueSerializer(new FallbackToStringSerializer());
+			cacheRedisTemplate.setValueSerializer(new CompactJdkSerializationRedisSerializer());
 		}
 	}
 

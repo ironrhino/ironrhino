@@ -9,7 +9,7 @@ import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.SerializationException;
 
-public class FallbackToStringSerializer extends JdkSerializationRedisSerializer {
+public class CompactJdkSerializationRedisSerializer extends JdkSerializationRedisSerializer {
 
 	@Override
 	public byte[] serialize(Object object) {

@@ -79,7 +79,7 @@ public abstract class RedisSerializerTestBase {
 		Object obj2 = serializer.deserialize(bytes);
 		if (obj instanceof NullObject || obj instanceof Enum)
 			assertThat(obj == obj2, is(true));
-		if (obj instanceof Number) // AtomicInteger not override equals
+		if (obj instanceof AtomicInteger) // AtomicInteger not override equals
 			assertThat(
 					obj.getClass() == obj2.getClass() && ((Number) obj).doubleValue() == ((Number) obj2).doubleValue(),
 					is(true));
