@@ -6,7 +6,7 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 
-public class NullObject implements Serializable {
+public final class NullObject implements Serializable {
 
 	private static final long serialVersionUID = 6123024289220735487L;
 

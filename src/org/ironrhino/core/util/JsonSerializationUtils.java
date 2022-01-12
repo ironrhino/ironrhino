@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -27,9 +28,11 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import lombok.experimental.UtilityClass;
 
@@ -89,8 +92,9 @@ public class JsonSerializationUtils {
 				.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
 				.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS).addMixIn(Throwable.class, ThrowableMixin.class)
 				.addMixIn(GrantedAuthority.class, SimpleGrantedAuthorityMixin.class)
-				.addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityMixin.class).registerModule(
-						new SimpleModule().addDeserializer(NullObject.class, new JsonDeserializer<NullObject>() {
+				.addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityMixin.class)
+				.registerModule(new SimpleModule().addSerializer(new NullObjectSerializer())
+						.addDeserializer(NullObject.class, new JsonDeserializer<NullObject>() {
 							@Override
 							public NullObject deserialize(JsonParser jsonparser,
 									DeserializationContext deserializationcontext)
@@ -170,4 +174,22 @@ public class JsonSerializationUtils {
 
 	}
 
+	private static class NullObjectSerializer extends StdSerializer<NullObject> {
+
+		private static final long serialVersionUID = 1999052150548658808L;
+
+		private final String classIdentifier = "@class";
+
+		NullObjectSerializer() {
+			super(NullObject.class);
+		}
+
+		@Override
+		public void serialize(NullObject value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+			jgen.writeStartObject();
+			jgen.writeStringField(this.classIdentifier, NullObject.class.getName());
+			jgen.writeEndObject();
+		}
+
+	}
 }
