@@ -45,41 +45,46 @@ public class JsonSerializationUtils {
 				ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
 	};
 
-	public static String serialize(Object object) throws IOException {
-		if (object == null)
+	public static byte[] serialize(Object object) throws IOException {
+		if (object == null) {
 			return null;
-		if (object instanceof Long)
-			return object + "L";
-		else if (object instanceof Float)
-			return object + "F";
-		else if (object instanceof Enum)
-			return object.getClass().getName() + '.' + ((Enum<?>) object).name();
-		return defaultTypingObjectMapper.writeValueAsString(object);
+		}
+		if (object instanceof Long) {
+			return (object + "L").getBytes();
+		} else if (object instanceof Float) {
+			return (object + "F").getBytes();
+		} else if (object instanceof Enum) {
+			return (object.getClass().getName() + '.' + ((Enum<?>) object).name()).getBytes();
+		}
+		return defaultTypingObjectMapper.writeValueAsBytes(object);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static Object deserialize(String string) throws IOException {
-		if (string == null)
+	public static Object deserialize(byte[] bytes) throws IOException {
+		if (bytes == null) {
 			return null;
-		if (Character.isDigit(string.charAt(0))) {
-			if (string.endsWith("L"))
-				return Long.valueOf(string.substring(0, string.length() - 1));
-			else if (string.endsWith("F"))
-				return Float.valueOf(string.substring(0, string.length() - 1));
 		}
-		if (Character.isAlphabetic(string.charAt(0)) && Character.isAlphabetic(string.charAt(string.length() - 1))) {
+		if (Character.isDigit((char) bytes[0])) {
+			if (((char) bytes[bytes.length - 1]) == 'L') {
+				return Long.valueOf(new String(bytes, 0, bytes.length - 1));
+			} else if (((char) bytes[bytes.length - 1]) == 'F') {
+				return Float.valueOf(new String(bytes, 0, bytes.length - 1));
+			}
+		}
+		if (Character.isAlphabetic((char) bytes[0]) && Character.isAlphabetic((char) bytes[bytes.length - 1])) {
+			String string = new String(bytes);
 			int index = string.lastIndexOf('.');
 			if (index > 0) {
 				String clazz = string.substring(0, index);
 				String name = string.substring(index + 1);
 				try {
 					return Enum.valueOf((Class<Enum>) Class.forName(clazz), name);
-				} catch (ClassNotFoundException e) {
+				} catch (ClassNotFoundException ex) {
 					return null;
 				}
 			}
 		}
-		return defaultTypingObjectMapper.readValue(string, Object.class);
+		return defaultTypingObjectMapper.readValue(bytes, Object.class);
 	}
 
 	public static ObjectMapper createNewObjectMapper() {

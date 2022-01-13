@@ -1,5 +1,6 @@
 package org.ironrhino.core.session.impl;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -124,9 +125,11 @@ public class CacheBasedHttpSessionStore implements HttpSessionStore {
 						String id = list.get(i);
 						try {
 							Map<String, String> map = new HashMap<>();
-							map.put(SESSION_KEY_KICKED_OUT_FROM, JsonSerializationUtils.serialize(ip));
+							map.put(SESSION_KEY_KICKED_OUT_FROM,
+									new String(JsonSerializationUtils.serialize(ip), StandardCharsets.UTF_8));
 							map.put(SESSION_KEY_KICKED_OUT_DATE,
-									JsonSerializationUtils.serialize(DateUtils.formatDatetime(new Date())));
+									new String(JsonSerializationUtils.serialize(DateUtils.formatDatetime(new Date())),
+											StandardCharsets.UTF_8));
 							cacheManager.put(id, JsonSerializationUtils.serialize(map),
 									session.getMaxInactiveInterval(), TimeUnit.SECONDS, CACHE_NAMESPACE);
 							log.info("user[{}] session[{}] is kicked out by session[{}] from {}", username, id,

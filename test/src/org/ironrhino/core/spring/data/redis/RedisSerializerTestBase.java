@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,9 +47,14 @@ public abstract class RedisSerializerTestBase {
 	public void testSimpleObject() {
 		test(Scope.GLOBAL);
 		test(new Date());
-		test(LocalDateTime.now());
 		test(new BigDecimal("100.00"));
 		test(new AtomicInteger(100));
+	}
+	
+	@Test
+	public void testDateAndTime() {
+		test(LocalDate.now());
+		test(LocalDateTime.now());
 	}
 
 	@Test

@@ -78,8 +78,7 @@ public class JsonSerializationUtilsTest {
 		u.setStatus(Status.ACTIVE);
 		u.setAge(12);
 		u.setContent("this is a lob");
-		String json = JsonSerializationUtils.serialize(u);
-		User u2 = (User) JsonSerializationUtils.deserialize(json);
+		User u2 = (User) JsonSerializationUtils.deserialize(JsonSerializationUtils.serialize(u));
 		assertThat(u2.getUsername(), equalTo(u.getUsername()));
 		assertThat(u2.getAge(), equalTo(u.getAge()));
 		assertThat(u2.getStatus(), equalTo(u.getStatus()));
@@ -91,16 +90,15 @@ public class JsonSerializationUtilsTest {
 	@Test
 	public void testTemporal() throws IOException {
 		TemporalObject object = new TemporalObject();
-		String json = JsonSerializationUtils.serialize(object);
-		TemporalObject to2 = (TemporalObject) JsonSerializationUtils.deserialize(json);
+		TemporalObject to2 = (TemporalObject) JsonSerializationUtils
+				.deserialize(JsonSerializationUtils.serialize(object));
 		assertThat(to2, equalTo(object));
 	}
 
 	@Test
 	public void testImmutable() throws IOException {
 		ImmutableObject object = new ImmutableObject(12, "test");
-		String json = JsonSerializationUtils.serialize(object);
-		assertThat(JsonSerializationUtils.deserialize(json), equalTo(object));
+		assertThat(JsonSerializationUtils.deserialize(JsonSerializationUtils.serialize(object)), equalTo(object));
 	}
 
 }

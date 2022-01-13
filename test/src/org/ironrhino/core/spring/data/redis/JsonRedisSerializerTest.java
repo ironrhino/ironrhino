@@ -7,7 +7,7 @@ public class JsonRedisSerializerTest extends RedisSerializerTestBase {
 
 	@Override
 	@Test
-	public void testSimpleObject() {
+	public void testDateAndTime() {
 		// JsonRedisSerializer doesn't supports this
 	}
 
