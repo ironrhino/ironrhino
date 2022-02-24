@@ -215,18 +215,14 @@ public class RequestUtils {
 	public static boolean isSameOrigin(String a, String b) {
 		if (StringUtils.isBlank(a) || StringUtils.isBlank(b))
 			return false;
-		if (a.startsWith("//"))
-			a = "http:" + a;
+		if (!a.startsWith("http://") && !a.startsWith("https://"))
+			return false;
 		if (b.startsWith("//"))
 			b = "http:" + b;
-		if (b.indexOf("://") < 0 || a.indexOf("://") < 0)
+		if (!b.startsWith("http://") && !b.startsWith("https://"))
 			return true;
 		String host1 = URI.create(a).getHost();
-		if (host1 == null)
-			host1 = "localhost";
 		String host2 = URI.create(b).getHost();
-		if (host2 == null)
-			host2 = "localhost";
 		return host1.equalsIgnoreCase(host2) || getDomainRoot(host1).equalsIgnoreCase(getDomainRoot(host2));
 	}
 

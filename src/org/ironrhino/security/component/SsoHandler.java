@@ -109,7 +109,7 @@ public class SsoHandler extends AccessHandler {
 
 	@Override
 	public boolean handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		if (!RequestUtils.isSameOrigin(request.getRequestURL().toString(), portalBaseUrl)) {
+		if (!RequestUtils.isSameOrigin(request, portalBaseUrl)) {
 			if (strictAccess)
 				throw new AccessDeniedException("Please access via domain name");
 			return false;
@@ -198,8 +198,7 @@ public class SsoHandler extends AccessHandler {
 			try {
 				Set<String> roles = userFromApi.getRoles();
 				if (roles != null && !roles.isEmpty()) {
-					List<GrantedAuthority> list = AuthorityUtils
-							.createAuthorityList(roles.toArray(new String[0]));
+					List<GrantedAuthority> list = AuthorityUtils.createAuthorityList(roles.toArray(new String[0]));
 					for (GrantedAuthority ga : list) {
 						if (!authorities.contains(ga))
 							authorities.add(ga);

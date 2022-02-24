@@ -417,7 +417,7 @@ public class BaseAction extends ActionSupport {
 		HttpServletResponse response = ServletActionContext.getResponse();
 		if (StringUtils.isNotBlank(targetUrl)
 				&& REDIRECT.equals(ActionContext.getContext().getActionInvocation().getResultCode()) && !hasErrors()
-				&& RequestUtils.isSameOrigin(request.getRequestURL().toString(), targetUrl)) {
+				&& RequestUtils.isSameOrigin(request, targetUrl)) {
 			targetUrl = response.encodeRedirectURL(targetUrl);
 			response.setHeader(Redirect.RESPONSE_HEADER_NAME, targetUrl);
 		}
