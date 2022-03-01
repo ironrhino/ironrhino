@@ -20,7 +20,7 @@ public class CompositeFileStorage implements FileStorage {
 	private final FileStorage fallbackFileStorage;
 
 	@Setter
-	private boolean merging;
+	private boolean merging = true;
 
 	@Override
 	public void write(InputStream is, String path) throws IOException {
