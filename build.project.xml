@@ -211,8 +211,8 @@
 	</target>
 
 	<target name="expand-version" depends="set-revision">
-		<replace dir="${classes.dir}/resources/spring">
-			<include name="applicationContext.*"/>
+		<replace dir="${classes.dir}">
+			<include name="resources/spring/applicationContext.*"/>
 			<replacefilter token="@project.version@" value="${version}"/>
 			<replacefilter token="@build.revision@" value="${revision}"/>
 			<replacefilter token="@build.timestamp@" value="${timestamp}"/>
