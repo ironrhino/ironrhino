@@ -1,6 +1,8 @@
 package org.ironrhino.core.util;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,11 +20,15 @@ import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.MethodExecutor;
 import org.springframework.expression.MethodResolver;
+import org.springframework.expression.TypeLocator;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.SpelCompilerMode;
+import org.springframework.expression.spel.SpelEvaluationException;
+import org.springframework.expression.spel.SpelMessage;
 import org.springframework.expression.spel.SpelParserConfiguration;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.ReflectiveMethodExecutor;
+import org.springframework.expression.spel.support.ReflectivePropertyAccessor;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 public enum ExpressionEngine {
@@ -69,6 +75,10 @@ public enum ExpressionEngine {
 		private SpelExpressionParser parser = new SpelExpressionParser(
 				new SpelParserConfiguration(SpelCompilerMode.IMMEDIATE, this.getClass().getClassLoader()));
 
+		private TypeLocator typeNotFoundTypeLocator = typeName -> {
+			throw new SpelEvaluationException(SpelMessage.TYPE_NOT_FOUND, typeName);
+		};
+
 		@Override
 		public Object evalExpression(String expression, Map<String, ?> context) {
 			Expression ex = expressionCache.computeIfAbsent(expression, key -> parser.parseExpression(expression));
@@ -86,7 +96,14 @@ public enum ExpressionEngine {
 
 		private EvaluationContext build(Map<String, ?> context) {
 			StandardEvaluationContext ctx = new StandardEvaluationContext(context);
-			ctx.addPropertyAccessor(new MapAccessor());
+			ctx.setPropertyAccessors(Arrays.asList(new MapAccessor() {
+				@Override
+				public boolean canWrite(EvaluationContext context, Object target, String name) throws AccessException {
+					return false;
+				}
+			}, new ReflectivePropertyAccessor(false)));
+			ctx.setConstructorResolvers(Collections.emptyList());
+			ctx.setTypeLocator(typeNotFoundTypeLocator);
 			ctx.addMethodResolver(new MethodResolver() {
 				@Override
 				public MethodExecutor resolve(EvaluationContext ctx, Object targetObject, String name,
