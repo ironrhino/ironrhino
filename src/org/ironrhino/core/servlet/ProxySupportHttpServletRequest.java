@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.web.util.matcher.IpAddressMatcher;
 
 public class ProxySupportHttpServletRequest extends HttpServletRequestWrapper {
 
@@ -42,6 +43,8 @@ public class ProxySupportHttpServletRequest extends HttpServletRequestWrapper {
 	public static final String HEADER_NAME_X_CLIENT_CERT = "X-Client-Cert";
 
 	public static final String REQUEST_ATTRIBUTE_PROXY_ADDR = "X-Proxy-Addr";
+
+	private static final String trustedAddress = System.getProperty(SYSTEM_PROPERTY_PROXY_TRUSTED_ADDRESS);
 
 	private String remoteAddr;
 
@@ -76,8 +79,7 @@ public class ProxySupportHttpServletRequest extends HttpServletRequestWrapper {
 			if (StringUtils.isNotBlank(realIp) && StringUtils.isNotBlank(forwardedFor)
 					&& !realIp.equals(forwardedFor)) {
 				String[] arr1 = forwardedFor.split("\\s*,\\s*");
-				boolean trustedForward = arr1[arr1.length - 1].equals(realIp)
-						&& isTrustedProxy(realIp, superRemoteAddr);
+				boolean trustedForward = arr1[arr1.length - 1].equals(realIp) && isTrustedProxy(superRemoteAddr);
 				if (trustedForward) {
 					temp = forwardedFor;
 					int index = 0;
@@ -104,13 +106,16 @@ public class ProxySupportHttpServletRequest extends HttpServletRequestWrapper {
 		return remoteAddr;
 	}
 
-	private static boolean isTrustedProxy(String realIp, String remoteAddr) {
-		String[] arr1 = realIp.split("\\.");
-		String[] arr2 = remoteAddr.split("\\.");
-		if (arr1.length == 4 && arr1.length == arr2.length && arr1[0].equals(arr2[0]) && arr1[1].equals(arr2[1]))
-			return true;
-		String trustedAddress = System.getProperty(SYSTEM_PROPERTY_PROXY_TRUSTED_ADDRESS);
-		return trustedAddress != null && Arrays.asList(trustedAddress.split(",")).contains(realIp);
+	private static boolean isTrustedProxy(String remoteAddr) {
+		if (trustedAddress != null) {
+			return Arrays.asList(trustedAddress.split(",")).contains(remoteAddr);
+		} else {
+			for (String subnet : "172.16.0.0/12,192.168.0.0/16,10.0.0.0/8,169.254.0.0/16,127.0.0.1/8,FEC0::/7,::1"
+					.split(","))
+				if (new IpAddressMatcher(subnet).matches(remoteAddr))
+					return true;
+			return false;
+		}
 	}
 
 	@Override
