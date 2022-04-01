@@ -307,7 +307,7 @@ public class PageViewServiceImpl implements PageViewService {
 				Set<String> keys = pageViewStringRedisTemplate.<Set<String>>execute((RedisConnection conn) -> {
 					Set<String> set = new HashSet<>();
 					Cursor<byte[]> cursor = conn
-							.scan(new ScanOptions.ScanOptionsBuilder().match(prefix + "*").count(100).build());
+							.scan(ScanOptions.scanOptions().match(prefix + "*").count(100).build());
 					while (cursor.hasNext())
 						set.add((String) pageViewStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
 					return set;

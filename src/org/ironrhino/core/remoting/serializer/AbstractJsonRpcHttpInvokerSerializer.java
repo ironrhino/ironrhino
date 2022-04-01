@@ -402,7 +402,7 @@ public abstract class AbstractJsonRpcHttpInvokerSerializer implements HttpInvoke
 				throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 			if (method == null)
 				method = ClassUtils.getInterfaceMethodIfPossible(
-						targetObject.getClass().getMethod(getMethodName(), getParameterTypes()));
+						targetObject.getClass().getMethod(getMethodName(), getParameterTypes()), null);
 			if (id == null) {
 				// notification
 				Map<String, String> contextMap = MDC.getCopyOfContextMap();

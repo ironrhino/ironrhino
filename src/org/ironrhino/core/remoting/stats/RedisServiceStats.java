@@ -123,7 +123,7 @@ public class RedisServiceStats implements ServiceStats {
 		Set<String> serviceKeys = remotingStringRedisTemplate.<Set<String>>execute((RedisConnection conn) -> {
 			Set<String> set = new HashSet<>();
 			Cursor<byte[]> cursor = conn
-					.scan(new ScanOptions.ScanOptionsBuilder().match(NAMESPACE_SERVICES + "*").count(100).build());
+					.scan(ScanOptions.scanOptions().match(NAMESPACE_SERVICES + "*").count(100).build());
 			while (cursor.hasNext())
 				set.add((String) remotingStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
 			return set;
@@ -153,7 +153,7 @@ public class RedisServiceStats implements ServiceStats {
 				Set<String> keys = remotingStringRedisTemplate.<Set<String>>execute((RedisConnection conn) -> {
 					Set<String> set = new HashSet<>();
 					Cursor<byte[]> cursor = conn
-							.scan(new ScanOptions.ScanOptionsBuilder().match(prefix + "*").count(100).build());
+							.scan(ScanOptions.scanOptions().match(prefix + "*").count(100).build());
 					while (cursor.hasNext())
 						set.add((String) remotingStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
 					return set;
@@ -323,7 +323,7 @@ public class RedisServiceStats implements ServiceStats {
 		Set<String> keys = remotingStringRedisTemplate.<Set<String>>execute((RedisConnection conn) -> {
 			Set<String> set = new HashSet<>();
 			Cursor<byte[]> cursor = conn
-					.scan(new ScanOptions.ScanOptionsBuilder().match(prefix + "*").count(100).build());
+					.scan(ScanOptions.scanOptions().match(prefix + "*").count(100).build());
 			while (cursor.hasNext())
 				set.add((String) remotingStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
 			return set;
@@ -355,7 +355,7 @@ public class RedisServiceStats implements ServiceStats {
 		Set<String> keys = remotingStringRedisTemplate.<Set<String>>execute((RedisConnection conn) -> {
 			Set<String> set = new HashSet<>();
 			Cursor<byte[]> cursor = conn
-					.scan(new ScanOptions.ScanOptionsBuilder().match(prefix + "*").count(100).build());
+					.scan(ScanOptions.scanOptions().match(prefix + "*").count(100).build());
 			while (cursor.hasNext())
 				set.add((String) remotingStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
 			return set;
