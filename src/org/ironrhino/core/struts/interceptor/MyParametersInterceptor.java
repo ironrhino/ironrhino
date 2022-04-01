@@ -1,6 +1,7 @@
 package org.ironrhino.core.struts.interceptor;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.ironrhino.core.util.ReflectionUtils;
@@ -23,7 +24,8 @@ public class MyParametersInterceptor extends ParametersInterceptor {
 	}
 
 	private static boolean isInBlacklist(String paramName) {
-		if (Arrays.asList(paramName.split("[.\\[\\]'\"]")).contains("class"))
+		List<String> list = Arrays.asList(paramName.split("[.\\[\\]'\"]"));
+		if (list.contains("class") || list.contains("Class"))
 			return true;
 		for (String keyword : KEYWORDS)
 			if (paramName.startsWith(keyword + '.') || paramName.startsWith(keyword + '['))
