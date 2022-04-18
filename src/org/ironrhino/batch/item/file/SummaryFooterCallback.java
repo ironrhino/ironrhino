@@ -3,20 +3,29 @@ package org.ironrhino.batch.item.file;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collections;
+import java.util.Map;
 
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.item.file.FlatFileFooterCallback;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.expression.MapAccessor;
+import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.common.TemplateParserContext;
+import org.springframework.expression.ParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.expression.spel.support.ReflectivePropertyAccessor;
+import org.springframework.expression.spel.support.SimpleEvaluationContext;
 
 import lombok.Setter;
 
-public class SummaryFooterCallback extends StepExecutionListenerSupport implements FlatFileFooterCallback {
+public class SummaryFooterCallback extends StepExecutionListenerSupport
+		implements FlatFileFooterCallback, InitializingBean {
+
+	private static final EvaluationContext evaluationContext = new SimpleEvaluationContext.Builder(new MapAccessor(),
+			new ReflectivePropertyAccessor(false)).withInstanceMethods().build();
+
+	private Expression expression;
 
 	private StepExecution stepExecution;
 
@@ -24,13 +33,16 @@ public class SummaryFooterCallback extends StepExecutionListenerSupport implemen
 	private String template = "#{stepExecution.writeCount}";
 
 	@Override
+	public void afterPropertiesSet() throws Exception {
+		expression = new SpelExpressionParser().parseExpression(template, ParserContext.TEMPLATE_EXPRESSION);
+
+	}
+
+	@Override
 	public void writeFooter(Writer writer) throws IOException {
-		ExpressionParser parser = new SpelExpressionParser();
-		Expression exp = parser.parseExpression(template, new TemplateParserContext());
-		StandardEvaluationContext ctx = new StandardEvaluationContext(
-				Collections.singletonMap("stepExecution", stepExecution));
-		ctx.addPropertyAccessor(new MapAccessor());
-		writer.write(String.valueOf(exp.getValue(ctx)));
+		Map<String, ?> ctx = Collections.singletonMap("stepExecution", stepExecution);
+		String output = String.valueOf(expression.getValue(evaluationContext, ctx));
+		writer.write(output);
 	}
 
 	@Override

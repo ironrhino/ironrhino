@@ -1,8 +1,6 @@
 package org.ironrhino.core.util;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,16 +18,14 @@ import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.MethodExecutor;
 import org.springframework.expression.MethodResolver;
-import org.springframework.expression.TypeLocator;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.SpelCompilerMode;
-import org.springframework.expression.spel.SpelEvaluationException;
-import org.springframework.expression.spel.SpelMessage;
 import org.springframework.expression.spel.SpelParserConfiguration;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.DataBindingMethodResolver;
 import org.springframework.expression.spel.support.ReflectiveMethodExecutor;
 import org.springframework.expression.spel.support.ReflectivePropertyAccessor;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.expression.spel.support.SimpleEvaluationContext;
 
 public enum ExpressionEngine {
 
@@ -72,17 +68,27 @@ public enum ExpressionEngine {
 
 		private Map<String, Expression> expressionCache = new ConcurrentHashMap<>();
 
-		private SpelExpressionParser parser = new SpelExpressionParser(
+		private final SpelExpressionParser parser = new SpelExpressionParser(
 				new SpelParserConfiguration(SpelCompilerMode.IMMEDIATE, this.getClass().getClassLoader()));
 
-		private TypeLocator typeNotFoundTypeLocator = typeName -> {
-			throw new SpelEvaluationException(SpelMessage.TYPE_NOT_FOUND, typeName);
-		};
+		private final EvaluationContext evaluationContext = new SimpleEvaluationContext.Builder(new MapAccessor() {
+			@Override
+			public boolean canWrite(EvaluationContext context, Object target, String name) throws AccessException {
+				return false;
+			}
+		}, new ReflectivePropertyAccessor(false)).withMethodResolvers(new MethodResolver() {
+			@Override
+			public MethodExecutor resolve(EvaluationContext ctx, Object targetObject, String name,
+					List<TypeDescriptor> argumentTypes) throws AccessException {
+				Method m = MathUtils.mathMethods.get(name);
+				return m != null ? new ReflectiveMethodExecutor(m) : null;
+			}
+		}, DataBindingMethodResolver.forInstanceMethodInvocation()).build();
 
 		@Override
 		public Object evalExpression(String expression, Map<String, ?> context) {
 			Expression ex = expressionCache.computeIfAbsent(expression, key -> parser.parseExpression(expression));
-			return ex.getValue(build(context));
+			return ex.getValue(evaluationContext, context);
 		}
 
 		@Override
@@ -91,31 +97,7 @@ public enum ExpressionEngine {
 					key -> parser.parseExpression(template,
 							template.contains("${") ? new TemplateParserContext("${", "}")
 									: org.springframework.expression.ParserContext.TEMPLATE_EXPRESSION));
-			return ex.getValue(build(context));
-		}
-
-		private EvaluationContext build(Map<String, ?> context) {
-			StandardEvaluationContext ctx = new StandardEvaluationContext(context);
-			ctx.setPropertyAccessors(Arrays.asList(new MapAccessor() {
-				@Override
-				public boolean canWrite(EvaluationContext context, Object target, String name) throws AccessException {
-					return false;
-				}
-			}, new ReflectivePropertyAccessor(false)));
-			ctx.setConstructorResolvers(Collections.emptyList());
-			ctx.setTypeLocator(typeNotFoundTypeLocator);
-			ctx.addMethodResolver(new MethodResolver() {
-				@Override
-				public MethodExecutor resolve(EvaluationContext ctx, Object targetObject, String name,
-						List<TypeDescriptor> argumentTypes) throws AccessException {
-					Method m = MathUtils.mathMethods.get(name);
-					if (m != null) {
-						return new ReflectiveMethodExecutor(m);
-					}
-					return null;
-				}
-			});
-			return ctx;
+			return ex.getValue(evaluationContext, context);
 		}
 
 	};
