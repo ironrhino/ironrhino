@@ -89,6 +89,7 @@ EOF
 cd ..
 cd ..
 sed -i '99i export SPRING_PROFILES_DEFAULT=dual' tomcat/bin/catalina.sh
+sed -i '99i export MALLOC_ARENA_MAX=4' tomcat/bin/catalina.sh
 sed -i '99i CATALINA_OPTS="-server -Xms128m -Xmx1024m -Xss256k -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=../logs/dumps -Djava.awt.headless=true -Djava.security.egd=file:/dev/urandom -Djava.net.preferIPv4Stack=true"' tomcat/bin/catalina.sh
 mv tomcat tomcat8080
 cp -R tomcat8080 tomcat8081
