@@ -133,6 +133,9 @@ public class SsoHandlerTest {
 		User user = mock(User.class);
 		given(user.getUsername()).willReturn("admin");
 		given(user.getPassword()).willReturn("password");
+		given(user.isEnabled()).willReturn(true);
+		given(user.isAccountNonExpired()).willReturn(true);
+		given(user.isAccountNonLocked()).willReturn(true);
 		given(user.getAuthorities()).willReturn(AuthorityUtils.createAuthorityList("ROLE_APP_1", "ROLE_APP_2"));
 		given(userDetailsService.loadUserByUsername("admin")).willReturn(user);
 
