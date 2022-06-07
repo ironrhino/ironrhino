@@ -220,7 +220,7 @@ public class RequestUtils {
 		if (b.startsWith("//"))
 			b = "http:" + b;
 		if (!b.startsWith("http://") && !b.startsWith("https://"))
-			return true;
+			return false;
 		String host1 = URI.create(a).getHost();
 		String host2 = URI.create(b).getHost();
 		return host1.equalsIgnoreCase(host2) || getDomainRoot(host1).equalsIgnoreCase(getDomainRoot(host2));
