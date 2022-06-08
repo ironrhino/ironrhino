@@ -29,7 +29,7 @@ public class CorsHandler extends AccessHandler {
 		response.setHeader("X-Powered-By", "Ironrhino");
 		response.setHeader("X-Frame-Options", xFrameOptions);
 		String origin = request.getHeader("Origin");
-		if (StringUtils.isNotBlank(origin)) {
+		if (StringUtils.isNotBlank(origin) && (origin.startsWith("http://") || origin.startsWith("https://"))) {
 			if (!("Upgrade".equalsIgnoreCase(request.getHeader("Connection"))
 					&& "WebSocket".equalsIgnoreCase(request.getHeader("Upgrade")))) {
 				if (openForAllOrigin || openForSameOrigin && RequestUtils.isSameOrigin(request, origin)
