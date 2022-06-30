@@ -34,6 +34,7 @@ import org.springframework.data.redis.serializer.SerializationException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 
+import io.lettuce.core.RedisCommandExecutionException;
 import lombok.extern.slf4j.Slf4j;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -72,6 +73,8 @@ public class RedisCacheManager implements CacheManager {
 	private RedisScript<Void> invalidateScript = new DefaultRedisScript<>(
 			"local cursor=0 repeat local resp=redis.call('scan',cursor,'match',ARGV[1]..':*','count',1000) cursor=tonumber(resp[1]) local keys=resp[2] for i=1,#keys do redis.call('del',keys[i]) end until cursor==0",
 			Void.class);
+
+	private volatile boolean getexSupported = true;
 
 	@PostConstruct
 	public void init() {
@@ -136,6 +139,8 @@ public class RedisCacheManager implements CacheManager {
 		RedisTemplate redisTemplate = findRedisTemplate(namespace);
 		BoundValueOperations operations = redisTemplate.boundValueOps(generateKey(key, namespace));
 		try {
+			if (getexSupported)
+				return timeToIdle > 0 ? operations.getAndExpire(timeToIdle, timeUnit) : operations.getAndPersist();
 			Object result = operations.get();
 			if (result != null && timeToIdle > 0)
 				operations.expire(timeToIdle, timeUnit);
@@ -145,8 +150,16 @@ public class RedisCacheManager implements CacheManager {
 			delete(key, namespace);
 			return null;
 		} catch (Exception e) {
+			if (e.getCause() instanceof RedisCommandExecutionException) {
+				getexSupported = false; // server.version < 6.2
+				return getWithTti(key, namespace, timeToIdle, timeUnit);
+			}
 			log.error(e.getMessage(), e);
 			return null;
+		} catch (AbstractMethodError e) {
+			// io/opentracing/contrib/redis/spring/data2/connection/TracingRedisConnection.getEx
+			getexSupported = false;
+			return getWithTti(key, namespace, timeToIdle, timeUnit);
 		}
 	}
 
