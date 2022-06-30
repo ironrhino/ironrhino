@@ -24,6 +24,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -91,13 +92,13 @@ public class RedisCacheManager implements CacheManager {
 	public void put(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace) {
 		if (value == null)
 			throw new IllegalArgumentException("value should not be null");
-		String actualKey = generateKey(key, namespace);
 		RedisTemplate redisTemplate = findRedisTemplate(namespace);
+		BoundValueOperations operations = redisTemplate.boundValueOps(generateKey(key, namespace));
 		try {
 			if (timeToLive > 0)
-				redisTemplate.opsForValue().set(actualKey, value, timeToLive, timeUnit);
+				operations.set(value, timeToLive, timeUnit);
 			else
-				redisTemplate.opsForValue().set(actualKey, value);
+				operations.set(value);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
@@ -105,9 +106,8 @@ public class RedisCacheManager implements CacheManager {
 
 	@Override
 	public boolean exists(String key, String namespace) {
-		String actualKey = generateKey(key, namespace);
 		try {
-			Boolean b = findRedisTemplate(namespace).hasKey(actualKey);
+			Boolean b = findRedisTemplate(namespace).hasKey(generateKey(key, namespace));
 			return b != null && b;
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -117,9 +117,10 @@ public class RedisCacheManager implements CacheManager {
 
 	@Override
 	public Object get(String key, String namespace) {
-		String actualKey = generateKey(key, namespace);
+		RedisTemplate redisTemplate = findRedisTemplate(namespace);
+		BoundValueOperations operations = redisTemplate.boundValueOps(generateKey(key, namespace));
 		try {
-			return findRedisTemplate(namespace).opsForValue().get(actualKey);
+			return operations.get();
 		} catch (SerializationException e) {
 			log.warn(e.getMessage());
 			delete(key, namespace);
@@ -132,12 +133,12 @@ public class RedisCacheManager implements CacheManager {
 
 	@Override
 	public Object getWithTti(String key, String namespace, int timeToIdle, TimeUnit timeUnit) {
-		String actualKey = generateKey(key, namespace);
 		RedisTemplate redisTemplate = findRedisTemplate(namespace);
+		BoundValueOperations operations = redisTemplate.boundValueOps(generateKey(key, namespace));
 		try {
-			Object result = redisTemplate.opsForValue().get(actualKey);
+			Object result = operations.get();
 			if (result != null && timeToIdle > 0)
-				redisTemplate.expire(actualKey, timeToIdle, timeUnit);
+				operations.expire(timeToIdle, timeUnit);
 			return result;
 		} catch (SerializationException e) {
 			log.warn(e.getMessage());
@@ -151,8 +152,7 @@ public class RedisCacheManager implements CacheManager {
 
 	@Override
 	public long ttl(String key, String namespace) {
-		String actualKey = generateKey(key, namespace);
-		Long value = findRedisTemplate(namespace).getExpire(actualKey, TimeUnit.MILLISECONDS);
+		Long value = findRedisTemplate(namespace).getExpire(generateKey(key, namespace), TimeUnit.MILLISECONDS);
 		if (value == null)
 			value = -1L;
 		if (value == -2)
@@ -169,9 +169,8 @@ public class RedisCacheManager implements CacheManager {
 
 	@Override
 	public void delete(String key, String namespace) {
-		String actualKey = generateKey(key, namespace);
 		try {
-			findRedisTemplate(namespace).delete(actualKey);
+			findRedisTemplate(namespace).delete(generateKey(key, namespace));
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
@@ -230,13 +229,13 @@ public class RedisCacheManager implements CacheManager {
 	public boolean putIfAbsent(String key, Object value, int timeToLive, TimeUnit timeUnit, String namespace) {
 		if (value == null)
 			throw new IllegalArgumentException("value should not be null");
-		String actualkey = generateKey(key, namespace);
 		RedisTemplate redisTemplate = findRedisTemplate(namespace);
+		BoundValueOperations operations = redisTemplate.boundValueOps(generateKey(key, namespace));
 		Boolean result;
 		if (timeToLive > 0) {
-			result = redisTemplate.opsForValue().setIfAbsent(actualkey, value, timeToLive, timeUnit);
+			result = operations.setIfAbsent(value, timeToLive, timeUnit);
 		} else {
-			result = redisTemplate.opsForValue().setIfAbsent(actualkey, value);
+			result = operations.setIfAbsent(value);
 		}
 		if (result == null)
 			throw new RuntimeException("Unexpected null");
