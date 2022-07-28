@@ -949,6 +949,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		Map<String, UiConfigImpl> uiConfigs = getUiConfigs();
 		BaseManager<EN> entityManager = getEntityManager(getEntityClass());
 		_entity = constructEntity();
+		if (hasErrors())
+			return false;
 		BeanWrapperImpl bw = new BeanWrapperImpl(_entity);
 		bw.setConversionService(conversionService);
 		for (Map.Entry<String, UiConfigImpl> entry : uiConfigs.entrySet()) {
