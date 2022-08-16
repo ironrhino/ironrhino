@@ -167,5 +167,5 @@ ${getDictionaryLabel(dictionaryName,value?string)}<#t>
 		</label><#t>
 		<#local index = index+1/>
 		</#if>
-		<#if !disabled && name?has_content && multiple><input type="hidden" name="__checkbox_${name?html}"></#if>
+		<#if !disabled && name?has_content><input type="hidden" name="__checkbox_${name?html}"></#if>
 </#macro>
