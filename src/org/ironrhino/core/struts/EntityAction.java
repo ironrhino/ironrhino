@@ -1972,6 +1972,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 							.get(ActionContext.CONVERSION_ERRORS);
 					if (conversionErrors != null && !conversionErrors.isEmpty()) {
 						conversionErrors.forEach((propertyName, v) -> {
+							if (propertyName.equals(getEntityName() + '.' + getVersionPropertyName()))
+								return; // ignore conversion error on version property
 							String message = XWorkConverter.getConversionErrorMessage(propertyName, temp);
 							addFieldError(propertyName, message);
 						});
