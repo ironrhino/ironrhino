@@ -67,16 +67,16 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 			if (stringValue.length() == getPaddingLength() + getCycleType().getPattern().length()) {
 				LocalDateTime datetime = LocalDateTime.now();
 				CycleType cycleType = getCycleType();
-				if (cycleType.ordinal() <= CycleType.MINUTE.ordinal())
-					datetime = datetime.withMinute(Integer.parseInt(stringValue.substring(10, 12)));
-				if (cycleType.ordinal() <= CycleType.HOUR.ordinal())
-					datetime = datetime.withHour(Integer.parseInt(stringValue.substring(8, 10)));
-				if (cycleType.ordinal() <= CycleType.DAY.ordinal())
-					datetime = datetime.withDayOfMonth(Integer.parseInt(stringValue.substring(6, 8)));
-				if (cycleType.ordinal() <= CycleType.MONTH.ordinal())
-					datetime = datetime.withMonth(Integer.parseInt(stringValue.substring(4, 6)));
 				if (cycleType.ordinal() <= CycleType.YEAR.ordinal())
 					datetime = datetime.withYear(Integer.parseInt(stringValue.substring(0, 4)));
+				if (cycleType.ordinal() <= CycleType.MONTH.ordinal())
+					datetime = datetime.withMonth(Integer.parseInt(stringValue.substring(4, 6)));
+				if (cycleType.ordinal() <= CycleType.DAY.ordinal())
+					datetime = datetime.withDayOfMonth(Integer.parseInt(stringValue.substring(6, 8)));
+				if (cycleType.ordinal() <= CycleType.HOUR.ordinal())
+					datetime = datetime.withHour(Integer.parseInt(stringValue.substring(8, 10)));
+				if (cycleType.ordinal() <= CycleType.MINUTE.ordinal())
+					datetime = datetime.withMinute(Integer.parseInt(stringValue.substring(10, 12)));
 				if (getCycleType().isSameCycle(datetime, now))
 					return stringValue;
 				else if (datetime.isAfter(now)) {
