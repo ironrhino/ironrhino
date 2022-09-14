@@ -130,7 +130,8 @@ public class CacheBasedHttpSessionStore implements HttpSessionStore {
 							map.put(SESSION_KEY_KICKED_OUT_DATE,
 									new String(JsonSerializationUtils.serialize(DateUtils.formatDatetime(new Date())),
 											StandardCharsets.UTF_8));
-							cacheManager.put(id, JsonSerializationUtils.serialize(map),
+							cacheManager.put(id,
+									new String(JsonSerializationUtils.serialize(map), StandardCharsets.UTF_8),
 									session.getMaxInactiveInterval(), TimeUnit.SECONDS, CACHE_NAMESPACE);
 							log.info("user[{}] session[{}] is kicked out by session[{}] from {}", username, id,
 									session.getId(), ip);
