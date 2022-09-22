@@ -107,7 +107,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 	public void save(T obj) {
 		boolean isNew;
 		IdentifierGenerator ig = ((SessionFactoryImplementor) sessionFactory).getMetamodel()
-				.entityPersister(obj.getClass()).getIdentifierGenerator();
+				.entityPersister(ReflectionUtils.getActualClass(obj)).getIdentifierGenerator();
 		if (ig instanceof Assigned || ig instanceof CompositeNestedGeneratedValueGenerator) {
 			Serializable id = obj.getId();
 			if (id == null)
