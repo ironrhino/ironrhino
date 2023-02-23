@@ -64,26 +64,21 @@ public class RedisCyclicSequence extends AbstractCyclicSequence {
 			LocalDateTime now = LocalDateTime.ofInstant(Instant.ofEpochMilli((Long) results.get(1)),
 					TimeZone.getDefault().toZoneId());
 			final String stringValue = String.valueOf(value);
-			if (stringValue.length() == getPaddingLength() + getCycleType().getPattern().length()) {
-				LocalDateTime datetime = LocalDateTime.now();
-				CycleType cycleType = getCycleType();
-				if (cycleType.ordinal() <= CycleType.YEAR.ordinal())
-					datetime = datetime.withYear(Integer.parseInt(stringValue.substring(0, 4)));
-				if (cycleType.ordinal() <= CycleType.MONTH.ordinal())
-					datetime = datetime.withMonth(Integer.parseInt(stringValue.substring(4, 6)));
-				if (cycleType.ordinal() <= CycleType.DAY.ordinal())
-					datetime = datetime.withDayOfMonth(Integer.parseInt(stringValue.substring(6, 8)));
-				if (cycleType.ordinal() <= CycleType.HOUR.ordinal())
-					datetime = datetime.withHour(Integer.parseInt(stringValue.substring(8, 10)));
-				if (cycleType.ordinal() <= CycleType.MINUTE.ordinal())
-					datetime = datetime.withMinute(Integer.parseInt(stringValue.substring(10, 12)));
-				if (getCycleType().isSameCycle(datetime, now))
-					return stringValue;
-				else if (datetime.isAfter(now)) {
-					// treat it as overflow not clock jumps backward
-					long next = value
-							- Long.valueOf(CycleType.DAY.format(now)) * ((long) Math.pow(10, getPaddingLength()));
-					return cycleType.format(now) + next;
+			int patternLength = getCycleType().getPattern().length();
+			if (stringValue.length() == getPaddingLength() + patternLength) {
+				String currentCycle = getCycleType().format(now);
+				int comparedValue = currentCycle.compareTo(stringValue.substring(0, patternLength));
+				if (comparedValue == 0) {
+					// in same cycle
+					if (Integer.valueOf(stringValue.substring(patternLength)) != 0) {
+						// make sure sequence restart from 0001 not 0000
+						// for example 202012120000 increment by 202012119999
+						return stringValue;
+					}
+				} else if (comparedValue < 0) {
+					// in same cycle but overflow
+					long next = value - Long.valueOf(currentCycle) * ((long) Math.pow(10, getPaddingLength()));
+					return currentCycle + next;
 				}
 			}
 			String restart = getStringValue(now, getPaddingLength(), 1);
