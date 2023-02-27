@@ -3,7 +3,6 @@ package org.ironrhino.jmh;
 import java.util.concurrent.TimeUnit;
 
 import org.ironrhino.core.remoting.client.HttpInvokerClient;
-import org.ironrhino.core.remoting.serializer.FstHttpInvokerSerializer;
 import org.ironrhino.core.remoting.serializer.JavaHttpInvokerSerializer;
 import org.ironrhino.core.remoting.serializer.JsonHttpInvokerSerializer;
 import org.ironrhino.core.remoting.serializer.SmileHttpInvokerSerializer;
@@ -64,12 +63,6 @@ public class RemotingBenchmarkTests {
 	@Benchmark
 	public User measureRemotingWithJsonSerializer() {
 		httpInvokerClient.getHttpInvokerRequestExecutor().setSerializer(JsonHttpInvokerSerializer.INSTANCE);
-		return testService.loadUserByUsername("admin");
-	}
-
-	@Benchmark
-	public User measureRemotingWithFstSerializer() {
-		httpInvokerClient.getHttpInvokerRequestExecutor().setSerializer(FstHttpInvokerSerializer.INSTANCE);
 		return testService.loadUserByUsername("admin");
 	}
 

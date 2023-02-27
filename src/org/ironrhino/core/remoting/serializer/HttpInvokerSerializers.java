@@ -29,9 +29,6 @@ public final class HttpInvokerSerializers {
 		if (ClassUtils.isPresent("com.fasterxml.jackson.dataformat.cbor.CBORFactory",
 				HttpInvokerSerializers.class.getClassLoader()))
 			SERIALIZERS.add(CborHttpInvokerSerializer.INSTANCE);
-		if (ClassUtils.isPresent("org.nustaq.serialization.FSTObjectInput",
-				HttpInvokerSerializers.class.getClassLoader()))
-			SERIALIZERS.add(FstHttpInvokerSerializer.INSTANCE);
 	}
 
 	public static HttpInvokerSerializer forRequest(HttpServletRequest request) {

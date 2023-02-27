@@ -40,7 +40,6 @@ import org.ironrhino.core.remoting.ServiceNotFoundException;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.remoting.client.HttpInvokerClient;
 import org.ironrhino.core.remoting.client.HttpInvokerRequestExecutor;
-import org.ironrhino.core.remoting.serializer.FstHttpInvokerSerializer;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializers;
 import org.ironrhino.core.remoting.serializer.JavaHttpInvokerSerializer;
 import org.ironrhino.core.servlet.AccessFilter;
@@ -617,8 +616,7 @@ public class JavaHttpInvokerServerTest extends HttpInvokerServerTestBase {
 	}
 
 	protected void verifyUserDetails(UserDetails userDetails) {
-		if (FstHttpInvokerSerializer.INSTANCE.getSerializationType().equals(serializationType)
-				|| JavaHttpInvokerSerializer.INSTANCE.getSerializationType().equals(serializationType)) {
+		if (JavaHttpInvokerSerializer.INSTANCE.getSerializationType().equals(serializationType)) {
 			assertThat(userDetails instanceof User, is(true));
 		} else {
 			assertThat(userDetails instanceof User, is(false));

@@ -125,9 +125,6 @@ public abstract class HttpInvokerSerializerTestBase {
 		if (JavaHttpInvokerSerializer.INSTANCE == serializer) {
 			assertThat(e, is(notNullValue()));
 			assertThat(e instanceof SerializationFailedException, is(true));
-		} else if (FstHttpInvokerSerializer.INSTANCE == serializer) {
-			assertThat(e, is(notNullValue()));
-			assertThat(e instanceof RuntimeException, is(true));
 		} else {
 			assertThat(e, is(nullValue()));
 		}

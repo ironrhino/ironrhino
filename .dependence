@@ -55,3 +55,4 @@
 +micrometer-registry-prometheus
 +jaeger-all<-ironrhino-remoting-common
 +spring-security-crypto
+-fst
