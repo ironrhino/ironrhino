@@ -4,8 +4,10 @@
 
 	<property file="build.properties" />
 
+	<import file="build.nashorn.xml"/>
+
 	<target name="createProject">
-		<script language="javascript">
+		<script language="javascript" classpathref="nashorn.classpath">
 					<![CDATA[
 					var File = Java.type('java.io.File');
 					var version = project.getProperty('version');

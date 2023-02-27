@@ -56,3 +56,7 @@
 +jaeger-all<-ironrhino-remoting-common
 +spring-security-crypto
 -fst
++nashorn-core
++asm
++asm-commons
++asm-util

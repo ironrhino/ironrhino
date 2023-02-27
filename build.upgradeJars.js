@@ -36,12 +36,12 @@ for (var n = 0; n < paths.length; n++) {
 		var jarname2 = fileInfo2.jarname;
 		var version2 = fileInfo2.version;
 		if (f.isFile() && filename != filename2 && jarname == jarname2
-			&& version2.length() > 0) {
+			&& version2.length > 0) {
 			if (!compareVersion(version, version2))
 				continue;
 			print('upgrade jar from ' + filename + ' to ' + filename2 + '\n');
 			if (file.exists()) {
-				var del = project.createTask("delete");
+				var del = project.createTask('delete');
 				del.setFile(file);
 				del.perform();
 			}
@@ -52,7 +52,7 @@ for (var n = 0; n < paths.length; n++) {
 	}
 }
 for (var i = 0; i < replacement.length; i += 2) {
-	var replace = project.createTask("replace");
+	var replace = project.createTask('replace');
 	replace.setFile(classpathfile);
 	replace.setToken(replacement[i]);
 	replace.setValue(replacement[i + 1]);
@@ -71,11 +71,14 @@ function trimFilename(file) {
 }
 
 function getFileInfo(filename) {
-	var jarname = filename.substring(0, filename.lastIndexOf(filename
-		.lastIndexOf('-') > 0 ? '-' : '.'));
-	var version = filename.substring(jarname.length() + 1);
-	if (version.length() > 4)
-		version = version.substring(0, version.length() - 4);
+	if (filename.indexOf('.') > 0)
+		filename = filename.substring(0, filename.lastIndexOf('.'));
+	var jarname = filename, version = '';
+	var i = filename.search(/\-\d+/);
+	if(i > 0) {
+		jarname = filename.substring(0, i);
+		version = filename.substring(i + 1);
+	}
 	return {
 		jarname: jarname,
 		version: version
@@ -83,15 +86,15 @@ function getFileInfo(filename) {
 }
 
 function compareVersion(v1, v2) {
-	var verarr1 = v1.split("\\.");
-	var verarr2 = v2.split("\\.");
-	var upgradable = false;
-	for (var j = 0; j < verarr2.length; j++) {
-		if (j == verarr1.length || verarr2[j] > verarr1[j]
-			|| verarr2[j].length() > verarr1[j].length()) {
-			upgradable = true;
-			break;
-		}
+	var verarr1 = v1.split('\.');
+	var verarr2 = v2.split('\.');
+	for (var i = 0; i < verarr2.length; i++) {
+		if (i >= verarr1.length)
+			return true;
+		var a = parseInt(verarr1[i]);
+		var b = parseInt(verarr2[i]);
+		if (a != b)
+			return a < b;
 	}
-	return upgradable;
+	return v1 != v2;
 }

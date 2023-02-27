@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE project>
+<project basedir=".">
+
+	<condition property="java11plus">
+		<hasmethod classname="java.lang.String" method="isBlank" />
+	</condition>
+	<path id="nashorn.classpath">
+		<fileset dir="lib">
+			<include name="nashorn-*.jar" if="java11plus" />
+			<include name="asm-*.jar" if="java11plus" />
+		</fileset>
+	</path>
+
+</project>

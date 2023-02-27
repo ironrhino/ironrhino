@@ -42,6 +42,16 @@
 		</fileset>
 	</path>
 
+	<condition property="java11plus">
+		<hasmethod classname="java.lang.String" method="isBlank"/>
+	</condition>
+	<path id="nashorn.classpath">
+		<fileset dir="lib">
+			<include name="nashorn-*.jar" if="java11plus" />
+			<include name="asm-*.jar" if="java11plus" />
+		</fileset>
+	</path>
+
 	<target name="init">
 		<mkdir dir="${target.dir}" />
 		<mkdir dir="${classes.dir}" />
@@ -50,13 +60,14 @@
 
 	<target name="sync">
 		<copy tofile="build.xml" file="${basedir}/../ironrhino/build.project.xml" failonerror="false" />
-		<script language="javascript">
+		<script language="javascript" classpathref="nashorn.classpath">
 			<![CDATA[
 					var file = new java.io.File(basedir + '/../ironrhino/build.sync.js');
 					if (file.exists()) {
 						var script = project.createTask('script');
 						script.setSrc(file);
 						script.setLanguage('javascript');
+						script.setClasspath(project.getReference('nashorn.classpath'));
 						script.perform();
 					}
 					]]>
@@ -75,7 +86,7 @@
 	<target name="compile" depends="sync">
 		<antcall target="clean" />
 		<antcall target="init" />
-		<script language="javascript">
+		<script language="javascript" classpathref="nashorn.classpath">
 			<![CDATA[
 			if(project.getTargets().containsKey('pre-compile'))
 				project.executeTarget('pre-compile');
@@ -91,7 +102,7 @@
 				<exclude name="**/*.java" />
 			</fileset>
 		</copy>
-		<script language="javascript">
+		<script language="javascript" classpathref="nashorn.classpath">
 			<![CDATA[
 			if(project.getTargets().containsKey('post-compile'))
 				project.executeTarget('post-compile');
@@ -101,7 +112,7 @@
 
 	<target name="test" depends="compile">
 		<mkdir dir="${test.classes.dir}" />
-		<script language="javascript">
+		<script language="javascript" classpathref="nashorn.classpath">
 			<![CDATA[
 			if(project.getTargets().containsKey('pre-test'))
 				project.executeTarget('pre-test');
@@ -120,7 +131,7 @@
 				<exclude name="**/*.java" />
 			</fileset>
 		</copy>
-		<script language="javascript">
+		<script language="javascript" classpathref="nashorn.classpath">
 			<![CDATA[
 			if(project.getTargets().containsKey('post-test'))
 				project.executeTarget('post-test');
@@ -155,7 +166,7 @@
 	</target>
 
 	<target name="set-revision">
-		<script language="javascript">
+		<script language="javascript" classpathref="nashorn.classpath">
 			<![CDATA[
 			var File = Java.type('java.io.File');
 			project.setProperty('timestamp',
@@ -220,7 +231,7 @@
 	</target>
 
 	<target name="append-revision-for-assets" depends="expand-version">
-		<script language="javascript">
+		<script language="javascript" classpathref="nashorn.classpath">
 			<![CDATA[
 			var File = Java.type('java.io.File');
 			var vcs;
@@ -409,7 +420,7 @@
 	</target>
 
 	<target name="jar" depends="compile,set-revision">
-		<script language="javascript">
+		<script language="javascript" classpathref="nashorn.classpath">
 			<![CDATA[
 		if(project.getTargets().containsKey('pre-jar'))
 			project.executeTarget('pre-jar');
@@ -418,7 +429,7 @@
 		<antcall target="unzip-assets" />
 		<antcall target="append-revision-for-assets" />
 		<antcall target="reset-assets" />
-		<script language="javascript">
+		<script language="javascript" classpathref="nashorn.classpath">
 			<![CDATA[
 			var File = Java.type('java.io.File');
 			var UUID = Java.type('java.util.UUID');
@@ -436,7 +447,7 @@
 		]]>
 		</script>
 		<antcall target="reset-append-revision-for-assets" />
-		<script language="javascript">
+		<script language="javascript" classpathref="nashorn.classpath">
 			<![CDATA[
 		if(project.getTargets().containsKey('post-jar'))
 			project.executeTarget('post-jar');
@@ -446,7 +457,7 @@
 
 	<target name="war" depends="jar">
 		<delete dir="${target.dir}/${war.name}" />
-		<script language="javascript">
+		<script language="javascript" classpathref="nashorn.classpath">
 			<![CDATA[
 		if(project.getTargets().containsKey('pre-war'))
 			project.executeTarget('pre-war');
@@ -467,7 +478,7 @@
 		<antcall target="reset-overrides" />
 		<antcall target="reset-append-revision-for-assets" />
 		<antcall target="reset-assets" />
-		<script language="javascript">
+		<script language="javascript" classpathref="nashorn.classpath">
 			<![CDATA[
 		if(project.getTargets().containsKey('post-war'))
 			project.executeTarget('post-war');
@@ -477,7 +488,7 @@
 
 	<target name="war2" depends="jar">
 		<delete dir="${target.dir}/${war.name}" />
-		<script language="javascript">
+		<script language="javascript" classpathref="nashorn.classpath">
 			<![CDATA[
 		if(project.getTargets().containsKey('pre-war2'))
 			project.executeTarget('pre-war2');
@@ -498,7 +509,7 @@
 		<antcall target="reset-descriptors" />
 		<antcall target="reset-overrides" />
 		<antcall target="reset-append-revision-for-assets" />
-		<script language="javascript">
+		<script language="javascript" classpathref="nashorn.classpath">
 			<![CDATA[
 		if(project.getTargets().containsKey('post-war2'))
 			project.executeTarget('post-war2');
@@ -508,7 +519,7 @@
 
 	<target name="war-standalone" depends="jar">
 		<delete dir="${target.dir}/${war.name}" />
-		<script language="javascript">
+		<script language="javascript" classpathref="nashorn.classpath">
 			<![CDATA[
 		if(project.getTargets().containsKey('pre-war-standalone'))
 			project.executeTarget('pre-war-standalone');
@@ -518,7 +529,7 @@
 		<copy tofile="${webapp.dir}/BOOT-INF/lib/bootstrap.jar" failonerror="false">
 			<fileset file="${lib.dir}/bootstrap*.jar" />
 		</copy>
-		<script language="javascript">
+		<script language="javascript" classpathref="nashorn.classpath">
 			<![CDATA[
 			var File = Java.type('java.io.File');
 			var lib = new File(project.getProperty('webapp.dir') + '/BOOT-INF/lib');
@@ -567,7 +578,7 @@
 		<delete dir="${webapp.dir}/bootstrap" />
 		<delete dir="${webapp.dir}/BOOT-INF" />
 		<delete dir="${target.dir}/classes" />
-		<script language="javascript">
+		<script language="javascript" classpathref="nashorn.classpath">
 			<![CDATA[
 		if(project.getTargets().containsKey('post-war-standalone'))
 			project.executeTarget('post-war-standalone');

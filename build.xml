@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE project>
-<project name="ironrhino" default="jar" basedir=".">
+<project name="ironrhino" default="dist" basedir=".">
 
 	<property file="build.properties" />
 
@@ -101,7 +101,7 @@
 	<import file="build.compress.xml" />
 
 	<target name="dist">
-		<antcall target="compile" />
+		<antcall target="test" />
 		<antcall target="jar" />
 		<antcall target="jar-sources" />
 	</target>

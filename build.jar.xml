@@ -64,8 +64,9 @@
 	<property name="rest-jar.name" value="ironrhino-rest-${version}.jar" />
 	<property name="batch-jar.name" value="ironrhino-batch-${version}.jar" />
 	<import file="build.compress.xml" />
+	<import file="build.nashorn.xml"/>
 	<target name="set-revision">
-		<script language="javascript">
+		<script language="javascript" classpathref="nashorn.classpath">
 			<![CDATA[
 			var File = Java.type('java.io.File');
 			project.setProperty('timestamp',new java.text.SimpleDateFormat('yyyy-MM-dd HH:mm:ss').format(new java.util.Date()));
@@ -92,7 +93,7 @@
 		</script>
 	</target>
 	<target name="append-revision-for-assets">
-		<script language="javascript">
+		<script language="javascript" classpathref="nashorn.classpath">
 			<![CDATA[
 			var File = Java.type('java.io.File');
 			var vcs;
@@ -223,7 +224,7 @@
 			</fileset>
 		</copy>
 		<loadfile srcfile="${classes.dir}/resources/view/login.ftl" property="login.ftl" />
-		<script language="javascript">
+		<script language="javascript" classpathref="nashorn.classpath">
 			<![CDATA[
 				var source = project.getProperty('login.ftl');
 				project.setProperty('login.form.ftl','<#ftl output_format="HTML">\n	'+source.substring(source.indexOf('<@s.form'),source.indexOf('</@s.form>')+10));

@@ -30,8 +30,7 @@ public class NameableThreadFactory implements ThreadFactory {
 
 	public NameableThreadFactory(String poolName, String threadGroupName,
 			UncaughtExceptionHandler uncaughtExceptionHandler) {
-		SecurityManager s = System.getSecurityManager();
-		this.group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
+		this.group = Thread.currentThread().getThreadGroup();
 		StringBuilder sb = new StringBuilder();
 		if (StringUtils.isNotBlank(poolName)) {
 			sb.append(poolName);
