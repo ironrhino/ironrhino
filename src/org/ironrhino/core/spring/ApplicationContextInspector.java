@@ -29,6 +29,8 @@ import org.ironrhino.core.fs.impl.FtpFileStorage;
 import org.ironrhino.core.servlet.ServletContainerHelper;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.ClassScanner;
+import org.ironrhino.rest.client.RestApi;
+import org.ironrhino.rest.client.RestApiFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -53,6 +55,7 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
@@ -143,6 +146,14 @@ public class ApplicationContextInspector {
 			if (clz == null) {
 				continue;
 			}
+			if (clz == RestApiFactoryBean.class.getName()) {
+				Class<?> intf = (Class<?>) bd.getConstructorArgumentValues().getArgumentValue(0, Class.class)
+						.getValue();
+				RestApi anno = intf.getAnnotation(RestApi.class);
+				if (anno != null)
+					props.computeIfAbsent(anno.apiBaseUrl(), k -> new TreeSet<>()).add(formatClassName(intf));
+				continue;
+			}
 			try {
 				Class<?> clazz = Class.forName(clz);
 				ReflectionUtils.doWithFields(clazz, field -> {
@@ -156,6 +167,19 @@ public class ApplicationContextInspector {
 							.add(formatClassName(method.getDeclaringClass()));
 				}, method -> {
 					return method.isAnnotationPresent(Value.class);
+				});
+				ReflectionUtils.doWithMethods(clazz, method -> {
+					Scheduled anno = method.getAnnotation(Scheduled.class);
+					props.computeIfAbsent(anno.initialDelayString(), k -> new TreeSet<>())
+							.add(formatClassName(method.getDeclaringClass()));
+					props.computeIfAbsent(anno.fixedDelayString(), k -> new TreeSet<>())
+							.add(formatClassName(method.getDeclaringClass()));
+					props.computeIfAbsent(anno.fixedRateString(), k -> new TreeSet<>())
+							.add(formatClassName(method.getDeclaringClass()));
+					props.computeIfAbsent(anno.cron(), k -> new TreeSet<>())
+							.add(formatClassName(method.getDeclaringClass()));
+				}, method -> {
+					return method.isAnnotationPresent(Scheduled.class);
 				});
 			} catch (NoClassDefFoundError e) {
 				e.printStackTrace();
