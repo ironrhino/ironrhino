@@ -41,7 +41,6 @@ import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -112,10 +111,14 @@ public class ApplicationContextInspector {
 		String name = propertySource.getName();
 		if (name != null && name.startsWith("servlet"))
 			return;
-		if (propertySource instanceof EnumerablePropertySource) {
+		if (propertySource instanceof CompositePropertySource) {
+			for (PropertySource<?> ps : ((CompositePropertySource) propertySource).getPropertySources()) {
+				addOverriddenProperties(properties, ps);
+			}
+		} else if (propertySource instanceof EnumerablePropertySource) {
 			EnumerablePropertySource<?> ps = (EnumerablePropertySource<?>) propertySource;
 			for (String s : ps.getPropertyNames()) {
-				if (!(propertySource instanceof ResourcePropertySource) && !getDefaultProperties().containsKey(s))
+				if (!getDefaultProperties().containsKey(s))
 					continue;
 				if (!properties.containsKey(s)) {
 					ApplicationProperty ap = new ApplicationProperty(
@@ -123,10 +126,6 @@ public class ApplicationContextInspector {
 					ap.getSources().add(name);
 					properties.put(s, ap);
 				}
-			}
-		} else if (propertySource instanceof CompositePropertySource) {
-			for (PropertySource<?> ps : ((CompositePropertySource) propertySource).getPropertySources()) {
-				addOverriddenProperties(properties, ps);
 			}
 		}
 	}
