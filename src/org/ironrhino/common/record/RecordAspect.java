@@ -74,6 +74,14 @@ public class RecordAspect implements TransactionSynchronization, Ordered {
 
 	@Override
 	public void afterCommit() {
+		try {
+			doAfterCommit();
+		} catch (Exception ex) {
+			log.error(ex.getMessage(), ex);
+		}
+	}
+
+	private void doAfterCommit() {
 		List<AbstractEvent> events = getHibernateEvents(false);
 		if (events == null || events.isEmpty())
 			return;
