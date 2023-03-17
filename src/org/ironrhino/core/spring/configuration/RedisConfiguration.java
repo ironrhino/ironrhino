@@ -41,6 +41,12 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.SocketOptions;
 import io.lettuce.core.TimeoutOptions;
+import io.lettuce.core.resource.ClientResources;
+import io.lettuce.core.resource.DefaultClientResources;
+import io.lettuce.core.resource.EpollProvider;
+import io.lettuce.core.resource.NettyCustomizer;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.epoll.EpollChannelOption;
 import io.opentracing.contrib.redis.common.TracingConfiguration;
 import io.opentracing.contrib.redis.spring.data2.connection.TracingRedisConnectionFactory;
 import io.opentracing.tag.Tags;
@@ -109,6 +115,27 @@ public class RedisConfiguration {
 	@Value("${redis.shareNativeConnection:true}")
 	private boolean shareNativeConnection;
 
+	@Bean(destroyMethod = "shutdown")
+	@Primary
+	public ClientResources clientResources() {
+		DefaultClientResources.Builder builder = DefaultClientResources.builder();
+		builder.nettyCustomizer(new NettyCustomizer() {
+			@Override
+			public void afterBootstrapInitialized(Bootstrap bootstrap) {
+				if (EpollProvider.isAvailable()) {
+					// KEEPALIVE_TIME = TCP_KEEPIDLE + TCP_KEEPINTVL * TCP_KEEPCNT = 15s +5s*3
+					// TCP_USER_TIMEOUT >= KEEPALIVE_TIME
+					// https://blog.cloudflare.com/when-tcp-sockets-refuse-to-die/
+					bootstrap.option(EpollChannelOption.TCP_KEEPIDLE, 15);
+					bootstrap.option(EpollChannelOption.TCP_KEEPINTVL, 5);
+					bootstrap.option(EpollChannelOption.TCP_KEEPCNT, 3);
+					bootstrap.option(EpollChannelOption.TCP_USER_TIMEOUT, 30000);
+				}
+			}
+		});
+		return builder.build();
+	}
+
 	@Bean
 	@Primary
 	public RedisConnectionFactory redisConnectionFactory() {
@@ -128,7 +155,8 @@ public class RedisConfiguration {
 		if (isUseSsl())
 			builder.useSsl();
 		LettuceClientConfiguration clientConfiguration = builder.clientOptions(clientOptions)
-				.clientName(AppInfo.getInstanceId(true)).commandTimeout(Duration.ofMillis(getReadTimeout()))
+				.clientResources(clientResources()).clientName(AppInfo.getInstanceId(true))
+				.commandTimeout(Duration.ofMillis(getReadTimeout()))
 				.shutdownTimeout(Duration.ofMillis(getShutdownTimeout())).build();
 		org.springframework.data.redis.connection.RedisConfiguration redisConfiguration;
 		if (getSentinels() != null) {

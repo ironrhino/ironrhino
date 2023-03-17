@@ -15,6 +15,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 
+import io.lettuce.core.resource.ClientResources;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -75,6 +76,11 @@ public class GlobalRedisConfiguration extends RedisConfiguration {
 
 	@Value("${global.redis.shareNativeConnection:true}")
 	private boolean shareNativeConnection;
+
+	@Bean(name = "globalClientResources", destroyMethod = "shutdown")
+	public ClientResources clientResources() {
+		return super.clientResources();
+	}
 
 	@Override
 	@Bean(name = "globalRedisConnectionFactory")
