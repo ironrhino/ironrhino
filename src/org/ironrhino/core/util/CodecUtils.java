@@ -4,9 +4,8 @@ import java.io.UnsupportedEncodingException;
 import java.lang.ref.SoftReference;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Base64;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.codec.binary.Hex;
 import org.ironrhino.core.tracing.Tracing;
@@ -27,7 +26,9 @@ public class CodecUtils {
 
 	public static final char[] CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
 
-	private static final Random random = new Random();
+	private static class Holder {
+		static final SecureRandom random = new SecureRandom();
+	}
 
 	private static ThreadLocal<SoftReference<MessageDigest>> MD5 = new ThreadLocal<SoftReference<MessageDigest>>() {
 
@@ -267,24 +268,24 @@ public class CodecUtils {
 	public static String randomString(int digits) {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < digits; i++)
-			sb.append(string.charAt(ThreadLocalRandom.current().nextInt(26)));
+			sb.append(string.charAt(Holder.random.nextInt(26)));
 		return sb.toString();
 	}
 
 	public static String randomDigitalString(int digits) {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < digits; i++)
-			sb.append(ThreadLocalRandom.current().nextInt(10));
+			sb.append(Holder.random.nextInt(10));
 		return sb.toString();
 	}
 
 	public static int randomInt(int digits) {
 		if (digits <= 1)
-			return ThreadLocalRandom.current().nextInt(10);
+			return Holder.random.nextInt(10);
 		int n = 10;
 		for (int i = 1; i < digits - 1; i++)
 			n *= 10;
-		return n + ThreadLocalRandom.current().nextInt(n * 9);
+		return n + Holder.random.nextInt(n * 9);
 	}
 
 	public static String nextId() {
@@ -293,9 +294,9 @@ public class CodecUtils {
 
 	public static String nextId(int length) {
 		char[] chars = new char[length];
-		chars[0] = CHARS[random.nextInt(length == 22 ? 8 : CHARS.length)];
+		chars[0] = CHARS[Holder.random.nextInt(length == 22 ? 8 : CHARS.length)];
 		for (int i = 1; i < chars.length; i++)
-			chars[i] = CHARS[random.nextInt(CHARS.length)];
+			chars[i] = CHARS[Holder.random.nextInt(CHARS.length)];
 		return new String(chars);
 	}
 
