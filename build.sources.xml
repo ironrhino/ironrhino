@@ -14,7 +14,7 @@
 	<property name="fs-sources-jar.name" value="ironrhino-fs-${version}-sources.jar" />
 	<property name="fs-sources-jar.includes" value="org/ironrhino/core/fs/**" />
 	<property name="remoting-common-sources-jar.name" value="ironrhino-remoting-common-${version}-sources.jar" />
-	<property name="remoting-common-sources-jar.includes" value="org/ironrhino/core/remoting/**,org/ironrhino/core/remoting/action/**,resources/view/service/**" />
+	<property name="remoting-common-sources-jar.includes" value="org/springframework/remoting/**,org/ironrhino/core/remoting/**,org/ironrhino/core/remoting/action/**,resources/view/service/**" />
 	<property name="remoting-server-sources-jar.name" value="ironrhino-remoting-server-${version}-sources.jar" />
 	<property name="remoting-server-sources-jar.includes" value="org/ironrhino/core/remoting/server/**" />
 	<property name="remoting-client-sources-jar.name" value="ironrhino-remoting-client-${version}-sources.jar" />
