@@ -168,11 +168,12 @@
 	<target name="set-revision">
 		<script language="javascript" classpathref="nashorn.classpath">
 			<![CDATA[
-			var File = Java.type('java.io.File');
+			var Files = Java.type('java.nio.file.Files');
+			var Paths = Java.type('java.nio.file.Paths');
 			project.setProperty('timestamp',
 					new java.text.SimpleDateFormat('yyyy-MM-dd HH:mm:ss')
 							.format(new java.util.Date()));
-			if (new File(basedir + '/.svn').isDirectory()) {
+			if (Files.isDirectory(Paths.get('.svn'))) {
 				var exec = project.createTask('exec');
 				exec.setExecutable('svn');
 				exec.setOutputproperty('svninfo');
@@ -198,7 +199,7 @@
 						}
 					}
 				}
-			} else if (new File(basedir + '/.git').isDirectory()) {
+			} else if (Files.isDirectory(Paths.get('.git'))) {
 				var exec = project.createTask('exec');
 				exec.setExecutable('git');
 				exec.setOutputproperty('gitlog');
@@ -234,99 +235,87 @@
 		<script language="javascript" classpathref="nashorn.classpath">
 			<![CDATA[
 			var File = Java.type('java.io.File');
-			var vcs;
-			if (new File(basedir + '/.svn').isDirectory())
-				vcs = 'svn';
-			else if (new File(basedir + '/.git').isDirectory())
-				vcs = 'git';
-			var assetsDir = new File(project.getProperty('webapp.dir') + '/assets');
-			var dirs = assetsDir.listFiles();
-			for (var n = 0; n < dirs.length; n++) {
-				var dir = dirs[n];
-				if (dir.getName() == 'components' || dir.getName() == 'images'
-						|| !dir.isDirectory())
-					continue;
-				var files = dir.listFiles();
-				for (var i = 0; i < files.length; i++) {
-					var file = files[i];
-					if (file.isDirectory())
-						continue;
-					var name = file.getName();
-					if (!name.endsWith('.js') && !name.endsWith('.css'))
-						continue;
-					if (name.indexOf('-min.') > 0)
-						continue;
-					var revision = null;
-					if (vcs == 'svn') {
-						var exec = project.createTask('exec');
-						exec.setExecutable('svn');
-						exec.setOutputproperty(name + '.svninfo');
-						exec.setFailIfExecutionFails(false);
-						exec.setResultProperty('resultCode');
-						var arg = exec.createArg();
-						arg.setValue('info');
-						arg = exec.createArg();
-						arg.setValue(file.getPath());
-						exec.execute();
-						var svninfo = project.getProperty(name + '.svninfo');
-						if (svninfo) {
-							var arr = svninfo.split('\n');
-							for (var j = 0; j < arr.length; j++) {
-								var arr2 = arr[j].split(':', 2);
-								if (arr2.length > 1) {
-									var s = arr2[1].trim();
-									try {
-										if (s.match(/^\d+$/)) {
-											revision = s;
-										}
-									} catch (e) {
+			var Files = Java.type('java.nio.file.Files');
+			var Paths = Java.type('java.nio.file.Paths');
+			var stream = Files.walk(Paths.get(project.getProperty('webapp.dir'), 'assets'));
+			stream.forEach(function(path) {
+				if (!Files.isRegularFile(path))
+					return;
+				var name = path.toString().replaceAll('\\\\', '/');
+				name = name.substring(name.indexOf('/assets/'));
+				if (name.indexOf('/components/') > 0 || name.indexOf('/images/') > 0
+					||!name.endsWith('.js') && !name.endsWith('.css')||name.indexOf('-min.') > 0)
+					return;
+				var revision = null;
+				if (Files.isDirectory(Paths.get('.svn'))) {
+					var exec = project.createTask('exec');
+					exec.setExecutable('svn');
+					exec.setOutputproperty(name + '.svninfo');
+					exec.setFailIfExecutionFails(false);
+					exec.setResultProperty('resultCode');
+					var arg = exec.createArg();
+					arg.setValue('info');
+					arg = exec.createArg();
+					arg.setValue(path);
+					exec.execute();
+					var svninfo = project.getProperty(name + '.svninfo');
+					if (svninfo) {
+						var arr = svninfo.split('\n');
+						for (var j = 0; j < arr.length; j++) {
+							var arr2 = arr[j].split(':', 2);
+							if (arr2.length > 1) {
+								var s = arr2[1].trim();
+								try {
+									if (s.match(/^\d+$/)) {
+										revision = s;
 									}
+								} catch (e) {
 								}
 							}
 						}
-					} else if (vcs == 'git') {
-						var exec = project.createTask('exec');
-						exec.setExecutable('git');
-						exec.setOutputproperty(name + '.gitlog');
-						exec.setFailIfExecutionFails(false);
-						exec.setResultProperty('resultCode');
-						var arg = exec.createArg();
-						arg.setValue('log');
-						arg = exec.createArg();
-						arg.setValue('-1');
-						arg = exec.createArg();
-						arg.setValue('--');
-						arg = exec.createArg();
-						arg.setValue('webapp/assets/' + dir.getName() + '/' + name);
-						exec.execute();
-						var gitlog = project.getProperty(name + '.gitlog');
-						if (gitlog && gitlog.trim().length() > 0) {
-							revision = gitlog.split('\n')[0].split(' ')[1];
-							if (revision.length() > 8)
-								revision = revision.substring(0, 7);
-						}
 					}
-					revision = revision || ('' + file.lastModified());
-					var decdir = new File(project.getProperty('webapp.dir')
-							+ '/WEB-INF/classes/resources/view/decorator');
-					if (decdir.exists()) {
-						var replaceregexp = project.createTask('replaceregexp');
-						replaceregexp.setEncoding('utf-8');
-						replaceregexp.setPreserveLastModified(true);
-						var fs = project.createDataType("fileset");
-						fs.setDir(decdir);
-						fs.setIncludes('**/*.ftl');
-						replaceregexp.addFileset(fs);
-						var prefix = name.substring(0, name.lastIndexOf('.'));
-						var suffix = name.substring(name.lastIndexOf('.') + 1);
-						var match = '/' + dir.getName() + '/' + prefix + '(.*\\.' + suffix + '(?!\\?))';
-						var replace = '/' + dir.getName() + '/' + prefix + '\\1' + '?' + revision;
-						replaceregexp.setMatch(match);
-						replaceregexp.setReplace(replace);
-						replaceregexp.perform();
+				} else if (Files.isDirectory(Paths.get('.git'))) {
+					var exec = project.createTask('exec');
+					exec.setExecutable('git');
+					exec.setOutputproperty(name + '.gitlog');
+					exec.setFailIfExecutionFails(false);
+					exec.setResultProperty('resultCode');
+					var arg = exec.createArg();
+					arg.setValue('log');
+					arg = exec.createArg();
+					arg.setValue('-1');
+					arg = exec.createArg();
+					arg.setValue('--');
+					arg = exec.createArg();
+					arg.setValue(path);
+					exec.execute();
+					var gitlog = project.getProperty(name + '.gitlog');
+					if (gitlog && gitlog.trim().length() > 0) {
+						revision = gitlog.split('\n')[0].split(' ')[1];
+						if (revision.length() > 8)
+							revision = revision.substring(0, 7);
 					}
 				}
-			}
+				revision = revision || ('' + path.toFile().lastModified());
+				var dir = new File(project.getProperty('webapp.dir')
+						+ '/WEB-INF/classes/resources/view/decorator');
+				if (dir.exists()) {
+					var replaceregexp = project.createTask('replaceregexp');
+					replaceregexp.setEncoding('utf-8');
+					replaceregexp.setPreserveLastModified(true);
+					var fs = project.createDataType("fileset");
+					fs.setDir(dir);
+					fs.setIncludes('**/*.ftl');
+					replaceregexp.addFileset(fs);
+					var prefix = name.substring(0, name.lastIndexOf('.'));
+					var suffix = name.substring(name.lastIndexOf('.') + 1);
+					var match = prefix + '(.*\\.' + suffix + '(?!\\?))';
+					var replace = prefix + '\\1' + '?' + revision;
+					replaceregexp.setMatch(match);
+					replaceregexp.setReplace(replace);
+					replaceregexp.perform();
+				}
+			});
 			]]>
 		</script>
 	</target>
