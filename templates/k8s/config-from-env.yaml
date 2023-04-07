@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${app}
+spec:
+  template:
+    spec:
+      containers:
+      - name: ${app}
+        env:
+        - name: redis.port
+          value: "6379"
+        - name: jdbc.password
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secrets
+              key: password

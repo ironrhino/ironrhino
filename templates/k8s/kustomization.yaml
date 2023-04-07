@@ -1,0 +1,14 @@
+configMapGenerator:
+- name: ${app}-config-properties
+  files:
+  - applicationContext.properties
+generatorOptions:
+  disableNameSuffixHash: true
+  labels:
+    type: generated
+resources:
+- deployment.yaml
+- service.yaml
+patches:
+- path: config-from-volume.yaml
+- path: config-from-env.yaml

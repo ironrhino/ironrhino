@@ -1,0 +1,11 @@
+secretGenerator:
+- name: mysql-secrets
+  envs:
+  - secrets.properties
+generatorOptions:
+  disableNameSuffixHash: true
+  labels:
+    type: generated
+resources:
+- deployment.yaml
+- service.yaml
