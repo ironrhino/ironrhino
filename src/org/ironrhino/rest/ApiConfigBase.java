@@ -1,6 +1,7 @@
 package org.ironrhino.rest;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
@@ -135,7 +136,28 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 
 	@Override
 	protected void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-		MappingJackson2HttpMessageConverter jackson2 = new MappingJackson2HttpMessageConverter();
+		MappingJackson2HttpMessageConverter jackson2 = new MappingJackson2HttpMessageConverter() {
+
+			@Override
+			public Object read(Type type, Class<?> contextClass, HttpInputMessage inputMessage) throws IOException {
+				try {
+					return super.read(type, contextClass, inputMessage);
+				} finally {
+					inputMessage.getBody().close();
+					// for LoggingBodyHttpServletRequest.ContentCachingInputStream.close()
+				}
+			}
+
+			@Override
+			public Object readInternal(Class<?> clazz, HttpInputMessage inputMessage) throws IOException {
+				try {
+					return super.readInternal(clazz, inputMessage);
+				} finally {
+					inputMessage.getBody().close();
+					// for LoggingBodyHttpServletRequest.ContentCachingInputStream.close()
+				}
+			}
+		};
 		jackson2.setObjectMapper(objectMapper());
 		converters.add(jackson2);
 		StringHttpMessageConverter string = new StringHttpMessageConverter(StandardCharsets.UTF_8) {
@@ -147,6 +169,7 @@ public abstract class ApiConfigBase extends WebMvcConfigurationSupport {
 					return super.readInternal(clazz, inputMessage);
 				} finally {
 					inputMessage.getBody().close();
+					// for LoggingBodyHttpServletRequest.ContentCachingInputStream.close()
 				}
 			}
 		};
