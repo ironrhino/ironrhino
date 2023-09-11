@@ -2,8 +2,6 @@ package org.ironrhino.rest;
 
 import static org.mockito.Mockito.mock;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -20,16 +18,11 @@ import org.ironrhino.core.util.JsonUtils;
 import org.ironrhino.rest.component.RestExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.format.FormatterRegistry;
-import org.springframework.http.HttpInputMessage;
-import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.http.server.ServerHttpResponse;
-import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -75,45 +68,10 @@ public abstract class AbstractMockMvcConfigurer implements WebMvcConfigurer {
 
 	@Override
 	public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-		MappingJackson2HttpMessageConverter jackson2 = new MappingJackson2HttpMessageConverter() {
-
-			@Override
-			protected void writeInternal(Object object, Type type, HttpOutputMessage outputMessage)
-					throws IOException, HttpMessageNotWritableException {
-				super.writeInternal(object, type, outputMessage);
-				if (!(outputMessage instanceof ServerHttpResponse)
-						|| outputMessage instanceof ServletServerHttpResponse) {
-					// don't close MediaType.TEXT_EVENT_STREAM
-					outputMessage.getBody().close();
-				}
-			}
-
-		};
+		MappingJackson2HttpMessageConverter jackson2 = new MappingJackson2HttpMessageConverter();
 		jackson2.setObjectMapper(JsonUtils.createNewObjectMapper());
 		converters.add(jackson2);
-		StringHttpMessageConverter string = new StringHttpMessageConverter(StandardCharsets.UTF_8) {
-
-			@Override
-			protected String readInternal(Class<? extends String> clazz, HttpInputMessage inputMessage)
-					throws IOException {
-				try {
-					return super.readInternal(clazz, inputMessage);
-				} finally {
-					inputMessage.getBody().close();
-				}
-			}
-
-			@Override
-			protected void writeInternal(String str, HttpOutputMessage outputMessage) throws IOException {
-				super.writeInternal(str, outputMessage);
-				if (!(outputMessage instanceof ServerHttpResponse)
-						|| outputMessage instanceof ServletServerHttpResponse) {
-					// don't close MediaType.TEXT_EVENT_STREAM
-					outputMessage.getBody().close();
-				}
-			}
-
-		};
+		StringHttpMessageConverter string = new StringHttpMessageConverter(StandardCharsets.UTF_8);
 		string.setWriteAcceptCharset(false);
 		converters.add(string);
 		converters.add(new ByteArrayHttpMessageConverter());
