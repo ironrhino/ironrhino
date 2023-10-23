@@ -108,6 +108,10 @@ public class XWorkListPropertyAccessor extends ListPropertyAccessor {
             if (listSize <= index) {
                 Object result = null;
 
+                if (index > autoGrowCollectionLimit) {
+                    throw new OgnlException("Error auto growing collection size to " + index + " which limited to " + autoGrowCollectionLimit);
+                }
+
                 for (int i = listSize; i < index; i++) {
 
                     list.add(null);
