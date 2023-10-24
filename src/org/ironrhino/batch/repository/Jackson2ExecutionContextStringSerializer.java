@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Jackson2ExecutionContextStringSerializer
 		extends org.springframework.batch.core.repository.dao.Jackson2ExecutionContextStringSerializer {
 
+	@SuppressWarnings("deprecation")
 	public Jackson2ExecutionContextStringSerializer() {
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false);
