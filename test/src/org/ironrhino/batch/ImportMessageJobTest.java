@@ -23,7 +23,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ContextConfiguration(locations = { "ctx.xml", "/resources/batch/importMessage.xml" })
 public class ImportMessageJobTest {
 
-	static final String SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS sample_message (id bigint(20) NOT NULL,title varchar(255) NOT NULL,content varchar(4000),createDate datetime(6),modifyDate datetime(6),PRIMARY KEY (id));TRUNCATE TABLE sample_message;";
+	static final String SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS sample_message (id bigint PRIMARY KEY,title varchar(255) NOT NULL,content varchar(4000),createDate datetime(6),modifyDate datetime(6));TRUNCATE TABLE sample_message;";
 
 	static final Date createDate = new Date();
 	static long count = 1000L;

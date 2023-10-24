@@ -32,16 +32,16 @@ public class RowsAssertionTaskTest {
 	public void testCount() throws Exception {
 		try (HikariDataSource ds = create(10)) {
 			execute(ds, "select count(*) from test", null, 10);
-			execute(ds, "select count(*) from test where value%2=0", null, 5);
-			execute(ds, "select count(*) from test where value%2=1", null, 5);
+			execute(ds, "select count(*) from test where val%2=0", null, 5);
+			execute(ds, "select count(*) from test where val%2=1", null, 5);
 		}
 	}
 
 	@Test
 	public void testUpdate() throws Exception {
 		try (HikariDataSource ds = create(10)) {
-			execute(ds, "update test set value=value+1 where value%2=0", null, 5);
-			execute(ds, "select count(*) from test where value%2=1", null, 10);
+			execute(ds, "update test set val=val+1 where val%2=0", null, 5);
+			execute(ds, "select count(*) from test where val%2=1", null, 10);
 		}
 	}
 
@@ -50,7 +50,7 @@ public class RowsAssertionTaskTest {
 		ds.setJdbcUrl("jdbc:h2:mem:test;");
 		try (Connection conn = ds.getConnection(); Statement stmt = conn.createStatement()) {
 			stmt.execute("drop table if exists test");
-			stmt.execute("create table if not exists test(value int)");
+			stmt.execute("create table if not exists test(val int)");
 			for (int i = 0; i < rows; i++) {
 				stmt.executeUpdate("insert into test values(" + i + ")");
 			}
