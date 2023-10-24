@@ -53,7 +53,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/micrometer-registry-influx-1.7.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/micrometer-registry-prometheus-1.7.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mvel2-2.4.4.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mysql-connector-java-8.0.25.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mysql-connector-java-8.0.33.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/netty-all-4.1.65.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/objenesis-3.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/ognl-3.1.26.jar"/>
