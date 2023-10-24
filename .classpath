@@ -23,8 +23,8 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/freemarker-2.3.31.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/h2-1.4.196.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/hibernate-commons-annotations-5.1.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/hibernate-core-5.6.7.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/hibernate-validator-6.2.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/hibernate-core-5.6.9.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/hibernate-validator-6.2.5.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/HikariCP-4.0.3.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/httpclient-4.5.13.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/httpcore-4.4.14.jar"/>
