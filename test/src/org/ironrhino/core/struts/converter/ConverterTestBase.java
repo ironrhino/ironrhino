@@ -6,7 +6,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.apache.struts2.util.StrutsTypeConverter;
 import org.junit.Test;
-import org.springframework.core.ResolvableType;
+import org.springframework.core.GenericTypeResolver;
 
 public abstract class ConverterTestBase<T extends StrutsTypeConverter> {
 
@@ -15,7 +15,7 @@ public abstract class ConverterTestBase<T extends StrutsTypeConverter> {
 	@SuppressWarnings("unchecked")
 	ConverterTestBase() {
 		try {
-			converter = (T) ResolvableType.forClass(getClass()).as(ConverterTestBase.class).resolveGeneric(0)
+			converter = (T) GenericTypeResolver.resolveTypeArgument(getClass(), ConverterTestBase.class)
 					.getConstructor().newInstance();
 		} catch (Exception e) {
 			throw new RuntimeException(e);

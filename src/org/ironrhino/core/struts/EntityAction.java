@@ -87,7 +87,7 @@ import org.springframework.beans.NullValueInNestedPathException;
 import org.springframework.beans.PropertyAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ResolvableType;
+import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.ConverterNotFoundException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -1806,8 +1806,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		Collection<BaseTreeControl> baseTreeControls = ApplicationContextUtils.getBeansOfType(BaseTreeControl.class)
 				.values();
 		for (BaseTreeControl btc : baseTreeControls) {
-			if (ResolvableType.forClass(btc.getClass()).as(BaseTreeControl.class)
-					.resolveGeneric(0) == getEntityClass()) {
+			if (GenericTypeResolver.resolveTypeArgument(btc.getClass(), BaseTreeControl.class) == getEntityClass()) {
 				baseTreeControl = btc;
 				break;
 			}
@@ -1918,7 +1917,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	// need call once before view
 	protected Class<EN> getEntityClass() {
 		if (entityClass == null && getClass() != EntityAction.class) {
-			entityClass = (Class<EN>) ResolvableType.forClass(getClass()).as(EntityAction.class).resolveGeneric(0);
+			entityClass = (Class<EN>) GenericTypeResolver.resolveTypeArgument(getClass(), EntityAction.class);
 		}
 		if (entityClass == null) {
 			ActionProxy proxy = ActionContext.getContext().getActionInvocation().getProxy();

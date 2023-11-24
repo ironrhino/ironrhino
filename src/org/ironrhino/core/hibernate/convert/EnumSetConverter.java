@@ -8,7 +8,7 @@ import java.util.Set;
 import javax.persistence.AttributeConverter;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.core.ResolvableType;
+import org.springframework.core.GenericTypeResolver;
 
 public abstract class EnumSetConverter<T extends Enum<T>> implements AttributeConverter<Set<T>, String> {
 
@@ -18,7 +18,7 @@ public abstract class EnumSetConverter<T extends Enum<T>> implements AttributeCo
 
 	@SuppressWarnings("unchecked")
 	public EnumSetConverter() {
-		enumType = (Class<T>) ResolvableType.forClass(getClass()).as(EnumSetConverter.class).resolveGeneric(0);
+		enumType = (Class<T>) GenericTypeResolver.resolveTypeArgument(getClass(), EnumSetConverter.class);
 	}
 
 	@Override

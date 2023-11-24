@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
-import org.springframework.core.ResolvableType;
+import org.springframework.core.GenericTypeResolver;
 import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -86,7 +86,7 @@ public abstract class AbstractPollingControl<T extends BasePollingEntity> implem
 
 	@SuppressWarnings("unchecked")
 	public AbstractPollingControl() {
-		entityClass = (Class<T>) ResolvableType.forClass(getClass()).as(AbstractPollingControl.class).resolveGeneric(0);
+		entityClass = (Class<T>) GenericTypeResolver.resolveTypeArgument(getClass(), AbstractPollingControl.class);
 	}
 
 	@PostConstruct

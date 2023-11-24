@@ -4,7 +4,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.core.ResolvableType;
+import org.springframework.core.GenericTypeResolver;
 
 @SuppressWarnings("unchecked")
 public abstract class EnumArrayConverter<T extends Enum<T>> {
@@ -14,7 +14,7 @@ public abstract class EnumArrayConverter<T extends Enum<T>> {
 	private final Class<T> enumType;
 
 	public EnumArrayConverter() {
-		enumType = (Class<T>) ResolvableType.forClass(getClass()).as(EnumArrayConverter.class).resolveGeneric(0);
+		enumType = (Class<T>) GenericTypeResolver.resolveTypeArgument(getClass(), EnumArrayConverter.class);
 	}
 
 	public String convertToDatabaseColumn(T[] array) {

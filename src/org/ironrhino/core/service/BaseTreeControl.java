@@ -26,7 +26,7 @@ import org.ironrhino.core.throttle.Mutex;
 import org.ironrhino.core.util.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
-import org.springframework.core.ResolvableType;
+import org.springframework.core.GenericTypeResolver;
 import org.springframework.transaction.annotation.Transactional;
 
 public abstract class BaseTreeControl<T extends BaseTreeableEntity<T>> {
@@ -40,7 +40,7 @@ public abstract class BaseTreeControl<T extends BaseTreeableEntity<T>> {
 
 	@SuppressWarnings("unchecked")
 	public BaseTreeControl() {
-		entityClass = (Class<T>) ResolvableType.forClass(getClass()).as(BaseTreeControl.class).resolveGeneric(0);
+		entityClass = (Class<T>) GenericTypeResolver.resolveTypeArgument(getClass(), BaseTreeControl.class);
 	}
 
 	protected T buildTree() {

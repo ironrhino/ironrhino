@@ -9,14 +9,14 @@ import org.ironrhino.core.servlet.RequestContext;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.aop.support.AbstractPointcutAdvisor;
-import org.springframework.core.ResolvableType;
+import org.springframework.core.GenericTypeResolver;
 
 public abstract class AbstractMethodInterceptor<ASPECT extends AbstractPointcutAdvisor> implements MethodInterceptor {
 
 	private final Class<?> aspectClass;
 
 	public AbstractMethodInterceptor() {
-		aspectClass = ResolvableType.forClass(getClass()).as(AbstractMethodInterceptor.class).resolveGeneric(0);
+		aspectClass = GenericTypeResolver.resolveTypeArgument(getClass(), AbstractMethodInterceptor.class);
 	}
 
 	protected boolean isBypass() {

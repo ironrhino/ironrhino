@@ -5,7 +5,7 @@ import java.lang.annotation.Annotation;
 import org.ironrhino.core.util.AnnotationUtils;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
-import org.springframework.core.ResolvableType;
+import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.core.type.ClassMetadata;
 
@@ -18,7 +18,7 @@ public abstract class SimpleCondition<T extends Annotation> implements Condition
 
 	@SuppressWarnings("unchecked")
 	public SimpleCondition() {
-		annotationClass = (Class<T>) ResolvableType.forClass(getClass()).as(SimpleCondition.class).resolveGeneric(0);
+		annotationClass = (Class<T>) GenericTypeResolver.resolveTypeArgument(getClass(), SimpleCondition.class);
 	}
 
 	public Class<T> getAnnotationClass() {

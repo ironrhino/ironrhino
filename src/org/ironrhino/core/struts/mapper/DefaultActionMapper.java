@@ -25,7 +25,7 @@ import org.ironrhino.core.model.ResultPage;
 import org.ironrhino.core.struts.EntityAction;
 import org.ironrhino.core.struts.result.AutoConfigResult;
 import org.ironrhino.core.util.RequestUtils;
-import org.springframework.core.ResolvableType;
+import org.springframework.core.GenericTypeResolver;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.opensymphony.xwork2.config.Configuration;
@@ -192,8 +192,8 @@ public class DefaultActionMapper extends AbstractActionMapper {
 						AutoConfig ac = actionClass.getAnnotation(AutoConfig.class);
 						if (ac == null && actionClass != EntityAction.class
 								&& EntityAction.class.isAssignableFrom(actionClass)) {
-							Class<?> entityClass = ResolvableType.forClass(actionClass).as(EntityAction.class)
-									.resolveGeneric(0);
+							Class<?> entityClass = GenericTypeResolver.resolveTypeArgument(actionClass,
+									EntityAction.class);
 							if (entityClass != null)
 								ac = entityClass.getAnnotation(AutoConfig.class);
 						}

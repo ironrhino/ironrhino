@@ -3,7 +3,7 @@ package org.ironrhino.core.hibernate.convert;
 import java.lang.reflect.Array;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.core.ResolvableType;
+import org.springframework.core.GenericTypeResolver;
 
 @SuppressWarnings("unchecked")
 public abstract class AbstractArrayConverter<T> {
@@ -13,8 +13,7 @@ public abstract class AbstractArrayConverter<T> {
 	private final Class<T> componentType;
 
 	public AbstractArrayConverter() {
-		componentType = (Class<T>) ResolvableType.forClass(getClass()).as(AbstractArrayConverter.class)
-				.resolveGeneric(0);
+		componentType = (Class<T>) GenericTypeResolver.resolveTypeArgument(getClass(), AbstractArrayConverter.class);
 	}
 
 	public String convertToDatabaseColumn(T[] array) {

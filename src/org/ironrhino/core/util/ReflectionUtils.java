@@ -11,9 +11,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -76,55 +74,6 @@ public class ReflectionUtils {
 			e.printStackTrace();
 			return Collections.emptyList();
 		}
-	}
-
-	@Deprecated
-	public static Class<?> getGenericClass(Class<?> clazz) {
-		// return ResolvableType.forClass(clazz).getSuperType().resolveGeneric(0);
-		return getGenericClass(clazz, null, 0);
-	}
-
-	@Deprecated
-	public static Class<?> getGenericClass(Class<?> clazz, int index) {
-		// return ResolvableType.forClass(clazz).getSuperType().resolveGeneric(index);
-		return getGenericClass(clazz, null, index);
-	}
-
-	@Deprecated
-	public static Class<?> getGenericClass(Class<?> clazz, Class<?> genericContainerClass) {
-		// return
-		// ResolvableType.forClass(clazz).as(genericContainerClass).resolveGeneric(0);
-		return getGenericClass(clazz, genericContainerClass, 0);
-	}
-
-	@Deprecated
-	public static Class<?> getGenericClass(Class<?> clazz, Class<?> genericContainerClass, int index) {
-		// return
-		// ResolvableType.forClass(clazz).as(genericContainerClass).resolveGeneric(index);
-		Type t = clazz.getGenericSuperclass();
-		while (t != null) {
-			if (t instanceof ParameterizedType) {
-				ParameterizedType paramType = (ParameterizedType) t;
-				if (genericContainerClass == null || genericContainerClass == paramType.getRawType()) {
-					return getGenericClass(paramType, index);
-				} else {
-					t = paramType.getRawType();
-				}
-			} else if (t instanceof Class) {
-				t = ((Class<?>) t).getGenericSuperclass();
-			}
-		}
-		return null;
-	}
-
-	public static Class<?> getGenericClass(Type genType, int index) {
-		if (genType instanceof ParameterizedType) {
-			ParameterizedType pramType = (ParameterizedType) genType;
-			Type[] params = pramType.getActualTypeArguments();
-			if ((params != null) && (params.length > index))
-				return params[index] instanceof Class ? (Class<?>) params[index] : null;
-		}
-		return null;
 	}
 
 	public static Class<?> getActualClass(Object object) {
