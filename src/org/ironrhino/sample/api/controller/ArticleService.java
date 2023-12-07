@@ -11,6 +11,7 @@ import org.ironrhino.rest.doc.annotation.ApiModule;
 import org.ironrhino.rest.doc.annotation.Status;
 import org.ironrhino.sample.api.model.Article;
 import org.springframework.core.annotation.Order;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,4 +44,6 @@ public interface ArticleService {
 	@RequestMapping(method = RequestMethod.POST)
 	Article postForm(Article article);
 
+	@RequestMapping(method = RequestMethod.POST, path = "/@ModelAttribute")
+	Article postFormWithExplicitModelAttribute(@ModelAttribute Article article);
 }

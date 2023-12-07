@@ -107,6 +107,20 @@ public class RestApiTest {
 		article.setPublishDate(LocalDate.of(2019, 2, 26));
 		assertThat(articleClient.postForm(article), is(article));
 	}
+	
+
+	@Test
+	public void testPostFormWithExplicitModelAttribute() {
+		assertThat(articleClient.postFormWithExplicitModelAttribute(null), is(new Article()));
+		then(articleController).should().postFormWithExplicitModelAttribute(new Article());
+
+		Article article = new Article();
+		article.setId(1024);
+		article.setTitle("RestApi");
+		article.setPublishDate(LocalDate.of(2019, 2, 26));
+		assertThat(articleClient.postFormWithExplicitModelAttribute(article), is(article));
+	}
+
 
 	@Test
 	public void testThrowException() {

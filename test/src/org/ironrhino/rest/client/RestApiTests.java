@@ -90,6 +90,16 @@ public class RestApiTests {
 		article.setPublishDate(LocalDate.of(2000, 10, 12));
 		assertThat(articleClient.postForm(article), is(article));
 	}
+	
+
+	@Test
+	public void testPostFormWithExplicitModelAttribute() {
+		Article article = new Article();
+		article.setId(100);
+		article.setAuthor("测试");
+		article.setPublishDate(LocalDate.of(2000, 10, 12));
+		assertThat(articleClient.postFormWithExplicitModelAttribute(article), is(article));
+	}
 
 	@Test(expected = RestStatus.class)
 	public void testThrowRestStatus() {

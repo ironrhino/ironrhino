@@ -72,6 +72,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -336,6 +337,10 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 				if (anno instanceof RequestBody) {
 					annotationPresent = true;
 					body = argument;
+				}
+				if (anno instanceof ModelAttribute) {
+					annotationPresent = true;
+					requestParamsObjectCandidates.add(argument);
 				}
 			}
 			// Put arguments to pathVariable even if @PathVariable not present

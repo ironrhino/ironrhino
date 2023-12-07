@@ -54,4 +54,8 @@ public class ArticleController implements ArticleService {
 		return article;
 	}
 
+	@Override
+	public Article postFormWithExplicitModelAttribute(Article article) {
+		return article;
+	}
 }
