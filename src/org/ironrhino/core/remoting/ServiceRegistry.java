@@ -3,7 +3,9 @@ package org.ironrhino.core.remoting;
 import java.util.Collection;
 import java.util.Map;
 
-public interface ServiceRegistry {
+import org.springframework.context.SmartLifecycle;
+
+public interface ServiceRegistry extends SmartLifecycle {
 
 	int DEFAULT_HTTP_PORT = 8080;
 

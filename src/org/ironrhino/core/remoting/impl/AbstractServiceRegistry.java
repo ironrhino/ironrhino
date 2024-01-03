@@ -13,7 +13,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 
 import org.apache.commons.lang3.StringUtils;
@@ -22,8 +21,8 @@ import org.ironrhino.core.remoting.Remoting;
 import org.ironrhino.core.remoting.ServiceNotFoundException;
 import org.ironrhino.core.remoting.ServiceRegistry;
 import org.ironrhino.core.util.AppInfo;
-import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.core.util.CounterUtils;
+import org.ironrhino.core.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.PropertyValue;
@@ -31,8 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
@@ -75,6 +72,29 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	private String localHost;
 
 	private Map<String, AtomicInteger> counters = new ConcurrentHashMap<>();
+
+	private volatile boolean running;
+
+	@Override
+	public boolean isRunning() {
+		return this.running;
+	}
+
+	@Override
+	public void start() {
+		if (this.running)
+			return;
+		init();
+		this.running = true;
+	}
+
+	@Override
+	public void stop() {
+		if (!this.running)
+			return;
+		this.running = false;
+		destroy();
+	}
 
 	@PostConstruct
 	private void afterPropertiesSet() {
@@ -221,25 +241,9 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
 	protected abstract Collection<String> doGetExportedHostsByService(String serviceName);
 
-	@PreDestroy
 	public void destroy() {
 		for (String serviceName : exportedServices.keySet())
 			unregister(serviceName);
-	}
-
-	@EventListener
-	public void onApplicationEvent(ContextRefreshedEvent event) {
-		if (ctx instanceof ConfigurableWebApplicationContext) {
-			// within servlet container
-			if (IS_SERVER_PRESENT) {
-				if (CLASS_NAME_SERVER.equals(event.getApplicationContext().getId()))
-					init();
-			} else if (event.getApplicationContext() == ctx) {
-				init();
-			}
-		} else if (event.getApplicationContext() == ctx) {
-			init();
-		}
 	}
 
 	private static String normalizeHost(String host) {
