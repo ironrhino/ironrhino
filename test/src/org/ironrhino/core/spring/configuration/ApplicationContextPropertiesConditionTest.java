@@ -3,9 +3,9 @@ package org.ironrhino.core.spring.configuration;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.ironrhino.core.util.AppInfo.KEY_STAGE;
-import static org.ironrhino.core.util.AppInfo.Stage;
 import static org.ironrhino.core.util.AppInfo.getStage;
 
+import org.ironrhino.core.util.AppInfo.Stage;
 import org.junit.Test;
 
 public class ApplicationContextPropertiesConditionTest {

@@ -3,8 +3,8 @@ package org.ironrhino.core.spring.configuration;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.ironrhino.core.util.AppInfo.KEY_RUNLEVEL;
-import static org.ironrhino.core.util.AppInfo.RunLevel;
 
+import org.ironrhino.core.util.AppInfo.RunLevel;
 import org.junit.Test;
 
 public class RunLevelConditionTest {

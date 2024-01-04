@@ -22,12 +22,12 @@ import org.ironrhino.core.spring.configuration.StageConditional;
 import org.ironrhino.core.spring.converter.CustomConversionService;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.DateUtils;
+import org.ironrhino.core.util.GenericTypeResolver;
 import org.ironrhino.core.util.JsonSerializationUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.ironrhino.core.util.SampleObjectCreator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.ironrhino.core.util.GenericTypeResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.util.function.SingletonSupplier;
 
