@@ -52,7 +52,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/micrometer-core-1.7.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/micrometer-registry-influx-1.7.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/micrometer-registry-prometheus-1.7.2.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mvel2-2.4.4.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mvel2-2.5.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/mysql-connector-java-8.0.33.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/netty-all-4.1.65.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/objenesis-3.2.jar"/>
@@ -107,7 +107,7 @@
 	<classpathentry kind="lib" path="lib/jmh-generator-annprocess-1.21.jar"/>
 	<classpathentry kind="lib" path="lib/jopt-simple-4.6.jar"/>
 	<classpathentry kind="lib" path="lib/junit-4.12.jar"/>
-	<classpathentry kind="lib" path="lib/lombok-1.18.26.jar"/>
+	<classpathentry kind="lib" path="lib/lombok-1.18.30.jar"/>
 	<classpathentry kind="lib" path="lib/mockito-core-3.11.2.jar"/>
 	<classpathentry kind="lib" path="lib/nashorn-core-15.4.jar"/>
 	<classpathentry kind="lib" path="lib/reactor-test-3.3.5.jar"/>
