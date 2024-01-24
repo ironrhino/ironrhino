@@ -1,6 +1,5 @@
 package org.ironrhino.core.spring.security;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -16,8 +15,6 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
-import lombok.Getter;
 
 public class DefaultAuthenticationManager extends ProviderManager {
 
@@ -35,23 +32,8 @@ public class DefaultAuthenticationManager extends ProviderManager {
 	@Value("${authenticationManager.usernameMaxLength:32}")
 	private int usernameMaxLength = 32;
 
-	@Autowired
-	@Getter
-	private List<AuthenticationProvider> providers;
-
-	public DefaultAuthenticationManager() {
-		// use dummy AuthenticationProvider to avoid exception throws by super class
-		super(Collections.singletonList(new AuthenticationProvider() {
-			@Override
-			public Authentication authenticate(Authentication auth) throws AuthenticationException {
-				return null;
-			}
-
-			@Override
-			public boolean supports(Class<?> paramClass) {
-				return false;
-			}
-		}));
+	public DefaultAuthenticationManager(List<AuthenticationProvider> providers) {
+		super(providers);
 	}
 
 	@Override
