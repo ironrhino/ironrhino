@@ -2,6 +2,7 @@ package org.ironrhino.core.spring.configuration;
 
 import java.io.IOException;
 
+import org.ironrhino.core.util.AppInfo;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -27,11 +28,13 @@ public class ResourcePresentCondition extends SimpleCondition<ResourcePresentCon
 
 	private static boolean exists(String resource) {
 		try {
+			resource = AppInfo.resolvePlaceholders(resource);
 			Resource[] resources = resourcePatternResolver.getResources(resource);
-			for (Resource r : resources)
+			for (Resource r : resources) {
 				if (r.exists()) {
 					return true;
 				}
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

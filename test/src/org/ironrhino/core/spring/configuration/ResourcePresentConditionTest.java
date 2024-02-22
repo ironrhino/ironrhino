@@ -18,6 +18,13 @@ public class ResourcePresentConditionTest {
 		assertThat(condition.matches(getAnnotation(PartialResourcesPresentBean.class)), is(false));
 	}
 
+	@Test
+	public void placeholderShouldBeResolved() {
+		System.setProperty("placeholder", "applicationContext");
+		assertThat(condition.matches(getAnnotation(ResourcePresentBeanWithPlaceholder.class)), is(true));
+		System.clearProperty("placeholder");
+	}
+
 	private ResourcePresentConditional getAnnotation(Class<?> clazz) {
 		return clazz.getAnnotation(ResourcePresentConditional.class);
 	}
@@ -38,8 +45,12 @@ public class ResourcePresentConditionTest {
 	static class NegatedResourceNotPresentBean {
 	}
 
-	@ResourcePresentConditional(value = {"classpath:resources/spring/applicationContext.properties",
-			"classpath:resources/spring/notPresentResource.properties"})
+	@ResourcePresentConditional(value = { "classpath:resources/spring/applicationContext.properties",
+			"classpath:resources/spring/notPresentResource.properties" })
 	static class PartialResourcesPresentBean {
+	}
+
+	@ResourcePresentConditional(value = "classpath:resources/spring/${placeholder}.properties")
+	static class ResourcePresentBeanWithPlaceholder {
 	}
 }
