@@ -7,6 +7,7 @@ import java.util.Properties;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.core.env.PropertySource;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.core.io.support.PropertySourceFactory;
 import org.springframework.lang.Nullable;
@@ -25,11 +26,12 @@ public class YamlPropertySourceFactory implements PropertySourceFactory {
 			}
 			throw new IllegalArgumentException("missing snakeyaml"); // for ignoreResourceNotFound
 		}
-		String sourceName = name != null ? name : resource.getResource().getFilename();
-		if (sourceName == null)
-			sourceName = "Unknown";
+		if (name == null) {
+			Resource underlying = resource.getResource();
+			name = underlying.getClass().getSimpleName() + "@" + System.identityHashCode(underlying);
+		}
 		Properties propertiesFromYaml = loadYamlIntoProperties(resource);
-		return new PropertiesPropertySource(sourceName, propertiesFromYaml);
+		return new PropertiesPropertySource(name, propertiesFromYaml);
 	}
 
 	private Properties loadYamlIntoProperties(EncodedResource resource) throws FileNotFoundException {
