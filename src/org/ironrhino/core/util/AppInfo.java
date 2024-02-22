@@ -26,6 +26,7 @@ import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.PropertySourcesPropertyResolver;
+import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -531,12 +532,9 @@ public class AppInfo {
 	}
 
 	public static String resolvePlaceholders(String text) {
-		MutablePropertySources propertySources = new MutablePropertySources();
-		PropertySource<?> localPropertySource = new PropertiesPropertySource("local",
-				getApplicationContextProperties());
-		propertySources.addFirst(localPropertySource);
-		PropertySourcesPropertyResolver propertyResolver = new PropertySourcesPropertyResolver(propertySources);
-		return propertyResolver.resolveRequiredPlaceholders(text);
+		StandardEnvironment env = new StandardEnvironment();
+		env.getPropertySources().addFirst(new PropertiesPropertySource("local", getApplicationContextProperties()));
+		return env.resolveRequiredPlaceholders(text);
 	}
 
 	public static String getEnv(String key) {
