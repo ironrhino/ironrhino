@@ -71,7 +71,7 @@ public class RedisCacheManager implements CacheManager {
 			Long.class);
 
 	private RedisScript<Void> invalidateScript = new DefaultRedisScript<>(
-			"local cursor=0 repeat local resp=redis.call('scan',cursor,'match',ARGV[1]..':*','count',1000) cursor=tonumber(resp[1]) local keys=resp[2] for i=1,#keys do redis.call('del',keys[i]) end until cursor==0",
+			"redis.replicate_commands() local cursor=0 repeat local resp=redis.call('scan',cursor,'match',ARGV[1]..':*','count',1000) cursor=tonumber(resp[1]) local keys=resp[2] for i=1,#keys do redis.call('del',keys[i]) end until cursor==0",
 			Void.class);
 
 	private volatile boolean getexSupported = true;
