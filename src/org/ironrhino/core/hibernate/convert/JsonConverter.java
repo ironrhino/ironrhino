@@ -36,7 +36,7 @@ public abstract class JsonConverter<T> implements AttributeConverter<T, String> 
 	@SuppressWarnings("unchecked")
 	@Override
 	public T convertToEntityAttribute(String string) {
-		if (string == null)
+		if (string == null || string.contentEquals("null"))
 			return null;
 		if (StringUtils.isEmpty(string)) {
 			if (type instanceof ParameterizedType) {
