@@ -1,6 +1,7 @@
 package org.ironrhino.core.fs;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -46,6 +47,12 @@ public abstract class FileStorageTestBase {
 		String path2 = "/test/test2/test2.txt";
 		writeToFile(fs, text, path);
 		writeToFile(fs, text, path2);
+		FileInfo info = this.fs.getFileInfo(path);
+		assertThat(info, is(notNullValue()));
+		assertThat(info.isFile(), is(true));
+		assertThat(info.getName(), is("test.txt"));
+		assertThat(info.getSize(), is((long) text.length()));
+		assertThat(info.getLastModified() > 1700000000000L, is(true));
 		assertThat(fs.isDirectory("/test"), is(true));
 		assertThat(fs.isDirectory("/test/test2/"), is(true));
 		assertThat(fs.open("/test/test2/"), is(nullValue()));

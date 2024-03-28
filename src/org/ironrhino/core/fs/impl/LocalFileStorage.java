@@ -115,6 +115,16 @@ public class LocalFileStorage extends AbstractFileStorage {
 	}
 
 	@Override
+	public FileInfo getFileInfo(String path) {
+		path = normalizePath(path);
+		File f = new File(this.directory, path);
+		if (!f.exists()) {
+			return null;
+		}
+		return new FileInfo(f.getName(), f.isFile(), f.length(), f.lastModified());
+	}
+
+	@Override
 	public List<FileInfo> listFiles(String path) {
 		path = normalizePath(path);
 		final List<FileInfo> list = new ArrayList<>();

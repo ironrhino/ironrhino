@@ -67,6 +67,12 @@ public class CompositeFileStorage implements FileStorage {
 	}
 
 	@Override
+	public FileInfo getFileInfo(String path) {
+		FileInfo info = mainFileStorage.getFileInfo(path);
+		return info != null ? info : fallbackFileStorage.getFileInfo(path);
+	}
+
+	@Override
 	public List<FileInfo> listFiles(String path) {
 		if (merging) {
 			List<FileInfo> list1 = mainFileStorage.listFiles(path);

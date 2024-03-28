@@ -363,10 +363,24 @@ public class FtpFileStorage extends AbstractFileStorage {
 	}
 
 	@Override
+	public FileInfo getFileInfo(String path) {
+		return executeWrapped(ftpClient -> {
+			String pathname = getPathname(path, ftpClient);
+			FTPFile[] files = ftpClient.listFiles(pathname);
+			if (files == null || files.length == 0) {
+				return null;
+			}
+			FTPFile f = files[0];
+			return new FileInfo(f.getName(), f.isFile(), f.getSize(),
+					f.getTimestamp().getTimeInMillis() + (useLocaltime ? 0 : TimeZone.getDefault().getRawOffset()));
+		});
+	}
+
+	@Override
 	public List<FileInfo> listFiles(String path) {
 		List<FileInfo> result = executeWrapped(ftpClient -> {
 			List<FileInfo> list = new ArrayList<>();
-			for (FTPFile f : ftpClient.listFiles(getPathname(path, ftpClient))) {
+			for (FTPFile f : ftpClient.listFiles(getPathname(path.endsWith("/") ? path : path + "/", ftpClient))) {
 				if (f.isFile())
 					list.add(new FileInfo(f.getName(), true, f.getSize(), f.getTimestamp().getTimeInMillis()
 							+ (useLocaltime ? 0 : TimeZone.getDefault().getRawOffset())));
@@ -383,7 +397,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 	public List<FileInfo> listFilesAndDirectory(String path) {
 		List<FileInfo> result = executeWrapped(ftpClient -> {
 			final List<FileInfo> list = new ArrayList<>();
-			for (FTPFile f : ftpClient.listFiles(getPathname(path, ftpClient)))
+			for (FTPFile f : ftpClient.listFiles(getPathname(path.endsWith("/") ? path : path + "/", ftpClient)))
 				list.add(new FileInfo(f.getName(), f.isFile(), f.getSize(), f.getTimestamp().getTimeInMillis()
 						+ (useLocaltime ? 0 : TimeZone.getDefault().getRawOffset())));
 			if (list.size() > MAX_PAGE_SIZE)

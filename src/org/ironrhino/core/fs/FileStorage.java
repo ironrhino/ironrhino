@@ -102,6 +102,8 @@ public interface FileStorage {
 
 	long getLastModified(String path);
 
+	FileInfo getFileInfo(String path);
+
 	List<FileInfo> listFiles(String path);
 
 	default Paged<FileInfo> listFiles(String path, int limit, String marker) {
