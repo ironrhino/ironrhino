@@ -23,13 +23,14 @@ public class EncodedPropertySourceFactory extends DefaultPropertySourceFactory {
 	public PropertySource<?> createPropertySource(String name, EncodedResource resource) throws IOException {
 		if (name == null) {
 			Resource underlying = resource.getResource();
-			name = underlying.getClass().getSimpleName() + "@" + System.identityHashCode(underlying);
+			name = underlying.getDescription();
 		}
 		return new EncodedPropertySource(name,
 				(EnumerablePropertySource<Map<String, Object>>) super.createPropertySource(name, resource));
 	}
 
-	static class EncodedPropertySource extends EnumerablePropertySource<EnumerablePropertySource<Map<String, Object>>> {
+	public static class EncodedPropertySource
+			extends EnumerablePropertySource<EnumerablePropertySource<Map<String, Object>>> {
 
 		private final EnumerablePropertySource<Map<String, Object>> rawPropertySource;
 

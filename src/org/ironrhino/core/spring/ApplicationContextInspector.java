@@ -27,6 +27,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.ironrhino.core.fs.impl.FtpFileStorage;
 import org.ironrhino.core.servlet.ServletContainerHelper;
+import org.ironrhino.core.spring.configuration.EncodedPropertySourceFactory;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.ClassScanner;
 import org.ironrhino.rest.client.RestApi;
@@ -120,17 +121,25 @@ public class ApplicationContextInspector {
 			}
 		} else if (propertySource instanceof EnumerablePropertySource) {
 			EnumerablePropertySource<?> ps = (EnumerablePropertySource<?>) propertySource;
-			for (String s : ps.getPropertyNames()) {
-				if (!getDefaultProperties().containsKey(s))
+			for (String key : ps.getPropertyNames()) {
+				if (!getDefaultProperties().containsKey(key))
 					continue;
-				if (!properties.containsKey(s)) {
+				if (!properties.containsKey(key)) {
 					ApplicationProperty ap = new ApplicationProperty(
-							s.endsWith(".password") ? "********" : String.valueOf(ps.getProperty(s)));
+							isSensitive(key, ps) ? "********" : String.valueOf(ps.getProperty(key)));
 					ap.getSources().add(name);
-					properties.put(s, ap);
+					properties.put(key, ap);
 				}
 			}
 		}
+	}
+
+	private boolean isSensitive(String key, EnumerablePropertySource<?> ps) {
+		if (key.endsWith(".password") || key.endsWith("Password"))
+			return true;
+		if (ps instanceof EncodedPropertySourceFactory.EncodedPropertySource)
+			return true;
+		return false;
 	}
 
 	public Map<String, ApplicationProperty> getDefaultProperties() {
