@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk-alpine
+FROM bellsoft/liberica-runtime-container:jre-8-musl
 
 ARG app=app
 
