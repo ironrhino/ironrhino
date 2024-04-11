@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.ironrhino.core.servlet.LazyCommitResponseWrapper;
+import org.ironrhino.security.component.SsoHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
@@ -29,7 +30,8 @@ public class HttpSessionFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws ServletException, IOException {
 		WrappedHttpSession session = new WrappedHttpSession(request, response, getServletContext(), httpSessionManager);
-		boolean lazyCommit = !session.isCacheBased();
+		boolean lazyCommit = !session.isCacheBased()
+				&& request.getAttribute(SsoHandler.REQUEST_ATTRIBUTE_KEY_SSO) == null;
 		WrappedHttpServletRequest wrappedHttpRequest = new WrappedHttpServletRequest(request, session);
 		LocaleContextHolder.setLocale(wrappedHttpRequest.getLocale(), true);
 		HttpServletResponse wrappedHttpResponse = lazyCommit ? new LazyCommitResponseWrapper(response) : response;
