@@ -7,27 +7,25 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.Order;
 import org.ironrhino.common.model.Dictionary;
 import org.ironrhino.core.event.EntityOperationEvent;
-import org.ironrhino.core.event.EntityOperationType;
 import org.ironrhino.core.metadata.Setup;
 import org.ironrhino.core.model.LabelValue;
 import org.ironrhino.core.service.EntityManager;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
-import org.ironrhino.core.util.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,33 +40,42 @@ public class DictionaryControl {
 
 	private volatile Map<String, Dictionary> map;
 
-	@PostConstruct
-	public void afterPropertiesSet() {
-		refresh();
+	private Map<String, Dictionary> getRequiredMap() {
+		Map<String, Dictionary> temp = map;
+		if (temp == null) {
+			map = temp = reload();
+		}
+		return temp;
 	}
 
-	public synchronized void refresh() {
+	private Map<String, Dictionary> reload() {
 		entityManager.setEntityClass(Dictionary.class);
 		List<Dictionary> list = entityManager.findAll(Order.asc("name"));
-		Map<String, Dictionary> temp = new ConcurrentHashMap<>();
+		Map<String, Dictionary> temp = new HashMap<>();
 		for (Dictionary d : list)
 			temp.put(d.getName(), d);
-		map = temp;
+		return temp;
+	}
+
+	@Scheduled(fixedDelayString = "${dictionaryControl.refresh.fixedDelay:5}", initialDelayString = "${dictionaryControl.refresh.initialDelay:5}", timeUnit = TimeUnit.MINUTES)
+	public void refresh() {
+		if (map != null)
+			map = reload();
 	}
 
 	public Dictionary getDictionary(String name) {
-		return map.get(name);
+		return getRequiredMap().get(name);
 	}
 
 	public Map<String, String> getItemsAsMap(String name) {
-		Dictionary dict = map.get(name);
+		Dictionary dict = getRequiredMap().get(name);
 		if (dict == null)
 			return Collections.emptyMap();
 		return dict.getItemsAsMap();
 	}
 
 	public Map<String, Map<String, String>> getItemsAsGroup(String name) {
-		Dictionary dict = map.get(name);
+		Dictionary dict = getRequiredMap().get(name);
 		if (dict == null)
 			return Collections.emptyMap();
 		return dict.getItemsAsGroup();
@@ -96,26 +103,7 @@ public class DictionaryControl {
 
 	@EventListener
 	public void onApplicationEvent(EntityOperationEvent<Dictionary> event) {
-		Dictionary dictInEvent = event.getEntity();
-		if (event.getType() == EntityOperationType.CREATE) {
-			map.put(dictInEvent.getName(), dictInEvent);
-		} else {
-			Dictionary dictInMemory = null;
-			for (Dictionary dictionary : map.values()) {
-				if (dictionary.getId().equals(dictInEvent.getId())) {
-					dictInMemory = dictionary;
-					break;
-				}
-			}
-			if (dictInMemory != null)
-				if (event.getType() == EntityOperationType.UPDATE) {
-					map.remove(dictInMemory.getName());
-					BeanUtils.copyProperties(dictInEvent, dictInMemory);
-					map.put(dictInMemory.getName(), dictInMemory);
-				} else if (event.getType() == EntityOperationType.DELETE) {
-					map.remove(dictInMemory.getName());
-				}
-		}
+		map = null;
 	}
 
 	@Setup

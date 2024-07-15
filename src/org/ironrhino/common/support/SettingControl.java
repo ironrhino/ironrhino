@@ -8,9 +8,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -20,14 +21,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.Order;
 import org.ironrhino.common.model.Setting;
 import org.ironrhino.core.event.EntityOperationEvent;
-import org.ironrhino.core.event.EntityOperationType;
 import org.ironrhino.core.metadata.Setup;
 import org.ironrhino.core.service.EntityManager;
 import org.ironrhino.core.spring.configuration.PropertySourceMode;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.DateUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
@@ -37,6 +36,7 @@ import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
 import org.springframework.lang.Nullable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,24 +60,36 @@ public class SettingControl {
 
 	private volatile Map<String, Setting> settings;
 
+	private Map<String, Setting> getRequiredSettings() {
+		Map<String, Setting> temp = settings;
+		if (temp == null)
+			settings = temp = reload();
+		return temp;
+	}
+
+	private Map<String, Setting> reload() {
+		entityManager.setEntityClass(Setting.class);
+		List<Setting> list = entityManager.findAll(Order.asc("key"));
+		Map<String, Setting> temp = new HashMap<>();
+		for (Setting s : list)
+			temp.put(s.getKey(), s);
+		return temp;
+	}
+
+	@Scheduled(fixedDelayString = "${settingControl.refresh.fixedDelay:5}", initialDelayString = "${settingControl.refresh.initialDelay:5}", timeUnit = TimeUnit.MINUTES)
+	public void refresh() {
+		if (settings != null)
+			settings = reload();
+	}
+
 	@PostConstruct
 	public void afterPropertiesSet() {
-		refresh();
 		if (propertySourceMode != null) {
 			MutablePropertySources mps = environment.getPropertySources();
-			PropertySource<?> ps = new SettingsPropertySource("settings", () -> this.settings);
+			PropertySource<?> ps = new SettingsPropertySource("settings", this::getRequiredSettings);
 			propertySourceMode.add(mps, ps);
 			log.info("Add settings PropertySource as {}", propertySourceMode);
 		}
-	}
-
-	public synchronized void refresh() {
-		entityManager.setEntityClass(Setting.class);
-		List<Setting> list = entityManager.findAll(Order.asc("key"));
-		Map<String, Setting> temp = new ConcurrentHashMap<>();
-		for (Setting s : list)
-			temp.put(s.getKey(), s);
-		settings = temp;
 	}
 
 	public void setValue(String key, String value) {
@@ -133,7 +145,7 @@ public class SettingControl {
 	}
 
 	public int getIntValue(String key, int defaultValue) {
-		Setting s = settings.get(key);
+		Setting s = getRequiredSettings().get(key);
 		if (s != null && StringUtils.isNotBlank(s.getValue()))
 			return Integer.parseInt(s.getValue().trim());
 		return defaultValue;
@@ -144,7 +156,7 @@ public class SettingControl {
 	}
 
 	public boolean getBooleanValue(String key, boolean defaultValue) {
-		Setting s = settings.get(key);
+		Setting s = getRequiredSettings().get(key);
 		if (s != null && StringUtils.isNotBlank(s.getValue())) {
 			String value = s.getValue().trim();
 			return value.equals("true");
@@ -153,9 +165,10 @@ public class SettingControl {
 	}
 
 	public List<Setting> getAllBooleanSettings() {
-		return Collections.unmodifiableList(settings.values().stream().filter(s -> !(s.isReadonly() || s.isHidden()))
-				.filter(s -> "true".equals(s.getValue()) || "false".equals(s.getValue()))
-				.sorted(Comparator.comparing(Setting::getKey)).collect(Collectors.toList()));
+		return Collections
+				.unmodifiableList(getRequiredSettings().values().stream().filter(s -> !(s.isReadonly() || s.isHidden()))
+						.filter(s -> "true".equals(s.getValue()) || "false".equals(s.getValue()))
+						.sorted(Comparator.comparing(Setting::getKey)).collect(Collectors.toList()));
 	}
 
 	public String getStringValue(String key) {
@@ -163,14 +176,14 @@ public class SettingControl {
 	}
 
 	public String getStringValue(String key, String defaultValue) {
-		Setting s = settings.get(key);
+		Setting s = getRequiredSettings().get(key);
 		if (s != null && StringUtils.isNotBlank(s.getValue()))
 			return s.getValue().trim();
 		return defaultValue;
 	}
 
 	public String[] getStringArray(String key) {
-		Setting s = settings.get(key);
+		Setting s = getRequiredSettings().get(key);
 		if (s != null && StringUtils.isNotBlank(s.getValue()))
 			return s.getValue().trim().split("\\s*,\\s*");
 		return new String[0];
@@ -178,26 +191,7 @@ public class SettingControl {
 
 	@EventListener
 	public void onApplicationEvent(EntityOperationEvent<Setting> event) {
-		Setting settingInEvent = event.getEntity();
-		if (event.getType() == EntityOperationType.CREATE) {
-			settings.put(settingInEvent.getKey(), settingInEvent);
-		} else {
-			Setting settingInMemory = null;
-			for (Setting setting : settings.values()) {
-				if (setting.getId().equals(settingInEvent.getId())) {
-					settingInMemory = setting;
-					break;
-				}
-			}
-			if (settingInMemory != null)
-				if (event.getType() == EntityOperationType.UPDATE) {
-					settings.remove(settingInMemory.getKey());
-					BeanUtils.copyProperties(settingInEvent, settingInMemory);
-					settings.put(settingInMemory.getKey(), settingInMemory);
-				} else if (event.getType() == EntityOperationType.DELETE) {
-					settings.remove(settingInMemory.getKey());
-				}
-		}
+		settings = null;
 	}
 
 	@Setup
