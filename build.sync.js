@@ -3,7 +3,7 @@ var FileInputStream = Java.type('java.io.FileInputStream');
 var InputStreamReader = Java.type('java.io.InputStreamReader');
 var BufferedReader = Java.type('java.io.BufferedReader');
 if (!new File(basedir + '/../ironrhino').isDirectory()) {
-	print('	directory ../ironrhino doesn\'t exists');
+	print('     directory ../ironrhino doesn\'t exists');
 } else {
 
 	var ironrhinoPaths = readClasspath(new File(basedir
@@ -138,6 +138,8 @@ function upgradeDependence(path, replacement) {
 		for (var i = 0; i < files.length; i++) {
 			var f = files[i];
 			var filename2 = f.getName();
+			if (filename2.endsWith('-sources.jar'))
+				continue;
 			var fileInfo2 = getFileInfo(filename2);
 			var jarname2 = fileInfo2.jarname;
 			var version2 = fileInfo2.version;
@@ -145,7 +147,7 @@ function upgradeDependence(path, replacement) {
 				&& version2.length > 0) {
 				if (!compareVersion(version, version2))
 					continue;
-				print('	[sync] Upgrading ' + filename + ' to ' + f.getName());
+				print('     [sync] Upgrading ' + filename + ' to ' + f.getName());
 				file = f;
 				if (tofile.exists()) {
 					var del = project.createTask('delete');
@@ -177,7 +179,7 @@ function upgradeDependence(path, replacement) {
 function addDependence(classpathfile, path) {
 	var f = new File(basedir + '/../ironrhino/' + path);
 	var filename = f.getName();
-	print('	[sync] Adding ' + filename);
+	print('     [sync] Adding ' + filename);
 	var copy = project.createTask('copy');
 	copy.setFile(f);
 	copy.setTofile(new File(basedir + '/' + path));
