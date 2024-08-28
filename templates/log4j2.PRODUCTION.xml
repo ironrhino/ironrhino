@@ -4,25 +4,33 @@
 		<Property name="logs.kafka.bootstrap.servers">${sys:kafka.bootstrap.servers:-localhost:9092}</Property>
 	</Properties>
 	<Appenders>
-		<Kafka name="KAFKA-ACCESS" topic="app.logs.access">
+		<Kafka name="KAFKA-ACCESS" topic="app.logs.access" syncSend="false">
 			<PatternLayout pattern="%d %X{username}@%X{remoteAddr} %X{method}%X{url}%X{userAgent}%X{referer}%X{request}%X{server}%X{responseTime}" charset="UTF-8"/>
 			<Property name="bootstrap.servers">${sys:logs.kafka.bootstrap.servers}</Property>
+			<Property name="linger.ms">10</Property>
 		</Kafka>
-		<Kafka name="KAFKA-APPLICATION" topic="app.logs.application">
+		<Kafka name="KAFKA-APPLICATION" topic="app.logs.application" syncSend="false">
 			<PatternLayout pattern="%d %c %t%X{request}%X{server}%X{url} %p %m%th{10}" charset="UTF-8"/>
 			<Property name="bootstrap.servers">${sys:logs.kafka.bootstrap.servers}</Property>
+			<Property name="linger.ms">10</Property>
 		</Kafka>
-		<Kafka name="KAFKA-REMOTING" topic="app.logs.remoting">
+		<Kafka name="KAFKA-REMOTING" topic="app.logs.remoting" syncSend="false">
 			<PatternLayout pattern="%d%X{request}%X{server} %X{service} %X{role} %m%th{10}%n" charset="UTF-8"/>
 			<Property name="bootstrap.servers">${sys:logs.kafka.bootstrap.servers}</Property>
+			<Property name="linger.ms">10</Property>
 		</Kafka>
-		<Kafka name="KAFKA-REST" topic="app.logs.rest">
+		<Kafka name="KAFKA-REST" topic="app.logs.rest" syncSend="false">
 			<PatternLayout pattern="%d %t%X{request}%X{server} %X{method}%X{url} %m%n" charset="UTF-8"/>
 			<Property name="bootstrap.servers">${sys:logs.kafka.bootstrap.servers}</Property>
+			<Property name="linger.ms">10</Property>
 		</Kafka>
 	</Appenders>
 	<Loggers>
 		<Logger name="org.apache.kafka.common.utils.AppInfoParser" level="ERROR"/>
+		<Logger name="org.apache.kafka.clients" additivity="false">
+			<AppenderRef ref="APPLICATION"/>
+			<!-- do not append to Kafka to avoid potential deadlock when RingBuffer is full -->
+		</Logger>
 		<Logger name="access" level="${sys:root.logger.level}" additivity="false">
 			<AppenderRef ref="ACCESS"/>
 			<AppenderRef ref="KAFKA-ACCESS"/>

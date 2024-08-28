@@ -16,7 +16,6 @@ import java.util.TimeZone;
 import java.util.TreeSet;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.ironrhino.core.log4j.MyThreadContextMap;
 import org.ironrhino.core.log4j.SimpleMergeStrategy;
 import org.ironrhino.core.spring.configuration.YamlPropertySourceFactory;
@@ -430,12 +429,11 @@ public class AppInfo {
 		System.setProperty("log4j2.configurationFile", configurationFile);
 		if (configurationFile.indexOf(',') > 0)
 			System.setProperty("log4j2.mergeStrategy", SimpleMergeStrategy.class.getName());
-		if (!SystemUtils.IS_OS_WINDOWS) {
-			if (System.getProperty("log4j2.contextSelector") == null)
-				System.setProperty("log4j2.contextSelector",
-						"org.apache.logging.log4j.core.async.AsyncLoggerContextSelector");
-			if (System.getProperty("log4j2.asyncLoggerRingBufferSize") == null)
-				System.setProperty("log4j2.asyncLoggerRingBufferSize", String.valueOf(256 * 1024));
+		if ("org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
+				.equals(System.getProperty("log4j2.contextSelector"))) {
+			// to avoid potential deadlock if KafkaAppender is using
+			if (System.getProperty("log4j2.asyncLoggerSynchronizeEnqueueWhenQueueFull") == null)
+				System.setProperty("log4j2.asyncLoggerSynchronizeEnqueueWhenQueueFull", String.valueOf(false));
 		}
 		System.setProperty("log4j2.threadContextMap", MyThreadContextMap.class.getName());
 		System.setProperty("log4j2.isThreadContextMapInheritable", String.valueOf(true));
