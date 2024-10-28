@@ -19,4 +19,6 @@ public @interface JsonDesensitize {
 
 	String value() default DEFAULT_NONE;
 
+	int position() default -1;
+
 }

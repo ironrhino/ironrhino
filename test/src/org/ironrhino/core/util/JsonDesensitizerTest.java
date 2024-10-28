@@ -81,9 +81,12 @@ public class JsonDesensitizerTest {
 	@Test
 	public void testToJsonWithAnnotation() {
 		JsonDesensitizer desensitizer = new JsonDesensitizer();
-		Person p = new Person("test", "13333333333", 12);
+		Person p = new Person("test", "13333333333", "13333333333", "13333333333", "13333333333", 12);
 		String json = desensitizer.toJson(p);
 		assertThat(json, containsString("\"1**********\""));
+		assertThat(json, containsString("\"****3333333\""));
+		assertThat(json, containsString("\"133****3333\""));
+		assertThat(json, containsString("\"1333333333****\""));
 		assertThat(json, not(containsString("age")));
 	}
 
@@ -101,7 +104,13 @@ public class JsonDesensitizerTest {
 	static class Person {
 		private final String name;
 		@JsonDesensitize("1**********")
-		private final String phone;
+		private final String phone1;
+		@JsonDesensitize(value = "****", position = 0)
+		private final String phone2;
+		@JsonDesensitize(value = "****", position = 3)
+		private final String phone3;
+		@JsonDesensitize(value = "****", position = 10)
+		private final String phone4;
 		@JsonDesensitize
 		private final int age;
 	}
