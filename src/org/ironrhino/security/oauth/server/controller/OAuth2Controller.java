@@ -265,8 +265,12 @@ public class OAuth2Controller {
 	private Map<String, Object> convert(Authorization authorization) {
 		Map<String, Object> result = new LinkedHashMap<>();
 		result.put("access_token", authorization.getAccessToken());
-		result.put("refresh_token", authorization.getRefreshToken());
+		result.put("token_type", "Bearer");
 		result.put("expires_in", authorization.getExpiresIn());
+		if (authorization.getRefreshToken() != null)
+			result.put("refresh_token", authorization.getRefreshToken());
+		if (authorization.getScope() != null)
+			result.put("scope", authorization.getScope());
 		return result;
 	}
 
