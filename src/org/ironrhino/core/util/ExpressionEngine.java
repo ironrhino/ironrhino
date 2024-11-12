@@ -23,8 +23,8 @@ import org.springframework.expression.spel.SpelCompilerMode;
 import org.springframework.expression.spel.SpelParserConfiguration;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.DataBindingMethodResolver;
+import org.springframework.expression.spel.support.DataBindingPropertyAccessor;
 import org.springframework.expression.spel.support.ReflectiveMethodExecutor;
-import org.springframework.expression.spel.support.ReflectivePropertyAccessor;
 import org.springframework.expression.spel.support.SimpleEvaluationContext;
 
 public enum ExpressionEngine {
@@ -71,19 +71,21 @@ public enum ExpressionEngine {
 		private final SpelExpressionParser parser = new SpelExpressionParser(
 				new SpelParserConfiguration(SpelCompilerMode.IMMEDIATE, this.getClass().getClassLoader()));
 
-		private final EvaluationContext evaluationContext = new SimpleEvaluationContext.Builder(new MapAccessor() {
-			@Override
-			public boolean canWrite(EvaluationContext context, Object target, String name) throws AccessException {
-				return false;
-			}
-		}, new ReflectivePropertyAccessor(false)).withMethodResolvers(new MethodResolver() {
-			@Override
-			public MethodExecutor resolve(EvaluationContext ctx, Object targetObject, String name,
-					List<TypeDescriptor> argumentTypes) throws AccessException {
-				Method m = MathUtils.mathMethods.get(name);
-				return m != null ? new ReflectiveMethodExecutor(m) : null;
-			}
-		}, DataBindingMethodResolver.forInstanceMethodInvocation()).build();
+		private final EvaluationContext evaluationContext = SimpleEvaluationContext
+				.forPropertyAccessors(new MapAccessor() {
+					@Override
+					public boolean canWrite(EvaluationContext context, Object target, String name)
+							throws AccessException {
+						return false;
+					}
+				}, DataBindingPropertyAccessor.forReadOnlyAccess()).withMethodResolvers(new MethodResolver() {
+					@Override
+					public MethodExecutor resolve(EvaluationContext ctx, Object targetObject, String name,
+							List<TypeDescriptor> argumentTypes) throws AccessException {
+						Method m = MathUtils.mathMethods.get(name);
+						return m != null ? new ReflectiveMethodExecutor(m) : null;
+					}
+				}, DataBindingMethodResolver.forInstanceMethodInvocation()).withAssignmentDisabled().build();
 
 		@Override
 		public Object evalExpression(String expression, Map<String, ?> context) {

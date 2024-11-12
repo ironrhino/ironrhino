@@ -10,11 +10,12 @@ import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.item.file.FlatFileFooterCallback;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.expression.MapAccessor;
+import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.ReflectivePropertyAccessor;
+import org.springframework.expression.spel.support.DataBindingPropertyAccessor;
 import org.springframework.expression.spel.support.SimpleEvaluationContext;
 
 import lombok.Setter;
@@ -22,8 +23,13 @@ import lombok.Setter;
 public class SummaryFooterCallback extends StepExecutionListenerSupport
 		implements FlatFileFooterCallback, InitializingBean {
 
-	private static final EvaluationContext evaluationContext = new SimpleEvaluationContext.Builder(new MapAccessor(),
-			new ReflectivePropertyAccessor(false)).withInstanceMethods().build();
+	private static final EvaluationContext evaluationContext = SimpleEvaluationContext
+			.forPropertyAccessors(new MapAccessor() {
+				@Override
+				public boolean canWrite(EvaluationContext context, Object target, String name) throws AccessException {
+					return false;
+				}
+			}, DataBindingPropertyAccessor.forReadOnlyAccess()).withInstanceMethods().withAssignmentDisabled().build();
 
 	private Expression expression;
 
