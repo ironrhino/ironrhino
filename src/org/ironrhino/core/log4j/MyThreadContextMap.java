@@ -11,6 +11,7 @@ public class MyThreadContextMap extends DefaultThreadContextMap {
 		this(true);
 	}
 
+	@SuppressWarnings("deprecation")
 	public MyThreadContextMap(boolean useMap) {
 		super(useMap);
 		put("server", " server:" + AppInfo.getInstanceId(true));
