@@ -29,14 +29,14 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/httpclient-4.5.13.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/httpcore-4.4.14.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/httpmime-4.5.13.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-annotations-2.15.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-core-2.15.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-databind-2.15.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-dataformat-cbor-2.15.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-dataformat-smile-2.15.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-datatype-jsr310-2.15.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-module-mrbean-2.15.3.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-module-parameter-names-2.15.3.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-annotations-2.18.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-core-2.18.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-databind-2.18.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-dataformat-cbor-2.18.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-dataformat-smile-2.18.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-datatype-jsr310-2.18.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-module-mrbean-2.18.1.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-module-parameter-names-2.18.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jaeger-all-1.6.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/javassist-3.29.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jboss-logging-3.4.2.jar"/>
