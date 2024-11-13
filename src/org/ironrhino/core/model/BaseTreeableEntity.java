@@ -2,6 +2,7 @@ package org.ironrhino.core.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -154,7 +155,7 @@ public abstract class BaseTreeableEntity<T extends BaseTreeableEntity<T>> extend
 
 	@Override
 	public String toString() {
-		return StringUtils.defaultString(this.name, String.valueOf(this.id));
+		return Objects.toString(this.name, String.valueOf(this.id));
 	}
 
 }

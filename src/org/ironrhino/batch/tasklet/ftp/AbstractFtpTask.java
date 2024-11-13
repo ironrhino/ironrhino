@@ -2,6 +2,7 @@ package org.ironrhino.batch.tasklet.ftp;
 
 import java.io.IOException;
 import java.net.URI;
+import java.time.Duration;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTP;
@@ -67,7 +68,7 @@ public abstract class AbstractFtpTask implements Tasklet {
 	protected FTPClient createClient() throws Exception {
 		FTPClient ftpClient = uri.getScheme().equals("ftps") ? new FTPSClient() : new FTPClient();
 		ftpClient.setDefaultTimeout(defaultTimeout);
-		ftpClient.setDataTimeout(dataTimeout);
+		ftpClient.setDataTimeout(Duration.ofMillis(dataTimeout));
 		ftpClient.setControlEncoding(controlEncoding);
 		ftpClient.connect(uri.getHost(), uri.getPort() > 0 ? uri.getPort() : ftpClient.getDefaultPort());
 		if (!FTPReply.isPositiveCompletion(ftpClient.getReplyCode())) {

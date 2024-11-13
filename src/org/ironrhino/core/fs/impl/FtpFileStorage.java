@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.URI;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -126,7 +127,7 @@ public class FtpFileStorage extends AbstractFileStorage {
 			public FTPClient create() throws Exception {
 				FTPClient ftpClient = uri.getScheme().equals("ftps") ? new FTPSClient() : new FTPClient();
 				ftpClient.setDefaultTimeout(defaultTimeout);
-				ftpClient.setDataTimeout(dataTimeout);
+				ftpClient.setDataTimeout(Duration.ofMillis(dataTimeout));
 				ftpClient.setControlEncoding(controlEncoding);
 				ftpClient.connect(uri.getHost(), uri.getPort() > 0 ? uri.getPort() : ftpClient.getDefaultPort());
 				if (!FTPReply.isPositiveCompletion(ftpClient.getReplyCode())) {
@@ -197,9 +198,9 @@ public class FtpFileStorage extends AbstractFileStorage {
 		poolConfig.setMaxTotal(maxTotal);
 		poolConfig.setMaxIdle(maxIdle);
 		poolConfig.setMinIdle(minIdle);
-		poolConfig.setMaxWaitMillis(maxWaitMillis);
-		poolConfig.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
-		poolConfig.setSoftMinEvictableIdleTimeMillis(poolConfig.getMinEvictableIdleTimeMillis());
+		poolConfig.setMaxWait(Duration.ofMillis(maxWaitMillis));
+		poolConfig.setMinEvictableIdleDuration(Duration.ofMillis(minEvictableIdleTimeMillis));
+		poolConfig.setSoftMinEvictableIdleDuration(poolConfig.getMinEvictableIdleDuration());
 		poolConfig.setLifo(false);
 		poolConfig.setTestOnBorrow(true);
 		pool = new GenericObjectPool<FTPClient>(factory, poolConfig);
