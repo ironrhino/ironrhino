@@ -12,6 +12,7 @@ import java.util.concurrent.Future;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import org.ironrhino.core.metadata.JsonDesensitize;
 import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.remoting.Remoting;
 import org.ironrhino.security.domain.User;
@@ -44,7 +45,8 @@ public interface TestService extends GenericService<UserDetails> {
 
 	String echo();
 
-	String echo(String value);
+	@JsonDesensitize(value = "**", position = 2)
+	String echo(@JsonDesensitize(value = "**", position = 2) String value);
 
 	boolean echoBoolean(boolean value);
 
@@ -93,7 +95,7 @@ public interface TestService extends GenericService<UserDetails> {
 	CompletableFuture<User> loadCompletableFutureUserByUsername(String username);
 
 	CompletableFuture<? extends UserDetails> loadCompletableFutureUserDetailsByUsername(String username);
-	
+
 	CompletionStage<? extends UserDetails> loadCompletionStageUserDetailsByUsername(String username);
 
 	Callable<User> loadCallableUserByUsername(String username);

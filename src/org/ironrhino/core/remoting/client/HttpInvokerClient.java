@@ -4,9 +4,8 @@ import java.io.IOException;
 import java.io.InvalidClassException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.net.ConnectException;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -14,6 +13,7 @@ import javax.annotation.PostConstruct;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
+import org.ironrhino.core.metadata.JsonDesensitize;
 import org.ironrhino.core.remoting.RemoteAccessException;
 import org.ironrhino.core.remoting.RemoteConnectFailureException;
 import org.ironrhino.core.remoting.RemoteInvocationFailureException;
@@ -206,18 +206,13 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 		Method method = methodInvocation.getMethod();
 		MDC.put("role", "CLIENT");
 		if (loggingPayload) {
-			Object payload;
 			Object[] arguments = methodInvocation.getArguments();
-			String[] parameterNames = ReflectionUtils.getParameterNames(method);
-			if (parameterNames != null) {
-				Map<String, Object> parameters = new LinkedHashMap<>();
-				for (int i = 0; i < parameterNames.length; i++)
-					parameters.put(parameterNames[i], arguments[i]);
-				payload = parameters;
-			} else {
-				payload = arguments;
+			Parameter[] parameters = method.getParameters();
+			JsonDesensitize[] config = new JsonDesensitize[arguments.length];
+			for (int i = 0; i < method.getParameterCount(); i++) {
+				config[i] = parameters[i].getAnnotation(JsonDesensitize.class);
 			}
-			remotingLogger.info("Request: {}", JsonDesensitizer.DEFAULT_INSTANCE.toJson(payload));
+			remotingLogger.info("Request: {}", JsonDesensitizer.DEFAULT_INSTANCE.desensitizeArray(arguments, config));
 		}
 		RemoteInvocationResult result;
 		try {
@@ -225,14 +220,14 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 			result = transformResult(invocation, methodInvocation, result);
 			if (loggingPayload) {
 				if (!result.hasInvocationTargetException()) {
-					remotingLogger.info("Response: {}", JsonDesensitizer.DEFAULT_INSTANCE.toJson(result.getValue()));
+					remotingLogger.info("Response: {}", JsonDesensitizer.DEFAULT_INSTANCE.desensitizeValue(result.getValue(),
+							method.getAnnotation(JsonDesensitize.class)));
 				} else {
 					InvocationTargetException ite = (InvocationTargetException) result.getException();
 					if (ite != null)
 						remotingLogger.error("Error:", ite.getTargetException());
 				}
 			}
-
 		} finally {
 			if (requestIdGenerated) {
 				CodecUtils.removeRequestId();

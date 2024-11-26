@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiPredicate;
@@ -112,8 +113,8 @@ public class JsonDesensitizer {
 									jgen.writeBooleanField(name, Boolean.getBoolean(newValue));
 								} else {
 									Object value = bw.getPropertyValue(name);
-									jgen.writeStringField(name, sanitzeString(value != null ? value.toString() : null,
-											newValue, annotation.position()));
+									jgen.writeStringField(name, desensitizeString(
+											value != null ? value.toString() : null, newValue, annotation.position()));
 								}
 							}
 						} else {
@@ -129,7 +130,7 @@ public class JsonDesensitizer {
 				.addMixIn(Object.class, DesensitizerMixIn.class).writer(filters);
 	}
 
-	private static String sanitzeString(String value, String mask, int position) {
+	private static String desensitizeString(String value, String mask, int position) {
 		if (value != null && position >= 0) {
 			int length = value.length();
 			if (length > position) {
@@ -143,6 +144,29 @@ public class JsonDesensitizer {
 			}
 		}
 		return mask;
+	}
+
+	public String desensitizeValue(Object data, JsonDesensitize config) {
+		if (config != null) {
+			if (data instanceof String) {
+				data = desensitizeString((String) data, config.value(), config.position());
+			} else if (org.springframework.beans.BeanUtils.isSimpleValueType(data.getClass())) {
+				data = !config.value().equals(JsonDesensitize.DEFAULT_NONE) ? config.value() : null;
+			}
+		}
+		return toJson(data);
+	}
+
+	public String desensitizeArray(Object[] data, JsonDesensitize[] config) {
+		if (data == null)
+			return null;
+		if (data.length == 0)
+			return "[]";
+		StringJoiner joiner = new StringJoiner(", ", "[ ", " ]");
+		for (int i = 0; i < data.length; i++) {
+			joiner.add(desensitizeValue(data[i], config != null && config.length > i ? config[i] : null));
+		}
+		return joiner.toString();
 	}
 
 	public String toJson(Object value) {

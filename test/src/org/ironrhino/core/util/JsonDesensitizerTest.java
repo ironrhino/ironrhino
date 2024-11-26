@@ -1,9 +1,12 @@
 package org.ironrhino.core.util;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import java.lang.annotation.Annotation;
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Map;
 import java.util.function.BiPredicate;
@@ -83,6 +86,72 @@ public class JsonDesensitizerTest {
 		JsonDesensitizer desensitizer = new JsonDesensitizer();
 		Person p = new Person("test", "13333333333", "13333333333", "13333333333", "13333333333", 12);
 		String json = desensitizer.toJson(p);
+		assertThat(json, containsString("\"1**********\""));
+		assertThat(json, containsString("\"****3333333\""));
+		assertThat(json, containsString("\"133****3333\""));
+		assertThat(json, containsString("\"1333333333****\""));
+		assertThat(json, not(containsString("age")));
+	}
+
+	@Test
+	public void testDesensitizeValue() {
+		JsonDesensitizer desensitizer = new JsonDesensitizer();
+		JsonDesensitize config = new JsonDesensitize() {
+			@Override
+			public Class<? extends Annotation> annotationType() {
+				return JsonDesensitize.class;
+			}
+
+			@Override
+			public String value() {
+				return "**";
+			}
+
+			@Override
+			public int position() {
+				return 2;
+			}
+
+		};
+		assertThat(desensitizer.desensitizeValue("test", config), equalTo("\"te**\""));
+		assertThat(desensitizer.desensitizeValue(new BigDecimal("12.3"), config), equalTo("\"**\""));
+
+		String json = desensitizer.desensitizeValue(
+				new Person("test", "13333333333", "13333333333", "13333333333", "13333333333", 12), config);
+		assertThat(json, containsString("\"1**********\""));
+		assertThat(json, containsString("\"****3333333\""));
+		assertThat(json, containsString("\"133****3333\""));
+		assertThat(json, containsString("\"1333333333****\""));
+		assertThat(json, not(containsString("age")));
+	}
+
+	@Test
+	public void testDesensitizeArray() {
+		JsonDesensitizer desensitizer = new JsonDesensitizer();
+		assertThat(desensitizer.desensitizeArray(new Object[] { 1, "test", null }, null),
+				equalTo("[ 1, \"test\", null ]"));
+
+		String json = desensitizer.desensitizeArray(
+				new Object[] { 1, "test",
+						new Person("test", "13333333333", "13333333333", "13333333333", "13333333333", 12) },
+				new JsonDesensitize[] { null, new JsonDesensitize() {
+					@Override
+					public Class<? extends Annotation> annotationType() {
+						return JsonDesensitize.class;
+					}
+
+					@Override
+					public String value() {
+						return "**";
+					}
+
+					@Override
+					public int position() {
+						return 2;
+					}
+
+				}, null });
+		assertThat(json, containsString("\"te**\""));
 		assertThat(json, containsString("\"1**********\""));
 		assertThat(json, containsString("\"****3333333\""));
 		assertThat(json, containsString("\"133****3333\""));

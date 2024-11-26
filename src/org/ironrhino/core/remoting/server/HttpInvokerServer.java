@@ -2,6 +2,8 @@ package org.ironrhino.core.remoting.server;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,13 +14,16 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.ironrhino.core.metadata.JsonDesensitize;
 import org.ironrhino.core.model.NullObject;
 import org.ironrhino.core.remoting.RemotingContext;
 import org.ironrhino.core.remoting.ServiceRegistry;
@@ -87,6 +92,7 @@ public class HttpInvokerServer implements HttpRequestHandler {
 			return;
 		}
 		Holder holder = Tracing.isEnabled() ? new Holder() : null;
+		AtomicReference<Method> methodHolder = new AtomicReference<>();
 		invoke(request, response, req -> {
 			if (holder != null) {
 				Tracer tracer = GlobalTracer.get();
@@ -96,28 +102,35 @@ public class HttpInvokerServer implements HttpRequestHandler {
 				holder.span = span;
 				holder.scope = tracer.activateSpan(span);
 			}
-			RemoteInvocation invocation = Tracing.execute("readRemoteInvocation",
-					() -> HttpInvokerSerializers.forRequest(req)
-							.readRemoteInvocation(ClassUtils.forName(interfaceName, null), req.getInputStream()));
+			Class<?> serviceInterface = ClassUtils.forName(interfaceName, null);
+			RemoteInvocation invocation = Tracing.execute("readRemoteInvocation", () -> HttpInvokerSerializers
+					.forRequest(req).readRemoteInvocation(serviceInterface, req.getInputStream()));
 			List<String> parameterTypeList = new ArrayList<>(invocation.getParameterTypes().length);
 			for (Class<?> cl : invocation.getParameterTypes())
 				parameterTypeList.add(cl.getSimpleName());
-			String method = invocation.getMethodName() + "(" + String.join(",", parameterTypeList) + ")";
 			MDC.put(MDC_KEY_ROLE, "SERVER");
-			MDC.put(MDC_KEY_SERVICE, MDC.get(MDC_KEY_INTERFACE_NAME) + '.' + method);
+			MDC.put(MDC_KEY_SERVICE, MDC.get(MDC_KEY_INTERFACE_NAME) + '.' + invocation.getMethodName() + "("
+					+ String.join(",", parameterTypeList) + ")");
 			if (holder != null) {
 				holder.span.setOperationName(MDC.get(MDC_KEY_SERVICE));
 			}
 			if (loggingPayload) {
-				Object[] args = invocation.getArguments();
-				remotingLogger.info("Request: {}", JsonDesensitizer.DEFAULT_INSTANCE
-						.toJson(args.length == 1 ? args[0] : invocation.getArguments()));
+				Object[] arguments = invocation.getArguments();
+				Method method = serviceInterface.getMethod(invocation.getMethodName(), invocation.getParameterTypes());
+				methodHolder.set(method);
+				Parameter[] parameters = method.getParameters();
+				JsonDesensitize[] config = new JsonDesensitize[arguments.length];
+				for (int i = 0; i < method.getParameterCount(); i++) {
+					config[i] = parameters[i].getAnnotation(JsonDesensitize.class);
+				}
+				remotingLogger.info("Request: {}",
+						JsonDesensitizer.DEFAULT_INSTANCE.desensitizeArray(arguments, config));
 			}
 			return invocation;
 		}, invocation -> {
 			try {
-				return Tracing.execute("invokeAndCreateResult",
-						() -> createRemoteInvocationResult(request, invocation, invocation.invoke(target)));
+				return Tracing.execute("invokeAndCreateResult", () -> createRemoteInvocationResult(request, invocation,
+						invocation.invoke(target), () -> methodHolder.get()));
 			} catch (Throwable ex) {
 				if (ex instanceof InvocationTargetException) {
 					ex = new InvocationTargetException(
@@ -136,11 +149,11 @@ public class HttpInvokerServer implements HttpRequestHandler {
 			MDC.remove(MDC_KEY_INTERFACE_NAME);
 			MDC.remove(MDC_KEY_ROLE);
 			MDC.remove(MDC_KEY_SERVICE);
-		});
+		}, () -> methodHolder.get());
 	}
 
 	protected RemoteInvocationResult createRemoteInvocationResult(HttpServletRequest request,
-			RemoteInvocation invocation, Object value) {
+			RemoteInvocation invocation, Object value, Supplier<Method> methodSupplier) {
 		if (value instanceof Optional) {
 			Optional<?> optional = ((Optional<?>) value);
 			return new RemoteInvocationResult(optional.orElse(null));
@@ -169,7 +182,7 @@ public class HttpInvokerServer implements HttpRequestHandler {
 								Tracing.logError(ex);
 								asyncResult.setException(new InvocationTargetException(ex));
 							}
-							invokeWithAsyncResult(context, contextMap, invocation, asyncResult);
+							invokeWithAsyncResult(context, contextMap, invocation, asyncResult, methodSupplier);
 						}
 					});
 				} else if (value instanceof ListenableFuture) {
@@ -177,13 +190,13 @@ public class HttpInvokerServer implements HttpRequestHandler {
 						try (Scope s = (span != null ? GlobalTracer.get().activateSpan((Span) span) : null)) {
 							RemoteInvocationResult asyncResult = new RemoteInvocationResult();
 							asyncResult.setValue(obj);
-							invokeWithAsyncResult(context, contextMap, invocation, asyncResult);
+							invokeWithAsyncResult(context, contextMap, invocation, asyncResult, methodSupplier);
 						}
 					}, ex -> {
 						try (Scope s = (span != null ? GlobalTracer.get().activateSpan((Span) span) : null)) {
 							Tracing.logError(ex);
 							invokeWithAsyncResult(context, contextMap, invocation,
-									new RemoteInvocationResult(new InvocationTargetException(ex)));
+									new RemoteInvocationResult(new InvocationTargetException(ex)), methodSupplier);
 						}
 					});
 				} else {
@@ -210,7 +223,7 @@ public class HttpInvokerServer implements HttpRequestHandler {
 									invokeAndCreateResultSpan.finish();
 								}
 							}
-							invokeWithAsyncResult(context, contextMap, invocation, asyncResult);
+							invokeWithAsyncResult(context, contextMap, invocation, asyncResult, methodSupplier);
 						}
 					});
 				}
@@ -231,7 +244,8 @@ public class HttpInvokerServer implements HttpRequestHandler {
 
 	private void invoke(HttpServletRequest request, HttpServletResponse response,
 			CheckedFunction<HttpServletRequest, RemoteInvocation, Exception> invocationFunction,
-			Function<RemoteInvocation, RemoteInvocationResult> invocationResultFunction, Runnable completion) {
+			Function<RemoteInvocation, RemoteInvocationResult> invocationResultFunction, Runnable completion,
+			Supplier<Method> methodSupplier) {
 		HttpInvokerSerializer serializer = HttpInvokerSerializers.forRequest(request);
 		try {
 			RemoteInvocation invocation = invocationFunction.apply(request);
@@ -254,7 +268,8 @@ public class HttpInvokerServer implements HttpRequestHandler {
 			if (loggingPayload) {
 				if (!result.hasException()) {
 					Object value = result.getValue();
-					remotingLogger.info("Response: {}", JsonDesensitizer.DEFAULT_INSTANCE.toJson(value));
+					remotingLogger.info("Response: {}", JsonDesensitizer.DEFAULT_INSTANCE.desensitizeValue(value,
+							methodSupplier != null ? methodSupplier.get().getAnnotation(JsonDesensitize.class) : null));
 				} else {
 					Throwable throwable = result.getException();
 					if (throwable != null && throwable.getCause() != null)
@@ -289,13 +304,13 @@ public class HttpInvokerServer implements HttpRequestHandler {
 	}
 
 	private void invokeWithAsyncResult(AsyncContext context, Map<String, String> contextMap,
-			RemoteInvocation invocation, RemoteInvocationResult result) {
+			RemoteInvocation invocation, RemoteInvocationResult result, Supplier<Method> methodSupplier) {
 		MDC.setContextMap(contextMap);
 		invoke((HttpServletRequest) context.getRequest(), (HttpServletResponse) context.getResponse(),
 				req -> invocation, inv -> result, () -> {
 					context.complete();
 					MDC.clear();
-				});
+				}, methodSupplier);
 	}
 
 	private static class Holder {
