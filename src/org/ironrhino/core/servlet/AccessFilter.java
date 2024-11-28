@@ -61,7 +61,7 @@ public class AccessFilter implements Filter {
 
 	private Logger accessLog = LoggerFactory.getLogger("access");
 
-	private Logger accesWarnLog = LoggerFactory.getLogger("access-warn");
+	private Logger accessWarnLog = LoggerFactory.getLogger("access-warn");
 
 	public static final long DEFAULT_RESPONSETIMETHRESHOLD = 5000;
 
@@ -234,7 +234,7 @@ public class AccessFilter implements Filter {
 					StringBuilder msg = new StringBuilder();
 					msg.append(RequestUtils.serializeData(request)).append(" response time:").append(responseTime)
 							.append("ms");
-					accesWarnLog.warn(msg.toString());
+					accessWarnLog.warn(msg.toString());
 					Metrics.recordTimer("http.access.slow", responseTime, TimeUnit.MILLISECONDS, "uri", uri);
 				}
 			} catch (ServletException e) {
