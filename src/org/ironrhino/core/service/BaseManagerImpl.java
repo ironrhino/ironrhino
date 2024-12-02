@@ -760,6 +760,8 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 					count += entities.length;
 					prev = null;
 					if (commitPerFetch) {
+						iterateSession.flush();
+						iterateSession.clear();
 						transaction.commit();
 						transaction.begin();
 					}
