@@ -32,7 +32,7 @@ public enum DatabaseProduct {
 		@Override
 		protected String getRecommendedJdbcUrlQueryString() {
 			return "createDatabaseIfNotExist=true&serverTimezone=" + TimeZone.getDefault().getID()
-					+ "&autoReconnectForPools=true&useUnicode=true&useServerPrepStmts=true&cachePrepStmts=true&tinyInt1isBit=false&socketTimeout=60000&sslMode=DISABLED&allowPublicKeyRetrieval=true";
+					+ "&autoReconnectForPools=true&useUnicode=true&useCursorFetch=true&cachePrepStmts=true&tinyInt1isBit=false&socketTimeout=60000&sslMode=DISABLED&allowPublicKeyRetrieval=true";
 		}
 
 	},
