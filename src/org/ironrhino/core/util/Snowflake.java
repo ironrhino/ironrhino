@@ -25,16 +25,25 @@ public class Snowflake {
 		int sequenceBits = 10;
 		String id = AppInfo.getEnv("worker.id");
 		if (id == null) {
-			String ip = AppInfo.getHostAddress();
-			int index = ip.lastIndexOf('.');
-			if (index > 0) {
-				id = ip.substring(index + 1);
-			} else {
-				// IPv6
-				index = ip.lastIndexOf(':');
-				id = ip.substring(index + 1);
-				id = String.valueOf(NumberUtils.xToDecimal(16, id.toUpperCase()));
-				workerIdBits = 16;
+			if (AppInfo.isRunInKubernetes()) {
+				String hostName = AppInfo.getHostName();
+				if (hostName.matches(".+-\\d+$")) {
+					// Kubernetes StatefulSet
+					id = hostName.substring(hostName.lastIndexOf('-') + 1);
+				}
+			}
+			if (id == null) {
+				String ip = AppInfo.getHostAddress();
+				int index = ip.lastIndexOf('.');
+				if (index > 0) {
+					id = ip.substring(index + 1);
+				} else {
+					// IPv6
+					index = ip.lastIndexOf(':');
+					id = ip.substring(index + 1);
+					id = String.valueOf(NumberUtils.xToDecimal(16, id.toUpperCase()));
+					workerIdBits = 16;
+				}
 			}
 		}
 		if (id != null) {

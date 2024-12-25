@@ -550,6 +550,10 @@ public class AppInfo {
 		return value;
 	}
 
+	public static boolean isRunInKubernetes() {
+		return System.getenv("KUBERNETES_SERVICE_HOST") != null && System.getenv("KUBERNETES_SERVICE_PORT") != null;
+	}
+
 	public static enum Stage {
 		DEVELOPMENT, TEST, PREPARATION, PRODUCTION, SANDBOX
 	}
