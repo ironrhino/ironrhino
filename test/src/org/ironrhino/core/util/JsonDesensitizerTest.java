@@ -84,13 +84,16 @@ public class JsonDesensitizerTest {
 	@Test
 	public void testToJsonWithAnnotation() {
 		JsonDesensitizer desensitizer = new JsonDesensitizer();
-		Person p = new Person("test", "13333333333", "13333333333", "13333333333", "13333333333", 12);
+		Person p = new Person("test", "13333333333", "13333333333", "13333333333", "13333333333", "110199012120220",
+				12);
 		String json = desensitizer.toJson(p);
 		assertThat(json, containsString("\"1**********\""));
 		assertThat(json, containsString("\"****3333333\""));
 		assertThat(json, containsString("\"133****3333\""));
 		assertThat(json, containsString("\"1333333333****\""));
+		assertThat(json, containsString("\"1101990121****0\""));
 		assertThat(json, not(containsString("age")));
+		assertThat(json, not(containsString("id_NO")));
 	}
 
 	@Test
@@ -117,7 +120,8 @@ public class JsonDesensitizerTest {
 		assertThat(desensitizer.desensitizeValue(new BigDecimal("12.3"), config), equalTo("\"**\""));
 
 		String json = desensitizer.desensitizeValue(
-				new Person("test", "13333333333", "13333333333", "13333333333", "13333333333", 12), config);
+				new Person("test", "13333333333", "13333333333", "13333333333", "13333333333", "110199012120220", 12),
+				config);
 		assertThat(json, containsString("\"1**********\""));
 		assertThat(json, containsString("\"****3333333\""));
 		assertThat(json, containsString("\"133****3333\""));
@@ -131,26 +135,27 @@ public class JsonDesensitizerTest {
 		assertThat(desensitizer.desensitizeArray(new Object[] { 1, "test", null }, null),
 				equalTo("[ 1, \"test\", null ]"));
 
-		String json = desensitizer.desensitizeArray(
-				new Object[] { 1, "test",
-						new Person("test", "13333333333", "13333333333", "13333333333", "13333333333", 12) },
-				new JsonDesensitize[] { null, new JsonDesensitize() {
-					@Override
-					public Class<? extends Annotation> annotationType() {
-						return JsonDesensitize.class;
-					}
+		String json = desensitizer
+				.desensitizeArray(
+						new Object[] { 1, "test", new Person("test", "13333333333", "13333333333", "13333333333",
+								"13333333333", "110199012120220", 12) },
+						new JsonDesensitize[] { null, new JsonDesensitize() {
+							@Override
+							public Class<? extends Annotation> annotationType() {
+								return JsonDesensitize.class;
+							}
 
-					@Override
-					public String value() {
-						return "**";
-					}
+							@Override
+							public String value() {
+								return "**";
+							}
 
-					@Override
-					public int position() {
-						return 2;
-					}
+							@Override
+							public int position() {
+								return 2;
+							}
 
-				}, null });
+						}, null });
 		assertThat(json, containsString("\"te**\""));
 		assertThat(json, containsString("\"1**********\""));
 		assertThat(json, containsString("\"****3333333\""));
@@ -180,6 +185,8 @@ public class JsonDesensitizerTest {
 		private final String phone3;
 		@JsonDesensitize(value = "****", position = 10)
 		private final String phone4;
+		@JsonDesensitize(value = "****", position = 10)
+		private final String ID_NO;
 		@JsonDesensitize
 		private final int age;
 	}

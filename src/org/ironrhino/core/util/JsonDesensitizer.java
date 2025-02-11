@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.StringJoiner;
+import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiPredicate;
@@ -15,14 +16,18 @@ import java.util.function.Function;
 
 import org.ironrhino.core.metadata.JsonDesensitize;
 import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.core.annotation.AnnotationUtils;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.PropertyWriter;
@@ -40,6 +45,8 @@ public class JsonDesensitizer {
 
 	@Getter
 	private final List<BiPredicate<String, Object>> dropping;
+
+	private final ObjectMapper objectMapper;
 
 	private final ObjectWriter objectWriter;
 
@@ -89,16 +96,7 @@ public class JsonDesensitizer {
 							e.printStackTrace();
 						}
 					} else {
-						JsonDesensitize annotation = null;
-						try {
-							annotation = AnnotationUtils.findAnnotation(bw.getPropertyDescriptor(name).getReadMethod(),
-									JsonDesensitize.class);
-							if (annotation == null)
-								annotation = AnnotationUtils.findAnnotation(
-										ReflectionUtils.getField(obj.getClass(), name), JsonDesensitize.class);
-						} catch (Exception e) {
-
-						}
+						JsonDesensitize annotation = writer.findAnnotation(JsonDesensitize.class);
 						if (annotation != null) {
 							String newValue = annotation.value();
 							if (newValue.equals(JsonDesensitize.DEFAULT_NONE)) {
@@ -126,8 +124,16 @@ public class JsonDesensitizer {
 				}
 			}
 		}).setFailOnUnknownId(false);
-		objectWriter = JsonUtils.createNewObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
-				.addMixIn(Object.class, DesensitizerMixIn.class).writer(filters);
+		JsonMapper.Builder builder = JsonMapper.builder();
+		builder.serializationInclusion(JsonInclude.Include.NON_NULL);
+		builder.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+		builder.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+		builder.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+		builder.enable(SerializationFeature.INDENT_OUTPUT);
+		builder.enable(MapperFeature.USE_STD_BEAN_NAMING);
+		builder.defaultTimeZone(TimeZone.getDefault());
+		objectMapper = builder.build();
+		objectWriter = objectMapper.addMixIn(Object.class, DesensitizerMixIn.class).writer(filters);
 	}
 
 	private static String desensitizeString(String value, String mask, int position) {
@@ -179,9 +185,9 @@ public class JsonDesensitizer {
 
 	public String desensitize(String json) {
 		try {
-			JsonNode node = JsonUtils.getObjectMapper().readTree(json);
+			JsonNode node = objectMapper.readTree(json);
 			desensitize(null, node, null);
-			return JsonUtils.getObjectMapper().writeValueAsString(node);
+			return objectMapper.writeValueAsString(node);
 		} catch (IOException e) {
 			return json;
 		}
