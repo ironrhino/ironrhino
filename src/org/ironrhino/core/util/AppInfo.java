@@ -288,7 +288,10 @@ public class AppInfo {
 			sb.append(_instanceId);
 			sb.append("@");
 		}
-		sb.append(getHostAddress());
+		String address = getHostAddress();
+		if (address.indexOf(':') > -1)
+			address = '[' + address + ']'; // IPv6
+		sb.append(address);
 		int httpPort = getHttpPort();
 		if (httpPort > 0)
 			sb.append(':').append(httpPort);
