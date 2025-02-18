@@ -57,6 +57,8 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 
 	private Map<String, String> servicePaths = new ConcurrentHashMap<>();
 
+	private boolean usingClusterIP = AppInfo.isRunInKubernetes() && AppInfo.getEnv("host.address") != null;
+
 	@Override
 	protected void onReady() {
 		Set<String> services = getExportedServices().keySet();
@@ -91,13 +93,16 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	@Override
 	protected void doRegister(String serviceName, String host) {
 		String key = NAMESPACE_SERVICES + serviceName;
-		remotingStringRedisTemplate.opsForList().remove(key, 0, host);
+		if (!usingClusterIP) {
+			// clean up leftover
+			remotingStringRedisTemplate.opsForList().remove(key, 0, host);
+		}
 		remotingStringRedisTemplate.opsForList().rightPush(key, host);
 	}
 
 	@Override
 	protected void doUnregister(String serviceName, String host) {
-		remotingStringRedisTemplate.opsForList().remove(NAMESPACE_SERVICES + serviceName, 0, host);
+		remotingStringRedisTemplate.opsForList().remove(NAMESPACE_SERVICES + serviceName, usingClusterIP ? 1 : 0, host);
 	}
 
 	@Override
@@ -121,8 +126,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	public Collection<String> getAllAppNames() {
 		Set<String> keys = remotingStringRedisTemplate.<Set<String>>execute((RedisConnection conn) -> {
 			Set<String> set = new HashSet<>();
-			Cursor<byte[]> cursor = conn
-					.scan(ScanOptions.scanOptions().match(NAMESPACE_APPS + "*").count(100).build());
+			Cursor<byte[]> cursor = conn.scan(ScanOptions.scanOptions().match(NAMESPACE_APPS + "*").count(100).build());
 			while (cursor.hasNext())
 				set.add((String) remotingStringRedisTemplate.getKeySerializer().deserialize(cursor.next()));
 			return set;

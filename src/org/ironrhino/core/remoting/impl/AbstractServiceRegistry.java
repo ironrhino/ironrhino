@@ -200,11 +200,10 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 	@Override
 	public void evict(String host) {
 		importedServiceCandidates.forEach((serviceName, hosts) -> {
-			List<String> tobeRemoved = hosts.stream().filter(s -> isSame(s, host)).collect(Collectors.toList());
-			if (!tobeRemoved.isEmpty()) {
-				hosts.removeAll(tobeRemoved);
+			hosts.stream().filter(s -> isSame(s, host)).findFirst().ifPresent(tobeRemoved -> {
+				hosts.remove(tobeRemoved);
 				logger.info("Evict {} for service {}", tobeRemoved, serviceName);
-			}
+			});
 		});
 	}
 
