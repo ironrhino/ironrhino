@@ -13,6 +13,8 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.annotation.WebListener;
 
 import org.apache.logging.log4j.LogManager;
+import org.ironrhino.core.util.AppInfo;
+import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.HttpClientUtils;
 import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.util.ClassUtils;
@@ -95,7 +97,8 @@ public class MainContextLoaderListener extends ContextLoaderListener {
 				if (thread.getClass().getSimpleName().equals("TimerThread"))
 					cancelTimer(thread);
 		} catch (Throwable e) {
-			e.printStackTrace();
+			if (AppInfo.getStage() == Stage.DEVELOPMENT)
+				e.printStackTrace();
 		}
 	}
 
@@ -120,7 +123,8 @@ public class MainContextLoaderListener extends ContextLoaderListener {
 			for (Thread thread : Thread.getAllStackTraces().keySet())
 				cleanupThreadLocals(thread);
 		} catch (Throwable e) {
-			e.printStackTrace();
+			if (AppInfo.getStage() == Stage.DEVELOPMENT)
+				e.printStackTrace();
 		}
 	}
 
