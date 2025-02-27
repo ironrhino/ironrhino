@@ -54,6 +54,15 @@ public class Snowflake {
 			} catch (NumberFormatException e) {
 				throw new IllegalArgumentException("Snowflake worker id should be an integer", e);
 			}
+			String offset = AppInfo.getEnv("worker.id.offset");
+			// workaround, ".spec.ordinals.start" is not supported by k8s lower than v1.31
+			if (offset != null) {
+				try {
+					workerId += Integer.parseInt(offset);
+				} catch (NumberFormatException e) {
+					throw new IllegalArgumentException("Snowflake worker id offset should be an integer", e);
+				}
+			}
 		}
 		log.info("Snowflake default instance worker id is {}", workerId);
 		DEFAULT_INSTANCE = new Snowflake(workerId, workerIdBits, sequenceBits);
