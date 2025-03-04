@@ -70,8 +70,7 @@ public class RemoteInvocationPartitionHandler extends TaskExecutorPartitionHandl
 					log.info("Using local JobStepExecutor to execute step[{}#{}] of job[{}#{}]", stepName,
 							stepExecutionId, jobName, jobExecutionId);
 				}
-				jobStepExecutor.execute(jobExecutionId, stepExecutionId, stepName);
-				return stepExecution;
+				return jobStepExecutor.execute(jobExecutionId, stepExecutionId, stepName);
 			}
 		});
 	}

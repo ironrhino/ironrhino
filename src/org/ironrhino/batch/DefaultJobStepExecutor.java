@@ -30,7 +30,8 @@ public class DefaultJobStepExecutor implements JobStepExecutor {
 	private StepRegistry stepRegistry;
 
 	@Override
-	public void execute(Long jobExecutionId, Long stepExecutionId, String stepName) throws JobExecutionException {
+	public StepExecution execute(Long jobExecutionId, Long stepExecutionId, String stepName)
+			throws JobExecutionException {
 		StepExecution stepExecution = jobExplorer.getStepExecution(jobExecutionId, stepExecutionId);
 		if (stepExecution == null)
 			throw new NoSuchStepException("No such StepExecution: " + stepExecutionId);
@@ -45,6 +46,7 @@ public class DefaultJobStepExecutor implements JobStepExecutor {
 		}
 		step.execute(stepExecution);
 		log.info("Executed step[{}#{}] of job[{}#{}]", stepName, stepExecutionId, jobName, jobExecutionId);
+		return stepExecution;
 	}
 
 }
