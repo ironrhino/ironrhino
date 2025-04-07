@@ -63,6 +63,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.GenericTypeResolver;
 import org.springframework.orm.hibernate5.HibernateCallback;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseManager<T> {
@@ -717,6 +718,7 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			DetachedCriteria dc, boolean commitPerFetch) {
 		Session iterateSession = sessionFactory.openSession();
 		iterateSession.setCacheMode(CacheMode.IGNORE);
+		iterateSession.setDefaultReadOnly(TransactionSynchronizationManager.isCurrentTransactionReadOnly());
 		Session callbackSession;
 		if (commitPerFetch) {
 			callbackSession = sessionFactory.openSession();
@@ -830,7 +832,9 @@ public abstract class BaseManagerImpl<T extends Persistable<?>> implements BaseM
 			T[] entities = Arrays.copyOfRange(buffer, 0, currentIndex);
 			callback.process(entities, hibernateSession);
 			Arrays.fill(buffer, null);
-			hibernateSession.flush();
+			if (!hibernateSession.isDefaultReadOnly()) {
+				hibernateSession.flush();
+			}
 			hibernateSession.clear();
 			currentIndex = 0;
 			return entities;

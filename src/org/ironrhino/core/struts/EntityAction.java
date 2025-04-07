@@ -91,6 +91,7 @@ import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.ConverterNotFoundException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ClassUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -1526,6 +1527,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		return SUCCESS;
 	}
 
+	@Transactional(readOnly = true)
 	public String csv() throws Exception {
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();
