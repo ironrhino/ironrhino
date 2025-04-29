@@ -25,8 +25,6 @@ import java.util.concurrent.Callable;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import javax.annotation.PostConstruct;
-
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.remoting.ServiceRegistry;
@@ -44,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Lookup;
@@ -92,7 +91,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
 
-public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryBean {
+public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryBean implements InitializingBean {
 
 	public static final String BASE_URL_SUFFIX = ".apiBaseUrl";
 
@@ -125,8 +124,8 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 	@Autowired(required = false)
 	private CircuitBreakerRegistry circuitBreakerRegistry;
 
-	@Value("${restApi.loggingBody:true}")
-	private boolean loggingBody = true;
+	@Value("${restApi.loggingBody:false}")
+	private boolean loggingBody = false;
 
 	public RestApiFactoryBean(Class<?> restApiClass) {
 		this(restApiClass, (RestTemplate) null);
@@ -169,10 +168,6 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 			}
 		}
 		this.restTemplate = restTemplate;
-		if (loggingBody && !this.restTemplate.getInterceptors().stream()
-				.anyMatch(LoggingClientHttpRequestInterceptor.class::isInstance))
-			this.restTemplate.getInterceptors()
-					.add(new LoggingClientHttpRequestInterceptor(LoggerFactory.getLogger(restApiClass)));
 		this.restApiBean = new ProxyFactory(restApiClass, this).getProxy(restApiClass.getClassLoader());
 		for (HttpMessageConverter<?> mc : restTemplate.getMessageConverters()) {
 			if (mc instanceof AbstractJackson2HttpMessageConverter) {
@@ -200,8 +195,12 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 		return ex.getClass().getName().equals("io.github.resilience4j.circuitbreaker.CallNotPermittedException");
 	}
 
-	@PostConstruct
-	private void init() {
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		if (loggingBody && !this.restTemplate.getInterceptors().stream()
+				.anyMatch(LoggingClientHttpRequestInterceptor.class::isInstance))
+			this.restTemplate.getInterceptors()
+					.add(new LoggingClientHttpRequestInterceptor(LoggerFactory.getLogger(restApiClass)));
 		ApplicationContext ctx = getApplicationContext();
 		Environment env = ctx.getEnvironment();
 		String baseUrl = env.getProperty(restApiClass.getName() + BASE_URL_SUFFIX);
@@ -589,5 +588,4 @@ public class RestApiFactoryBean extends FallbackSupportMethodInterceptorFactoryB
 	public static <T> T create(Class<T> restApiClass, RestTemplate restTemplate) {
 		return (T) new RestApiFactoryBean(restApiClass, restTemplate).getObject();
 	}
-
 }
