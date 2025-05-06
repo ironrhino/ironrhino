@@ -37,6 +37,10 @@
 				<@config.inputTemplate?interpret/>
 			</@controlGroup>
 			</#if>
+		<#elseif config.template?has_content && readonly>
+			<@controlGroup id=id group=group label=label description=description>
+				<@config.template?interpret/>
+			</@controlGroup>
 		<#elseif config.type=='textarea'>
 			<@s.textarea id=id label=label name=name class=config.cssClass+(config.cssClass?contains('span')||config.cssClass?contains('input-'))?then('',' input-xxlarge') readonly=readonly dynamicAttributes=dynamicAttributes/>
 		<#elseif config.type=='checkbox'>

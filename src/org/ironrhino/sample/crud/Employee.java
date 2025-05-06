@@ -14,6 +14,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.PastOrPresent;
 
 import org.ironrhino.core.metadata.AutoConfig;
+import org.ironrhino.core.metadata.Readonly;
 import org.ironrhino.core.metadata.Richtable;
 import org.ironrhino.core.metadata.UiConfig;
 import org.ironrhino.core.model.Persistable;
@@ -37,7 +38,7 @@ public class Employee implements Persistable<String> {
 	@Column(name = "employeeNo", length = 5)
 	private String id;
 
-	@UiConfig(width = "200px")
+	@UiConfig(width = "200px", template = "${value[0..<1]}**", readonly = @Readonly(expression = "!entity.new"))
 	@SearchableComponent
 	private String name;
 
