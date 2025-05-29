@@ -112,7 +112,7 @@ public class MainAppInitializer implements WebApplicationInitializer {
 		filterDynamic = servletContext.addFilter("openSessionInViewFilter", DelegatingFilter.class);
 		filterDynamic.setAsyncSupported(true);
 		filterDynamic.setInitParameter("targetFilterLifecycle", Boolean.toString(true));
-		filterDynamic.setInitParameter("excludePatterns", "/assets/*,/remoting/*");
+		filterDynamic.setInitParameter("excludePatterns", "/assets/*,/remoting/*,/common/console");
 		filterDynamic.setInitParameter("singleSession", Boolean.toString(true));
 		filterDynamic.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST, DispatcherType.ASYNC), true, "/*");
 
