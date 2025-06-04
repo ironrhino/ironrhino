@@ -166,7 +166,7 @@ public class RedisConfiguration {
 		} else {
 			redisConfiguration = new RedisStandaloneConfiguration(hostName(), getPort());
 		}
-		if (StringUtils.isNotBlank(password) && redisConfiguration instanceof WithPassword) {
+		if (StringUtils.isNotBlank(getPassword()) && redisConfiguration instanceof WithPassword) {
 			((WithPassword) redisConfiguration).setPassword(RedisPassword.of(getPassword()));
 		}
 		if (redisConfiguration instanceof WithDatabaseIndex) {
