@@ -57,6 +57,9 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/netty-all-4.1.65.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/objenesis-3.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/ognl-3.1.26.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/opentelemetry-api-1.51.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/opentelemetry-context-1.51.0.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/opentelemetry-opentracing-shim-1.51.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/persistence-api-2.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/pinyin4j-2.5.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/reactive-streams-1.0.3.jar"/>
