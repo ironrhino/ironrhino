@@ -308,8 +308,12 @@ public class CodecUtils {
 	public static String generateRequestId() {
 		if (Tracing.isEnabled()) {
 			Span span = GlobalTracer.get().activeSpan();
-			if (span != null)
-				return span.context().toTraceId();
+			if (span != null) {
+				String id = span.context().toTraceId();
+				if (org.springframework.util.StringUtils.hasLength(id)) {
+					return id;
+				}
+			}
 		}
 		return nextId();
 	}

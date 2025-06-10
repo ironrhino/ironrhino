@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.util.ClassUtils;
 
 import io.jaegertracing.internal.Constants;
 import io.jaegertracing.internal.JaegerTracer;
@@ -27,6 +28,9 @@ import io.jaegertracing.spi.Reporter;
 import io.jaegertracing.spi.Sampler;
 import io.jaegertracing.spi.Sender;
 import io.jaegertracing.thrift.internal.senders.UdpSender;
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.opentracingshim.OpenTracingShim;
 import io.opentracing.Tracer;
 import io.opentracing.propagation.Format.Builtin;
 import io.opentracing.propagation.TextMap;
@@ -73,7 +77,7 @@ public class TracingConfiguration {
 
 	@PostConstruct
 	public void init() throws Exception {
-		if (!Tracing.isEnabled())
+		if (GlobalTracer.isRegistered() || !Tracing.isEnabled())
 			return;
 		String scheme = uri.getScheme();
 		if (scheme == null || !scheme.equals("udp") && !scheme.equals("http") && !scheme.equals("https"))
@@ -121,6 +125,16 @@ public class TracingConfiguration {
 
 	@Bean
 	protected static TracingPostProcessor tracingPostProcessor(Environment env) {
+		if (ClassUtils.isPresent("io.opentelemetry.api.OpenTelemetry", TracingConfiguration.class.getClassLoader())) {
+			OpenTelemetry openTelemetry = GlobalOpenTelemetry.get();
+			if (!openTelemetry.getClass().getName().equals("io.opentelemetry.api.DefaultOpenTelemetry")) {
+				Tracer tracer = OpenTracingShim.createTracerShim(openTelemetry);
+				GlobalTracer.registerIfAbsent(tracer);
+				log.info("Register tracer with {}", openTelemetry);
+				return TracingPostProcessor.INSTANCE;
+			}
+		}
+		
 		String uri = env.getProperty(KEY_JAEGER_COLLECTOR_URI, DEFAULT_JAEGER_COLLECTOR_URI);
 		boolean enabled = uri.startsWith("udp://") || AddressAvailabilityCondition.check(uri, 2000);
 		if (!enabled) {
