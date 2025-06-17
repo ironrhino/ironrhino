@@ -153,7 +153,7 @@ public class JsonDesensitizer {
 	}
 
 	public String desensitizeValue(Object data, JsonDesensitize config) {
-		if (config != null) {
+		if (data != null && config != null) {
 			if (data instanceof String) {
 				data = desensitizeString((String) data, config.value(), config.position());
 			} else if (org.springframework.beans.BeanUtils.isSimpleValueType(data.getClass())) {
