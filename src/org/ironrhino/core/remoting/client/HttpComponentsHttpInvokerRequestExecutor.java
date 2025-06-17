@@ -23,6 +23,7 @@ import org.ironrhino.core.remoting.RemotingContext;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializer;
 import org.ironrhino.core.remoting.serializer.HttpInvokerSerializers;
 import org.ironrhino.core.servlet.AccessFilter;
+import org.ironrhino.core.tracing.TextMapPropagators;
 import org.ironrhino.core.tracing.Tracing;
 import org.ironrhino.core.util.AppInfo;
 import org.slf4j.MDC;
@@ -71,7 +72,9 @@ public class HttpComponentsHttpInvokerRequestExecutor extends HttpInvokerRequest
 			postMethod.addHeader(AccessFilter.HTTP_HEADER_REQUEST_CHAIN, requestChain);
 		postMethod.addHeader(AccessFilter.HTTP_HEADER_REQUEST_FROM, AppInfo.getInstanceId(true));
 
-		Tracing.inject(postMethod);
+		if (Tracing.isEnabled()) {
+			TextMapPropagators.inject(postMethod);
+		}
 
 		postMethod.setHeader(HTTP_HEADER_CONTENT_TYPE, getSerializer().getContentType());
 		postMethod.setHeader(HTTP_HEADER_CONTENT_LENGTH, Integer.toString(baos.size()));

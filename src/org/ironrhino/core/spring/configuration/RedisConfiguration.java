@@ -10,7 +10,6 @@ import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
-import org.ironrhino.core.tracing.Tracing;
 import org.ironrhino.core.util.AppInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,10 +46,6 @@ import io.lettuce.core.resource.EpollProvider;
 import io.lettuce.core.resource.NettyCustomizer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.epoll.EpollChannelOption;
-import io.opentracing.contrib.redis.common.TracingConfiguration;
-import io.opentracing.contrib.redis.spring.data2.connection.TracingRedisConnectionFactory;
-import io.opentracing.tag.Tags;
-import io.opentracing.util.GlobalTracer;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -182,7 +177,7 @@ public class RedisConfiguration {
 	@Primary
 	public RedisTemplate<String, ?> redisTemplate() {
 		RedisTemplate<String, ?> template = new RedisTemplate<>();
-		template.setConnectionFactory(wrap(redisConnectionFactory()));
+		template.setConnectionFactory(redisConnectionFactory());
 		RedisSerializer<String> stringSerializer = new StringRedisSerializer();
 		template.setKeySerializer(stringSerializer);
 		return template;
@@ -191,7 +186,7 @@ public class RedisConfiguration {
 	@Bean
 	public StringRedisTemplate stringRedisTemplate() {
 		StringRedisTemplate template = new StringRedisTemplate();
-		template.setConnectionFactory(wrap(redisConnectionFactory()));
+		template.setConnectionFactory(redisConnectionFactory());
 		return template;
 	}
 
@@ -211,31 +206,6 @@ public class RedisConfiguration {
 		if (StringUtils.isNotBlank(getHost()))
 			hostName = getHost();
 		return hostName;
-	}
-
-	protected RedisConnectionFactory wrap(RedisConnectionFactory redisConnectionFactory) {
-		if (!Tracing.isEnabled())
-			return redisConnectionFactory;
-		TracingConfiguration.Builder builder = new TracingConfiguration.Builder(GlobalTracer.get())
-				.traceWithActiveSpanOnly(true).extensionTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_CLIENT);
-		StringBuilder service = new StringBuilder("redis");
-		if (getSentinels() != null) {
-			builder.extensionTag("peer.address", String.join(",", getSentinels()));
-			service.append("-sentinel");
-		} else if (getClusterNodes() != null) {
-			builder.extensionTag("peer.address", String.join(",", getClusterNodes()));
-			service.append("-cluster");
-		} else {
-			if (isUseSsl())
-				service.append("s");
-			service.append("://").append(hostName());
-			if (getPort() != 6379)
-				service.append(":").append(getPort());
-			if (getDatabase() > 0)
-				service.append("/").append(getDatabase());
-		}
-		builder.extensionTag(Tags.PEER_SERVICE.getKey(), service.toString());
-		return new TracingRedisConnectionFactory(redisConnectionFactory, builder.build());
 	}
 
 }

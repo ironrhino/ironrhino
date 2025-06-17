@@ -21,7 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ironrhino.core.metrics.Metrics;
 import org.ironrhino.core.session.HttpSessionManager;
 import org.ironrhino.core.spring.security.DefaultAuthenticationSuccessHandler;
-import org.ironrhino.core.tracing.HttpServletRequestTextMap;
+import org.ironrhino.core.tracing.TextMapPropagators;
 import org.ironrhino.core.tracing.Tracing;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.CodecUtils;
@@ -35,13 +35,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
-import io.opentracing.Scope;
-import io.opentracing.Span;
-import io.opentracing.Tracer;
-import io.opentracing.Tracer.SpanBuilder;
-import io.opentracing.propagation.Format;
-import io.opentracing.tag.Tags;
-import io.opentracing.util.GlobalTracer;
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.Scope;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -113,18 +108,10 @@ public class AccessFilter implements Filter {
 		String uri = request.getRequestURI();
 		uri = uri.substring(request.getContextPath().length());
 
-		Span span = null;
 		Scope scope = null;
-		if (!uri.startsWith("/assets/") && Tracing.isEnabled()) {
-			Tracer tracer = GlobalTracer.get();
-			SpanBuilder spanBuilder = tracer.buildSpan(request.getMethod().toLowerCase() + ":" + uri)
-					.asChildOf(tracer.extract(Format.Builtin.HTTP_HEADERS, new HttpServletRequestTextMap(request)));
-			span = spanBuilder.start();
-			Tags.HTTP_URL.set(span, request.getRequestURL().toString());
-			Tags.HTTP_METHOD.set(span, request.getMethod());
-			if (request.getDispatcherType() == DispatcherType.ASYNC)
-				span.setTag("async", true);
-			scope = tracer.activateSpan(span);
+		if (Tracing.isEnabled()) {
+			Context extractedContext = TextMapPropagators.extract(Context.current(), request);
+			scope = extractedContext.makeCurrent();
 		}
 
 		RequestContext.set(request, response);
@@ -250,14 +237,9 @@ public class AccessFilter implements Filter {
 				}
 				MDC.clear();
 			}
-		} catch (Exception e) {
-			Tracing.logError(e);
-			throw e;
 		} finally {
-			if (span != null) {
-				Tags.HTTP_STATUS.set(span, response.getStatus());
+			if (scope != null) {
 				scope.close();
-				span.finish();
 			}
 			RequestContext.reset();
 			LocaleContextHolder.resetLocaleContext();

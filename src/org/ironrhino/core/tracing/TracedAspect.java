@@ -20,16 +20,13 @@ import org.ironrhino.core.util.ReflectionUtils;
 import org.springframework.core.Ordered;
 import org.springframework.transaction.annotation.Transactional;
 
-import io.jaegertracing.internal.JaegerSpanContext;
-import io.opentracing.Scope;
-import io.opentracing.Span;
-import io.opentracing.SpanContext;
-import io.opentracing.Tracer;
-import io.opentracing.tag.Tags;
-import io.opentracing.util.GlobalTracer;
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Scope;
 
 @Aspect
-public class TracingAspect extends BaseAspect {
+public class TracedAspect extends BaseAspect {
 
 	private static final String TAG_NAME_CALLSITE = "callsite";
 
@@ -39,27 +36,27 @@ public class TracingAspect extends BaseAspect {
 
 	private static final String TAG_NAME_ENTITY = "entity";
 
-	public TracingAspect() {
+	public TracedAspect() {
 		order = Ordered.HIGHEST_PRECEDENCE + 1;
 	}
 
 	@Around("execution(public * *(..)) and @annotation(traced)")
 	public Object trace(ProceedingJoinPoint pjp, Traced traced) throws Throwable {
-		Tracer tracer = GlobalTracer.get();
-		if (traced.withActiveSpanOnly() && tracer.activeSpan() == null)
+		if (!Tracing.isEnabled() || traced.withActiveSpanOnly() && !Tracing.isCurrentSpanActive())
 			return pjp.proceed();
 		Method method = ((MethodSignature) pjp.getSignature()).getMethod();
 		String operationName = traced.operationName();
 		if (StringUtils.isBlank(operationName))
 			operationName = ReflectionUtils.stringify(method);
-		Span span = tracer.buildSpan(operationName).start();
+		Tracer tracer = GlobalOpenTelemetry.getTracer("ironrhino");
+		Span span = tracer.spanBuilder(operationName).startSpan();
 		Object result = null;
-		try (Scope scope = tracer.activateSpan(span)) {
+		try (Scope scope = span.makeCurrent()) {
 			if (isDebug()) {
-				span.setTag(TAG_NAME_CALLSITE, getCallSite(method, pjp.getTarget()));
+				span.setAttribute(TAG_NAME_CALLSITE, getCallSite(method, pjp.getTarget()));
 				String[] params = ReflectionUtils.getParameterNames(method);
 				for (int i = 0; i < params.length; i++)
-					span.setTag(TAG_NAME_PREFIX_PARAM + params[i], String.valueOf(pjp.getArgs()[i]));
+					span.setAttribute(TAG_NAME_PREFIX_PARAM + params[i], String.valueOf(pjp.getArgs()[i]));
 			}
 			result = pjp.proceed();
 			return result;
@@ -70,16 +67,18 @@ public class TracingAspect extends BaseAspect {
 			Map<String, Object> context = buildContext(pjp);
 			putReturnValueIntoContext(context, result);
 			for (Tag tag : traced.tags())
-				span.setTag(tag.name(), ExpressionUtils.evalString(tag.value(), context));
-			span.finish();
+				span.setAttribute(tag.name(), ExpressionUtils.evalString(tag.value(), context));
+			span.end();
 		}
 	}
 
 	@Around("execution(public * *(..)) and @annotation(transactional) and not @annotation(Traced)")
 	public Object trace(ProceedingJoinPoint pjp, Transactional transactional) throws Throwable {
+		if (!Tracing.isEnabled())
+			return pjp.proceed();
 		Method method = ((MethodSignature) pjp.getSignature()).getMethod();
 		List<Serializable> tags = new ArrayList<>();
-		tags.add(Tags.COMPONENT.getKey());
+		tags.add("component");
 		tags.add("tx");
 		tags.add(TAG_NAME_TX_READONLY);
 		tags.add(transactional.readOnly());
@@ -107,9 +106,7 @@ public class TracingAspect extends BaseAspect {
 	private static boolean isDebug() {
 		if (AppInfo.getStage() == Stage.DEVELOPMENT)
 			return true;
-		Span activeSpan = GlobalTracer.get().activeSpan();
-		SpanContext ctx = activeSpan != null ? activeSpan.context() : null;
-		return ctx instanceof JaegerSpanContext && ((JaegerSpanContext) ctx).isDebug();
+		return Span.current().getSpanContext().isSampled();
 	}
 
 	private static String getCallSite(Method method, Object target) {

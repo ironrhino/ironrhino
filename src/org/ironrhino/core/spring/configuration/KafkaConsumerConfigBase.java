@@ -16,7 +16,6 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.ironrhino.core.metrics.KafkaConsumerMetrics;
 import org.ironrhino.core.metrics.MicrometerPresent;
 import org.ironrhino.core.spring.DefaultPropertiesProvider;
-import org.ironrhino.core.tracing.Tracing;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +31,6 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.opentracing.contrib.kafka.spring.TracingConsumerFactory;
-import io.opentracing.util.GlobalTracer;
 import lombok.Getter;
 
 @EnableKafka
@@ -115,9 +112,6 @@ public class KafkaConsumerConfigBase implements DefaultPropertiesProvider {
 		DefaultKafkaConsumerFactory<String, T> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerConfigs);
 		consumerFactory.setKeyDeserializer(new StringDeserializer());
 		consumerFactory.setValueDeserializer(new TopicNameBasedJsonDeserializer<>(JsonUtils.createNewObjectMapper()));
-		if (Tracing.isEnabled()) {
-			return new TracingConsumerFactory<String, T>(consumerFactory, GlobalTracer.get());
-		}
 		return consumerFactory;
 	}
 

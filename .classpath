@@ -37,7 +37,6 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-datatype-jsr310-2.18.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-module-mrbean-2.18.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jackson-module-parameter-names-2.18.1.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jaeger-all-1.6.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/javassist-3.30.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jboss-logging-3.4.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/jboss-logging-annotations-2.1.0.jar"/>
@@ -59,7 +58,6 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/ognl-3.1.26.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/opentelemetry-api-1.51.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/opentelemetry-context-1.51.0.jar"/>
-	<classpathentry kind="lib" path="webapp/WEB-INF/lib/opentelemetry-opentracing-shim-1.51.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/persistence-api-2.2.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/pinyin4j-2.5.0.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/reactive-streams-1.0.3.jar"/>

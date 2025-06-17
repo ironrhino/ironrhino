@@ -11,8 +11,8 @@ import org.apache.commons.codec.binary.Hex;
 import org.ironrhino.core.tracing.Tracing;
 import org.slf4j.MDC;
 
-import io.opentracing.Span;
-import io.opentracing.util.GlobalTracer;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanContext;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -307,12 +307,9 @@ public class CodecUtils {
 
 	public static String generateRequestId() {
 		if (Tracing.isEnabled()) {
-			Span span = GlobalTracer.get().activeSpan();
-			if (span != null) {
-				String id = span.context().toTraceId();
-				if (org.springframework.util.StringUtils.hasLength(id)) {
-					return id;
-				}
+			SpanContext spanContext = Span.current().getSpanContext();
+			if (spanContext != SpanContext.getInvalid()) {
+				return spanContext.getTraceId();
 			}
 		}
 		return nextId();

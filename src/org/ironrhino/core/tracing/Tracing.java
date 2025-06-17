@@ -1,32 +1,25 @@
 package org.ironrhino.core.tracing;
 
 import java.io.Serializable;
-import java.net.HttpURLConnection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.ironrhino.core.util.CheckedCallable;
 import org.ironrhino.core.util.CheckedRunnable;
-import org.springframework.http.HttpMessage;
 import org.springframework.util.ClassUtils;
 
-import io.opentracing.Scope;
-import io.opentracing.Span;
-import io.opentracing.Tracer;
-import io.opentracing.log.Fields;
-import io.opentracing.propagation.Format;
-import io.opentracing.tag.Tags;
-import io.opentracing.util.GlobalTracer;
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanBuilder;
+import io.opentelemetry.api.trace.SpanContext;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Scope;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class Tracing {
 
-	private static volatile boolean enabled = ClassUtils.isPresent("io.opentracing.Tracer",
+	private static volatile boolean enabled = ClassUtils.isPresent("io.opentelemetry.api.trace.Tracer",
 			Tracing.class.getClassLoader());
-
-	private static final ThreadLocal<Throwable> throwable = new ThreadLocal<>();
 
 	static void disable() {
 		enabled = false;
@@ -40,13 +33,13 @@ public class Tracing {
 		if (!enabled || shouldSkip(tags))
 			return callable.call();
 		Span span = buildSpan(operationName, tags);
-		try (Scope scope = GlobalTracer.get().activateSpan(span)) {
+		try (Scope scope = span.makeCurrent()) {
 			return callable.call();
 		} catch (Exception ex) {
 			logError(ex);
 			throw ex;
 		} finally {
-			span.finish();
+			span.end();
 		}
 	}
 
@@ -56,13 +49,13 @@ public class Tracing {
 			return;
 		}
 		Span span = buildSpan(operationName, tags);
-		try (Scope scope = GlobalTracer.get().activateSpan(span)) {
+		try (Scope scope = span.makeCurrent()) {
 			runnable.run();
 		} catch (Exception ex) {
 			logError(ex);
 			throw ex;
 		} finally {
-			span.finish();
+			span.end();
 		}
 	}
 
@@ -71,13 +64,13 @@ public class Tracing {
 		if (!enabled || shouldSkip(tags))
 			return callable.call();
 		Span span = buildSpan(operationName, tags);
-		try (Scope scope = GlobalTracer.get().activateSpan(span)) {
+		try (Scope scope = span.makeCurrent()) {
 			return callable.call();
 		} catch (Throwable ex) {
 			logError(ex);
 			throw ex;
 		} finally {
-			span.finish();
+			span.end();
 		}
 	}
 
@@ -88,13 +81,13 @@ public class Tracing {
 			return;
 		}
 		Span span = buildSpan(operationName, tags);
-		try (Scope scope = GlobalTracer.get().activateSpan(span)) {
+		try (Scope scope = span.makeCurrent()) {
 			runnable.run();
 		} catch (Exception ex) {
 			logError(ex);
 			throw ex;
 		} finally {
-			span.finish();
+			span.end();
 		}
 	}
 
@@ -103,15 +96,15 @@ public class Tracing {
 			return callable;
 		ensureReportingActiveSpan();
 		Span span = buildSpan(operationName, tags);
-		span.setTag("async", true);
+		span.setAttribute("async", true);
 		return () -> {
-			try (Scope scope = GlobalTracer.get().activateSpan(span)) {
+			try (Scope scope = span.makeCurrent()) {
 				return callable.call();
 			} catch (Exception ex) {
 				logError(ex);
 				throw ex;
 			} finally {
-				span.finish();
+				span.end();
 			}
 		};
 	}
@@ -121,15 +114,15 @@ public class Tracing {
 			return runnable;
 		ensureReportingActiveSpan();
 		Span span = buildSpan(operationName, tags);
-		span.setTag("async", true);
+		span.setAttribute("async", true);
 		return () -> {
-			try (Scope scope = GlobalTracer.get().activateSpan(span)) {
+			try (Scope scope = span.makeCurrent()) {
 				runnable.run();
 			} catch (Exception ex) {
 				logError(ex);
 				throw ex;
 			} finally {
-				span.finish();
+				span.end();
 			}
 		};
 	}
@@ -140,15 +133,15 @@ public class Tracing {
 			return callable;
 		ensureReportingActiveSpan();
 		Span span = buildSpan(operationName, tags);
-		span.setTag("async", true);
+		span.setAttribute("async", true);
 		return () -> {
-			try (Scope scope = GlobalTracer.get().activateSpan(span)) {
+			try (Scope scope = span.makeCurrent()) {
 				return callable.call();
 			} catch (Exception ex) {
 				logError(ex);
 				throw ex;
 			} finally {
-				span.finish();
+				span.end();
 			}
 		};
 	}
@@ -159,57 +152,51 @@ public class Tracing {
 			return runnable;
 		ensureReportingActiveSpan();
 		Span span = buildSpan(operationName, tags);
-		span.setTag("async", true);
+		span.setAttribute("async", true);
 		return () -> {
-			try (Scope scope = GlobalTracer.get().activateSpan(span)) {
+			try (Scope scope = span.makeCurrent()) {
 				runnable.run();
 			} catch (Exception ex) {
 				logError(ex);
 				throw ex;
 			} finally {
-				span.finish();
+				span.end();
 			}
 		};
 	}
 
 	public static void logError(Throwable ex) {
-		if (enabled) {
-			Span span = GlobalTracer.get().activeSpan();
-			if (span != null) {
-				Tags.SAMPLING_PRIORITY.set(span, 1);
-				Tags.ERROR.set(span, true);
-				Throwable old = throwable.get();
-				if (ex != old) {
-					throwable.set(ex);
-					Map<String, Object> map = new HashMap<>();
-					map.put(Fields.EVENT, "error");
-					map.put(Fields.ERROR_OBJECT, ex);
-					map.put(Fields.MESSAGE, ex.getMessage());
-					span.log(map);
-				}
-			}
+		if (isCurrentSpanActive()) {
+			Span span = Span.current();
+			span.recordException(ex);
 		}
+	}
+
+	public static boolean isCurrentSpanActive() {
+		if (!enabled)
+			return false;
+		return Span.current().getSpanContext() != SpanContext.getInvalid();
 	}
 
 	private static boolean shouldSkip(Serializable... tags) {
 		boolean isComponent = false;
 		Integer samplingPriority = null;
 		for (int i = 0; i < tags.length; i += 2) {
-			if (Tags.COMPONENT.getKey().equals(tags[i])) {
+			if ("component".equals(tags[i])) {
 				isComponent = true;
-			} else if (Tags.SAMPLING_PRIORITY.getKey().equals(tags[i])) {
+			} else if ("sample.priority".equals(tags[i])) {
 				Serializable value = tags[i + 1];
 				if (value instanceof Integer)
 					samplingPriority = (Integer) value;
 			}
 		}
-		return GlobalTracer.get().activeSpan() == null && isComponent
-				|| (samplingPriority != null && samplingPriority < 0);
+		return isCurrentSpanActive() && isComponent || (samplingPriority != null && samplingPriority < 0);
 	}
 
 	private static Span buildSpan(String operationName, Serializable... tags) {
-		Tracer tracer = GlobalTracer.get();
-		Span span = tracer.buildSpan(operationName).start();
+		Tracer tracer = GlobalOpenTelemetry.getTracer("ironrhino");
+		SpanBuilder spanBuilder = tracer.spanBuilder(operationName);
+		Span span = spanBuilder.startSpan();
 		setTags(span, tags);
 		return span;
 	}
@@ -221,59 +208,33 @@ public class Tracing {
 			for (int i = 0; i < tags.length / 2; i++) {
 				String name = String.valueOf(tags[i * 2]);
 				Serializable value = tags[i * 2 + 1];
-				if (value instanceof Number)
-					span.setTag(name, (Number) value);
+				if (value instanceof Long)
+					span.setAttribute(name, (Long) value);
+				else if (value instanceof Double)
+					span.setAttribute(name, (Double) value);
 				else if (value instanceof Boolean)
-					span.setTag(name, (Boolean) value);
+					span.setAttribute(name, (Boolean) value);
 				else if (value != null)
-					span.setTag(name, String.valueOf(value));
+					span.setAttribute(name, String.valueOf(value));
 			}
 		}
 	}
 
 	public static void ensureReportingActiveSpan() {
+		if (!enabled)
+			return;
 		// ensure current span be reported
 		// see also org.ironrhino.core.tracing.DelegatingReporter
-		Tracer tracer = GlobalTracer.get();
-		Span current = tracer.activeSpan();
-		if (current != null)
-			Tags.SAMPLING_PRIORITY.set(current, 1);
+		Span current = Span.current();
+		if (isCurrentSpanActive())
+			current.setAttribute("sample.priority", 1);
 	}
 
 	public static void setTags(Serializable... tags) {
 		if (Tracing.isEnabled()) {
-			Tracer tracer = GlobalTracer.get();
-			Span span = tracer.activeSpan();
-			if (span != null)
+			Span span = Span.current();
+			if (isCurrentSpanActive())
 				setTags(span, tags);
-		}
-	}
-
-	public static void inject(HttpMessage httpMessage) throws Exception {
-		if (enabled) {
-			Tracer tracer = GlobalTracer.get();
-			Span span = tracer.activeSpan();
-			if (span != null)
-				tracer.inject(span.context(), Format.Builtin.HTTP_HEADERS, new SpringHttpMessageTextMap(httpMessage));
-		}
-	}
-
-	public static void inject(org.apache.http.HttpMessage httpMessage) {
-		if (enabled) {
-			Tracer tracer = GlobalTracer.get();
-			Span span = tracer.activeSpan();
-			if (span != null)
-				tracer.inject(span.context(), Format.Builtin.HTTP_HEADERS,
-						new HttpComponentsHttpMessageTextMap(httpMessage));
-		}
-	}
-
-	public static void inject(HttpURLConnection connection) {
-		if (enabled) {
-			Tracer tracer = GlobalTracer.get();
-			Span span = tracer.activeSpan();
-			if (span != null)
-				tracer.inject(span.context(), Format.Builtin.HTTP_HEADERS, new HttpURLConnectionTextMap(connection));
 		}
 	}
 

@@ -53,7 +53,9 @@
 +micrometer-core
 +micrometer-registry-influx
 +micrometer-registry-prometheus
-+jaeger-all<-ironrhino-remoting-common
+-jaeger-all
++opentelemetry-api<-ironrhino-remoting-common
++opentelemetry-context<-ironrhino-remoting-common
 +spring-security-crypto
 -fst
 +nashorn-core

@@ -48,11 +48,6 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.HttpRequestHandler;
 
-import io.opentracing.Scope;
-import io.opentracing.Span;
-import io.opentracing.Tracer;
-import io.opentracing.tag.Tags;
-import io.opentracing.util.GlobalTracer;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -91,17 +86,9 @@ public class HttpInvokerServer implements HttpRequestHandler {
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}
-		Holder holder = Tracing.isEnabled() ? new Holder() : null;
 		AtomicReference<Method> methodHolder = new AtomicReference<>();
 		invoke(request, response, req -> {
-			if (holder != null) {
-				Tracer tracer = GlobalTracer.get();
-				Span span = tracer.buildSpan(interfaceName).start();
-				Tags.SPAN_KIND.set(span, Tags.SPAN_KIND_SERVER);
-				Tags.COMPONENT.set(span, "remoting");
-				holder.span = span;
-				holder.scope = tracer.activateSpan(span);
-			}
+
 			Class<?> serviceInterface = ClassUtils.forName(interfaceName, null);
 			RemoteInvocation invocation = Tracing.execute("readRemoteInvocation", () -> HttpInvokerSerializers
 					.forRequest(req).readRemoteInvocation(serviceInterface, req.getInputStream()));
@@ -111,9 +98,6 @@ public class HttpInvokerServer implements HttpRequestHandler {
 			MDC.put(MDC_KEY_ROLE, "SERVER");
 			MDC.put(MDC_KEY_SERVICE, MDC.get(MDC_KEY_INTERFACE_NAME) + '.' + invocation.getMethodName() + "("
 					+ String.join(",", parameterTypeList) + ")");
-			if (holder != null) {
-				holder.span.setOperationName(MDC.get(MDC_KEY_SERVICE));
-			}
 			if (loggingPayload) {
 				Object[] arguments = invocation.getArguments();
 				Method method = serviceInterface.getMethod(invocation.getMethodName(), invocation.getParameterTypes());
@@ -142,10 +126,6 @@ public class HttpInvokerServer implements HttpRequestHandler {
 				return new RemoteInvocationResult(ex);
 			}
 		}, () -> {
-			if (holder != null) {
-				holder.scope.close();
-				holder.span.finish();
-			}
 			MDC.remove(MDC_KEY_INTERFACE_NAME);
 			MDC.remove(MDC_KEY_ROLE);
 			MDC.remove(MDC_KEY_SERVICE);
@@ -160,76 +140,51 @@ public class HttpInvokerServer implements HttpRequestHandler {
 		} else if (value instanceof Callable || value instanceof Future) {
 			AsyncContext context = request.startAsync();
 			Map<String, String> contextMap = MDC.getCopyOfContextMap();
-			Span asyncSpan = Tracing.isEnabled() ? GlobalTracer.get().buildSpan("async").withTag("async", true).start()
-					: null;
-			try (Scope scope = asyncSpan != null ? GlobalTracer.get().activateSpan(asyncSpan) : null) {
-				Object span = asyncSpan;
-				// generated lambda function use Span as captured parameter type
-				// NoClassDefFoundError could be thrown when perform Class.getDeclaredMethods()
-				if (value instanceof CompletionStage<?>) {
-					((CompletionStage<?>) value).whenComplete((obj, e) -> {
-						try (Scope s = (span != null ? GlobalTracer.get().activateSpan((Span) span) : null)) {
-							RemoteInvocationResult asyncResult = new RemoteInvocationResult();
-							if (e == null) {
-								asyncResult.setValue(obj);
-							} else {
-								Throwable ex = e;
-								if (ex instanceof CompletionException) {
-									ex = transform(e.getCause());
-								}
-								log.error("Processing of " + MDC.get(MDC_KEY_INTERFACE_NAME)
-										+ " remote call resulted in exception", ex);
-								Tracing.logError(ex);
-								asyncResult.setException(new InvocationTargetException(ex));
-							}
-							invokeWithAsyncResult(context, contextMap, invocation, asyncResult, methodSupplier);
+			// generated lambda function use Span as captured parameter type
+			// NoClassDefFoundError could be thrown when perform Class.getDeclaredMethods()
+			if (value instanceof CompletionStage<?>) {
+				((CompletionStage<?>) value).whenComplete((obj, e) -> {
+					RemoteInvocationResult asyncResult = new RemoteInvocationResult();
+					if (e == null) {
+						asyncResult.setValue(obj);
+					} else {
+						Throwable ex = e;
+						if (ex instanceof CompletionException) {
+							ex = transform(e.getCause());
 						}
-					});
-				} else if (value instanceof ListenableFuture) {
-					((ListenableFuture<?>) value).addCallback(obj -> {
-						try (Scope s = (span != null ? GlobalTracer.get().activateSpan((Span) span) : null)) {
-							RemoteInvocationResult asyncResult = new RemoteInvocationResult();
-							asyncResult.setValue(obj);
-							invokeWithAsyncResult(context, contextMap, invocation, asyncResult, methodSupplier);
-						}
-					}, ex -> {
-						try (Scope s = (span != null ? GlobalTracer.get().activateSpan((Span) span) : null)) {
-							Tracing.logError(ex);
-							invokeWithAsyncResult(context, contextMap, invocation,
-									new RemoteInvocationResult(new InvocationTargetException(ex)), methodSupplier);
-						}
-					});
-				} else {
-					context.start(() -> {
-						RemoteInvocationResult asyncResult = new RemoteInvocationResult();
-						try (Scope s = (span != null ? GlobalTracer.get().activateSpan((Span) span) : null)) {
-							Span invokeAndCreateResultSpan = s != null
-									? GlobalTracer.get().buildSpan("invokeAndCreateResult").start()
-									: null;
-							Scope sc = (s != null ? GlobalTracer.get().activateSpan(invokeAndCreateResultSpan) : null);
-							try {
-								asyncResult.setValue(value instanceof Callable ? (((Callable<?>) value)).call()
-										: (((Future<?>) value)).get());
-							} catch (Throwable e) {
-								if (value instanceof Future && e instanceof ExecutionException)
-									e = transform(e.getCause());
-								log.error("Processing of " + MDC.get(MDC_KEY_INTERFACE_NAME)
-										+ " remote call resulted in exception", e);
-								Tracing.logError(e);
-								asyncResult.setException(new InvocationTargetException(e));
-							} finally {
-								if (sc != null) {
-									sc.close();
-									invokeAndCreateResultSpan.finish();
-								}
-							}
-							invokeWithAsyncResult(context, contextMap, invocation, asyncResult, methodSupplier);
-						}
-					});
-				}
-			} finally {
-				if (asyncSpan != null)
-					asyncSpan.finish();
+						log.error("Processing of " + MDC.get(MDC_KEY_INTERFACE_NAME)
+								+ " remote call resulted in exception", ex);
+						Tracing.logError(ex);
+						asyncResult.setException(new InvocationTargetException(ex));
+					}
+					invokeWithAsyncResult(context, contextMap, invocation, asyncResult, methodSupplier);
+				});
+			} else if (value instanceof ListenableFuture) {
+				((ListenableFuture<?>) value).addCallback(obj -> {
+					RemoteInvocationResult asyncResult = new RemoteInvocationResult();
+					asyncResult.setValue(obj);
+					invokeWithAsyncResult(context, contextMap, invocation, asyncResult, methodSupplier);
+				}, ex -> {
+					Tracing.logError(ex);
+					invokeWithAsyncResult(context, contextMap, invocation,
+							new RemoteInvocationResult(new InvocationTargetException(ex)), methodSupplier);
+				});
+			} else {
+				context.start(() -> {
+					RemoteInvocationResult asyncResult = new RemoteInvocationResult();
+					try {
+						asyncResult.setValue(value instanceof Callable ? (((Callable<?>) value)).call()
+								: (((Future<?>) value)).get());
+					} catch (Throwable e) {
+						if (value instanceof Future && e instanceof ExecutionException)
+							e = transform(e.getCause());
+						log.error("Processing of " + MDC.get(MDC_KEY_INTERFACE_NAME)
+								+ " remote call resulted in exception", e);
+						Tracing.logError(e);
+						asyncResult.setException(new InvocationTargetException(e));
+					}
+					invokeWithAsyncResult(context, contextMap, invocation, asyncResult, methodSupplier);
+				});
 			}
 			return null;
 		}
@@ -311,11 +266,6 @@ public class HttpInvokerServer implements HttpRequestHandler {
 					context.complete();
 					MDC.clear();
 				}, methodSupplier);
-	}
-
-	private static class Holder {
-		Span span;
-		Scope scope;
 	}
 
 }
