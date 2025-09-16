@@ -93,7 +93,7 @@ public class KafkaConsumerConfigBase implements DefaultPropertiesProvider {
 					&& !f.getName().endsWith("_DOC")) {
 				try {
 					String key = (String) f.get(null);
-					if (key.equals(ConsumerConfig.DEFAULT_ISOLATION_LEVEL))
+					if (key == null || key.equals(ConsumerConfig.DEFAULT_ISOLATION_LEVEL))
 						continue;
 					String prefixedKey = getConfigKeyPrefix() + key;
 					String value = environment.getProperty(prefixedKey);
