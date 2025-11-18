@@ -208,23 +208,24 @@ public class RequestUtils {
 		response.addCookie(cookie);
 	}
 
-	public static boolean isSameOrigin(HttpServletRequest request, String url) {
-		return isSameOrigin(request.getRequestURL().toString(), url);
+	public static boolean isSameOrigin(HttpServletRequest request, String targetUrl) {
+		return isSameOrigin(request.getRequestURL().toString(), targetUrl);
 	}
 
-	public static boolean isSameOrigin(String a, String b) {
-		if (StringUtils.isBlank(a) || StringUtils.isBlank(b))
+	public static boolean isSameOrigin(String requestUrl, String targetUrl) {
+		if (StringUtils.isBlank(requestUrl) || requestUrl.indexOf("://") < 0 || StringUtils.isBlank(targetUrl))
 			return false;
-		if (a.startsWith("//"))
-			a = "http:" + a;
-		if (b.startsWith("//"))
-			b = "http:" + b;
-		if (b.indexOf("://") < 0 || a.indexOf("://") < 0)
-			return true;
-		String host1 = URI.create(a).getHost();
+		if (requestUrl.startsWith("//"))
+			requestUrl = "http:" + requestUrl;
+		if (targetUrl.startsWith("//"))
+			targetUrl = "http:" + targetUrl;
+		if (targetUrl.indexOf("://") < 0) {
+			return targetUrl.startsWith("/");
+		}
+		String host1 = URI.create(requestUrl).getHost();
 		if (host1 == null)
 			host1 = "localhost";
-		String host2 = URI.create(b).getHost();
+		String host2 = URI.create(targetUrl).getHost();
 		if (host2 == null)
 			host2 = "localhost";
 		return host1.equalsIgnoreCase(host2) || getDomainRoot(host1).equalsIgnoreCase(getDomainRoot(host2));
