@@ -208,7 +208,7 @@ public class ResultPage<T> implements Serializable {
 						|| name.startsWith(StringUtils.uncapitalize(ResultPage.class.getSimpleName()) + '.'))
 					continue;
 				for (String value : values)
-					sb.append(name).append('=')
+					sb.append(URLEncoder.encode(name, "UTF-8")).append('=')
 							.append(URLEncoder.encode(value.length() > 256 ? value.substring(0, 256) : value, "UTF-8"))
 							.append('&');
 			}
