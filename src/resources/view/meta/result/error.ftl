@@ -80,10 +80,12 @@
 		</#if>
 	</#list>
 	</#if>
+	<@stageConditional value="PRODUCTION" negated=true>
 	<#if exception?has_content>
 	<pre>	${statics['org.ironrhino.core.util.ExceptionUtils'].getStackTraceAsString(exception)!}</pre>
 	</br>
 	</#if>
+	</@stageConditional>
 	<a href="javascript:history.back();">${getText('back')}</a>
 	<a href="<@url value="/"/>">${getText('index')}</a>
 </div>
