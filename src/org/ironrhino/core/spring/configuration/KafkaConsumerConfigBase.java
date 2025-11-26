@@ -27,6 +27,7 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
+import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -111,7 +112,8 @@ public class KafkaConsumerConfigBase implements DefaultPropertiesProvider {
 			consumerConfigs.remove(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG);
 		DefaultKafkaConsumerFactory<String, T> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerConfigs);
 		consumerFactory.setKeyDeserializer(new StringDeserializer());
-		consumerFactory.setValueDeserializer(new TopicNameBasedJsonDeserializer<>(JsonUtils.createNewObjectMapper()));
+		consumerFactory.setValueDeserializer(new ErrorHandlingDeserializer<>(
+				new TopicNameBasedJsonDeserializer<>(JsonUtils.createNewObjectMapper())));
 		return consumerFactory;
 	}
 
