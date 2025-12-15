@@ -220,8 +220,8 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 			result = transformResult(invocation, methodInvocation, result);
 			if (loggingPayload) {
 				if (!result.hasInvocationTargetException()) {
-					remotingLogger.info("Response: {}", JsonDesensitizer.DEFAULT_INSTANCE.desensitizeValue(result.getValue(),
-							method.getAnnotation(JsonDesensitize.class)));
+					remotingLogger.info("Response: {}", JsonDesensitizer.DEFAULT_INSTANCE
+							.desensitizeValue(result.getValue(), method.getAnnotation(JsonDesensitize.class)));
 				} else {
 					InvocationTargetException ite = (InvocationTargetException) result.getException();
 					if (ite != null)
@@ -263,7 +263,7 @@ public class HttpInvokerClient extends FallbackSupportMethodInterceptorFactoryBe
 				}
 				return result;
 			} catch (Exception e) {
-				remotingLogger.error("Exception:", e.getCause() != null ? e.getCause() : e);
+				remotingLogger.error("Exception: " + e.getMessage(), e.getCause() != null ? e.getCause() : e);
 				if (urlFromDiscovery) {
 					time = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - time);
 					remotingLogger.info("Invoked to {} fail in {}ms", targetDiscoveredHost, time);
