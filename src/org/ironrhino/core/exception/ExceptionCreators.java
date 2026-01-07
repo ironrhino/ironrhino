@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.ironrhino.core.util.NumberUtils;
+import org.ironrhino.core.util.ReflectionUtils;
 
 public class ExceptionCreators {
 
@@ -34,8 +35,14 @@ public class ExceptionCreators {
 			return Proxy.newProxyInstance(clz.getClassLoader(), new Class[] { clz }, new InvocationHandler() {
 				@Override
 				public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+					if (org.springframework.util.ReflectionUtils.isHashCodeMethod(method)) {
+						return System.identityHashCode(proxy);
+					}
 					if (org.springframework.util.ReflectionUtils.isToStringMethod(method)) {
 						return "Dynamic proxy for [" + clz.getName() + "]";
+					}
+					if (method.isDefault()) {
+						return ReflectionUtils.invokeDefaultMethod(proxy, method, args);
 					}
 					ExceptionDetail exceptionDetail = method.getAnnotation(ExceptionDetail.class);
 					if (exceptionDetail == null) {

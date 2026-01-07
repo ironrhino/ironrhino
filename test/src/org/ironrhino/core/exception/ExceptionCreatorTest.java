@@ -42,6 +42,18 @@ public class ExceptionCreatorTest {
 	}
 
 	@Test
+	public void createBusinessExceptionWithDefaultMethod() {
+		RuntimeException suppressed = new RuntimeException("suppressed");
+		BusinessException exception = BusinessExceptions.INSTANCE.createUnsatisfiedBalance("800010001",
+				new BigDecimal("23.23"), new BigDecimal("34.34"), suppressed);
+		assertThat(exception.getCode(), equalTo("XXX-101-F-0001"));
+		assertThat(exception.getMessage(), containsString("800010001"));
+		assertThat(exception.getMessage(), containsString("23.23"));
+		assertThat(exception.getMessage(), containsString("34.34"));
+		assertThat(exception.getSuppressed()[0], is(suppressed));
+	}
+
+	@Test
 	public void throwCustomException() {
 		boolean thrown = false;
 		try {
@@ -70,28 +82,34 @@ public class ExceptionCreatorTest {
 	@ExceptionCreator(project = "XXX", module = "101")
 	public interface BusinessExceptions {
 
-		public static final BusinessExceptions INSTANCE = ExceptionCreators.get(BusinessExceptions.class);
+		BusinessExceptions INSTANCE = ExceptionCreators.get(BusinessExceptions.class);
 
 		@ExceptionDetail(message = "The balance of your account [%s] is %.2f but required %.2f", type = "F", id = 1)
-		public void throwUnsatisfiedBalance(String accountNo, BigDecimal balance, BigDecimal required)
+		void throwUnsatisfiedBalance(String accountNo, BigDecimal balance, BigDecimal required)
 				throws BusinessException;
 
 		@ExceptionDetail(message = "The balance of your account [%s] is %.2f but required %.2f", type = "F", id = 1)
-		public BusinessException createUnsatisfiedBalance(String accountNo, BigDecimal balance, BigDecimal required);
+		BusinessException createUnsatisfiedBalance(String accountNo, BigDecimal balance, BigDecimal required);
+
+		default BusinessException createUnsatisfiedBalance(String accountNo, BigDecimal balance, BigDecimal required,
+				Throwable suppressed) {
+			BusinessException exception = createUnsatisfiedBalance(accountNo, balance, required);
+			exception.addSuppressed(suppressed);
+			return exception;
+		}
 
 	}
 
 	@ExceptionCreator(project = "XXX", module = "101", type = CustomException.class, length = 5)
 	public interface CustomExceptions {
 
-		public static final CustomExceptions INSTANCE = ExceptionCreators.get(CustomExceptions.class);
+		CustomExceptions INSTANCE = ExceptionCreators.get(CustomExceptions.class);
 
 		@ExceptionDetail(message = "The balance of your account [%s] is %.2f but required %.2f", type = "F", id = 1)
-		public void throwUnsatisfiedBalance(String accountNo, BigDecimal balance, BigDecimal required)
-				throws CustomException;
+		void throwUnsatisfiedBalance(String accountNo, BigDecimal balance, BigDecimal required) throws CustomException;
 
 		@ExceptionDetail(message = "The balance of your account [%s] is %.2f but required %.2f", type = "F", id = 1)
-		public CustomException createUnsatisfiedBalance(String accountNo, BigDecimal balance, BigDecimal required);
+		CustomException createUnsatisfiedBalance(String accountNo, BigDecimal balance, BigDecimal required);
 
 	}
 
