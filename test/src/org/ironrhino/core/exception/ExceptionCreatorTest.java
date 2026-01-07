@@ -27,6 +27,9 @@ public class ExceptionCreatorTest {
 			assertThat(exception.getMessage(), containsString("800010001"));
 			assertThat(exception.getMessage(), containsString("23.23"));
 			assertThat(exception.getMessage(), containsString("34.34"));
+			StackTraceElement firstStackTrace = exception.getStackTrace()[0];
+			assertThat(firstStackTrace.getClassName(), equalTo(getClass().getName()));
+			assertThat(firstStackTrace.getMethodName(), equalTo("throwBusinessException"));
 		}
 		assertThat(thrown, is(true));
 	}

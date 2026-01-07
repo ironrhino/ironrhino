@@ -53,6 +53,19 @@ public class ExceptionCreators {
 							NumberUtils.format(exceptionDetail.id(), exceptionCreator.length()));
 					String message = String.format(exceptionDetail.message(), args);
 					Exception exception = (Exception) ctor.newInstance(code, message);
+					StackTraceElement[] stackTrace = exception.getStackTrace();
+					int index = 0;
+					for (int i = 0; i < stackTrace.length; i++) {
+						if (stackTrace[i].getMethodName().equals(method.getName())) {
+							index = i + 1;
+							break;
+						}
+					}
+					if (index > 0) {
+						StackTraceElement[] subStackTrace = new StackTraceElement[stackTrace.length - index];
+						System.arraycopy(stackTrace, index, subStackTrace, 0, subStackTrace.length);
+						exception.setStackTrace(subStackTrace);
+					}
 					Class<?> returnType = method.getReturnType();
 					if (returnType == void.class) {
 						throw exception;
