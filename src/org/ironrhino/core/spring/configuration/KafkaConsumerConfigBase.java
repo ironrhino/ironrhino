@@ -9,7 +9,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -18,17 +22,23 @@ import org.ironrhino.core.metrics.MicrometerPresent;
 import org.ironrhino.core.spring.DefaultPropertiesProvider;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.JsonUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
+import org.springframework.core.log.LogAccessor;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.listener.BatchInterceptor;
 import org.springframework.kafka.listener.ContainerProperties;
+import org.springframework.kafka.support.serializer.DeserializationException;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.springframework.kafka.support.serializer.SerializationUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -82,6 +92,7 @@ public class KafkaConsumerConfigBase implements DefaultPropertiesProvider {
 		factory.setConsumerFactory(consumerFactory);
 		factory.setConcurrency(getConsumerConcurrency());
 		factory.setBatchListener(true);
+		factory.setBatchInterceptor(new ErrorHandlingBatchInterceptor<>());
 		factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
 		return factory;
 	}
@@ -165,6 +176,35 @@ public class KafkaConsumerConfigBase implements DefaultPropertiesProvider {
 						"Can't deserialize data [" + Arrays.toString(data) + "] from topic [" + topic + "]", e);
 			}
 
+		}
+
+	}
+
+	public static class ErrorHandlingBatchInterceptor<K, V> implements BatchInterceptor<K, V> {
+
+		private final Logger logger = LoggerFactory.getLogger(getClass());
+
+		@Override
+		public ConsumerRecords<K, V> intercept(ConsumerRecords<K, V> records, Consumer<K, V> consumer) {
+			for (TopicPartition partition : records.partitions()) {
+				for (ConsumerRecord<K, V> record : records.records(partition)) {
+					if (record.value() == null) {
+						DeserializationException exception = SerializationUtils.getExceptionFromHeader(record,
+								SerializationUtils.VALUE_DESERIALIZER_EXCEPTION_HEADER, new LogAccessor(getClass()));
+						if (exception != null) {
+							handleError(record, exception);
+						}
+					}
+				}
+			}
+			return records;
+		}
+
+		void handleError(ConsumerRecord<K, V> record, Exception exception) {
+			this.logger.error(
+					String.format("failed to deserialize value of ConsumerRecord(topic = %s, partition = %d, key = %s)",
+							record.topic(), record.partition(), record.key()),
+					exception);
 		}
 
 	}
