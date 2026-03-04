@@ -72,7 +72,7 @@ public class HttpInvokerServer implements HttpRequestHandler {
 	@Override
 	public void handleRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		if (request instanceof ProxySupportHttpServletRequest) {
+		if (!serviceRegistry.isLoadBalancingUsed() && request instanceof ProxySupportHttpServletRequest) {
 			log.error("Forbidden for Proxy");
 			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 			return;

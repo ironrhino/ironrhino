@@ -57,7 +57,12 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 
 	private Map<String, String> servicePaths = new ConcurrentHashMap<>();
 
-	private boolean usingClusterIP = AppInfo.isRunInKubernetes() && AppInfo.getEnv("host.address") != null;
+	private boolean loadBalancingUsed = AppInfo.isRunInKubernetes() && AppInfo.getEnv("host.address") != null;
+
+	@Override
+	public boolean isLoadBalancingUsed() {
+		return this.loadBalancingUsed;
+	}
 
 	@Override
 	protected void onReady() {
@@ -93,7 +98,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 	@Override
 	protected void doRegister(String serviceName, String host) {
 		String key = NAMESPACE_SERVICES + serviceName;
-		if (!usingClusterIP) {
+		if (!isLoadBalancingUsed()) {
 			// clean up leftover
 			remotingStringRedisTemplate.opsForList().remove(key, 0, host);
 		}
@@ -102,7 +107,8 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 
 	@Override
 	protected void doUnregister(String serviceName, String host) {
-		remotingStringRedisTemplate.opsForList().remove(NAMESPACE_SERVICES + serviceName, usingClusterIP ? 1 : 0, host);
+		remotingStringRedisTemplate.opsForList().remove(NAMESPACE_SERVICES + serviceName, isLoadBalancingUsed() ? 1 : 0,
+				host);
 	}
 
 	@Override

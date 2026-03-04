@@ -37,4 +37,8 @@ public interface ServiceRegistry extends SmartLifecycle {
 
 	Collection<String> getExportedHostsByService(String serviceName);
 
+	default boolean isLoadBalancingUsed() {
+		return false;
+	}
+
 }
