@@ -66,7 +66,7 @@ public class MetricsConfiguration {
 
 	@Bean
 	protected static BeanPostProcessor metricsBeanPostProcessor(Environment env) {
-		Metrics.globalRegistry.config().commonTags("app", AppInfo.getAppName(), "instance",
+		Metrics.globalRegistry.config().commonTags("application", AppInfo.getAppName(), "instance",
 				AppInfo.getInstanceId(true, true));
 		return new BeanPostProcessor() {
 			@Override
