@@ -21,7 +21,7 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
 @ClassPresentConditional("io.micrometer.prometheus.PrometheusMeterRegistry")
 public class PrometheusMeterRegistryProvider extends AccessHandler implements MeterRegistryProvider {
 
-	public static final String DEFAULT_METRICS_PATH = "/metrics";
+	public static final String DEFAULT_METRICS_PATH = "/actuator/prometheus";
 
 	@Value("${prometheus.metricsPath:" + DEFAULT_METRICS_PATH + "}")
 	private String metricsPath = DEFAULT_METRICS_PATH;
