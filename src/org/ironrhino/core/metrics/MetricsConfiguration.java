@@ -26,6 +26,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.binder.MeterBinder;
+import io.micrometer.core.instrument.binder.jvm.JvmInfoMetrics;
 import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
 import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
 
@@ -88,6 +89,7 @@ public class MetricsConfiguration {
 
 		MeterRegistry meterRegistry = Metrics.globalRegistry;
 
+		new JvmInfoMetrics().bindTo(meterRegistry);
 		new JvmThreadMetrics().bindTo(meterRegistry);
 		new JvmMemoryMetrics().bindTo(meterRegistry);
 		meterBinders.forEach(mb -> mb.bindTo(meterRegistry));
