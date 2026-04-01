@@ -23,12 +23,15 @@ import org.springframework.core.env.Environment;
 
 import com.zaxxer.hikari.HikariDataSource;
 
+import io.micrometer.core.instrument.Meter.Id;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.binder.MeterBinder;
 import io.micrometer.core.instrument.binder.jvm.JvmInfoMetrics;
 import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
 import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
+import io.micrometer.core.instrument.config.MeterFilter;
+import io.micrometer.core.instrument.distribution.DistributionStatisticConfig;
 
 @Order(0)
 @Configuration
@@ -53,6 +56,7 @@ public class MetricsConfiguration {
 			return;
 		}
 		instrument();
+		config(Metrics.globalRegistry);
 	}
 
 	@PreDestroy
@@ -63,6 +67,21 @@ public class MetricsConfiguration {
 	@Bean
 	public TimedAspect timedAspect() {
 		return new TimedAspect();
+	}
+
+	protected void config(MeterRegistry meterRegistry) {
+		Metrics.globalRegistry.config().meterFilter(new MeterFilter() {
+
+			@Override
+			public DistributionStatisticConfig configure(Id id, DistributionStatisticConfig config) {
+				if (id.getName().equals("http.server.requests")) {
+					return config.merge(DistributionStatisticConfig.builder().percentilesHistogram(true)
+							.percentiles(0.95, 0.99).build());
+				}
+				return config;
+			}
+
+		});
 	}
 
 	@Bean
@@ -110,6 +129,7 @@ public class MetricsConfiguration {
 				}
 			}
 		}
+
 	}
 
 }
