@@ -168,8 +168,13 @@ public class AccessFilter implements Filter {
 				s = "";
 			MDC.put("userAgent", " UserAgent:" + s);
 			s = request.getHeader("Referer");
-			if (s == null || !s.startsWith("http"))
+			if (s == null || !s.startsWith("http")) {
 				s = "";
+			} else {
+				int index = s.indexOf('?');
+				if (index > 0)
+					s = s.substring(0, index);
+			}
 			MDC.put("referer", " Referer:" + s);
 			s = RequestUtils.getCookieValue(request, DefaultAuthenticationSuccessHandler.COOKIE_NAME_LOGIN_USER);
 			if (s != null)
@@ -219,8 +224,7 @@ public class AccessFilter implements Filter {
 				long responseTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
 				if (isRequestDispatcher && responseTime > responseTimeThreshold) {
 					StringBuilder msg = new StringBuilder();
-					msg.append(RequestUtils.serializeData(request)).append(" response time:").append(responseTime)
-							.append("ms");
+					msg.append("response time:").append(responseTime).append("ms");
 					accessWarnLog.warn(msg.toString());
 					Metrics.recordTimer("http.access.slow", responseTime, TimeUnit.MILLISECONDS, "uri", uri);
 				}
