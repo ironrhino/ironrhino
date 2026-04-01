@@ -233,7 +233,7 @@ public class AccessFilter implements Filter {
 					long responseTime = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
 					MDC.put("responseTime", " responseTime:" + responseTime);
 					accessLog.info("");
-					Metrics.recordTimer("http.access", responseTime, TimeUnit.MILLISECONDS);
+					Metrics.recordTimer("http.server.requests", responseTime, TimeUnit.MILLISECONDS);
 				}
 				MDC.clear();
 			}
