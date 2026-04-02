@@ -177,8 +177,15 @@ public class AccessFilter implements Filter {
 			}
 			MDC.put("referer", " Referer:" + s);
 			s = RequestUtils.getCookieValue(request, DefaultAuthenticationSuccessHandler.COOKIE_NAME_LOGIN_USER);
-			if (s != null)
+			if (s != null) {
+				if (s.length() == 11) {
+					s = s.substring(0, 3) + "****" + s.substring(7);
+				}
+				if (s.length() == 18) {
+					s = s.substring(0, 10) + "****" + s.substring(14);
+				}
 				MDC.put("username", s);
+			}
 			String sessionId = null;
 			if (httpSessionManager != null) {
 				sessionId = httpSessionManager.getSessionId(request);
