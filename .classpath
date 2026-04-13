@@ -97,6 +97,7 @@
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/transaction-api-1.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/validation-api-2.0.1.jar"/>
 	<classpathentry kind="lib" path="webapp/WEB-INF/lib/xwork-core-23.16.jar"/>
+	<classpathentry kind="lib" path="webapp/WEB-INF/lib/zip4j-2.11.6.jar"/>
 	<classpathentry kind="lib" path="lib/annotations-api-3.0.jar"/>
 	<classpathentry kind="lib" path="lib/asm-9.4.jar"/>
 	<classpathentry kind="lib" path="lib/asm-commons-9.4.jar"/>
