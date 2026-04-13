@@ -326,7 +326,7 @@ ${formHeader!}
 </#if>
 </#list>
 </#list>
-<a download="${csvFileName!'data.csv'}" href="${downloadUrl}"><span class="glyphicon glyphicon-download-alt clickable"></span></a>
+<a href="${downloadUrl}" <#if csvDoubleCheckRequired>class="doublecheck"<#else>download="${csvFileName!'data.csv'}"</#if>><span class="glyphicon glyphicon-download-alt clickable"></span></a>
 </#if>
 </div>
 </div>

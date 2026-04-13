@@ -1,6 +1,7 @@
 package org.ironrhino.core.struts;
 
 import java.beans.PropertyDescriptor;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
@@ -44,6 +45,8 @@ import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.query.Query;
 import org.hibernate.sql.JoinType;
+import org.ironrhino.core.download.DownloadNotifier;
+import org.ironrhino.core.download.SimpleDownloadNotifier;
 import org.ironrhino.core.hibernate.CriteriaState;
 import org.ironrhino.core.hibernate.CriterionUtils;
 import org.ironrhino.core.metadata.AppendOnly;
@@ -75,9 +78,11 @@ import org.ironrhino.core.util.AnnotationUtils;
 import org.ironrhino.core.util.ApplicationContextUtils;
 import org.ironrhino.core.util.AuthzUtils;
 import org.ironrhino.core.util.BeanUtils;
+import org.ironrhino.core.util.CodecUtils;
 import org.ironrhino.core.util.CompareUtils;
 import org.ironrhino.core.util.DateUtils;
 import org.ironrhino.core.util.JsonUtils;
+import org.ironrhino.core.util.Zip4jHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapperImpl;
@@ -153,14 +158,36 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 	@Autowired
 	protected ConversionService conversionService;
 
+	@Autowired(required = false)
+	protected DownloadNotifier downloadNotifier = new SimpleDownloadNotifier();
+
 	@Value("${csv.defaultEncoding:GBK}")
 	private String csvDefaultEncoding = "GBK";
 
 	@Value("${csv.maxRows:0}")
 	private int csvMaxRows;
 
+	@Value("${csv.encryptionEnabled:false}")
+	private boolean csvEncryptionEnabled;
+
 	public int getCsvMaxRows() {
 		return csvMaxRows > 0 ? csvMaxRows : 1000 * ResultPage.DEFAULT_PAGE_SIZE;
+	}
+
+	public String getCsvFileName() {
+		return getText(getEntityName()) + ".csv";
+	}
+
+	public boolean isCsvEncryptionEnabled() {
+		return csvEncryptionEnabled;
+	}
+
+	public boolean isCsvDoubleCheckRequired() {
+		try {
+			return getClass().getMethod("csv").isAnnotationPresent(DoubleChecker.class);
+		} catch (NoSuchMethodException e) {
+			return false;
+		}
 	}
 
 	public boolean isSearchable() {
@@ -1566,133 +1593,157 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			addActionError(getText("query.result.number.exceed", new String[] { String.valueOf(maxRows) }));
 			return ERROR;
 		}
-		response.setCharacterEncoding(csvDefaultEncoding);
-		response.setHeader("Content-type", "text/csv");
-		response.setHeader("Content-disposition", "attachment;filename=data.csv");
+		String fileName = getCsvFileName();
+		PrintWriter printWriter;
+		if (isCsvEncryptionEnabled()) {
+			String password = CodecUtils.nextId(10);
+			printWriter = new PrintWriter(new OutputStreamWriter(
+					Zip4jHelper.wrapStreamWithPassword(response.getOutputStream(), fileName, password),
+					csvDefaultEncoding));
+			int index = fileName.lastIndexOf('.');
+			fileName = (index > 0 ? fileName.substring(0, index) : fileName) + "-" + System.currentTimeMillis()
+					+ ".zip";
+			response.setHeader("Content-type", "application/zip");
+			downloadNotifier.notify(AuthzUtils.getUserDetails(), fileName, password,
+					AuthzUtils.getDoubleChecker(UserDetails.class));
+		} else {
+			printWriter = response.getWriter();
+			response.setCharacterEncoding(csvDefaultEncoding);
+			response.setHeader("Content-type", "text/csv");
+			downloadNotifier.notify(AuthzUtils.getUserDetails(), fileName, null,
+					AuthzUtils.getDoubleChecker(UserDetails.class));
+		}
+		response.setHeader("Content-disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
+
 		final String columnSeperator = ",";
 		final String lineSeperator = "\r\n";
-		final PrintWriter writer = response.getWriter();
-		for (int i = 0; i < exportColumnsList.size(); i++) {
-			String label = exportColumnsList.get(i);
-			UiConfigImpl uic = getUiConfigs().get(label);
-			if (uic != null && StringUtils.isNotBlank(uic.getAlias()))
-				label = uic.getAlias();
-			writer.print(getText(label));
-			writer.print(i == exportColumnsList.size() - 1 ? lineSeperator : columnSeperator);
-		}
-		entityManager.iterate(10, (entityArray, session) -> {
-			for (Object en : entityArray) {
-				BeanWrapperImpl bw = new BeanWrapperImpl(en);
-				for (int i = 0; i < exportColumnsList.size(); i++) {
-					String name = exportColumnsList.get(i);
-					Object value = bw.getPropertyValue(name);
-					if (value != null && sumColumns.containsKey(name)) {
-						Class<?> clazz = value.getClass();
-						Object sum;
-						if (clazz == float.class || clazz == Float.class) {
-							BigDecimal old = (BigDecimal) sumColumns.get(name);
-							if (old == null)
-								old = BigDecimal.ZERO;
-							sum = old.add(new BigDecimal(Float.toString((Float) value)));
-						} else if (clazz == double.class || clazz == Double.class) {
-							BigDecimal old = (BigDecimal) sumColumns.get(name);
-							if (old == null)
-								old = BigDecimal.ZERO;
-							sum = old.add(new BigDecimal(Double.toString((Double) value)));
-						} else if (clazz == BigDecimal.class) {
-							BigDecimal old = (BigDecimal) sumColumns.get(name);
-							if (old == null)
-								old = BigDecimal.ZERO;
-							sum = old.add((BigDecimal) value);
-						} else if (clazz == short.class || clazz == Short.class) {
-							Long old = (Long) sumColumns.get(name);
-							if (old == null)
-								old = 0L;
-							sum = old + (Short) value;
-						} else if (clazz == int.class || clazz == Integer.class) {
-							Long old = (Long) sumColumns.get(name);
-							if (old == null)
-								old = 0L;
-							sum = old + (Integer) value;
-						} else if (clazz == long.class || clazz == Long.class) {
-							Long old = (Long) sumColumns.get(name);
-							if (old == null)
-								old = 0L;
-							sum = old + (Long) value;
-						} else {
-							throw new IllegalArgumentException("Unsupported type: " + clazz.getName());
-						}
-						sumColumns.put(name, (Number) sum);
-					}
-					String text;
-					Template csvTemplate = csvTemplates.get(name);
-					if (csvTemplate != null) {
-						StringWriter sw = new StringWriter();
-						Map<String, Object> rootMap = new HashMap<>(4, 1);
-						rootMap.put("entity", en);
-						rootMap.put("value", value);
-						try {
-							csvTemplate.process(rootMap, sw);
-							text = sw.toString();
-						} catch (Exception e) {
-							text = e.getMessage();
-						}
-					} else {
-						if (value == null) {
-							text = "";
-						} else if (value instanceof Collection) {
-							text = StringUtils.join((Collection) value, ",");
-						} else if (value instanceof Object[]) {
-							text = StringUtils.join((Object[]) value, ",");
-						} else if (value instanceof Boolean) {
-							text = getText(value.toString());
-						} else if (value instanceof Date) {
-							if (value instanceof Time) {
-								text = DateUtils.format((Date) value, "HH:mm:ss");
-							} else if (value instanceof java.sql.Date) {
-								text = DateUtils.formatDate8((Date) value);
+
+		try (PrintWriter writer = printWriter) {
+			for (int i = 0; i < exportColumnsList.size(); i++) {
+				String label = exportColumnsList.get(i);
+				UiConfigImpl uic = getUiConfigs().get(label);
+				if (uic != null && StringUtils.isNotBlank(uic.getAlias()))
+					label = uic.getAlias();
+				writer.print(getText(label));
+				writer.print(i == exportColumnsList.size() - 1 ? lineSeperator : columnSeperator);
+			}
+			entityManager.iterate(10, (entityArray, session) -> {
+				for (Object en : entityArray) {
+					BeanWrapperImpl bw = new BeanWrapperImpl(en);
+					for (int i = 0; i < exportColumnsList.size(); i++) {
+						String name = exportColumnsList.get(i);
+						Object value = bw.getPropertyValue(name);
+						if (value != null && sumColumns.containsKey(name)) {
+							Class<?> clazz = value.getClass();
+							Object sum;
+							if (clazz == float.class || clazz == Float.class) {
+								BigDecimal old = (BigDecimal) sumColumns.get(name);
+								if (old == null)
+									old = BigDecimal.ZERO;
+								sum = old.add(new BigDecimal(Float.toString((Float) value)));
+							} else if (clazz == double.class || clazz == Double.class) {
+								BigDecimal old = (BigDecimal) sumColumns.get(name);
+								if (old == null)
+									old = BigDecimal.ZERO;
+								sum = old.add(new BigDecimal(Double.toString((Double) value)));
+							} else if (clazz == BigDecimal.class) {
+								BigDecimal old = (BigDecimal) sumColumns.get(name);
+								if (old == null)
+									old = BigDecimal.ZERO;
+								sum = old.add((BigDecimal) value);
+							} else if (clazz == short.class || clazz == Short.class) {
+								Long old = (Long) sumColumns.get(name);
+								if (old == null)
+									old = 0L;
+								sum = old + (Short) value;
+							} else if (clazz == int.class || clazz == Integer.class) {
+								Long old = (Long) sumColumns.get(name);
+								if (old == null)
+									old = 0L;
+								sum = old + (Integer) value;
+							} else if (clazz == long.class || clazz == Long.class) {
+								Long old = (Long) sumColumns.get(name);
+								if (old == null)
+									old = 0L;
+								sum = old + (Long) value;
 							} else {
-								text = DateUtils.formatDatetime((Date) value);
+								throw new IllegalArgumentException("Unsupported type: " + clazz.getName());
+							}
+							sumColumns.put(name, (Number) sum);
+						}
+						String text;
+						Template csvTemplate = csvTemplates.get(name);
+						if (csvTemplate != null) {
+							StringWriter sw = new StringWriter();
+							Map<String, Object> rootMap = new HashMap<>(4, 1);
+							rootMap.put("entity", en);
+							rootMap.put("value", value);
+							try {
+								csvTemplate.process(rootMap, sw);
+								text = sw.toString();
+							} catch (Exception e) {
+								text = e.getMessage();
 							}
 						} else {
-							text = String.valueOf(value);
+							if (value == null) {
+								text = "";
+							} else if (value instanceof Collection) {
+								text = StringUtils.join((Collection) value, ",");
+							} else if (value instanceof Object[]) {
+								text = StringUtils.join((Object[]) value, ",");
+							} else if (value instanceof Boolean) {
+								text = getText(value.toString());
+							} else if (value instanceof Date) {
+								if (value instanceof Time) {
+									text = DateUtils.format((Date) value, "HH:mm:ss");
+								} else if (value instanceof java.sql.Date) {
+									text = DateUtils.formatDate8((Date) value);
+								} else {
+									text = DateUtils.formatDatetime((Date) value);
+								}
+							} else {
+								text = String.valueOf(value);
+							}
 						}
+						if (text.contains(String.valueOf(columnSeperator)) || text.contains("\"")
+								|| text.contains("\n")) {
+							if (text.contains("\""))
+								text = text.replaceAll("\"", "\"\"");
+							text = new StringBuilder(text.length() + 2).append("\"").append(text).append("\"")
+									.toString();
+						}
+						writer.print(text);
+						writer.print(i == exportColumnsList.size() - 1 ? lineSeperator : columnSeperator);
 					}
-					if (text.contains(String.valueOf(columnSeperator)) || text.contains("\"") || text.contains("\n")) {
-						if (text.contains("\""))
-							text = text.replaceAll("\"", "\"\"");
-						text = new StringBuilder(text.length() + 2).append("\"").append(text).append("\"").toString();
+
+				}
+				writer.flush();
+			}, dc);
+			if (!sumColumns.isEmpty()) {
+				for (int i = 0; i < exportColumnsList.size(); i++) {
+					String name = exportColumnsList.get(i);
+					if (sumColumns.containsKey(name)) {
+						Object value = sumColumns.get(name);
+						String text = value.toString();
+						Template csvTemplate = csvTemplates.get(name);
+						if (csvTemplate != null) {
+							StringWriter sw = new StringWriter();
+							Map<String, Object> rootMap = new HashMap<>(4, 1);
+							rootMap.put("value", value);
+							try {
+								csvTemplate.process(rootMap, sw);
+								text = sw.toString();
+							} catch (Exception e) {
+								text = e.getMessage();
+							}
+						}
+						if (text.contains(String.valueOf(columnSeperator)))
+							text = new StringBuilder(text.length() + 2).append("\"").append(text).append("\"")
+									.toString();
+						writer.print(text);
 					}
-					writer.print(text);
 					writer.print(i == exportColumnsList.size() - 1 ? lineSeperator : columnSeperator);
 				}
-
-			}
-			writer.flush();
-		}, dc);
-		if (!sumColumns.isEmpty()) {
-			for (int i = 0; i < exportColumnsList.size(); i++) {
-				String name = exportColumnsList.get(i);
-				if (sumColumns.containsKey(name)) {
-					Object value = sumColumns.get(name);
-					String text = value.toString();
-					Template csvTemplate = csvTemplates.get(name);
-					if (csvTemplate != null) {
-						StringWriter sw = new StringWriter();
-						Map<String, Object> rootMap = new HashMap<>(4, 1);
-						rootMap.put("value", value);
-						try {
-							csvTemplate.process(rootMap, sw);
-							text = sw.toString();
-						} catch (Exception e) {
-							text = e.getMessage();
-						}
-					}
-					if (text.contains(String.valueOf(columnSeperator)))
-						text = new StringBuilder(text.length() + 2).append("\"").append(text).append("\"").toString();
-					writer.print(text);
-				}
-				writer.print(i == exportColumnsList.size() - 1 ? lineSeperator : columnSeperator);
 			}
 		}
 		return NONE;
