@@ -326,7 +326,7 @@ ${formHeader!}
 </#if>
 </#list>
 </#list>
-<a download="data.csv" href="${downloadUrl}"><span class="glyphicon glyphicon-download-alt clickable"></span></a>
+<a download="${csvFileName!'data.csv'}" href="${downloadUrl}"><span class="glyphicon glyphicon-download-alt clickable"></span></a>
 </#if>
 </div>
 </div>
