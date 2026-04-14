@@ -3,6 +3,7 @@ package org.ironrhino.core.struts;
 import java.io.BufferedReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.net.URLEncoder;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -435,7 +436,7 @@ public class BaseAction extends ActionSupport {
 				sb.append(k).append(": ").append(String.join("\t", v)).append("; ");
 			});
 			sb.delete(sb.length() - 2, sb.length() - 1);
-			response.setHeader("X-Field-Errors", sb.toString());
+			response.setHeader("X-Field-Errors", URLEncoder.encode(sb.toString(), "UTF-8"));
 		}
 	}
 
