@@ -1325,7 +1325,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	private boolean checkEntityReadonly(String expression, EN entity) throws Exception {
 		if (StringUtils.isNotBlank(expression)) {
-			Template template = new Template(null, "${(" + expression + ")?string!}", freemarkerManager.getConfig());
+			Template template = new Template(null, "${(" + expression + ")?string!}",
+					freemarkerManager.getConfiguration(ServletActionContext.getServletContext()));
 			StringWriter sw = new StringWriter();
 			Map<String, Object> rootMap = new HashMap<>(2, 1);
 			rootMap.put("entity", entity);
@@ -1339,7 +1340,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		if (StringUtils.isNotBlank(expression)) {
 			try {
 				Template template = new Template(null, "${(" + expression + ")?string!}",
-						freemarkerManager.getConfig());
+						freemarkerManager.getConfiguration(ServletActionContext.getServletContext()));
 				StringWriter sw = new StringWriter();
 				Map<String, Object> rootMap = new HashMap<>(4, 1);
 				rootMap.put("entity", entity);
@@ -1550,7 +1551,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			if (uc.isShowSum())
 				sumColumns.put(name, null);
 			if (StringUtils.isNotBlank(uc.getCsvTemplate()))
-				csvTemplates.put(name, new Template(null, uc.getCsvTemplate(), freemarkerManager.getConfig()));
+				csvTemplates.put(name, new Template(null, uc.getCsvTemplate(),
+						freemarkerManager.getConfiguration(ServletActionContext.getServletContext())));
 		}
 
 		DetachedCriteria dc = detachedCriteria();
