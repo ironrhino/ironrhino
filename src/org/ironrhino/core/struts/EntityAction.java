@@ -70,6 +70,7 @@ import org.ironrhino.core.search.elasticsearch.annotations.Searchable;
 import org.ironrhino.core.security.role.UserRole;
 import org.ironrhino.core.service.BaseManager;
 import org.ironrhino.core.service.BaseTreeControl;
+import org.ironrhino.core.spring.security.password.PasswordGenerator;
 import org.ironrhino.core.struts.AnnotationShadows.HiddenImpl;
 import org.ironrhino.core.struts.AnnotationShadows.ReadonlyImpl;
 import org.ironrhino.core.struts.AnnotationShadows.RichtableImpl;
@@ -157,6 +158,9 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	@Autowired
 	protected ConversionService conversionService;
+
+	@Autowired(required = false)
+	protected PasswordGenerator passwordGenerator = u -> CodecUtils.generatePassword();
 
 	@Autowired(required = false)
 	protected DownloadNotifier downloadNotifier = new SimpleDownloadNotifier();
@@ -1596,7 +1600,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		String fileName = getCsvFileName();
 		PrintWriter printWriter;
 		if (isCsvEncryptionEnabled()) {
-			String password = CodecUtils.nextId(10);
+			UserDetails user = AuthzUtils.getUserDetails();
+			String password = passwordGenerator.generate(user);
 			printWriter = new PrintWriter(new OutputStreamWriter(
 					Zip4jHelper.wrapStreamWithPassword(response.getOutputStream(), fileName, password),
 					csvDefaultEncoding));
@@ -1604,8 +1609,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			fileName = (index > 0 ? fileName.substring(0, index) : fileName) + "-" + System.currentTimeMillis()
 					+ ".zip";
 			response.setHeader("Content-type", "application/zip");
-			downloadNotifier.notify(AuthzUtils.getUserDetails(), fileName, password,
-					AuthzUtils.getDoubleChecker(UserDetails.class));
+			downloadNotifier.notify(user, fileName, password, AuthzUtils.getDoubleChecker(UserDetails.class));
 		} else {
 			printWriter = response.getWriter();
 			response.setCharacterEncoding(csvDefaultEncoding);

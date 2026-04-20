@@ -6,6 +6,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.Random;
 
 import org.apache.commons.codec.binary.Hex;
 import org.ironrhino.core.tracing.Tracing;
@@ -25,6 +26,8 @@ public class CodecUtils {
 	public static final String MDC_KEY_REQUEST = "request";
 
 	public static final char[] CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
+
+	private static final char[] specialCharacters = "~!@#$%^&*-=+?".toCharArray();
 
 	private static class Holder {
 		static final SecureRandom random = new SecureRandom();
@@ -331,4 +334,12 @@ public class CodecUtils {
 		MDC.remove(MDC_KEY_REQUEST);
 	}
 
+	public static String generatePassword() {
+		int length = 20;
+		Random random = new Random();
+		char ch = specialCharacters[random.nextInt(specialCharacters.length)];
+		int pos = random.nextInt(length);
+		String password = CodecUtils.nextId(length - 1);
+		return password.substring(0, pos) + ch + password.substring(pos);
+	}
 }

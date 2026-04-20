@@ -4,7 +4,7 @@ import org.ironrhino.core.spring.configuration.StageConditional;
 import org.ironrhino.core.spring.security.password.PasswordGenerator;
 import org.ironrhino.core.spring.security.password.PasswordNotifier;
 import org.ironrhino.core.util.AppInfo.Stage;
-import org.ironrhino.security.model.User;
+import org.ironrhino.core.util.CodecUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -17,9 +17,7 @@ public class SimplePasswordControl implements PasswordGenerator, PasswordNotifie
 
 	@Override
 	public String generate(UserDetails user) {
-		if (user instanceof User)
-			return "password";
-		return user.getUsername();
+		return CodecUtils.generatePassword();
 	}
 
 	@Override
