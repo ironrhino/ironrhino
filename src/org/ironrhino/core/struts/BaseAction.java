@@ -424,7 +424,8 @@ public class BaseAction extends ActionSupport {
 		}
 		if (!(returnInput || !isAjax() || (isCaptchaRequired() && captchaStatus.isFirstReachThreshold())
 				|| !(isUseJson() || hasErrors()))) {
-			ActionContext.getContext().getActionInvocation().setResultCode(JSON);
+			if (!response.containsHeader("Content-Disposition"))
+				ActionContext.getContext().getActionInvocation().setResultCode(JSON);
 			if (csrfRequired) {
 				csrf = CodecUtils.nextId();
 				RequestUtils.saveCookie(request, response, COOKIE_NAME_CSRF, csrf, false, true);

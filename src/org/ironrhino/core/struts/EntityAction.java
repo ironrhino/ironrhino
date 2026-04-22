@@ -1617,7 +1617,7 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 			downloadNotifier.notify(AuthzUtils.getUserDetails(), fileName, null,
 					AuthzUtils.getDoubleChecker(UserDetails.class));
 		}
-		response.setHeader("Content-disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
+		response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
 
 		final String columnSeperator = ",";
 		final String lineSeperator = "\r\n";
