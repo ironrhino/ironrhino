@@ -31,6 +31,10 @@ public class NumberUtils {
 	}
 
 	public static String format(int value, int digit) {
+		return format((long) value, digit);
+	}
+
+	public static String format(long value, int digit) {
 		NumberFormat nf = NumberFormat.getIntegerInstance();
 		nf.setGroupingUsed(false);
 		nf.setMinimumIntegerDigits(digit);

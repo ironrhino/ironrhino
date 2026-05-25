@@ -30,7 +30,7 @@ public abstract class AbstractSimpleSequence implements SimpleSequence, Initiali
 
 	@Override
 	public String nextStringValue() {
-		return NumberUtils.format(nextIntValue(), paddingLength);
+		return NumberUtils.format(nextLongValue(), paddingLength);
 	}
 
 	@Override

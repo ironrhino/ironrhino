@@ -111,7 +111,7 @@ public class MySQLSimpleSequence extends AbstractDatabaseSimpleSequence {
 				}
 			} else {
 				stmt.execute("CREATE TABLE `" + tableName
-						+ "` (NAME VARCHAR(50) NOT NULL PRIMARY KEY, VALUE INT NOT NULL DEFAULT 0, LAST_UPDATED BIGINT NOT NULL) ");
+						+ "` (NAME VARCHAR(50) NOT NULL PRIMARY KEY, VALUE BIGINT NOT NULL DEFAULT 0, LAST_UPDATED BIGINT NOT NULL) ");
 				stmt.execute("INSERT INTO `" + tableName + "` VALUES('" + sequenceName + "',0,UNIX_TIMESTAMP())");
 			}
 		}
