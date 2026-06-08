@@ -1,5 +1,9 @@
 package org.ironrhino.core.util;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 import java.util.Random;
 
 import lombok.Value;
@@ -33,7 +37,7 @@ public class Snowflake {
 				}
 			}
 			if (id == null) {
-				String ip = AppInfo.getHostAddress();
+				String ip = findHostAddress();
 				int index = ip.lastIndexOf('.');
 				if (index > 0) {
 					id = ip.substring(index + 1);
@@ -117,6 +121,25 @@ public class Snowflake {
 
 	public Info parse(long id) {
 		return new Info(id, workerIdBits, sequenceBits);
+	}
+
+	private static String findHostAddress() {
+		try {
+			Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
+			while (e.hasMoreElements()) {
+				NetworkInterface n = e.nextElement();
+				Enumeration<InetAddress> ee = n.getInetAddresses();
+				while (ee.hasMoreElements()) {
+					InetAddress addr = ee.nextElement();
+					String ip = addr.getHostAddress();
+					if (ip.equals("127.0.0.1") || ip.split("\\.").length != 4 || ip.startsWith("169.254."))
+						continue;
+					return ip;
+				}
+			}
+		} catch (SocketException e) {
+		}
+		return "127.0.0.1";
 	}
 
 	@Value
