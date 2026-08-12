@@ -1561,6 +1561,8 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 
 	@Transactional(readOnly = true)
 	public String csv() throws Exception {
+		if (!getRichtableConfig().isDownloadable())
+			return NOTFOUND;
 		HttpServletRequest request = ServletActionContext.getRequest();
 		HttpServletResponse response = ServletActionContext.getResponse();
 		String columns = request.getParameter("columns");
