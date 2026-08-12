@@ -190,8 +190,8 @@ public abstract class AbstractServiceRegistry implements ServiceRegistry {
 
 	@Override
 	public void unregister(String serviceName, String path) {
-		exportedServices.remove(serviceName);
-		exportedServiceDescriptions.remove(serviceName);
+		// exportedServices.remove(serviceName);
+		// exportedServiceDescriptions.remove(serviceName);
 		doUnregister(serviceName, concatPath(getLocalHost(), path));
 	}
 
