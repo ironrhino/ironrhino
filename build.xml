@@ -41,8 +41,9 @@
 	<target name="compile">
 		<antcall target="clean" />
 		<antcall target="init" />
-		<javac includeantruntime="false" debug="true" debuglevel="lines,vars,source" srcdir="${src.dir}" destdir="${classes.dir}" encoding="utf-8">
+		<javac release="21" includeantruntime="false" debug="true" debuglevel="lines,vars,source" srcdir="${src.dir}" destdir="${classes.dir}" encoding="utf-8">
 			<compilerarg line="-Xlint:unchecked" />
+			<compilerarg value="-proc:full" />
 			<compilerarg value="-parameters" />
 			<classpath>
 				<path refid="lib.classpath" />
@@ -60,8 +61,9 @@
 
 	<target name="compile-test" depends="compile">
 		<mkdir dir="${test.classes.dir}" />
-		<javac includeantruntime="false" debug="true" debuglevel="lines,vars,source" srcdir="${test.src.dir}" destdir="${test.classes.dir}" encoding="UTF-8">
+		<javac release="21" includeantruntime="false" debug="true" debuglevel="lines,vars,source" srcdir="${test.src.dir}" destdir="${test.classes.dir}" encoding="UTF-8">
 			<compilerarg line="-Xlint:unchecked" />
+			<compilerarg value="-proc:full" />
 			<compilerarg value="-parameters" />
 			<classpath>
 				<path refid="lib.classpath" />

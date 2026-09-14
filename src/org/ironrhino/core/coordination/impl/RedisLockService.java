@@ -101,6 +101,7 @@ public class RedisLockService implements LockService {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	static String holder() {
 		return AppInfo.getInstanceId() + '$' + Thread.currentThread().getId();
 	}

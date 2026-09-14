@@ -158,6 +158,7 @@ public class Redlock {
 		CompletableFuture.allOf(cfs).join();
 	}
 
+	@SuppressWarnings("deprecation")
 	private static String holder() {
 		return AppInfo.getInstanceId() + '$' + Thread.currentThread().getId();
 	}

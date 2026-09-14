@@ -147,6 +147,7 @@ public class LocalizedTextUtil {
      * @param defaultLocale The locale to use if localeStr is <tt>null</tt>.
      * @return requested Locale
      */
+    @SuppressWarnings("deprecation")
     public static Locale localeFromString(String localeStr, Locale defaultLocale) {
         if ((localeStr == null) || (localeStr.trim().length() == 0) || ("_".equals(localeStr))) {
             if (defaultLocale != null) {

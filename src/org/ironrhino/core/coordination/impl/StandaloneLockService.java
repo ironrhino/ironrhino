@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Component("lockService")
 @ServiceImplementationConditional(profiles = DEFAULT)
+@SuppressWarnings("deprecation")
 public class StandaloneLockService implements LockService {
 
 	private Map<String, Long> locks = new ConcurrentHashMap<>();

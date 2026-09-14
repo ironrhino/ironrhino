@@ -123,6 +123,7 @@ public class AnnotationUtils {
 	 * @return A {@link Collection}&lt;{@link AnnotatedElement}&gt; containing all of the
 	 *  method {@link AnnotatedElement}s matching the specified {@link Annotation}s
 	 */
+	@SuppressWarnings("deprecation")
 	public static Collection<Method> getAnnotatedMethods(Class clazz, Class<? extends Annotation>... annotation){
 		if( SpringProxy.class.isAssignableFrom(clazz) )
 			clazz = clazz.getSuperclass();

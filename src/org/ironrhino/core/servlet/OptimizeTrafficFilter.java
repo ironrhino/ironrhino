@@ -78,6 +78,7 @@ public class OptimizeTrafficFilter implements Filter {
 						} else if (acceptEncoding.indexOf("deflate") >= 0) {
 							// has problem with IE6
 							ByteArrayOutputStream boas = new ByteArrayOutputStream(bytes.length / 2);
+							@SuppressWarnings("resource")
 							DeflaterOutputStream dfos = new DeflaterOutputStream(boas,
 									new Deflater(Deflater.BEST_COMPRESSION), bytes.length / 2);
 							dfos.write(bytes);
