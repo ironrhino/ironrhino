@@ -1,7 +1,7 @@
 package org.ironrhino.core.servlet;
 
 import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServlet;
@@ -56,7 +56,7 @@ public class TestServlet extends HttpServlet {
 	private boolean test(String testurl) {
 		log.info("testing: " + testurl);
 		try {
-			HttpURLConnection conn = (HttpURLConnection) new URL(testurl).openConnection();
+			HttpURLConnection conn = (HttpURLConnection) URI.create(testurl).toURL().openConnection();
 			conn.setConnectTimeout(1000);
 			conn.setReadTimeout(1000);
 			conn.connect();

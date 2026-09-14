@@ -425,7 +425,6 @@ public class DateUtils {
 		 * @return
 		 */
 		public Lunar(Calendar cal) {
-			@SuppressWarnings("unused")
 			int yearCyl, monCyl, dayCyl;
 			int leapMonth = 0;
 			Calendar baseCalendar = Calendar.getInstance();

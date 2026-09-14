@@ -3,7 +3,7 @@
 <project basedir=".">
 
 	<condition property="java11plus">
-		<hasmethod classname="java.lang.String" method="isBlank" />
+		<javaversion atleast="11" />
 	</condition>
 	<path id="nashorn.classpath">
 		<fileset dir="lib">

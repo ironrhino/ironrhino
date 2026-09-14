@@ -4,7 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
 import java.util.Locale;
 import java.util.zip.GZIPInputStream;
 
@@ -27,7 +27,7 @@ public class SimpleHttpInvokerRequestExecutor extends HttpInvokerRequestExecutor
 	@Override
 	protected RemoteInvocationResult doExecuteRequest(String serviceUrl, MethodInvocation methodInvocation,
 			ByteArrayOutputStream baos) throws IOException {
-		HttpURLConnection con = (HttpURLConnection) new URL(serviceUrl).openConnection();
+		HttpURLConnection con = (HttpURLConnection) URI.create(serviceUrl).toURL().openConnection();
 		prepareConnection(con, baos.size());
 		baos.writeTo(con.getOutputStream());
 		validateResponse(con);
