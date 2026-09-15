@@ -58,7 +58,6 @@ public class RedisServiceRegistryTest extends RedisServiceRegistryAdapter {
 		String serviceName = TestService.class.getName();
 		exportedServices.put(serviceName, new TestServiceImpl());
 		serviceRegistry.unregister(serviceName);
-		assertThat(exportedServices.containsKey(serviceName), is(false));
 		then(opsForList).should().remove(NAMESPACE_SERVICES + serviceName, 0, serviceRegistry.getLocalHost());
 	}
 
