@@ -57,7 +57,7 @@ public class DefaultVerificationService implements VerificationService {
 		if (verficationCode == null) {
 			codeToSend = (String) cacheManager.get(receiver, CACHE_NAMESPACE);
 			if (codeToSend != null && cacheManager.exists(receiver + SUFFIX_RESEND, CACHE_NAMESPACE)) {
-				log.warn("{} is trying resend within cooldown time", receiver);
+				log.debug("{} is trying resend within cooldown time", receiver);
 				return;
 			}
 		} else {
