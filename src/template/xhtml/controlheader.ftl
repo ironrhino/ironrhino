@@ -8,6 +8,9 @@
 <#assign _label=getText(_label)>
 </#if>
 <#if _label?has_content>
-<label class="control-label"<#if parameters.id??> for="${parameters.id?html}"</#if>><#if parameters.dynamicAttributes['_internal_description']?has_content><span data-content="${parameters.dynamicAttributes['_internal_description']}" class="poped glyphicon glyphicon-question-sign"></span> </#if>${_label?html}</label>
+<#assign uselabelTag=parameters.id?? && !parameters.listKey??>
+<<#if uselabelTag>div<#else>span</#if> class="control-label"<#if parameters.id?? && !parameters.listKey??> for="${parameters.id?html}"</#if>>
+<#if parameters.dynamicAttributes['_internal_description']?has_content><span data-content="${parameters.dynamicAttributes['_internal_description']}" class="poped glyphicon glyphicon-question-sign"></span> </#if>${_label?html}
+</<#if uselabelTag>div<#else>span</#if>>
 </#if>
 <div class="controls">
