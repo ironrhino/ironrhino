@@ -11,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
-import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.hibernate.CriteriaState;
 import org.ironrhino.core.hibernate.CriterionUtils;
 import org.ironrhino.core.metadata.Authorize;
@@ -69,9 +68,6 @@ public class UserAction extends EntityAction<User> {
 
 	@Autowired(required = false)
 	private UserRoleFilter userRoleFilter;
-
-	@Autowired
-	protected EventPublisher eventPublisher;
 
 	@Override
 	protected void prepare(DetachedCriteria dc, CriteriaState criteriaState) {

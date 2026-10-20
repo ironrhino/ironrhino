@@ -9,7 +9,6 @@ import javax.validation.constraints.NotBlank;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
-import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Captcha;
 import org.ironrhino.core.metadata.JsonConfig;
@@ -79,9 +78,6 @@ public class LoginAction extends BaseAction {
 
 	@Autowired
 	protected DefaultUsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter;
-
-	@Autowired
-	protected EventPublisher eventPublisher;
 
 	@Autowired(required = false)
 	@Getter

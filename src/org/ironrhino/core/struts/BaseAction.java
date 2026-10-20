@@ -12,6 +12,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
+import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.Captcha;
 import org.ironrhino.core.metadata.Csrf;
@@ -104,6 +105,9 @@ public class BaseAction extends ActionSupport {
 
 	@Getter
 	protected boolean csrfRequired;
+	
+	@Autowired
+	protected EventPublisher eventPublisher;
 
 	@Autowired(required = false)
 	protected CaptchaManager captchaManager;

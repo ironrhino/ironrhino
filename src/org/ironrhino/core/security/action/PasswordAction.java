@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ServletActionContext;
-import org.ironrhino.core.event.EventPublisher;
 import org.ironrhino.core.metadata.Authorize;
 import org.ironrhino.core.metadata.AutoConfig;
 import org.ironrhino.core.metadata.Scope;
@@ -76,9 +75,6 @@ public class PasswordAction extends BaseAction {
 
 	@Autowired(required = false)
 	private List<VerificationCodeChecker> verificationCodeCheckers = Collections.emptyList();
-
-	@Autowired
-	protected EventPublisher eventPublisher;
 
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" })
