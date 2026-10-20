@@ -47,6 +47,7 @@ import org.hibernate.query.Query;
 import org.hibernate.sql.JoinType;
 import org.ironrhino.core.download.DownloadNotifier;
 import org.ironrhino.core.download.SimpleDownloadNotifier;
+import org.ironrhino.core.event.UnmaskEvent;
 import org.ironrhino.core.hibernate.CriteriaState;
 import org.ironrhino.core.hibernate.CriterionUtils;
 import org.ironrhino.core.metadata.AppendOnly;
@@ -57,6 +58,7 @@ import org.ironrhino.core.metadata.JsonConfig;
 import org.ironrhino.core.metadata.Owner;
 import org.ironrhino.core.metadata.Readonly;
 import org.ironrhino.core.metadata.Richtable;
+import org.ironrhino.core.metadata.Scope;
 import org.ironrhino.core.model.Attachmentable;
 import org.ironrhino.core.model.BaseTreeableEntity;
 import org.ironrhino.core.model.Enableable;
@@ -1421,6 +1423,57 @@ public class EntityAction<EN extends Persistable<?>> extends BaseAction {
 		}
 		putEntityToValueStack(_entity);
 		return VIEW;
+	}
+
+	public String unmask() throws Exception {
+		String result = view();
+		if (!VIEW.equals(result)) {
+			return NONE;
+		}
+		HttpServletRequest request = ServletActionContext.getRequest();
+		String property = request.getParameter("property");
+		if (StringUtils.isBlank(property)) {
+			return NONE;
+		}
+		String[] segments = property.split("\\.");
+		String lastSegmant = null;
+		UiConfigImpl uci = null;
+		boolean isCollection = false;
+		for (String segment : segments) {
+			int index = segment.indexOf('[');
+			if (index > 0) {
+				segment = segment.substring(0, index);
+			}
+			lastSegmant = segment;
+			if (uci == null) {
+				uci = getUiConfigs().get(segment);
+				if (uci == null) {
+					return NONE;
+				}
+			} else {
+				uci = EntityClassHelper.getUiConfigs(isCollection ? uci.getElementType() : uci.getPropertyType())
+						.get(segment);
+				if (uci == null) {
+					return NONE;
+				}
+			}
+			isCollection = index > 0;
+		}
+		String cleartext = doUnmask(_entity, property);
+		if (StringUtils.isNotBlank(cleartext)) {
+			eventPublisher.publish(
+					new UnmaskEvent(AuthzUtils.getUsername(), request.getRemoteAddr(), _entity, lastSegmant, cleartext),
+					Scope.LOCAL);
+			HttpServletResponse response = ServletActionContext.getResponse();
+			response.setHeader("Content-type", "text/plain");
+			response.getWriter().write(cleartext);
+		}
+		return NONE;
+	}
+
+	protected String doUnmask(EN entity, String field) {
+		Object value = new BeanWrapperImpl(_entity).getPropertyValue(field);
+		return value != null ? String.valueOf(value) : null;
 	}
 
 	public String export() throws Exception {
