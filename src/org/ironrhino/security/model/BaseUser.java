@@ -88,7 +88,7 @@ public class BaseUser extends BaseRecordableEntity implements RoledUserDetails, 
 
 	@MobilePhoneNumber
 	@SearchableProperty
-	@UiConfig(width = "120px", template = "<#if value?length==11>${(value[0..2]+'****'+value[7..])!}<#else>${value!}</#if>")
+	@UiConfig(width = "120px", template = "<#if value!?length==11><span data-unmaskurl=\"/${entityName}/unmask/${entity.id}?property=phone\">${value[0..2]+'****'+value[7..]}</span><#else>${value!}</#if>")
 	private String phone;
 
 	@JsonIgnore
