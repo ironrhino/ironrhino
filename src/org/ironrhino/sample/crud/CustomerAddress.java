@@ -30,7 +30,7 @@ public class CustomerAddress implements Serializable {
 	private Employee receiver;
 
 	@MobilePhoneNumber
-	@UiConfig(width = "100px")
+	@UiConfig(width = "100px", template = "<#if value!?length==11><span data-unmaskurl=\"/sample/customer/unmask/${entity.id}?property=${('addresses['+element@index+']')?url}.mobile\">${value[0..2]+'****'+value[7..]}</span><#else>${value!}</#if>")
 	@Column(length = 11)
 	private String mobile;
 
