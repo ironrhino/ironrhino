@@ -178,6 +178,7 @@ public class RedisServiceRegistry extends AbstractServiceRegistry {
 		int index = instanceId.lastIndexOf('-');
 		if (index > 0) {
 			String appName = instanceId.substring(0, instanceId.lastIndexOf('@'));
+			index = appName.lastIndexOf('-');
 			if (index > 0)
 				appName = appName.substring(0, index);
 			host = appName + instanceId.substring(instanceId.lastIndexOf('@'));
