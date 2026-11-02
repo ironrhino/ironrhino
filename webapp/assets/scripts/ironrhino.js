@@ -42231,12 +42231,9 @@ $(document).on('click', 'a.doublecheck', function(e) {
 	e.preventDefault();
 	return false;
 });
-(function($) {
-	$.fn.unmask = function() {
-		if (!this.data('unmaskurl')) {
-			return this;
-		}
-		return this.after(' <i class="clickable glyphicon glyphicon-eye-open"></i>').next().click(function(e) {
+Observation.unmask = function(container) {
+	$$('[data-unmaskurl]', container).each(function() {
+		$(this).after(' <i class="clickable glyphicon glyphicon-eye-open"></i>').next().click(function(e) {
 			var icon = $(e.target);
 			var t = icon.prev();
 			if (icon.hasClass('glyphicon-eye-open')) {
@@ -42267,11 +42264,7 @@ $(document).on('click', 'a.doublecheck', function(e) {
 				icon.addClass('glyphicon-eye-open').removeClass('glyphicon-eye-close');
 			}
 		});
-	};
-})(jQuery);
-
-Observation.unmask = function(container) {
-	$$('[data-unmaskurl]', container).unmask();
+	});
 };
 Initialization.apiplayground = function() {
 	$(document).on('submit', 'form.api-playground', function(e) {
