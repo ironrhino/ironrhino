@@ -21,7 +21,6 @@ import java.util.function.Consumer;
 
 import javax.persistence.Id;
 import javax.sql.DataSource;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.StringUtils;
@@ -32,6 +31,7 @@ import org.ironrhino.core.util.AppInfo.Stage;
 import org.ironrhino.core.util.ExpressionUtils;
 import org.ironrhino.core.util.GenericTypeResolver;
 import org.ironrhino.core.util.ReflectionUtils;
+import org.ironrhino.core.util.XmlUtils;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
@@ -143,7 +143,7 @@ public class JdbcRepositoryFactoryBean extends MethodInterceptorFactoryBean
 		});
 		try (InputStream is = jdbcRepositoryClass.getResourceAsStream(jdbcRepositoryClass.getSimpleName() + ".xml")) {
 			if (is != null) {
-				NodeList nl = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is)
+				NodeList nl = XmlUtils.DEFAULT_DOCUMENT_BUILDER_FACTORY.newDocumentBuilder().parse(is)
 						.getElementsByTagName("entry");
 				for (int i = 0; i < nl.getLength(); i++) {
 					Element entry = (Element) nl.item(i);
@@ -156,7 +156,7 @@ public class JdbcRepositoryFactoryBean extends MethodInterceptorFactoryBean
 		try (InputStream is = jdbcRepositoryClass
 				.getResourceAsStream(jdbcRepositoryClass.getSimpleName() + "." + databaseProduct.name() + ".xml")) {
 			if (is != null) {
-				NodeList nl = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is)
+				NodeList nl = XmlUtils.DEFAULT_DOCUMENT_BUILDER_FACTORY.newDocumentBuilder().parse(is)
 						.getElementsByTagName("entry");
 				for (int i = 0; i < nl.getLength(); i++) {
 					Element entry = (Element) nl.item(i);

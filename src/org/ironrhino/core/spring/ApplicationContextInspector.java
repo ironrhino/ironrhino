@@ -20,7 +20,6 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -30,6 +29,7 @@ import org.ironrhino.core.servlet.ServletContainerHelper;
 import org.ironrhino.core.spring.configuration.EncodedPropertySourceFactory;
 import org.ironrhino.core.util.AppInfo;
 import org.ironrhino.core.util.ClassScanner;
+import org.ironrhino.core.util.XmlUtils;
 import org.ironrhino.rest.client.RestApi;
 import org.ironrhino.rest.client.RestApiFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -250,12 +250,11 @@ public class ApplicationContextInspector {
 
 	}
 
-	DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-
 	private void add(Resource resource, Map<String, Set<String>> props) {
 		if (resource.isReadable())
 			try (InputStream is = resource.getInputStream()) {
-				Document doc = builderFactory.newDocumentBuilder().parse(new InputSource(is));
+				Document doc = XmlUtils.DEFAULT_DOCUMENT_BUILDER_FACTORY.newDocumentBuilder()
+						.parse(new InputSource(is));
 				add(resource, doc.getDocumentElement(), props);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
